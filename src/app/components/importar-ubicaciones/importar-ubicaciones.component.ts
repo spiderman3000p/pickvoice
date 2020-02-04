@@ -139,7 +139,7 @@ export class ImportarUbicacionesComponent implements OnInit {
         currentRowErrors = [];
         for (const field in this.headers) {
           if (1) {
-            // comprobando campos requeridos
+            // comprobando si el campo es requerido
             if (this.headers[field].required && (!row[field] || row[field].length === 0)) {
               const validationError = new Object() as ValidationError;
               validationError.index = rowIndex;
@@ -149,6 +149,7 @@ export class ImportarUbicacionesComponent implements OnInit {
               errorFound = true;
               console.error(`No existe el campo ${field} en el registro ${rowIndex}`);
             }
+            // comprobando si hay un minimo permitido
             if (this.headers[field].min && row[field] < this.headers[field].min) {
               const validationError = new Object() as ValidationError;
               validationError.index = rowIndex;
@@ -160,6 +161,7 @@ export class ImportarUbicacionesComponent implements OnInit {
               console.error(`El campo ${this.headers[field].name} (${field})
               debe ser mayor que ${this.headers[field].min} en el registro ${rowIndex}`);
             }
+            // comporbando si hay un maximo permitido
             if (this.headers[field].max && row[field] > this.headers[field].max) {
               const validationError = new Object() as ValidationError;
               validationError.index = rowIndex;
@@ -170,6 +172,18 @@ export class ImportarUbicacionesComponent implements OnInit {
               errorFound = true;
               console.error(`El campo ${this.headers[field].name} (${field})
               debe ser menor que ${this.headers[field].max} en el registro ${rowIndex}`);
+            }
+            // comprobando si el campo es unico
+            if (this.headers[field].unique && copyData.findIndex(_row => _row[field] === row[field]) > -1) {
+              const validationError = new Object() as ValidationError;
+              validationError.index = rowIndex;
+              validationError.error = `El campo ${this.headers[field].name} (${field})
+               debe ser unico en toda la coleccion`;
+              this.dataValidationErrors.push(validationError);
+              currentRowErrors.push(validationError);
+              errorFound = true;
+              console.error(`El campo ${this.headers[field].name} (${field})
+              debe ser unico en toda la coleccion, en el registro ${rowIndex}`);
             }
           }
         }

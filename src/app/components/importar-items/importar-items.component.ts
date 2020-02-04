@@ -170,6 +170,18 @@ export class ImportarItemsComponent implements OnInit {
               console.error(`El campo ${this.headers[field].name} (${field})
               debe ser menor que ${this.headers[field].max} en el registro ${rowIndex}`);
             }
+            // comprobando si el campo es unico
+            if (this.headers[field].unique && copyData.findIndex(_row => _row[field] === row[field]) > -1) {
+              const validationError = new Object() as ValidationError;
+              validationError.index = rowIndex;
+              validationError.error = `El campo ${this.headers[field].name} (${field})
+               debe ser unico en toda la coleccion`;
+              this.dataValidationErrors.push(validationError);
+              currentRowErrors.push(validationError);
+              errorFound = true;
+              console.error(`El campo ${this.headers[field].name} (${field})
+              debe ser unico en toda la coleccion, en el registro ${rowIndex}`);
+            }
             if (field === 'itemType') {
               item[field] = new Object() as ItemType;
               item[field].code = row[field] as string;
