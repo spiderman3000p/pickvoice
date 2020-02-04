@@ -1,0 +1,75 @@
+/* You can add global styles to this file, and also import other style files */
+@import "custom-bootstrap.scss";
+@import "node_modules/bootstrap/scss/bootstrap";
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; overflow-y: hidden}
+.form-signin {
+    width: 100%;
+    max-width: 330px;
+    padding: 15px;
+    margin: auto;
+  }
+  .form-signin .checkbox {
+    font-weight: 400;
+  }
+  .form-signin .form-control {
+    position: relative;
+    box-sizing: border-box;
+    height: auto;
+    padding: 10px;
+    font-size: 16px;
+  }
+  .form-signin .form-control:focus {
+    z-index: 2;
+  }
+  .form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  .form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  .slide1 {
+    background-image: url('assets/images/slide1.jpg');
+    background-repeat: no-repeat, no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+  .slide2 {
+    background-image: url('assets/images/slide2.jpg');
+    background-repeat: no-repeat, no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+  .slide3 {
+    background-image: url('assets/images/slide3.jpg');
+    background-repeat: no-repeat, no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+  .mat-table {
+    overflow-x: scroll;
+  }
+  mat-sidenav-content{
+    padding-bottom: 20%;
+  };
+  mat-label{
+    word-break: break-all;
+  }
+
+  .example-loading-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 56px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }

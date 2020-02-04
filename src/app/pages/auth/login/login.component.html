@@ -1,0 +1,54 @@
+<main>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-4 text-center p-6">
+        <form class="form-signin" (ngSubmit)="doLogin()">
+          <img class="mb-4" src="assets/images/logo.png" alt="" width="72" height="72">
+          <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+          <label for="inputEmail" class="sr-only">Email address</label>
+          <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="" [formControl]="email">
+          <label for="inputPassword" class="sr-only">Password</label>
+          <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="" [formControl]="password">
+          <div class="checkbox mb-3">
+            <label>
+              <input type="checkbox" value="remember-me"> Remember me
+            </label>
+          </div>
+          <button mat-raised-button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+          <p class="mt-5 mb-3 text-muted"><a href="">Forgot password?</a></p>
+      </form>
+      </div>
+      <div class="col-sm-8 p-0">
+          <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel">
+              <ol class="carousel-indicators">
+                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+              </ol>
+              <div class="carousel-inner">
+                <div class="carousel-item slide1 vh-100 active" data-interval="5000">
+                    <p class="float-right">Slide 1</p>
+                  <!--img src="assets/images/slide1.jpg" class="d-block w-100 h-100" alt="..."-->
+                </div>
+                <div class="carousel-item slide2 vh-100" data-interval="5000">
+                    <p class="float-right">Slide 2</p>
+                  <!--img src="assets/images/slide2.jpg" class="d-block w-100 h-100" alt="..."-->
+                </div>
+                <div class="carousel-item slide3 vh-100" data-interval="5000">
+                    <p class="float-right">Slide 3</p>
+                  <!--img src="assets/images/slide3.jpg" class="d-block w-100 h-100" alt="..."-->
+                </div>
+              </div>
+              <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            </div>
+      </div>
+    </div>
+  </div>
+</main>

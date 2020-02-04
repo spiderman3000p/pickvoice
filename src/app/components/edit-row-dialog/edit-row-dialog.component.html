@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>{{ dialogTitle }}</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div mat-dialog-content>
+        <div class="example-loading-shade" *ngIf="isLoadingResults">
+            <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+        </div>
+        <mat-form-field class="w-100" *ngFor="let key of keys">
+            <mat-label>{{fields[key].name}} {{fields[key].required ? '*' : ''}}</mat-label>
+            <input class="w-100" matInput type="text" [formControlName]="key">
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+        <button mat-button mat-dialog-close [disabled]="isLoadingResults">CANCEL</button>
+    </div>
+</form>

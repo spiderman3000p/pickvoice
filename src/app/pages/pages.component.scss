@@ -1,0 +1,19 @@
+mat-sidenav-container{
+    height: 100%;
+}
+mat-sidenav{
+    background-color: #00b19d;
+    width: 250px;
+}
+.mat-list-base .mat-list-item{
+    color: white;
+}
+.mat-nav-list .mat-list-item{
+    transition: background 0.5s;
+}
+.mat-sidenav-content .mat-toolbar{
+    background-color: white;
+}
+mat-form-field.fluid{
+    width: 100%;
+}

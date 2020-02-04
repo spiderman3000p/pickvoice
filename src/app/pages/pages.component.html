@@ -1,0 +1,26 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport="true"
+      attr.role="navigation"
+      [mode]="mobileQuery.matches ? 'over' : 'side'"
+      [opened]="!mobileQuery.matches">
+    <mat-toolbar color="primary">Pick Voice</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null"  routerLink="/pages/dashboard" routerLinkActive="active"><mat-icon class="mr-3" aria-hidden="true">home</mat-icon> Dashboard</a>
+      <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importaritems" routerLinkActive="active"><mat-icon class="mr-3" aria-hidden="true">input</mat-icon>  Importar Items</a>
+      <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importarubicaciones" routerLinkActive="active"><mat-icon class="mr-3" aria-hidden="true">input</mat-icon> Importar Ubicaciones</a>
+      <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importarpedidos" routerLinkActive="active"><mat-icon class="mr-3" aria-hidden="true">input</mat-icon> Importar Pedidos</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="light">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

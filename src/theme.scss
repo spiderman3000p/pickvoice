@@ -1,0 +1,72 @@
+@import '~@angular/material/theming';
+@include mat-core();
+$md-alegra-primary: (
+  50 : #e0f6f3,
+  100 : #b3e8e2,
+  200 : #80d8ce,
+  300 : #4dc8ba,
+  400 : #26bdac,
+  500 : #00b19d,
+  600 : #00aa95,
+  700 : #00a18b,
+  800 : #009881,
+  900 : #00886f,
+  A100 : #b4ffef,
+  A200 : #81ffe4,
+  A400 : #4effd9,
+  A700 : #35ffd4,
+  contrast: (
+      50 : #000000,
+      100 : #000000,
+      200 : #000000,
+      300 : #000000,
+      400 : #000000,
+      500 : #ffffff,
+      600 : #ffffff,
+      700 : #ffffff,
+      800 : #ffffff,
+      900 : #ffffff,
+      A100 : #000000,
+      A200 : #000000,
+      A400 : #000000,
+      A700 : #000000,
+  )
+);
+$md-light: (
+  50 : #ffffff,
+  100 : #ffffff,
+  200 : #ffffff,
+  300 : #ffffff,
+  400 : #ffffff,
+  500 : #ffffff,
+  600 : #ffffff,
+  700 : #ffffff,
+  800 : #ffffff,
+  900 : #ffffff,
+  A100 : #ffffff,
+  A200 : #ffffff,
+  A400 : #ffffff,
+  A700 : #ffffff,
+  contrast: (
+      50 : #000000,
+      100 : #000000,
+      200 : #000000,
+      300 : #000000,
+      400 : #000000,
+      500 : #000000,
+      600 : #000000,
+      700 : #000000,
+      800 : #000000,
+      900 : #000000,
+      A100 : #000000,
+      A200 : #000000,
+      A400 : #000000,
+      A700 : #000000,
+  )
+);
+$my-app-light: mat-palette($md-alegra-primary);
+$my-app-primary: mat-palette($md-alegra-primary);
+$my-app-accent:  mat-palette($md-light, 500, 900, A100);
+$my-app-warn:    mat-palette($mat-light-blue);
+$my-app-theme: mat-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
+@include angular-material-theme($my-app-theme);
