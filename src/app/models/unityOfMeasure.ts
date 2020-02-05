@@ -1,6 +1,6 @@
 /**
  * Pick Voice
- * Api para el sistema Pick Voice, plataforma que optimiza los procesos logisticos de un centro de distribucion, implementando tecnologia por voz.
+ * Api para el sistema Pick Voice, plataforma que optimiza los procesos logisticos de un centro de distribucion, implementando tecnologia por voz. 
  *
  * OpenAPI spec version: 1.0.0
  * Contact: gabriel.martinez@tau-tech.co
@@ -9,8 +9,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-export interface ItemType {
+
+export interface UnityOfMeasure { 
     code?: string;
     name?: string;
-    description?: string;
 }

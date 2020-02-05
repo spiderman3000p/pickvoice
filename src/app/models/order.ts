@@ -1,6 +1,7 @@
 /**
  * Pick Voice
- * Api para el sistema Pick Voice, plataforma que optimiza los procesos logisticos de un centro de distribucion, implementando tecnologia por voz.
+ * Api para el sistema Pick Voice, plataforma que optimiza los procesos logisticos de un centro de
+ * distribucion, implementando tecnologia por voz. 
  *
  * OpenAPI spec version: 1.0.0
  * Contact: gabriel.martinez@tau-tech.co
@@ -12,7 +13,8 @@
 import { Customer } from './customer';
 import { OrderLine } from './orderLine';
 import { Transport } from './transport';
-export interface Order {
+
+export interface Order { 
     /**
      * Identificador único para una orden o pedido.
      */
@@ -21,7 +23,7 @@ export interface Order {
      * El formato debe ser DD/MM/YYYY
      */
     deliveryDate?: string;
-    route: Transport;
+    transport?: Transport;
     customer: Customer;
     orderLine: OrderLine;
     /**
@@ -31,7 +33,7 @@ export interface Order {
     /**
      * La fecha en que el camión va a salir del almacén.
      */
-    departureDateTime?: string;
+    departureDateTime?: Date;
     /**
      * trabajo primario a la cual pertenece la orden
      */

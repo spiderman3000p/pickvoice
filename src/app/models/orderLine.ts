@@ -1,6 +1,6 @@
 /**
  * Pick Voice
- * Api para el sistema Pick Voice, plataforma que optimiza los procesos logisticos de un centro de distribucion, implementando tecnologia por voz.
+ * Api para el sistema Pick Voice, plataforma que optimiza los procesos logisticos de un centro de distribucion, implementando tecnologia por voz. 
  *
  * OpenAPI spec version: 1.0.0
  * Contact: gabriel.martinez@tau-tech.co
@@ -11,7 +11,8 @@
  */
 import { Item } from './item';
 import { Location } from './location';
-export interface OrderLine {
+
+export interface OrderLine { 
     item?: Item;
     /**
      * Cantidad reservada a pickear por este ítem.

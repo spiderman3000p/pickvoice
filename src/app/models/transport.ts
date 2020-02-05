@@ -1,6 +1,6 @@
 /**
  * Pick Voice
- * Api para el sistema Pick Voice, plataforma que optimiza los procesos logisticos de un centro de distribucion, implementando tecnologia por voz.
+ * Api para el sistema Pick Voice, plataforma que optimiza los procesos logisticos de un centro de distribucion, implementando tecnologia por voz. 
  *
  * OpenAPI spec version: 1.0.0
  * Contact: gabriel.martinez@tau-tech.co
@@ -9,13 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-export interface Transport {
+
+export interface Transport { 
     /**
      * Numero del transprote del tms (SAP).
      */
     transportNumber?: string;
     /**
-     * Ruta o número de transporte asociada a la orden.
+     * Ruta a la cual pertenece en el transporte; una ruta puede tener consolidado varios transportes.
      */
     route?: string;
     name?: string;
@@ -32,11 +33,11 @@ export interface Transport {
      */
     transportState?: Transport.TransportStateEnum;
 }
-export declare namespace Transport {
-    type TransportStateEnum = 'Pending' | 'InProgress' | 'Complete';
-    const TransportStateEnum: {
-        Pending: TransportStateEnum;
-        InProgress: TransportStateEnum;
-        Complete: TransportStateEnum;
+export namespace Transport {
+    export type TransportStateEnum = 'Pending' | 'InProgress' | 'Complete';
+    export const TransportStateEnum = {
+        Pending: 'Pending' as TransportStateEnum,
+        InProgress: 'InProgress' as TransportStateEnum,
+        Complete: 'Complete' as TransportStateEnum
     };
 }

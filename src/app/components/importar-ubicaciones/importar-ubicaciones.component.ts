@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component';
 import { EditRowDialogComponent } from '../edit-row-dialog/edit-row-dialog.component';
-import { Location } from '../../models/location.d';
+import { Location } from '../../models/location';
 import { ModelMap } from '../../models/model-maps.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -184,6 +184,16 @@ export class ImportarUbicacionesComponent implements OnInit {
               errorFound = true;
               console.error(`El campo ${this.headers[field].name} (${field})
               debe ser unico en toda la coleccion, en el registro ${rowIndex}`);
+            }
+            if (field === 'itemType') {
+              item[field] = new Object() as ItemType;
+              item[field].code = row[field] as string;
+              item[field].name = '';
+            }
+            if (field === 'uom') {
+              item[field] = new Object() as UnityOfMeasure;
+              item[field].code = row[field] as string;
+              item[field].name = '';
             }
           }
         }
