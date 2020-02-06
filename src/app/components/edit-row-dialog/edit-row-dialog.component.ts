@@ -19,14 +19,23 @@ export class EditRowDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<EditRowDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
     const row = data.row; // object
+    console.log('row recibida', row);
     this.fields = data.map as any; // map of object
+    console.log('fields', this.fields);
     const formControls = {};
     this.keys = Object.keys(this.fields);
+    console.log('keys', this.keys);
+    let value = '';
     this.keys.forEach((key, index) => {
+      /* value = this.utilities.renderColumnData(this.fields[key].type, row[key]);
+      if (this.fields[key].type === 'date') {
+        console.log('valor de fecha en dialogo editar', value);
+      }*/
+      value = row[key];
       if (this.fields[key].required) {
-        formControls[key] = new FormControl(row[key], Validators.required);
+        formControls[key] = new FormControl(value, Validators.required);
       } else {
-        formControls[key] = new FormControl(row[key]);
+        formControls[key] = new FormControl(value);
       }
     });
     this.dialogTitle = 'Edit Row';

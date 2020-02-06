@@ -73,3 +73,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; overflow-y:
     align-items: center;
     justify-content: center;
   }
+  mat-datepicker{
+    z-index: 1000;
+  }

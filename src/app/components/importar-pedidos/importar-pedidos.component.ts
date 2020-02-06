@@ -5,8 +5,12 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component';
 import { EditRowDialogComponent } from '../edit-row-dialog/edit-row-dialog.component';
 import { Item } from '../../models/item';
+import { Customer } from '../../models/customer';
+import { OrderLine } from '../../models/orderLine';
 import { ItemType } from '../../models/itemType';
 import { Order } from '../../models/order';
+import { Transport } from '../../models/transport';
+import { Location } from '../../models/location';
 import { UnityOfMeasure } from '../../models/unityOfMeasure';
 import { ModelMap } from '../../models/model-maps.model';
 import { MatPaginator } from '@angular/material/paginator';
@@ -31,6 +35,9 @@ export interface ValidationError {
 export class ImportarPedidosComponent implements OnInit {
   headers: any = ModelMap.OrderMap;
   validationRequested = false;
+  skipedColumns = ['sku', 'description', 'itemType', 'codeUom', 'qtyToPicked',
+  'expiryDate', 'serial', 'codeLocation', 'baseItemOverride', 'caseLabelCheckDigits',
+  'cartonCode', 'workCode'];
   invalidRows: any[] = [];
   dataSource: MatTableDataSource<any>;
   dataToSend: Order[];
@@ -70,19 +77,24 @@ export class ImportarPedidosComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.isLoadingResults = false;
       if (result && result.length > 0) {
-        console.log('data length:', result.length);
-        console.log('expected data keys:', this.displayedColumns);
+
         const receivedKeys: any[] = Object.keys(result[0]);
-        console.log('received data keys:', receivedKeys);
 
         if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
           console.error('el formato de los datos recibidos no coincide con el formato esperado');
           this.utilities.showSnackBar('Error en el formato de los datos', 'OK');
           return;
         }
-        this.dataSource.data = result;
+        this.dataSource.data = result.map((element, index) => {
+          element.index = index;
+          return element;
+        });
       }
     });
+  }
+
+  renderColumnData(type: string, data: any) {
+    return this.utilities.renderColumnData(type, data);
   }
 
   applyFilter(filterValue: string) {
@@ -109,12 +121,16 @@ export class ImportarPedidosComponent implements OnInit {
         // status 201 is successfull response (CREATED)
         if (result && result.status === 201 && result.ok && result.statusText === 'Created') {
           this.isDataSaved = true;
-          console.log('items created successfully');
-          this.utilities.showSnackBar('Items saved successfully', 'OK');
+          this.isReadyToSend = false;
+          this.dataToSend = [];
+          this.dataSource.data = [];
+          this.validationRequested = false;
+          console.log('orders created successfully');
+          this.utilities.showSnackBar('Orders saved successfully', 'OK');
         } else {
           this.isDataSaved = false;
-          console.log('items could not be created');
-          this.utilities.showSnackBar('Error saving items', 'OK');
+          console.log('order could not be created');
+          this.utilities.showSnackBar('Error saving orders', 'OK');
         }
       });
     } else {
@@ -136,9 +152,8 @@ export class ImportarPedidosComponent implements OnInit {
       let currentRowErrors = [];
       let errorFound: boolean;
       this.isLoadingResults = true;
+      let exists;
       const copyData = this.dataSource.data.slice();
-
-      console.log('dataSource es un array valido');
 
       copyData.forEach((row, rowIndex) => {
         const item = JSON.parse(JSON.stringify(row)) as Order;
@@ -146,6 +161,14 @@ export class ImportarPedidosComponent implements OnInit {
         currentRowErrors = [];
         for (const field in this.headers) {
           if (1) {
+            if (this.skipedColumns.findIndex(column => column === field) > 0) {
+              /*
+                las columnas que se encuentren dentro del array skipedColumns son ignoradas
+                y se salta a la siguiente columna porque las columnas dentro del array skipedColumns
+                son referenciadas directamente.
+              */
+              continue;
+            }
             // comprobando campos requeridos
             if (this.headers[field].required && (!row[field] || row[field].length === 0)) {
               const validationError = new Object() as ValidationError;
@@ -178,22 +201,73 @@ export class ImportarPedidosComponent implements OnInit {
               console.error(`El campo ${this.headers[field].name} (${field})
               debe ser menor que ${this.headers[field].max} en el registro ${rowIndex}`);
             }
+            exists = 0;
+            copyData.forEach((element, index) => {
+              if (index !== rowIndex) {
+                exists += element[field] == row[field] ? 1 : 0;
+              }
+            });
             // comprobando si el campo es unico
-            if (this.headers[field].unique && copyData.findIndex(_row => _row[field] === row[field]) > -1) {
+            if (this.headers[field].unique &&  exists > 0) {
               const validationError = new Object() as ValidationError;
               validationError.index = rowIndex;
               validationError.error = `El campo ${this.headers[field].name} (${field})
-               debe ser unico en toda la coleccion`;
+               debe ser unico en toda la coleccion. Se repite ${exists} veces`;
               this.dataValidationErrors.push(validationError);
               currentRowErrors.push(validationError);
               errorFound = true;
               console.error(`El campo ${this.headers[field].name} (${field})
-              debe ser unico en toda la coleccion, en el registro ${rowIndex}`);
+              debe ser unico en toda la coleccion, en el registro ${rowIndex}. Se repite ${exists} veces`);
+            }
+            if (field === 'transport') {
+              item['transport'] = new Object() as Transport;
+              item[field].transportNumber = row[field];
+              item[field].route = row['route'] ? row['route'] : '';
+              item[field].name = row['routeName'] ? row['routeName'] : '';
+              item[field].dispatchPlatforms = row['dispatchPlatforms'] ? row['dispatchPlatforms'] : '';
+              item[field].carrierCode = row['carrierCode'] ? row['carrierCode'] : '';
+            }
+            if (field === 'customerNumber') {
+              item['customer'] = new Object() as Customer;
+              item['customer'].code = row[field];
+              item['customer'].name = row['customerName'] ? row['customerName'] : '';
+              item['customer'].address = row['address'] ? row['address'] : '';
+            }
+            if (field === 'sku') {
+              const orderLine = new Object() as OrderLine;
+              orderLine.item = new Object() as Item;
+              orderLine.item.sku = row['sku'];
+              orderLine.item.description = row['description'] ? row['description'] : '';
+              orderLine.item.itemType = row['itemType'] ? row['itemType'] : '';
+              orderLine.item.uom = row['codeUom'] ? row['codeUom'] : '';
+
+              orderLine.qtyToPicked = row['qtyToPicked'] ? row['qtyToPicked'] : '';
+              orderLine.expiryDate = row['expiryDate'] ? row['expiryDate'] : '';
+              orderLine.serial = row['serial'] ? row['serial'] : '';
+
+              orderLine.location = new Object() as Location;
+              orderLine.location.code = row['codeLocation'] ? row['codeLocation'] : '';
+
+              orderLine.baseItemOverride = row['baseItemOverride'] ? row['baseItemOverride'] : '';
+              orderLine.caseLabelCheckDigits = row['caseLabelCheckDigits'] ? row['caseLabelCheckDigits'] : '';
+              orderLine.cartonCode = row['cartonCode'] ? row['cartonCode'] : '';
+              orderLine.cartonCode = row['pickSequenceNumber'] ? row['pickSequenceNumber'] : '';
+              orderLine.workCode = row['workCode'] ? row['workCode'] : '';
+
+              item['orderLine'] = orderLine;
+            }
+            if (field === 'departureDateTime' || field === 'departureDateTime') {
+              item[field] = new Date(row[field]);
             }
           }
         }
-        // omitimos el registro si hay algun error de validacion en él
+        /*
+          agregamos un campo indice para poder usarlo en el mat-table. 
+          TODO: debe haber alguna forma de obtener el indice en el mat-table, sin necesidad de hacer esto
+          pero por los momentos es una solucion
+        */
         this.dataSource.data[rowIndex].index = rowIndex;
+        // omitimos el registro si hay algun error de validacion en él
         if (errorFound) {
           this.invalidRows.push({ row: rowIndex, errors: currentRowErrors.slice() });
           this.dataSource.data[rowIndex].invalid = true;
@@ -228,7 +302,7 @@ export class ImportarPedidosComponent implements OnInit {
   }
 
   editRow(index: number) {
-    const dialogRef = this.dialog.open(EditRowDialogComponent, { data: { row: this.dataSource.data[index], map: ModelMap.ItemMap}});
+    const dialogRef = this.dialog.open(EditRowDialogComponent, { data: { row: this.dataSource.data[index], map: ModelMap.OrderMap}});
     dialogRef.afterClosed().subscribe(result => {
       console.log('dialog result:', result);
       if (result) {

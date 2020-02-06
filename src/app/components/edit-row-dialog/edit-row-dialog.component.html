@@ -6,7 +6,10 @@
         </div>
         <mat-form-field class="w-100" *ngFor="let key of keys">
             <mat-label>{{fields[key].name}} {{fields[key].required ? '*' : ''}}</mat-label>
-            <input class="w-100" matInput type="text" [formControlName]="key">
+            <input class="w-100" matInput type="text" [formControlName]="key" *ngIf="fields[key].type !== 'date'">
+            <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="fields[key].type === 'date'" readonly>
+            <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="fields[key].type === 'date'"></mat-datepicker-toggle>
+            <mat-datepicker #pickerDate ></mat-datepicker>
         </mat-form-field>
     </div>
     <div mat-dialog-actions>

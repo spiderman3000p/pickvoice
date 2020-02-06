@@ -61,19 +61,24 @@ export class ImportarUbicacionesComponent implements OnInit {
       this.isLoadingResults = false;
       console.log('dialog result:', result);
       if (result && result.length > 0) {
-        console.log('data length:', result.length);
-        console.log('expected data keys:', this.displayedColumns);
+
         const receivedKeys: any[] = Object.keys(result[0]);
-        console.log('received data keys:', receivedKeys);
 
         if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
           console.error('el formato de los datos recibidos no coincide con el formato esperado');
           this.utilities.showSnackBar('Error en el formato de los datos', 'OK');
           return;
         }
-        this.dataSource.data = result;
+        this.dataSource.data = result.map((element, index) => {
+          element.index = index;
+          return element;
+        });
       }
     });
+  }
+
+  renderColumnData(type: string, data: any) {
+    return this.utilities.renderColumnData(type, data);
   }
 
   applyFilter(filterValue: string) {
@@ -90,8 +95,6 @@ export class ImportarUbicacionesComponent implements OnInit {
     if (this.dataValidationErrors.length === 0 && this.isReadyToSend) {
       console.log('sending data to api...');
       this.isLoadingResults = true;
-      console.log('temporalmente se esta enviando solo el primer registro hasta\
-       que agreguen un metodo que reciba una lista de ubicaciones');
       this.apiService.createLocationWithList(this.dataToSend, 'response', true).pipe(
         retry(3)
       ).subscribe(result => {
@@ -129,9 +132,8 @@ export class ImportarUbicacionesComponent implements OnInit {
       let currentRowErrors = [];
       let errorFound: boolean;
       this.isLoadingResults = true;
+      let exists;
       const copyData = this.dataSource.data.slice();
-
-      console.log('dataSource es un array valido');
 
       copyData.forEach((row, rowIndex) => {
         const item = JSON.parse(JSON.stringify(row)) as Location;
@@ -174,31 +176,34 @@ export class ImportarUbicacionesComponent implements OnInit {
               debe ser menor que ${this.headers[field].max} en el registro ${rowIndex}`);
             }
             // comprobando si el campo es unico
-            if (this.headers[field].unique && copyData.findIndex(_row => _row[field] === row[field]) > -1) {
+            exists = 0;
+            copyData.forEach((element, index) => {
+              if (index !== rowIndex) {
+                exists += element[index] == row[field] ? 1 : 0;
+              }
+            });
+            // comprobando si el campo es unico
+            if (this.headers[field].unique &&  exists > 0) {
               const validationError = new Object() as ValidationError;
               validationError.index = rowIndex;
               validationError.error = `El campo ${this.headers[field].name} (${field})
-               debe ser unico en toda la coleccion`;
+               debe ser unico en toda la coleccion. Se repite ${exists} veces`;
               this.dataValidationErrors.push(validationError);
               currentRowErrors.push(validationError);
               errorFound = true;
               console.error(`El campo ${this.headers[field].name} (${field})
-              debe ser unico en toda la coleccion, en el registro ${rowIndex}`);
-            }
-            if (field === 'itemType') {
-              item[field] = new Object() as ItemType;
-              item[field].code = row[field] as string;
-              item[field].name = '';
-            }
-            if (field === 'uom') {
-              item[field] = new Object() as UnityOfMeasure;
-              item[field].code = row[field] as string;
-              item[field].name = '';
+              debe ser unico en toda la coleccion, en el registro ${rowIndex}. Se repite ${exists} veces`);
             }
           }
         }
-        // omitimos el registro si hay algun error de validacion en él
+
+        /*
+          agregamos un campo indice para poder usarlo en el mat-table. 
+          TODO: debe haber alguna forma de obtener el indice en el mat-table, sin necesidad de hacer esto
+          pero por los momentos es una solucion
+        */
         this.dataSource.data[rowIndex].index = rowIndex;
+        // omitimos el registro si hay algun error de validacion en él
         if (errorFound) {
           this.invalidRows.push({ row: rowIndex, errors: currentRowErrors.slice() });
           this.dataSource.data[rowIndex].invalid = true;
@@ -233,7 +238,7 @@ export class ImportarUbicacionesComponent implements OnInit {
   }
 
   editRow(index: number) {
-    const dialogRef = this.dialog.open(EditRowDialogComponent, { data: { row: this.dataSource.data[index], map: ModelMap.ItemMap}});
+    const dialogRef = this.dialog.open(EditRowDialogComponent, { data: { row: this.dataSource.data[index], map: ModelMap.LocationMap}});
     dialogRef.afterClosed().subscribe(result => {
       console.log('dialog result:', result);
       if (result) {

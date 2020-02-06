@@ -15,8 +15,8 @@
             </button>
             <mat-menu #menu="matMenu" xPosition="before">
               <button mat-menu-item (click)="importFile('csv')">Importar desde archivo CSV/XLSX</button>
-              <button mat-menu-item (click)="importFile('url')">Importar CSV desde URL</button>
-              <!--button mat-menu-item (click)="importFile('api')">Importar CSV/XLSX desde API</button-->
+              <button mat-menu-item (click)="importFile('url')">Importar CSV/xlsx desde URL</button>
+              <button mat-menu-item (click)="importFile('api')">Importar CSV/XLSX desde API</button>
             </mat-menu>
           </mat-card-title>
         </mat-card-header>
@@ -31,7 +31,7 @@
             <mat-table [dataSource]="dataSource" matSort>
               <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ headers[column].name | uppercase}} </th>
-                <td mat-cell *matCellDef="let element"> {{ element[column] }} </td>
+                <td mat-cell *matCellDef="let element"> {{ renderColumnData(headers[column].type, element[column]) }} </td>
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

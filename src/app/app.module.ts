@@ -26,6 +26,9 @@ import { ImportDialogComponent } from './components/import-dialog/import-dialog.
 import { ApiModule } from '@pickvoice/pickvoice-api';
 import { HttpClientModule } from '@angular/common/http';
 import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
+
 
 @NgModule({
   declarations: [
@@ -47,12 +50,14 @@ import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-di
     MatSnackBarModule,
     MatToolbarModule,
     MatButtonModule,
+    MatDatepickerModule,
     MatSidenavModule,
     MatIconModule,
     MatListModule,
     MatGridListModule,
     MatCardModule,
     MatMenuModule,
+    MatRadioModule,
     PagesModule,
     FormsModule,
     ReactiveFormsModule,
@@ -62,7 +67,9 @@ import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-di
   entryComponents: [
     ImportDialogComponent
   ],
-  providers: [],
+  providers: [
+    { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -17,6 +17,10 @@ export class UtilitiesService {
     return true;
   }
 
+  renderColumnData(type: string, data: any) {
+    return data && type && type === 'date' ? new Intl.DateTimeFormat('en-US').format(data) :  data;
+  }
+
   equalArrays(array1: any[], array2: any[]) {
     let equals = true;
     array1.forEach((element1, index1) => {

@@ -1,4 +1,19 @@
-import { Item } from './item';
+/*
+    Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
+    Cada propiedad aqui especificada, corresponde a las columnas de los archivos de importacion
+    (csv, xlsx) para cada entidad, y se especifican su nombre para usar en el header de la tabla en la
+    pantalla de importacion, si son columnas requeridas, unicas, el valor minimo, el valor maximo, y el
+    tipo de dato (en caso de que sea distinto a un string y necesite un input especial, como las
+    fechas por ejemplo).
+
+    Los atributos validados hasta ahora son:
+    required: la columna no puede estar vacia
+    unique: el valor no puede repetirse en el mismo archivo,
+    min: valor minimo aceptado,
+    max: valor maximo aceptado,
+    type: tipo de dato (solo para fechas con el valor 'date' por cuestiones de formato especial distinto
+    a los campos de texto)
+*/
 export class ModelMap {
     public static ItemMap = {
         sku: {
@@ -92,7 +107,8 @@ export class ModelMap {
         },
         checkDigits: {
             name: 'check digits',
-            required: false
+            required: false,
+            unique: true
         }
     };
 
@@ -104,19 +120,97 @@ export class ModelMap {
         },
         deliveryDate: {
             name: 'delivery date',
+            required: false,
+            type: 'date'
+        },
+        transport: {
+            name: 'transport',
             required: false
         },
         route: {
             name: 'route',
+            required: false
+        },
+        routeName: {
+            name: 'route name',
+            required: false
+        },
+        dispatchPlatforms: {
+            name: 'route',
+            required: false
+        },
+        carrierCode: {
+            name: 'route',
+            required: false
+        },
+        customerNumber: {
+            name: 'customer number',
             required: true
         },
-        customer: {
-            name: 'customer',
+        customerName: {
+            name: 'customer name',
             required: true
         },
-        orderLine: {
-            name: 'order line',
-            required: true
+        address: {
+            name: 'address',
+            required: false
+        },
+        sku: {
+            name: 'sku',
+            required: false
+        },
+        description: {
+            name: 'description',
+            required: false
+        },
+        itemType: {
+            name: 'item type',
+            required: false
+        },
+        codeUom: {
+            name: 'uom',
+            required: false
+        },
+        qtyToPicked: {
+            name: 'qty picked',
+            required: false
+        },
+        expiryDate: {
+            name: 'expiry date',
+            required: false,
+            type: 'date'
+        },
+        serial: {
+            name: 'serial',
+            required: false
+        },
+        batchNumber: {
+            name: 'batch number',
+            required: false
+        },
+        codeLocation: {
+            name: 'code location',
+            required: false
+        },
+        baseItemOverride: {
+            name: 'base item override',
+            required: false
+        },
+        caseLabelCheckDigits: {
+            name: 'check digits',
+            required: false
+        },
+        cartonCode: {
+            name: 'carton code',
+            required: false
+        },
+        pickSequenceNumber: {
+            name: 'pick sequence',
+            required: false
+        },
+        workCode: {
+            name: 'work code',
+            required: false
         },
         goalTime: {
             name: 'goal time',
@@ -124,7 +218,8 @@ export class ModelMap {
         },
         departureDateTime: {
             name: 'departure date',
-            required: false
+            required: false,
+            type: 'date'
         },
         rootWorkCode: {
             name: 'root code',

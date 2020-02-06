@@ -9,6 +9,8 @@ import { ImportarPedidosComponent } from '../components/importar-pedidos/importa
 import { NotFoundComponent } from '../components/not-found/not-found.component';
 import { PagesComponent } from '../pages/pages.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -44,6 +46,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatFormFieldModule,
     MatInputModule,
     MatTableModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatButtonModule,
     MatToolbarModule,
     MatSidenavModule,
@@ -53,6 +57,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatCardModule,
     MatMenuModule,
     MatTooltipModule
+  ],
+  providers: [
   ]
 })
 export class PagesModule { }

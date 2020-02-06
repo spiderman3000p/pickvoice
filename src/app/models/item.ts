@@ -48,3 +48,11 @@ export interface Item {
      */
     itemState?: Item.ItemStateEnum;
 }
+
+export declare namespace Item {
+    type ItemStateEnum = 'active' | 'locked';
+    const ItemStateEnum: {
+        Active: ItemStateEnum;
+        Locked: ItemStateEnum;
+    };
+}

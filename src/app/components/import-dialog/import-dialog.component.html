@@ -1,35 +1,38 @@
 <h2 mat-dialog-title>{{ dialogTitle }}</h2>
-<form (ngSubmit)="onSubmit()">
     <div mat-dialog-content>
         <div class="example-loading-shade" *ngIf="isLoadingResults">
             <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
         </div>
-        <div class="row">
-            <div class="col-sm-12" *ngIf="importType === 'csv'">
-                <mat-label>{{ file.name ? file.name : 'Ningun archivo seleccionado' }}</mat-label><br>
-                <input #myFile type="file" [formControl]="fileInput" class="d-none" accept=".csv, .xls, .xlsx" (change)="validateFile($event.target.files)" name="file" required>
-                <button mat-raised-button color="primary" (click)="myFile.click()" type="button">Select file</button>
-                <br>
-                <mat-hint>Only valid CSV, XLSX formats</mat-hint>
-            </div>
-            <div class="col-sm-12" *ngIf="importType === 'url'">
-                <mat-form-field class="w-100">
-                    <mat-label>Type URL</mat-label>
-                    <input class="w-100" matInput type="url" [formControl]="urlInput" minlength="10" name="url" required>
-                    <mat-hint>Only valid CSV URL's (Ex: https://example.com/file.csv)</mat-hint>
-                </mat-form-field>
-            </div>
-            <div class="col-sm-12" *ngIf="importType === 'api'">
-                <mat-form-field class="w-100">
-                    <mat-label>Type API endpoint</mat-label>
-                    <input class="w-100" matInput type="url" [formControl]="urlInput" name="url" minlength="10" required>
-                    <mat-hint>Only valid URL's (Ex: https://example.com/api/v1/endpoint1)</mat-hint>
-                </mat-form-field>
+        
+        <div class="col-sm-12" *ngIf="importType === 'csv'">
+            <mat-label>{{ file.name ? file.name : 'Ningun archivo seleccionado' }}</mat-label><br>
+            <input #myFile type="file" [formControl]="fileInput" class="d-none" accept=".csv, .xls, .xlsx" (change)="validateFile($event.target.files)" name="file" required>
+            <button mat-raised-button color="primary" (click)="myFile.click()" type="button">Select file</button>
+            <br>
+            <mat-hint>Only valid CSV, XLSX formats</mat-hint>
+        </div>
+        <div class="col-sm-12" *ngIf="importType === 'url'">
+            <mat-form-field class="w-100">
+                <mat-label>Type URL</mat-label>
+                <input class="w-100" matInput type="url" [formControl]="urlInput" minlength="10" name="url" required>
+                <mat-hint>Only valid CSV URL's (Ex: https://example.com/file.csv)</mat-hint>
+            </mat-form-field>
+        </div>
+        <div class="col-sm-12" *ngIf="importType === 'api'">
+            <mat-form-field class="w-100">
+                <mat-label>Type API endpoint</mat-label>
+                <input class="w-100" matInput type="url" [formControl]="urlInput" name="url" minlength="10" required>
+                <mat-hint>Only valid URL's (Ex: https://example.com/api/v1/endpoint1)</mat-hint>
+            </mat-form-field>
+            <div class="mt-3 w-100">
+                <mat-radio-group matInput [formControl]="apiType" aria-label="Select an option">
+                    <mat-radio-button value="csv">CSV/TEXT</mat-radio-button>
+                    <mat-radio-button value="xlsx">XLSX</mat-radio-button>
+                </mat-radio-group>
             </div>
         </div>
     </div>
-    <div mat-dialog-actions>
-        <button mat-button type="submit" [disabled]="isLoadingResults">LOAD</button>
+    <div mat-dialog-actions align="end">
+        <button mat-button (click)="onSubmit()" [disabled]="isLoadingResults">LOAD</button>
         <button mat-button mat-dialog-close [disabled]="isLoadingResults">CANCEL</button>
     </div>
-</form>
