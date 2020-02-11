@@ -3,6 +3,7 @@ import { ParseService } from '../../services/parse.service';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component';
+import { ImportingWidgetComponent } from '../importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../edit-row-dialog/edit-row-dialog.component';
 import { Location } from '../../models/location';
 import { ModelMap } from '../../models/model-maps.model';
@@ -45,6 +46,31 @@ export class ImportarUbicacionesComponent implements OnInit {
     this.filter = new FormControl('');
     this.dataValidationErrors = [];
     this.dataToSend = [];
+  }
+
+  importWidget() {
+    const dialogRef = this.dialog.open(ImportingWidgetComponent,
+      {
+        width: '800px',
+      });
+    dialogRef.afterClosed().subscribe(result => {
+      this.isLoadingResults = false;
+      console.log('dialog result:', result);
+      if (result && result.length > 0) {
+
+        const receivedKeys: any[] = Object.keys(result[0]);
+
+        if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
+          console.error('el formato de los datos recibidos no coincide con el formato esperado');
+          this.utilities.showSnackBar('Error en el formato de los datos', 'OK');
+          return;
+        }
+        this.dataSource.data = result.map((element, index) => {
+          element.index = index;
+          return element;
+        });
+      }
+    });
   }
 
   importFile(_type: string) {

@@ -23,9 +23,11 @@ import { LoginComponent } from './pages/auth/login/login.component';
 import { PagesModule } from './pages/pages.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
+import { ImportingWidgetComponent } from './components/importing-widget/importing-widget.component';
 import { ApiModule } from '@pickvoice/pickvoice-api';
 import { HttpClientModule } from '@angular/common/http';
 import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
+import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
 
@@ -35,7 +37,9 @@ import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/rad
     AppComponent,
     LoginComponent,
     ImportDialogComponent,
-    EditRowDialogComponent
+    EditRowDialogComponent,
+    ImportingWidgetComponent,
+    FileImportComponent
   ],
   imports: [
     ApiModule,

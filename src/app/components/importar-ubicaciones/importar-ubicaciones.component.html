@@ -10,6 +10,9 @@
         <mat-card-header>
           <mat-card-title>
             Ubicaciones
+            <button mat-raised-button color="primary" (click)="importWidget()">
+                <mat-icon>cloud_upload</mat-icon> <span class="ml-3">Importar</span>
+              </button>
             <button mat-raised-button color="primary" class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
               <mat-icon>add_circle_outline</mat-icon> <span class="ml-3">Importar</span>
             </button>
