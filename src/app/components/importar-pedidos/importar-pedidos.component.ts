@@ -1,17 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ParseService } from '../../services/parse.service';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component';
+import { ImportingWidgetComponent } from '../importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../edit-row-dialog/edit-row-dialog.component';
-import { Item } from '../../models/item';
-import { Customer } from '../../models/customer';
-import { OrderLine } from '../../models/orderLine';
-import { ItemType } from '../../models/itemType';
-import { Order } from '../../models/order';
-import { Transport } from '../../models/transport';
-import { Location } from '../../models/location';
-import { UnityOfMeasure } from '../../models/unityOfMeasure';
 import { ModelMap } from '../../models/model-maps.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -19,7 +11,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, catchError, retry } from 'rxjs/operators';
-import { OrderService } from '@pickvoice/pickvoice-api';
+import { OrderService, Item, ItemType, Customer, OrderLine,
+         Order, Transport, Location, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { HttpResponse } from '@angular/common/http';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
@@ -63,6 +56,35 @@ export class ImportarPedidosComponent implements OnInit {
     this.dataToSend = [];
   }
 
+  importWidget() {
+    const dialogRef = this.dialog.open(ImportingWidgetComponent,
+      {
+        width: '90vw',
+        height: '90vh'
+      });
+    dialogRef.afterClosed().subscribe(result => {
+      this.isLoadingResults = false;
+      console.log('dialog result:', result);
+      if (result && result.length > 0) {
+
+        const receivedKeys: any[] = Object.keys(result[0]);
+
+        if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
+          console.log('received keys', receivedKeys);
+          console.log('required keys', this.displayedColumns);
+          console.error('el formato de los datos recibidos no coincide con el formato esperado');
+          this.utilities.showSnackBar('Error in data format', 'OK');
+          return;
+        }
+        this.dataSource.data = result.map((element, index) => {
+          element.index = index;
+          return element;
+        });
+        this.sendData();
+      }
+    });
+  }
+
   importFile(_type: string) {
     this.isDataSaved = false;
     this.isLoadingResults = true;
@@ -81,8 +103,10 @@ export class ImportarPedidosComponent implements OnInit {
         const receivedKeys: any[] = Object.keys(result[0]);
 
         if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
+          console.log('received keys', receivedKeys);
+          console.log('required keys', this.displayedColumns);
           console.error('el formato de los datos recibidos no coincide con el formato esperado');
-          this.utilities.showSnackBar('Error en el formato de los datos', 'OK');
+          this.utilities.showSnackBar('Error in data format', 'OK');
           return;
         }
         this.dataSource.data = result.map((element, index) => {
@@ -135,7 +159,7 @@ export class ImportarPedidosComponent implements OnInit {
       });
     } else {
       console.error('Los datos no estan listos para ser enviados');
-      this.utilities.showSnackBar('Los datos no estan listos para ser enviados', 'OK');
+      this.utilities.showSnackBar('Data are not ready to be sent', 'OK');
     }
   }
 
@@ -293,11 +317,11 @@ export class ImportarPedidosComponent implements OnInit {
       console.log('validation errors', this.dataValidationErrors);
       console.log('validation errors per row', this.invalidRows);
       if (this.dataValidationErrors.length > 0) {
-        this.utilities.showSnackBar(`Se importaron todos los registros excepto ${this.invalidRows.length} registros invalidos`, 'OK');
+        this.utilities.showSnackBar(`All data imported except ${this.invalidRows.length} invalid records`, 'OK');
       }
     } else {
       console.log('No hay datos en la tabla');
-      this.utilities.showSnackBar(`No hay datos para importar`, 'OK');
+      this.utilities.showSnackBar(`There is no data to import`, 'OK');
     }
   }
 

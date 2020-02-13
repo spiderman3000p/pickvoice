@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @import "custom-bootstrap.scss";
 @import "node_modules/bootstrap/scss/bootstrap";
+@import "~ag-grid-community/dist/styles/ag-grid.css";
+@import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; overflow-y: hidden}
@@ -75,4 +77,26 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; overflow-y:
   }
   mat-datepicker{
     z-index: 1000;
+  }
+  mat-table {
+    min-height: 300px;
+  }
+  .mat-elevation-z0{
+      box-shadow: unset;
+  }
+  .mat-expansion-panel {
+    background: unset;
+    color: white;
+  }
+  .mat-expansion-panel-content {
+    background-color: rgba(0,0,0,0.1);
+  }
+  .mat-expansion-panel-body {
+    padding: 0px !important;
+  }
+  .mat-list-item-content {
+    padding: 0 24px !important;
+  }
+  .mat-dialog-content-p0 {
+    padding: 0px !important;
   }

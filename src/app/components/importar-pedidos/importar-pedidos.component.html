@@ -1,7 +1,7 @@
 <div class="container-fluid pb-12">
   <div class="row">
     <div class="col-sm-12">
-      <h1 class="mat-h1">Importar Pedidos</h1>
+      <h1 class="mat-h1">Import Orders</h1>
     </div>
   </div>
   <div class="row">
@@ -9,15 +9,18 @@
       <mat-card>
         <mat-card-header>
           <mat-card-title>
-            Pedidos
-            <button mat-raised-button color="primary" class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
+            Orders
+            <button mat-raised-button color="primary" class="more-button" (click)="importWidget()">
+              <mat-icon>cloud_upload</mat-icon> <span class="ml-3">Import</span>
+            </button>
+            <!--button mat-raised-button color="primary" class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
                     <mat-icon>add_circle_outline</mat-icon> <span class="ml-3">Importar</span>
                     </button>
             <mat-menu #menu="matMenu" xPosition="before">
               <button mat-menu-item (click)="importFile('csv')">Importar desde archivo CSV/XLSX</button>
               <button mat-menu-item (click)="importFile('url')">Importar CSV/xlsx desde URL</button>
               <button mat-menu-item (click)="importFile('api')">Importar CSV/XLSX desde API</button>
-            </mat-menu>
+            </mat-menu-->
           </mat-card-title>
         </mat-card-header>
         <mat-card-content>
@@ -47,7 +50,7 @@
         <mat-card-actions align="end">
           <button mat-raised-button [ngClass]="{'primary': !isReadyToSend, 'success': isReadyToSend}" [disabled]="isLoadingResults"
             (click)="!isReadyToSend ? validateData() : sendData()" *ngIf="dataSource.data.length > 0 && !isReadyToSend">{{ getValidateBtnText() }}</button>
-          <button mat-raised-button (click)="sendData()" [disabled]="!isReadyToSend || isLoadingResults || isDataSaved" color="primary">Siguiente</button>
+          <button mat-raised-button (click)="sendData()" [disabled]="!isReadyToSend || isLoadingResults || isDataSaved" color="primary">Next</button>
         </mat-card-actions>
       </mat-card>
     </div>

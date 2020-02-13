@@ -18,7 +18,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule} from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { PagesModule } from './pages/pages.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -30,7 +31,11 @@ import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-di
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
-
+import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
+import { AgGridModule } from 'ag-grid-angular';
+import { DataStorage } from './services/data-provider';
+import { BASE_PATH } from '@pickvoice/pickvoice-api';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -39,7 +44,8 @@ import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/rad
     ImportDialogComponent,
     EditRowDialogComponent,
     ImportingWidgetComponent,
-    FileImportComponent
+    FileImportComponent,
+    DataPreviewComponent
   ],
   imports: [
     ApiModule,
@@ -62,17 +68,21 @@ import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/rad
     MatCardModule,
     MatMenuModule,
     MatRadioModule,
+    MatTabsModule,
     PagesModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatTableModule
+    MatTableModule,
+    AgGridModule.withComponents([])
   ],
   entryComponents: [
     ImportDialogComponent
   ],
   providers: [
-    { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }}
+    { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }},
+    { provide: BASE_PATH, useValue: environment.apiBaseUrl },
+    DataStorage
   ],
   bootstrap: [AppComponent]
 })

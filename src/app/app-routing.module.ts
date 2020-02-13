@@ -4,6 +4,7 @@ import { LoginComponent } from './pages/auth/login/login.component';
 import { PagesComponent } from './pages/pages.component';
 import { AuthGuard } from './guards/auth.guard';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
+import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
 
 const routes: Routes = [
   {
@@ -24,6 +25,10 @@ const routes: Routes = [
       {
         path: 'file-import',
         component: FileImportComponent
+      },
+      {
+        path: 'data-preview',
+        component: DataPreviewComponent
       },
       {
         path: '',

@@ -2,6 +2,11 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
 
+export interface ValidationError {
+  error: string;
+  index: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })

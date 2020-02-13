@@ -180,10 +180,10 @@ export class ModelMap {
             required: false,
             type: 'date'
         },
-        serial: {
+        /*serial: {
             name: 'serial',
             required: false
-        },
+        },*/
         batchNumber: {
             name: 'batch number',
             required: false
