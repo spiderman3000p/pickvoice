@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { PagesComponent } from './pages.component';
-import { DashboardComponent } from '../components/dashboard/dashboard.component';
-import { NotFoundComponent } from '../components/not-found/not-found.component';
-import { ImportarPedidosComponent } from '../components/importar-pedidos/importar-pedidos.component';
-import { ImportarUbicacionesComponent } from '../components/importar-ubicaciones/importar-ubicaciones.component';
-import { ImportarItemsComponent } from '../components/importar-items/importar-items.component';
+import { DashboardComponent } from '../pages/dashboard/dashboard.component';
+import { NotFoundComponent } from '../pages/not-found/not-found.component';
+import { ImportarPedidosComponent } from '../pages/importar-pedidos/importar-pedidos.component';
+import { ImportarUbicacionesComponent } from '../pages/importar-ubicaciones/importar-ubicaciones.component';
+import { ImportarItemsComponent } from '../pages/importar-items/importar-items.component';
 
 const routes: Routes = [
   {

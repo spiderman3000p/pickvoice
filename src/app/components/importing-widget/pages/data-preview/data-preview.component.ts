@@ -22,7 +22,13 @@ export class DataPreviewComponent implements OnInit {
     this.dataProvider.columnDefs.subscribe(columnDefs => {
       console.log('new columnDefs arrived', columnDefs);
       if (columnDefs) {
-        this.columnDefs = columnDefs;
+        this.columnDefs = columnDefs.map(col => {
+          col['filter'] = true;
+          col['editable'] = true;
+          col['sortable'] = true;
+          return col;
+        });
+        // this.columnDefs = columnDefs;
       }
     });
     console.log('in data-preview initial sheets', this.sheets);
@@ -41,7 +47,12 @@ export class DataPreviewComponent implements OnInit {
 
   setData() {
     this.rowData = this.sheets[0].rowData;
-    this.columnDefs = this.sheets[0].columnDefs;
+    this.columnDefs = this.sheets[0].columnDefs.map(col => {
+      col['filter'] = true;
+      col['editable'] = true;
+      col['sortable'] = true;
+      return col;
+    });
     this.dataProvider.data = this.rowData;
   }
 

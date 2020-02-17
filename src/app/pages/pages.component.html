@@ -5,28 +5,45 @@
       [opened]="!mobileQuery.matches">
     <mat-toolbar color="primary">Pick Voice</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/dashboard" routerLinkActive="active"><mat-icon class="mr-3" aria-hidden="true">home</mat-icon> Dashboard</a>
-      <mat-accordion [displayMode]="flat">
-        <mat-expansion-panel class="mat-elevation-z0">
-          <mat-expansion-panel-header>
-            <mat-icon class="mr-3" aria-hidden="true">settings</mat-icon>
-            Manteinance
-          </mat-expansion-panel-header>
-          <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importaritems" routerLinkActive="active">Import Items</a>
-          <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importarubicaciones" routerLinkActive="active">Import Locations</a>
-          <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importarpedidos" routerLinkActive="active">Import Orders</a>
-        </mat-expansion-panel>
-        <mat-expansion-panel class="mat-elevation-z0">
-          <mat-expansion-panel-header>
-            <mat-icon class="mr-3" aria-hidden="true">input</mat-icon>
-            Options
-          </mat-expansion-panel-header>
-          <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/dashboard" >Option 1</a>
-          <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importaritems">Option 2</a>
-          <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importarubicaciones">Option 3</a>
-          <a mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" routerLink="/pages/importarpedidos">Option 4</a>
-        </mat-expansion-panel>
-      </mat-accordion>
+      <span *ngFor="let option of menuOptions">
+        <!-- si el item de primer nivel no tiene hijos -->
+        <a *ngIf="option.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="option.route" routerLinkActive="active">
+          <mat-icon *ngIf="option.icon" aria-hidden="true">{{option.icon}}</mat-icon>
+          {{option.text}}
+        </a>
+        <!-- si el item de primer nivel si tiene hijos -->
+        <mat-accordion [displayMode]="flat" *ngIf="option.children.length > 0">
+          <mat-expansion-panel class="mat-elevation-z0">
+            <mat-expansion-panel-header>
+              <mat-icon *ngIf="option.icon" aria-hidden="true">{{option.icon}}</mat-icon>
+              {{option.text}}
+            </mat-expansion-panel-header>
+            <span *ngFor="let child2 of option.children">
+                <!-- si el item de segundo nivel no tiene hijos -->
+                <a class="pl-3" *ngIf="child2.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="child2.route" routerLinkActive="active">
+                  <!--mat-icon *ngIf="child2.icon" aria-hidden="true">{{child2.icon}}</mat-icon-->
+                  {{child2.text}}
+                </a>
+                <!-- si el item de segundo nivel si tiene hijos -->
+                <mat-accordion [displayMode]="flat" *ngIf="child2.children.length > 0">
+                  <mat-expansion-panel class="mat-elevation-z0">
+                    <mat-expansion-panel-header>
+                      <!--mat-icon *ngIf="child2.icon" aria-hidden="true">{{child2.icon}}</mat-icon-->
+                      <span class="pl-3">{{child2.text}}</span>
+                    </mat-expansion-panel-header>
+                    <span *ngFor="let child3 of child2.children">
+                        <!-- hasta el 3er nivel se aceptan hijos -->
+                        <a class="pl-4" *ngIf="child3.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="child3.route" routerLinkActive="active">
+                          <!--mat-icon *ngIf="option.icon" class="aria-hidden="true">{{child3.icon}}</mat-icon-->
+                          {{child3.text}}
+                        </a>
+                      </span>
+                  </mat-expansion-panel>
+                </mat-accordion>
+              </span>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </span>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

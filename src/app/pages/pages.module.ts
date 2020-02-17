@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PagesRoutingModule } from './pages-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DashboardComponent } from '../components/dashboard/dashboard.component';
-import { ImportarItemsComponent } from '../components/importar-items/importar-items.component';
-import { ImportarUbicacionesComponent } from '../components/importar-ubicaciones/importar-ubicaciones.component';
-import { ImportarPedidosComponent } from '../components/importar-pedidos/importar-pedidos.component';
-import { NotFoundComponent } from '../components/not-found/not-found.component';
+import { DashboardComponent } from '../pages/dashboard/dashboard.component';
+import { ImportarItemsComponent } from '../pages/importar-items/importar-items.component';
+import { ImportarUbicacionesComponent } from '../pages/importar-ubicaciones/importar-ubicaciones.component';
+import { ImportarPedidosComponent } from '../pages/importar-pedidos/importar-pedidos.component';
+import { NotFoundComponent } from '../pages/not-found/not-found.component';
 import { PagesComponent } from '../pages/pages.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -26,6 +26,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { AdministrationComponent } from './administration/administration.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     ImportarItemsComponent,
     ImportarPedidosComponent,
     ImportarUbicacionesComponent,
-    PagesComponent
+    PagesComponent,
+    AdministrationComponent
   ],
   imports: [
     CommonModule,
