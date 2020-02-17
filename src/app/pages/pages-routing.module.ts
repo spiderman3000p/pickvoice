@@ -6,31 +6,65 @@ import { NotFoundComponent } from '../pages/not-found/not-found.component';
 import { ImportarPedidosComponent } from '../pages/importar-pedidos/importar-pedidos.component';
 import { ImportarUbicacionesComponent } from '../pages/importar-ubicaciones/importar-ubicaciones.component';
 import { ImportarItemsComponent } from '../pages/importar-items/importar-items.component';
+import { ImportComponent } from '../pages/import/import.component';
+import { RecentOriginsComponent } from '../pages/recent-origins/recent-origins.component';
+import { ItemsComponent } from '../pages/items/items.component';
+import { LocationsComponent } from '../pages/locations/locations.component';
+import { ItemTypesComponent } from '../pages/item-types/item-types.component';
+import { RecentOriginsSettingsComponent } from '../pages/recent-origins-settings/recent-origins-settings.component';
+import { CurrentActionsComponent } from '../pages/current-actions/current-actions.component';
+import { AdministrationComponent } from '../pages/administration/administration.component';
+import { PendingOrdersComponent } from '../pages/pending-orders/pending-orders.component';
 
 const routes: Routes = [
   {
+    path: 'import',
+    component: ImportComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'recent-origins',
+    component: RecentOriginsComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'items',
+    component: ItemsComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'locations',
+    component: LocationsComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'item-types',
+    component: ItemTypesComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'recent-origins-settings',
+    component: RecentOriginsSettingsComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'administration',
+    component: AdministrationComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'pending-orders',
+    component: PendingOrdersComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'current-actions',
+    component: CurrentActionsComponent,
+    pathMatch: 'full'
+  },
+  {
     path: 'dashboard',
     component: DashboardComponent,
-    pathMatch: 'full'
-  },
-  {
-    path: 'not-found',
-    component: NotFoundComponent,
-    pathMatch: 'full'
-  },
-  {
-    path: 'importaritems',
-    component: ImportarItemsComponent,
-    pathMatch: 'full'
-  },
-  {
-    path: 'importarubicaciones',
-    component: ImportarUbicacionesComponent,
-    pathMatch: 'full'
-  },
-  {
-    path: 'importarpedidos',
-    component: ImportarPedidosComponent,
     pathMatch: 'full'
   },
   {

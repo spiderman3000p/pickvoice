@@ -27,6 +27,14 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { AdministrationComponent } from './administration/administration.component';
+import { PendingOrdersComponent } from './pending-orders/pending-orders.component';
+import { CurrentActionsComponent } from './current-actions/current-actions.component';
+import { ItemsComponent } from './items/items.component';
+import { ItemTypesComponent } from './item-types/item-types.component';
+import { LocationsComponent } from './locations/locations.component';
+import { RecentOriginsComponent } from './recent-origins/recent-origins.component';
+import { ImportComponent } from './import/import.component';
+import { RecentOriginsSettingsComponent } from './recent-origins-settings/recent-origins-settings.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +44,15 @@ import { AdministrationComponent } from './administration/administration.compone
     ImportarPedidosComponent,
     ImportarUbicacionesComponent,
     PagesComponent,
-    AdministrationComponent
+    AdministrationComponent,
+    PendingOrdersComponent,
+    CurrentActionsComponent,
+    ItemsComponent,
+    ItemTypesComponent,
+    LocationsComponent,
+    RecentOriginsComponent,
+    ImportComponent,
+    RecentOriginsSettingsComponent
   ],
   imports: [
     CommonModule,

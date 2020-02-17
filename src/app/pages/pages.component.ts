@@ -34,25 +34,25 @@ export class PagesComponent implements OnInit, OnDestroy  {
             {
               text: 'Items',
               icon: 'home',
-              route: '/pages/dashboard',
+              route: '/pages/items',
               children: []
             },
             {
               text: 'Locations',
               icon: 'home',
-              route: '/pages/dashboard',
+              route: '/pages/locations',
               children: []
             },
             {
               text: 'Item Types',
               icon: 'home',
-              route: '/pages/dashboard',
+              route: '/pages/item-types',
               children: []
             },
             {
               text: 'Recent Origins',
               icon: 'home',
-              route: '/pages/dashboard',
+              route: '/pages/recent-origins',
               children: []
             }
           ]
@@ -62,19 +62,19 @@ export class PagesComponent implements OnInit, OnDestroy  {
     {
       text: 'Administration',
       icon: 'home',
-      route: '/pages/dashboard',
+      route: '/pages/administration',
       children: []
     },
     {
       text: 'Pending Orders',
       icon: 'home',
-      route: '/pages/dashboard',
+      route: '/pages/pending-orders',
       children: []
     },
     {
       text: 'Current Actions',
       icon: 'home',
-      route: '/pages/dashboard',
+      route: '/pages/current-actions',
       children: []
     }
   ];
