@@ -28,9 +28,7 @@ export class ImportingWidgetComponent implements OnInit {
       });
       this.dataProvider.fileName.subscribe(fileName => {
         console.log('fileName on importing-widget', fileName);
-        if (fileName) {
-          this.fileName = fileName;
-        }
+        this.fileName = fileName;
       });
       this.router.navigate([{outlets: {importing: 'importing'}}]);
   }
@@ -42,10 +40,10 @@ export class ImportingWidgetComponent implements OnInit {
 
   loadData() {
     // validamos los datos
-    this.validateData();
+    // this.validateData();
     // cerramos el dialogo enviando los datos en formato json al componente llamante.
-    // this.init();
-    // this.dialogRef.close(this.dataProvider.data);
+    this.init();
+    this.dialogRef.close(this.dataProvider.data);
   }
 
   validateData() {

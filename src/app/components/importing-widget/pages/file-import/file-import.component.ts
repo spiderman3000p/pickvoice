@@ -4,14 +4,9 @@ import { UtilitiesService } from '../../../../services/utilities.service';
 import { DataStorage } from '../../../../services/data-provider';
 import { MatDialog } from '@angular/material/dialog';
 import { ImportDialogComponent } from '../../../import-dialog/import-dialog.component';
-import { ModelMap } from '../../../../models/model-maps.model';
 import * as XLSX from 'xlsx';
 import { of, from } from 'rxjs';
 
-/*import { Grid } from 'ag-grid-community';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-balham.css';
-*/
 @Component({
   selector: 'app-file-import',
   templateUrl: './file-import.component.html',
@@ -24,18 +19,15 @@ export class FileImportComponent implements OnInit {
   file: File;
   displayedColumns: string[];
   parsedData: any;
-  dataTypesModelMaps = {
-    items: ModelMap.ItemMap,
-    locations: ModelMap.LocationMap,
-    orders: ModelMap.OrderMap
-  };
+
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
               private dataProvider: DataStorage) {
     // TODO: obtener de la ruta el tipo de datos a importar: items, locations u orders
     this.dataTypeToImport = this.dataProvider.getDataType();
     console.log('data type to import', this.dataTypeToImport);
     // Obtener las columnas a mostrar segun el tipo de datos recibidos
-    this.displayedColumns = Object.keys(this.dataTypesModelMaps[this.dataTypeToImport]);
+    this.displayedColumns = Object.keys(this.utilities.dataTypesModelMaps[this.dataTypeToImport]);
+    console.log('displayedColumns', this.displayedColumns);
   }
 
   ngOnInit(): void {
@@ -134,6 +126,6 @@ export class FileImportComponent implements OnInit {
   goBack() {
     this.isLoadingResults = false;
     this.isDataSaved = false;
-    this.router.navigate([{outlets: {importing: 'import-type-selection'}}]);
+    this.router.navigate([{outlets: {importing: 'importing/import-type-selection'}}]);
   }
 }

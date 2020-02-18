@@ -15,7 +15,7 @@
             <mat-form-field class="w-100">
                 <mat-label>Type URL</mat-label>
                 <input class="w-100" matInput type="url" [formControl]="urlInput" minlength="10" name="url" required>
-                <mat-hint>Only valid CSV URL's (Ex: https://example.com/file.csv)</mat-hint>
+                <mat-hint>Only valid CSV, XLSX, TXT URL's (Ex: https://example.com/file.csv)</mat-hint>
             </mat-form-field>
         </div>
         <div class="col-sm-12" *ngIf="importType === 'api'">

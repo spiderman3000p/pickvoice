@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
+import { ModelMap } from '../models/model-maps.model';
 
 export interface ValidationError {
   error: string;
@@ -11,7 +12,11 @@ export interface ValidationError {
   providedIn: 'root'
 })
 export class UtilitiesService {
-
+  public dataTypesModelMaps = {
+    items: ModelMap.ItemMap,
+    locations: ModelMap.LocationMap,
+    orders: ModelMap.OrderMap
+  };
   constructor(private snackBar: MatSnackBar) { }
 
   showSnackBar(message: string, action: string) {

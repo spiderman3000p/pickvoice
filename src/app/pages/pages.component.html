@@ -9,14 +9,14 @@
         <!-- si el item de primer nivel no tiene hijos -->
         <a *ngIf="option.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="option.route" routerLinkActive="active">
           <mat-icon *ngIf="option.icon" aria-hidden="true">{{option.icon}}</mat-icon>
-          {{option.text}}
+          <span class="pl-3">{{option.text}}</span>
         </a>
         <!-- si el item de primer nivel si tiene hijos -->
         <mat-accordion [displayMode]="flat" *ngIf="option.children.length > 0">
           <mat-expansion-panel class="mat-elevation-z0">
             <mat-expansion-panel-header>
               <mat-icon *ngIf="option.icon" aria-hidden="true">{{option.icon}}</mat-icon>
-              {{option.text}}
+              <span class="pl-3">{{option.text}}</span>
             </mat-expansion-panel-header>
             <span *ngFor="let child2 of option.children">
                 <!-- si el item de segundo nivel no tiene hijos -->

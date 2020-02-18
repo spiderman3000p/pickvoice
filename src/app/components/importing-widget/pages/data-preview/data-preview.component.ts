@@ -47,13 +47,15 @@ export class DataPreviewComponent implements OnInit {
   }
 
   setData() {
-    this.rowData = this.sheets[0].rowData;
-    this.columnDefs = this.sheets[0].columnDefs.map(col => {
-      col.filter = true;
-      col.editable = true;
-      col.sortable = true;
-      return col;
-    });
+    if (this.sheets.length > 0) {
+      this.rowData = this.sheets[0].rowData;
+      this.columnDefs = this.sheets[0].columnDefs.map(col => {
+        col.filter = true;
+        col.editable = true;
+        col.sortable = true;
+        return col;
+      });
+    }
     this.dataProvider.data = this.rowData;
   }
 
@@ -61,7 +63,11 @@ export class DataPreviewComponent implements OnInit {
     this.rowData = [];
     this.columnDefs = [];
     this.sheets = [];
-    this.router.navigate([{outlets: {importing: 'file-import'}}]);
+    this.dataProvider.setFileName('');
+    this.dataProvider.setRowData([]);
+    this.dataProvider.setSheets([]);
+    this.dataProvider.setColumnDefs([]);
+    this.router.navigate([{outlets: {importing: 'importing/file-import'}}]);
   }
 
   ngOnInit(): void {

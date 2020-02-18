@@ -29,6 +29,7 @@ import { ApiModule } from '@pickvoice/pickvoice-api';
 import { HttpClientModule } from '@angular/common/http';
 import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
+import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
@@ -45,6 +46,7 @@ import { environment } from '../environments/environment';
     EditRowDialogComponent,
     ImportingWidgetComponent,
     FileImportComponent,
+    ImportTypeSelectionComponent,
     DataPreviewComponent
   ],
   imports: [

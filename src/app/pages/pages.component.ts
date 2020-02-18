@@ -61,19 +61,19 @@ export class PagesComponent implements OnInit, OnDestroy  {
     },
     {
       text: 'Administration',
-      icon: 'home',
+      icon: 'supervisor_account',
       route: '/pages/administration',
       children: []
     },
     {
       text: 'Pending Orders',
-      icon: 'home',
+      icon: 'restore',
       route: '/pages/pending-orders',
       children: []
     },
     {
       text: 'Current Actions',
-      icon: 'home',
+      icon: 'query_builder',
       route: '/pages/current-actions',
       children: []
     }
