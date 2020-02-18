@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { PagesComponent } from './pages/pages.component';
 import { AuthGuard } from './guards/auth.guard';
+import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
 
@@ -23,6 +24,10 @@ const routes: Routes = [
     outlet: 'importing',
     children: [
       {
+        path: 'import-type-selection',
+        component: ImportTypeSelectionComponent
+      },
+      {
         path: 'file-import',
         component: FileImportComponent
       },
@@ -32,7 +37,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'file-import',
+        redirectTo: 'import-type-selection',
         pathMatch: 'full'
       },
       {

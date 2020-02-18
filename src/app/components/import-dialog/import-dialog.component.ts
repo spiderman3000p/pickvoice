@@ -61,18 +61,6 @@ export class ImportDialogComponent {
     }
   }
 
-  loadFile() {
-    console.log('file attached', this.file);
-    if (this.file.type.includes('text') || this.file.type.includes('csv') ||
-        this.file.type.includes('application/vnd.ms-excel')) {
-      this.isLoadingResults = true;
-     
-    } else if (this.file.type.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        || this.file.type.includes('application/vnd.ms-excel')) {
-      this.isLoadingResults = true;
-    }
-  }
-
   loadUrl() {
 
     if (this.urlInput.value.endsWith('.csv') || this.urlInput.value.endsWith('.txt') ||
@@ -137,7 +125,6 @@ export class ImportDialogComponent {
   }
 
   loadApi() {
-    if (/*this.apiType.value === 'xlsx' || this.apiType.value === 'csv'*/ true) {
       this.httpClient.get(this.urlInput.value, { responseType: 'blob'}).pipe(
         tap(
           data => {
@@ -191,16 +178,10 @@ export class ImportDialogComponent {
         };
         reader.readAsBinaryString(response);
       });
-    } else {
-      this.utilities.showSnackBar(`File extension is invalid`, 'OK');
-    }
   }
 
   onSubmit() {
     console.log('submiting');
-    if (this.importType === 'csv') {
-      this.loadFile();
-    }
     if (this.importType === 'url') {
       this.loadUrl();
     }
@@ -210,6 +191,6 @@ export class ImportDialogComponent {
   }
 
   close() {
-    this.dialogRef.close(this.parsedData);
+    this.dialogRef.close();
   }
 }

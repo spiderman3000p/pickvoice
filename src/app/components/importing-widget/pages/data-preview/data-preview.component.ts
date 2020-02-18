@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { DataStorage } from '../../../../services/data-provider';
 
 @Component({
@@ -11,7 +12,7 @@ export class DataPreviewComponent implements OnInit {
   rowData: any[] = [];
   columnDefs: any[] = [];
 
-  constructor(private dataProvider: DataStorage) {
+  constructor(private dataProvider: DataStorage, private router: Router) {
     this.sheets = this.dataProvider.getSheets();
     this.dataProvider.rowData.subscribe(rowData => {
       console.log('new rowData arrived', rowData);
@@ -48,17 +49,19 @@ export class DataPreviewComponent implements OnInit {
   setData() {
     this.rowData = this.sheets[0].rowData;
     this.columnDefs = this.sheets[0].columnDefs.map(col => {
-      col['filter'] = true;
-      col['editable'] = true;
-      col['sortable'] = true;
+      col.filter = true;
+      col.editable = true;
+      col.sortable = true;
       return col;
     });
     this.dataProvider.data = this.rowData;
   }
 
-  changeSheet(sheet: any) {
-    /*this.rowData = sheet.rowData;
-    this.columnDefs = sheet.columnDefs;*/
+  goBack() {
+    this.rowData = [];
+    this.columnDefs = [];
+    this.sheets = [];
+    this.router.navigate([{outlets: {importing: 'file-import'}}]);
   }
 
   ngOnInit(): void {

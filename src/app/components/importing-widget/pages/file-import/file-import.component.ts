@@ -20,12 +20,22 @@ import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 export class FileImportComponent implements OnInit {
   isLoadingResults = false;
   isDataSaved = false;
+  dataTypeToImport = '';
   file: File;
   displayedColumns: string[];
   parsedData: any;
+  dataTypesModelMaps = {
+    items: ModelMap.ItemMap,
+    locations: ModelMap.LocationMap,
+    orders: ModelMap.OrderMap
+  };
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
-              private dataProvider: DataStorage) { 
-    // this.displayedColumns = Object.keys(ModelMap.LocationMap);
+              private dataProvider: DataStorage) {
+    // TODO: obtener de la ruta el tipo de datos a importar: items, locations u orders
+    this.dataTypeToImport = this.dataProvider.getDataType();
+    console.log('data type to import', this.dataTypeToImport);
+    // Obtener las columnas a mostrar segun el tipo de datos recibidos
+    this.displayedColumns = Object.keys(this.dataTypesModelMaps[this.dataTypeToImport]);
   }
 
   ngOnInit(): void {
@@ -94,36 +104,6 @@ export class FileImportComponent implements OnInit {
       this.utilities.showSnackBar(`Data parsed successfully`, 'OK');
     };
     reader.readAsBinaryString(this.file);
-    /*if (this.file.type.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        || this.file.type.includes('application/vnd.ms-excel')) {
-      this.isLoadingResults = true;
-      readXlsxFile(this.file).then((rows) => {
-        this.isLoadingResults = false;
-        // `rows` is an array of rows
-        // each row being an array of cells.
-        const fields = Object.assign(rows[0]);
-        rows.splice(0, 1);
-        this.parsedData = rows.map((row, index) => {
-          // return {...row};
-          const object = {};
-          fields.map((field, _index) => {
-            object[field] = row[_index];
-          });
-          return object;
-        });
-        const navigationExtras: NavigationExtras = {
-          queryParams: {
-            data: JSON.stringify({
-              rows: this.parsedData,
-              columns: fields
-            })
-          }
-        };
-        console.log('parsed xlsx data', this.parsedData);
-        this.router.navigate ([{ outlets: { importing: 'importing/data-preview'}}], navigationExtras);
-        this.utilities.showSnackBar(`Data parsed successfully`, 'OK');
-      });
-    }*/
   }
 
   importUrl(_type: string) {
@@ -149,5 +129,11 @@ export class FileImportComponent implements OnInit {
         }
       }
     });
+  }
+
+  goBack() {
+    this.isLoadingResults = false;
+    this.isDataSaved = false;
+    this.router.navigate([{outlets: {importing: 'import-type-selection'}}]);
   }
 }

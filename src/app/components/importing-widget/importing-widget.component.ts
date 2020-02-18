@@ -41,8 +41,15 @@ export class ImportingWidgetComponent implements OnInit {
   }
 
   loadData() {
-    this.init();
-    this.dialogRef.close(this.dataProvider.data);
+    // validamos los datos
+    this.validateData();
+    // cerramos el dialogo enviando los datos en formato json al componente llamante.
+    // this.init();
+    // this.dialogRef.close(this.dataProvider.data);
+  }
+
+  validateData() {
+    
   }
 
   close() {

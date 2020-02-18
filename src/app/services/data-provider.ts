@@ -8,11 +8,13 @@ export class DataStorage {
     public data: any;
     /*public sheets: Observable<any[]>;
     public fileName: Observable<any>;*/
+    public dataType: Subject<any>;
     public sheets: Subject<any[]>;
     public fileName: Subject<any>;
     public rowData: Subject<any[]>;
     public columnDefs: Subject<any[]>;
     _fileName: string;
+    _dataType: string;
     _sheets: any[];
     _rowData: any[];
     _columnDefs: any[];
@@ -21,8 +23,10 @@ export class DataStorage {
         this.fileName = new Subject();
         this.sheets = new Subject();
         this.rowData = new Subject();
+        this.dataType = new Subject();
         this.columnDefs = new Subject();
         this._fileName = '';
+        this._dataType = '';
         this._sheets = [];
         this._rowData = [];
         this._columnDefs = [];
@@ -36,6 +40,11 @@ export class DataStorage {
     public setFileName(fileName: string) {
         this._fileName = fileName;
         this.fileName.next(fileName);
+    }
+
+    public setDataType(dataType: string) {
+        this._dataType = dataType;
+        this.dataType.next(dataType);
     }
 
     public setRowData(rowData: any[]) {
@@ -62,5 +71,9 @@ export class DataStorage {
 
     public getColumnDefs() {
         return this._columnDefs;
+    }
+
+    public getDataType() {
+        return this._dataType;
     }
 }
