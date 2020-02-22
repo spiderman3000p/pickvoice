@@ -38,7 +38,7 @@ export class FileImportComponent implements OnInit {
     console.log('file', this.file);
     console.log('file size', this.file.size);
     console.log('file type', this.file.type);
-    console.log('file path', this.file.webkitRelativePath);
+    // console.log('file path', this.file.webkitRelativePath);
     if (this.file.size > (5 * 1024 * 1024)) {
       this.utilities.showSnackBar('The file size is bigger than 5MB', 'OK');
       return;
@@ -88,7 +88,7 @@ export class FileImportComponent implements OnInit {
       // guardando los datos en el provider
       this.dataProvider.setSheets(sheets);
       this.dataProvider.setFileName(this.file.name);
-      this.dataProvider.filePath = this.file.webkitRelativePath;
+      this.dataProvider.filePath = 'unknown'; /*this.file.webkitRelativePath;*/
       /*this.dataProvider.data = {
         sheets: sheets
       };*/
