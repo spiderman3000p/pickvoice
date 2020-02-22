@@ -11,7 +11,7 @@
                 <mat-card-title>
                     Data to import
                     <button mat-raised-button color="primary" class="more-button" (click)="importWidget()">
-                        <mat-icon>cloud_upload</mat-icon> <span class="ml-3">Import</span>
+                        <mat-icon>cloud_upload</mat-icon> <span class="btn-label">Import</span>
                     </button>
                     <!--button mat-raised-button color="primary" class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
                     <mat-icon>add_circle_outline</mat-icon> <span class="ml-3">Importar</span>
@@ -41,7 +41,7 @@
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;" [matTooltip]="row.tooltip"
                     [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row.index)"></tr>
                     </table>
-                    <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                    <mat-paginator [length]="dataSource.data.length" pageSize="5" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
                 </div>
                 <div *ngIf="validationRequested && !isLoadingResults && dataSource.data.length > 0" role="alert" class="alert" 
                 [ngClass]="{ 'alert-danger': (dataValidationErrors.length > 0), 'alert-success': isReadyToSend || isDataSaved }">

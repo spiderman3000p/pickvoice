@@ -23,3 +23,17 @@ mat-drawer-content{
 .mat-dialog-content{
     max-height: 70vh;
 }
+
+@media screen and (max-width:480px){
+    .mat-dialog-content {
+        padding: 0px;
+    }
+    mat-dialog-container {
+        padding-top: 0px !important;
+    }
+    mat-drawer{
+        position: absolute;
+        max-width: 90%;
+        min-width: 90%;
+    }
+}

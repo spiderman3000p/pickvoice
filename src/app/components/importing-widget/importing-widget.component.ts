@@ -1,4 +1,5 @@
-import { Inject, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, Inject } from '@angular/core';
+import { MediaMatcher } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { from, Observable } from 'rxjs';
@@ -12,14 +13,21 @@ import { DataStorage } from '../../services/data-provider';
   templateUrl: './importing-widget.component.html',
   styleUrls: ['./importing-widget.component.css']
 })
-export class ImportingWidgetComponent implements OnInit {
+export class ImportingWidgetComponent implements OnInit, OnDestroy {
   fileName: string;
   sheets: any[];
+  mobileQuery: MediaQueryList;
   constructor(
     public dialogRef: MatDialogRef<ImportingWidgetComponent>, private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService,
-    private httpClient: HttpClient, private dataProvider: DataStorage) {
+    private httpClient: HttpClient, private dataProvider: DataStorage,
+    changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
       this.init();
+      // responsive del panel lateral izquierdo
+      this.mobileQuery = media.matchMedia('(max-width: 600px)');
+      this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+      this.mobileQuery.addListener(this._mobileQueryListener);
+
       this.dataProvider.sheets.subscribe(sheets => {
         console.log('sheets on importing-widget', sheets);
         if (sheets) {
@@ -51,9 +59,6 @@ export class ImportingWidgetComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  ngOnInit(): void {
-  }
-
   goBack() {
     this.fileName = '';
     this.sheets = [];
@@ -67,4 +72,12 @@ export class ImportingWidgetComponent implements OnInit {
     this.dataProvider.setColumnDefs(sheet.columnDefs);
   }
 
+  private _mobileQueryListener: () => void;
+
+  ngOnInit(): void {
+  }
+  
+  ngOnDestroy(): void {
+    this.mobileQuery.removeListener(this._mobileQueryListener);
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { RecentOriginsService } from '../../services/recent-origins.service';
@@ -50,7 +50,9 @@ export class ImportComponent implements OnInit {
   constructor(
     private dialog: MatDialog, private itemsService: ItemsService, private ordersService: OrderService,
     private locationsService: LocationsService, private utilities: UtilitiesService,
-    private dataProvider: DataStorage, private recentOriginsService: RecentOriginsService ) {
+    private dataProvider: DataStorage, private recentOriginsService: RecentOriginsService,
+    private cdr: ChangeDetectorRef ) {
+    
     this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
     this.dataValidationErrors = [];
@@ -61,6 +63,7 @@ export class ImportComponent implements OnInit {
       this.headers = this.utilities.dataTypesModelMaps[dataType];
       console.log('headers in import component', this.headers);
     });
+    this.initPaginatorSort();
   }
 
   importWidget() {
@@ -83,10 +86,12 @@ export class ImportComponent implements OnInit {
           this.utilities.showSnackBar('Error in data format', 'OK');
           return;
         }
-        this.dataSource.data = result.map((element, index) => {
+        const newData = result.map((element, index) => {
           element.index = index;
           return element;
         });
+        this.dataSource.data = newData;
+        setTimeout(() => this.initPaginatorSort(), 500);
         this.sendData();
       }
     });
@@ -454,11 +459,19 @@ export class ImportComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log('dialog result:', result);
       if (result) {
-        Object.keys(result).forEach(key => {
+        /*Object.keys(result).forEach(key => {
           this.dataSource.data[index][key] = result[key];
-        });
+        });*/
+        let row = this.dataSource.data[index];
+        row = result;
+        this.initPaginatorSort();
       }
     });
+  }
+
+  initPaginatorSort() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   getValidationAlertMessage() {
@@ -504,8 +517,6 @@ export class ImportComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
   }
 
 }
