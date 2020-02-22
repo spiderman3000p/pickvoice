@@ -28,20 +28,31 @@ export class UtilitiesService {
   }
 
   renderColumnData(type: string, data: any) {
-    return data && type && type === 'date' ? new Intl.DateTimeFormat('en-US').format(data) :  data;
+    let dataValue;
+    switch (type) {
+      case 'date':
+        if (typeof data === 'string') {
+          dataValue = new Intl.DateTimeFormat('en-US').format(new Date(data));
+        } else {
+          dataValue = data;
+        }
+        break;
+      case 'itemType': dataValue = data.code; break;
+      case 'itemUom': dataValue = data.code; break;
+      default: dataValue = data;
+    }
+    return dataValue;
   }
 
   equalArrays(array1: any[], array2: any[]) {
-    let equals = true;
-    array1.forEach((element1, index1) => {
-      if (!equals) {
-        return;
+    if (array1.length !== array2.length) {
+      return false;
+    }
+    for (const element of array1) {
+      if (!array2.includes(element)) {
+        return false;
       }
-      if (array1[index1] !== array2[index1]) {
-        equals = false;
-      }
-    });
-
-    return array1.length === array2.length && equals;
+    }
+    return true;
   }
 }

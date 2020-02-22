@@ -3,9 +3,6 @@ import { CommonModule } from '@angular/common';
 import { PagesRoutingModule } from './pages-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DashboardComponent } from '../pages/dashboard/dashboard.component';
-import { ImportarItemsComponent } from '../pages/importar-items/importar-items.component';
-import { ImportarUbicacionesComponent } from '../pages/importar-ubicaciones/importar-ubicaciones.component';
-import { ImportarPedidosComponent } from '../pages/importar-pedidos/importar-pedidos.component';
 import { NotFoundComponent } from '../pages/not-found/not-found.component';
 import { PagesComponent } from '../pages/pages.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -26,6 +23,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTabsModule } from '@angular/material/tabs';
 import { AdministrationComponent } from './administration/administration.component';
 import { PendingOrdersComponent } from './pending-orders/pending-orders.component';
 import { CurrentActionsComponent } from './current-actions/current-actions.component';
@@ -34,15 +32,11 @@ import { ItemTypesComponent } from './item-types/item-types.component';
 import { LocationsComponent } from './locations/locations.component';
 import { RecentOriginsComponent } from './recent-origins/recent-origins.component';
 import { ImportComponent } from './import/import.component';
-import { RecentOriginsSettingsComponent } from './recent-origins-settings/recent-origins-settings.component';
 
 @NgModule({
   declarations: [
     DashboardComponent,
     NotFoundComponent,
-    ImportarItemsComponent,
-    ImportarPedidosComponent,
-    ImportarUbicacionesComponent,
     PagesComponent,
     AdministrationComponent,
     PendingOrdersComponent,
@@ -51,8 +45,7 @@ import { RecentOriginsSettingsComponent } from './recent-origins-settings/recent
     ItemTypesComponent,
     LocationsComponent,
     RecentOriginsComponent,
-    ImportComponent,
-    RecentOriginsSettingsComponent
+    ImportComponent
   ],
   imports: [
     CommonModule,
@@ -76,7 +69,8 @@ import { RecentOriginsSettingsComponent } from './recent-origins-settings/recent
     MatCardModule,
     MatMenuModule,
     MatTooltipModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatTabsModule
   ],
   providers: [
   ]

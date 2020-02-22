@@ -46,10 +46,6 @@ export class ImportingWidgetComponent implements OnInit {
     this.dialogRef.close(this.dataProvider.data);
   }
 
-  validateData() {
-    
-  }
-
   close() {
     this.init();
     this.dialogRef.close();

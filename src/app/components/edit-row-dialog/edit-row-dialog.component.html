@@ -4,15 +4,28 @@
         <div class="example-loading-shade" *ngIf="isLoadingResults">
             <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
         </div>
-        <mat-form-field class="w-100" *ngFor="let key of keys">
-            <mat-label>{{fields[key].name}} {{fields[key].required ? '*' : ''}}</mat-label>
-            <input class="w-100" matInput type="text" [formControlName]="key" *ngIf="fields[key].type !== 'date'">
-            <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="fields[key].type === 'date'" readonly>
-            <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="fields[key].type === 'date'"></mat-datepicker-toggle>
-            <mat-datepicker #pickerDate ></mat-datepicker>
-        </mat-form-field>
+        <span *ngFor="let key of keys">
+            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [appearance]="fields[key].type === 'boolean' ? 'none' : ''">
+                <mat-label>{{fields[key].name}} {{fields[key].required ? '*' : ''}}</mat-label>
+                <!-- campos number -->
+                <input class="w-100" matInput type="number" [formControlName]="key" *ngIf="fields[key].type === 'number'">
+                <!-- campos date -->
+                <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="fields[key].type === 'date'" readonly>
+                <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="fields[key].type === 'date'"></mat-datepicker-toggle>
+                <mat-datepicker #pickerDate ></mat-datepicker>
+                <!-- campos string -->
+                <input class="w-100" matInput type="text" [formControlName]="key"
+                *ngIf="fields[key].type !== 'number' && fields[key].type !== 'boolean' && fields[key].type !== 'date'">
+                <!-- campos boolean -->
+                <input matInput [formControlName]="key" hidden>
+                <mat-slide-toggle  *ngIf="fields[key].type === 'boolean'" color="primary"
+                (change)="form.get(key).setValue(!form.get(key).value)" [checked]="form.get(key).value">
+                    {{fields[key].name}}
+                </mat-slide-toggle>
+            </mat-form-field>
+        </span>
     </div>
-    <div mat-dialog-actions>
+    <div mat-dialog-actions align="end">
         <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
         <button mat-button mat-dialog-close [disabled]="isLoadingResults">CANCEL</button>
     </div>

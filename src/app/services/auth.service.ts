@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable, of} from 'rxjs';
 import { tap, delay } from 'rxjs/operators';
-
+import { UserService } from '@pickvoice/pickvoice-api';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  isLoggedIn = false;
-  redirectUrl: string;
+  public isLoggedIn = false;
+  public redirectUrl: string;
+  public username: string;
 
-  constructor() { }
+  constructor(private userService: UserService) { }
   // Dummy login function
-  login(email: string, password: string): Observable<boolean> {
-    return of(true).pipe(delay(2000), tap(val => this.isLoggedIn = true));
+  login(username: string, password: string): Observable<any> {
+    return this.userService.loginUser(username, password, 'response', false);
   }
 
   logout(): void {

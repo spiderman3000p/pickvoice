@@ -9,9 +9,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-import { map, catchError, retry } from 'rxjs/operators';
+import { retry } from 'rxjs/operators';
 import { ItemsService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
-import { HttpResponse } from '@angular/common/http';
 
 export interface ValidationError {
   error: string;
@@ -26,7 +25,7 @@ export class ItemsComponent implements OnInit {
   headers: any = ModelMap.ItemMap;
   validationRequested = false;
   invalidRows: any[] = [];
-  dataSource: MatTableDataSource<any>;
+  dataSource: MatTableDataSource<Item>;
   dataToSend: Item[];
   displayedColumns = Object.keys(ModelMap.ItemMap);
   pageSizeOptions = [5, 10]; // si se mustran mas por pantalla se sale del contenedor
@@ -45,9 +44,18 @@ export class ItemsComponent implements OnInit {
       this.dataValidationErrors = [];
       this.dataToSend = [];
       console.log('requesting items');
-      this.apiService.retrieveAllItems('response', false).pipe(retry(3)/*, catchError(this.handleError)*/).subscribe(items => {
-        console.log('items received', items);
-        // this.dataSource.data = items;
+      this.isLoadingResults = true;
+      this.apiService.retrieveAllItems('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
+      .subscribe(response => {
+        this.isLoadingResults = false;
+        console.log('items received', response.body);
+        this.dataSource.data = response.body.map((element, index) => {
+          return { index: index, ... element};
+        });
+      }, error => {
+        this.isLoadingResults = false;
+        console.error('error on requesting data');
+        this.utilities.showSnackBar('Error on requesting data', 'OK');
       });
   }
 
@@ -74,12 +82,31 @@ export class ItemsComponent implements OnInit {
   }
 
   editRow(index: number) {
-    const dialogRef = this.dialog.open(EditRowDialogComponent, { data: { row: this.dataSource.data[index], map: ModelMap.ItemMap}});
+    console.log('row to send to edit dialog', this.dataSource.data[index]);
+    console.log('map to send to edit dialog',
+    this.utilities.dataTypesModelMaps.items);
+    const dialogRef = this.dialog.open(EditRowDialogComponent, {
+      data: {
+        row: this.dataSource.data[index],
+        map: this.utilities.dataTypesModelMaps.items,
+        type: 'items',
+        remoteSync: true // para mandar los datos a la BD por la API
+      }
+    });
     dialogRef.afterClosed().subscribe(result => {
       console.log('dialog result:', result);
       if (result) {
+        /*
+          Aqui la asignacion del array de objetos deberia ser tan sencillo como: this.dataSource.data = result
+          Pero de esa forma no se refresca la tabla. Asi que la unica forma para que se reflejen los cambios
+          inmediatamente en la tabla es editando registro por registro. Para eso usamos un ForEach
+        */
         Object.keys(result).forEach(key => {
-          this.dataSource.data[index][key] = result[key];
+          if (key === 'itemType' || key === 'uom') {
+            this.dataSource.data[index][key].code = result[key];
+          } else {
+            this.dataSource.data[index][key] = result[key];
+          }
         });
       }
     });

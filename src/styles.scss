@@ -13,6 +13,16 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   overflow-y: hidden;
 }
+table{
+  width: 100%;
+}
+table.mat-table {
+  display: table;
+}
+th.mat-header-cell {
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
 .cdk-global-scrollblock{
   overflow: hidden;
 }
@@ -109,4 +119,12 @@ body {
   }
   .mat-dialog-content-p0 {
     padding: 0px !important;
+  }
+  .more-button {
+    position: absolute !important;
+    top: 20px;
+    right: 20px;
+  }
+  .min-height-80 {
+    min-height: 80vh;
   }

@@ -7,6 +7,7 @@
     fechas por ejemplo).
 
     Los atributos validados hasta ahora son:
+    boolean: para mostrar un toggle en los formularios
     required: la columna no puede estar vacia
     unique: el valor no puede repetirse en el mismo archivo,
     min: valor minimo aceptado,
@@ -18,97 +19,123 @@ export class ModelMap {
     public static ItemMap = {
         sku: {
             name: 'item sku',
-            required: true
+            required: true,
+            type: 'string'
         },
         upc: {
             name: 'upc',
-            required: false
+            required: false,
+            type: 'string'
         },
         description: {
             name: 'item description',
-            required: true
+            required: true,
+            type: 'string'
         },
         phonetic: {
             name: 'phonetic description',
-            required: false
+            required: false,
+            type: 'string'
         },
         itemType: {
             name: 'item type',
-            required: true
+            required: true,
+            type: 'itemType'
         },
         uom: {
             name: 'item uom',
-            required: true
+            required: true,
+            type: 'itemUom'
+        },
+        weightTolerance: {
+            name: 'weight tolerance',
+            required: true,
+            min: 0,
+            max: 100,
+            type: 'number'
+        },
+        scannedVerification: {
+            name: 'scanner verification id',
+            required: false,
+            type: 'string'
+        },
+        spokenVerification: {
+            name: 'spoken verification id',
+            required: false,
+            type: 'string'
         },
         weight: {
             name: 'item weight',
-            required: false
+            required: false,
+            type: 'boolean'
         },
         variableWeight: {
             name: 'variable weight',
             required: true,
-            min: 0,
-            max: 100
-        },
-        weightTolerance: {
-            name: 'weight tolerance',
-            required: true
+            type: 'boolean'
         },
         expiryDate: {
             name: 'expiry date',
-            required: false
+            required: false,
+            type: 'boolean'
         },
         serial: {
             name: 'item serial',
-            required: false
+            required: false,
+            type: 'boolean'
         },
         batchNumber: {
             name: 'batch number',
-            required: false
-        },
-        scannerVerification: {
-            name: 'scanner verification id',
-            required: false
-        },
-        spokenVerification: {
-            name: 'spoken verification id',
-            required: false
-        },
-        status: {
-            name: 'Item Status',
-            required: true
+            required: false,
+            type: 'boolean'
         }
     };
 
     public static LocationMap = {
         code: {
             name: 'code',
-            required: true
+            required: true,
+            type: 'string'
         },
-        sections: {
-            name: 'sections',
-            required: false
+        section: {
+            name: 'section',
+            required: false,
+            type: 'string'
         },
         lane: {
             name: 'lane',
-            required: false
+            required: false,
+            type: 'string'
         },
         column: {
             name: 'column',
-            required: false
+            required: false,
+            type: 'string'
         },
         height: {
             name: 'height',
-            required: false
+            required: false,
+            type: 'number'
         },
         deep: {
             name: 'deep',
-            required: false
-        },
-        checkDigits: {
-            name: 'check digits',
             required: false,
-            unique: true
+            type: 'string'
+        },
+        checkDigit: {
+            name: 'check digit',
+            required: false,
+            unique: true,
+            type: 'number',
+            min: 1,
+            max: 99999,
+            minlength: 1,
+            maxlength: 5
+        },
+        module: {
+            name: 'module',
+            required: false,
+            type: 'string'
         }
     };
 
@@ -224,6 +251,32 @@ export class ModelMap {
         rootWorkCode: {
             name: 'root code',
             required: false
+        }
+    };
+    public static RecentOriginMap = {
+        filename: {
+            name: 'file name',
+            type: 'string'
+        },
+        filepath: {
+            name: 'file path',
+            type: 'string'
+        },
+        date: {
+            name: 'date',
+            type: 'date'
+        },
+        user: {
+            name: 'user',
+            type: 'string'
+        },
+        totalRows: {
+            name: 'total rows',
+            type: 'number'
+        },
+        invalidRows: {
+            name: 'invalid rows',
+            type: 'number'
         }
     };
 

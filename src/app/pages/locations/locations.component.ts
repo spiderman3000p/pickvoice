@@ -9,9 +9,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-import { map, catchError, retry } from 'rxjs/operators';
+import { retry } from 'rxjs/operators';
 import { LocationsService, Location } from '@pickvoice/pickvoice-api';
-import { HttpResponse } from '@angular/common/http';
 
 export interface ValidationError {
   error: string;
@@ -28,7 +27,7 @@ export class LocationsComponent implements OnInit {
   headers: any = ModelMap.LocationMap;
   validationRequested = false;
   invalidRows: any[] = [];
-  dataSource: MatTableDataSource<any>;
+  dataSource: MatTableDataSource<Location>;
   dataToSend: Location[];
   displayedColumns = Object.keys(ModelMap.LocationMap);
   pageSizeOptions = [5, 10]; // si se mustran mas por pantalla se sale del contenedor
@@ -46,11 +45,19 @@ export class LocationsComponent implements OnInit {
       this.filter = new FormControl('');
       this.dataValidationErrors = [];
       this.dataToSend = [];
+      this.isLoadingResults = true;
       console.log('requesting locations');
       this.apiService.retrieveAllLocation('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
-      .subscribe(locations => {
-        console.log('locations received', locations);
-        // this.dataSource.data = locations;
+      .subscribe(response => {
+        this.isLoadingResults = false;
+        console.log('locations received', response.body);
+        this.dataSource.data = response.body.map((element, index) => {
+          return { index: index, ... element};
+        });
+      }, error => {
+        console.error('Error on requesting locations');
+        this.isLoadingResults = false;
+        this.utilities.showSnackBar('Error on requesting data', 'OK');
       });
   }
 
@@ -77,8 +84,17 @@ export class LocationsComponent implements OnInit {
   }
 
   editRow(index: number) {
-    const dialogRef = this.dialog.open(EditRowDialogComponent, { data: { row: this.dataSource.data[index],
-      map: ModelMap.LocationMap}});
+    const dialogRef = this.dialog.open(EditRowDialogComponent,
+      {
+        data:
+        {
+          row: this.dataSource.data[index],
+          map: ModelMap.LocationMap,
+          type: 'locations',
+          remoteSync: true // para mandar los datos a la BD por la API
+        }
+      }
+    );
     dialogRef.afterClosed().subscribe(result => {
       console.log('dialog result:', result);
       if (result) {

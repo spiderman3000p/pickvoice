@@ -19,6 +19,8 @@ export class DataPreviewComponent implements OnInit {
       if (rowData) {
         this.rowData = rowData;
       }
+    }, error => {
+      console.error('error on request', error);
     });
     this.dataProvider.columnDefs.subscribe(columnDefs => {
       console.log('new columnDefs arrived', columnDefs);

@@ -5,14 +5,17 @@ import { Subject, Observable, from, of } from 'rxjs';
     providedIn: 'root',
 })
 export class DataStorage {
-    public data: any;
-    /*public sheets: Observable<any[]>;
-    public fileName: Observable<any>;*/
-    public dataType: Subject<any>;
-    public sheets: Subject<any[]>;
-    public fileName: Subject<any>;
-    public rowData: Subject<any[]>;
-    public columnDefs: Subject<any[]>;
+    public data: any; // usada para alojar los rows de la tabla del componente de importacion
+    public dataType: Subject<any>; // se refiere al tipo de importacion: items, locations, orders
+    public sheets: Subject<any[]>; // guarda las paginas del archivo excel/txt/csv parseado
+    public fileName: Subject<any>; // guarda el nombre del archivo parseado
+    public rowData: Subject<any[]>; /* guarda los datos de un registro en particular para usarlos
+    en el componente importing-widget*/
+    public columnDefs: Subject<any[]>; /* guarda la definicion de columnas del archivo parseado
+    para usarlos en el componente importing-widget*/
+    public filePath: string; /* guarda el path del archivo seleccionado, no es subject porque
+    no se requiere obtener su cambio en tiempo real
+    */
     _fileName: string;
     _dataType: string;
     _sheets: any[];

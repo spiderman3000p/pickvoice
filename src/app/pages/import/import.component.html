@@ -11,7 +11,7 @@
                 <mat-card-title>
                     Data to import
                     <button mat-raised-button color="primary" class="more-button" (click)="importWidget()">
-                    <mat-icon>cloud_upload</mat-icon> <span class="ml-3">Import</span>
+                        <mat-icon>cloud_upload</mat-icon> <span class="ml-3">Import</span>
                     </button>
                     <!--button mat-raised-button color="primary" class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
                     <mat-icon>add_circle_outline</mat-icon> <span class="ml-3">Importar</span>
@@ -31,7 +31,7 @@
                     <input matInput [formControl]="filter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
                 </mat-form-field>
                 <div *ngIf="dataSource.data.length > 0">
-                    <mat-table [dataSource]="dataSource" matSort>
+                    <table mat-table [dataSource]="dataSource" matSort>
                     <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ headers[column].name | uppercase}} </th>
                         <td mat-cell *matCellDef="let element"> {{ renderColumnData(headers[column].type, element[column]) }} </td>
@@ -40,11 +40,11 @@
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;" [matTooltip]="row.tooltip"
                     [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row.index)"></tr>
-                    </mat-table>
+                    </table>
                     <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                 </div>
                 <div *ngIf="validationRequested && !isLoadingResults && dataSource.data.length > 0" role="alert" class="alert" 
-                [ngClass]="{ 'alert-danger': (dataValidationErrors.length > 0), 'alert-success': isReadyToSend }">
+                [ngClass]="{ 'alert-danger': (dataValidationErrors.length > 0), 'alert-success': isReadyToSend || isDataSaved }">
                     {{ getValidationAlertMessage() }}
                 </div>
                 </mat-card-content>
@@ -52,7 +52,7 @@
                     <button mat-raised-button [ngClass]="{'primary': !isReadyToSend, 'success': isReadyToSend}"
                     [disabled]="isLoadingResults" (click)="!isReadyToSend ? validateData() : sendData()" 
                     *ngIf="dataSource.data.length > 0 && !isReadyToSend">{{ getValidateBtnText() }}</button>
-                    <button mat-raised-button (click)="sendData()" [disabled]="!isReadyToSend || isLoadingResults || isDataSaved"
+                    <button mat-raised-button *ngIf="!isDataSaved" (click)="sendData()" [disabled]="!isReadyToSend || isLoadingResults"
                     color="primary">Next</button>
                 </mat-card-actions>
             </mat-card>

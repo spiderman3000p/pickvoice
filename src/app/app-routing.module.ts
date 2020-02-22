@@ -22,6 +22,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'pages', pathMatch: 'full' },
   { path: 'importing',
     outlet: 'importing',
+    // canActivateChild: [AuthGuard],
     children: [
       {
         path: 'import-type-selection',

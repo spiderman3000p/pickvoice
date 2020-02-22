@@ -38,6 +38,7 @@ export class FileImportComponent implements OnInit {
     console.log('file', this.file);
     console.log('file size', this.file.size);
     console.log('file type', this.file.type);
+    console.log('file path', this.file.webkitRelativePath);
     if (this.file.size > (5 * 1024 * 1024)) {
       this.utilities.showSnackBar('The file size is bigger than 5MB', 'OK');
       return;
@@ -71,10 +72,11 @@ export class FileImportComponent implements OnInit {
       wb.SheetNames.forEach((key, index) => {
         wsname = key;
         ws = wb.Sheets[key];
-        parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false});
+        parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false, defval: ''});
         const sheet = {} as any;
         sheet.name = wsname;
         sheet.rowData = parsedData;
+        console.log('keys parsed', Object.keys(parsedData[0]));
         sheet.columnDefs = Object.keys(parsedData[0]).map(column => {
           return {field: column};
         });
@@ -86,6 +88,7 @@ export class FileImportComponent implements OnInit {
       // guardando los datos en el provider
       this.dataProvider.setSheets(sheets);
       this.dataProvider.setFileName(this.file.name);
+      this.dataProvider.filePath = this.file.webkitRelativePath;
       /*this.dataProvider.data = {
         sheets: sheets
       };*/
@@ -115,7 +118,7 @@ export class FileImportComponent implements OnInit {
         const receivedKeys: any[] = Object.keys(result[0]);
 
         if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
-          console.error('el formato de los datos recibidos no coincide con el formato esperado');
+          console.error('the received data schema is not valid');
           this.utilities.showSnackBar('Error in data format', 'OK');
           return;
         }

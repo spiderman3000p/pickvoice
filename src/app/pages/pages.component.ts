@@ -48,12 +48,6 @@ export class PagesComponent implements OnInit, OnDestroy  {
               icon: 'home',
               route: '/pages/item-types',
               children: []
-            },
-            {
-              text: 'Recent Origins',
-              icon: 'home',
-              route: '/pages/recent-origins',
-              children: []
             }
           ]
         }
@@ -63,19 +57,20 @@ export class PagesComponent implements OnInit, OnDestroy  {
       text: 'Administration',
       icon: 'supervisor_account',
       route: '/pages/administration',
-      children: []
-    },
-    {
-      text: 'Pending Orders',
-      icon: 'restore',
-      route: '/pages/pending-orders',
-      children: []
-    },
-    {
-      text: 'Current Actions',
-      icon: 'query_builder',
-      route: '/pages/current-actions',
-      children: []
+      children: [
+        {
+          text: 'Pending Orders',
+          icon: 'restore',
+          route: '/pages/pending-orders',
+          children: []
+        },
+        {
+          text: 'Current Actions',
+          icon: 'query_builder',
+          route: '/pages/current-actions',
+          children: []
+        }
+      ]
     }
   ];
 

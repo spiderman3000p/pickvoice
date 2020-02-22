@@ -1,11 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
+import { RecentOriginsService } from '../../services/recent-origins.service';
 import { DataStorage } from '../../services/data-provider';
 import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
 import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { ModelMap } from '../../models/model-maps.model';
+import { RecentOrigin } from '../../models/recent-origin.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -48,7 +50,7 @@ export class ImportComponent implements OnInit {
   constructor(
     private dialog: MatDialog, private itemsService: ItemsService, private ordersService: OrderService,
     private locationsService: LocationsService, private utilities: UtilitiesService,
-    private dataProvider: DataStorage ) {
+    private dataProvider: DataStorage, private recentOriginsService: RecentOriginsService ) {
     this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
     this.dataValidationErrors = [];
@@ -77,7 +79,7 @@ export class ImportComponent implements OnInit {
         if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
           console.log('received keys', receivedKeys);
           console.log('required keys', this.displayedColumns);
-          console.error('el formato de los datos recibidos no coincide con el formato esperado');
+          console.error('the received data schema is invalid');
           this.utilities.showSnackBar('Error in data format', 'OK');
           return;
         }
@@ -89,7 +91,7 @@ export class ImportComponent implements OnInit {
       }
     });
   }
-
+/* TODO: eliminar
   importFile(_type: string) {
     this.isDataSaved = false;
     this.isLoadingResults = true;
@@ -109,7 +111,7 @@ export class ImportComponent implements OnInit {
         if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
           console.log('received keys', receivedKeys);
           console.log('required keys', this.displayedColumns);
-          console.error('el formato de los datos recibidos no coincide con el formato esperado');
+          console.error('the received data schema is invaid');
           this.utilities.showSnackBar('Error in data format', 'OK');
           return;
         }
@@ -121,7 +123,7 @@ export class ImportComponent implements OnInit {
       }
     });
   }
-
+*/
   renderColumnData(type: string, data: any) {
     return this.utilities.renderColumnData(type, data);
   }
@@ -132,69 +134,6 @@ export class ImportComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-  }
-
-  sendItemsData() {
-    this.itemsService.createItemsList(this.dataToSend, 'response', true).pipe(
-      retry(3)
-    ).subscribe(result => {
-      this.isLoadingResults = false;
-      result = result as HttpResponse<any>;
-      // result as HttpResponse is expected
-      console.log('api call result', result);
-      // status 201 is successfull response (CREATED)
-      if (result && result.status === 201 && result.ok) {
-        this.isDataSaved = true;
-        console.log('items created successfully');
-        this.utilities.showSnackBar('Items saved successfully', 'OK');
-       } else {
-        this.isDataSaved = false;
-        console.log('items could not be created');
-        this.utilities.showSnackBar('Error saving items', 'OK');
-      }
-    });
-  }
-
-  sendLocationsData() {
-    this.locationsService.createLocationsList(this.dataToSend, 'response', true).pipe(
-      retry(3)
-    ).subscribe(result => {
-      this.isLoadingResults = false;
-      result = result as HttpResponse<any>;
-      // result as HttpResponse is expected
-      console.log('api call result', result);
-      // status 201 is successfull response (CREATED)
-      if (result && result.status === 201 && result.ok) {
-        this.isDataSaved = true;
-        console.log('locations created successfully');
-        this.utilities.showSnackBar('Locations saved successfully', 'OK');
-       } else {
-        this.isDataSaved = false;
-        console.log('locations could not be created');
-        this.utilities.showSnackBar('Error saving locations', 'OK');
-      }
-    });
-  }
-
-  sendOrdersData() {
-    this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(
-      retry(3)
-    ).subscribe(result => {
-      this.isLoadingResults = false;
-      result = result as HttpResponse<any>;
-      // result as HttpResponse is expected
-      console.log('api call result', result);
-      // status 201 is successfull response (CREATED)
-      if (result && result.status === 201 && result.ok) {
-        this.isDataSaved = true;
-        console.log('orders created successfully');
-        this.utilities.showSnackBar('Orders saved successfully', 'OK');
-       } else {
-        this.isDataSaved = false;
-        console.log('orders could not be created');
-        this.utilities.showSnackBar('Error saving orders', 'OK');
-      }
-    });
   }
 
   sendData() {
@@ -216,6 +155,76 @@ export class ImportComponent implements OnInit {
     }
   }
 
+  sendItemsData() {
+    this.itemsService.createItemsList(this.dataToSend, 'response', true).pipe(
+      retry(3)
+    ).subscribe(result => {
+      this.isLoadingResults = false;
+      result = result as HttpResponse<any>;
+      // result as HttpResponse is expected
+      console.log('api call result', result);
+      // status 201 is successfull response (CREATED)
+      if (result && result.status === 201 && result.ok) {
+        this.isDataSaved = true;
+        console.log('items created successfully');
+        this.addRecentOrigin('items');
+        this.utilities.showSnackBar('Items saved successfully', 'OK');
+       } else {
+        this.isDataSaved = false;
+        console.log('items could not be created');
+        this.utilities.showSnackBar('Error saving items', 'OK');
+      }
+    }, error => {
+      console.error('error en request');
+      this.utilities.showSnackBar('Error saving items', 'OK');
+      this.isLoadingResults = false;
+    });
+  }
+
+  sendLocationsData() {
+    this.locationsService.createLocationsList(this.dataToSend, 'response', true).pipe(
+      retry(3)
+    ).subscribe(result => {
+      this.isLoadingResults = false;
+      result = result as HttpResponse<any>;
+      // result as HttpResponse is expected
+      console.log('api call result', result);
+      // status 201 is successfull response (CREATED)
+      if (result && result.status === 201 && result.ok) {
+        this.isDataSaved = true;
+        console.log('locations created successfully');
+        this.addRecentOrigin('locations');
+        this.utilities.showSnackBar('Locations saved successfully', 'OK');
+       } else {
+        this.isDataSaved = false;
+        console.log('locations could not be created');
+        this.utilities.showSnackBar('Error saving locations', 'OK');
+      }
+    });
+  }
+
+  sendOrdersData() {
+    this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(
+      retry(3)
+    ).subscribe(result => {
+      this.isLoadingResults = false;
+      result = result as HttpResponse<any>;
+      // result as HttpResponse is expected
+      console.log('api call result', result);
+      // status 201 is successfull response (CREATED)
+      if (result && result.status === 201 && result.ok) {
+        this.isDataSaved = true;
+        console.log('orders created successfully');
+        this.addRecentOrigin('orders');
+        this.utilities.showSnackBar('Orders saved successfully', 'OK');
+       } else {
+        this.isDataSaved = false;
+        console.log('orders could not be created');
+        this.utilities.showSnackBar('Error saving orders', 'OK');
+      }
+    });
+  }
+
   handleError(error: any) {
     console.error('error sending data to api', error);
     this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
@@ -232,143 +241,162 @@ export class ImportComponent implements OnInit {
       this.isLoadingResults = true;
       let exists;
       const copyData = this.dataSource.data.slice();
+      let rowToSave: any;
 
       copyData.forEach((row, rowIndex) => {
-        const rowToSave = JSON.parse(JSON.stringify(row));
+        if (this.dataProvider.getDataType() === 'items') {
+          rowToSave = new Object(row) as Item;
+        }
+        if (this.dataProvider.getDataType() === 'locations') {
+          rowToSave = new Object(row) as Location;
+        }
+        if (this.dataProvider.getDataType() === 'orders') {
+          rowToSave = new Object(row) as Order;
+        }
         errorFound = false;
         currentRowErrors = [];
         // console.log('headers before validate', this.headers);
         for (const field in this.headers) {
           if (1) {// just for avoid lint error mark on visual studio code
             // console.log('validating field ', field);
-          /*
-            Para el caso de la importacion de ordenes, hay ciertas columnas que no se van validar en esta iteracion.
-            Esas columnas a no iterar son las que se encuentran en el array skipedColumns.
-            Esas columnas que se encuentren dentro del array skipedColumns son referenciadas directamente.
-          */
-          if (this.dataProvider.getDataType() === 'orders' && this.skipedColumns.findIndex(column => column === field) > -1) {
-            // console.log('skipped field ', field);
-            continue;
-          }
-          // comprobando campos requeridos
-          if (this.headers[field].required && (!row[field] || row[field].length === 0)) {
-            // console.log('it is required?');
-            const validationError = new Object() as ValidationError;
-            validationError.index = rowIndex;
-            validationError.error = `The field ${this.headers[field].name} (${field}) is required`;
-            this.dataValidationErrors.push(validationError);
-            currentRowErrors.push(validationError);
-            errorFound = true;
-            console.error(`There's no exists the field ${field} in the record ${rowIndex}`);
-          }
-          if (this.headers[field].min && row[field] < this.headers[field].min) {
-            // console.log('it is lower than min?');
-            const validationError = new Object() as ValidationError;
-            validationError.index = rowIndex;
-            validationError.error = `The field ${this.headers[field].name} (${field})
-              must be greater than ${this.headers[field].min}`;
-            this.dataValidationErrors.push(validationError);
-            currentRowErrors.push(validationError);
-            errorFound = true;
-            console.error(`The field ${this.headers[field].name} (${field})
-            must be greater than ${this.headers[field].min} in the record ${rowIndex}`);
-          }
-          if (this.headers[field].max && row[field] > this.headers[field].max) {
-            // console.log('it is greater than max?');
-            const validationError = new Object() as ValidationError;
-            validationError.index = rowIndex;
-            validationError.error = `The field ${this.headers[field].name} (${field})
-              must be lower than ${this.headers[field].max}`;
-            this.dataValidationErrors.push(validationError);
-            currentRowErrors.push(validationError);
-            errorFound = true;
-            console.error(`The field ${this.headers[field].name} (${field})
-            must be lower than ${this.headers[field].max} in the record ${rowIndex}`);
-          }
-          // comprobando si el campo es unico
-          exists = 0;
-          copyData.forEach((element, index) => {
-            // console.log(`index & rowIndex ${index}, ${rowIndex}`);
-            if (index !== rowIndex) {
-              // console.log(`exists!!`);
-              exists += element[field] == row[field] ? 1 : 0;
+            // arreglamos los valores booleanos en caso de que esten en formato texto mayusculas
+            if (row[field] === 'TRUE' || row[field] === 'FALSE') {
+              row[field] = row[field] === 'TRUE' ? true : false;
             }
-          });
-          console.log(`field ${field} repeat ${exists} times`);
-          // comprobando si el campo es unico
-          if (this.headers[field].unique &&  exists > 0) {
-            const validationError = new Object() as ValidationError;
-            validationError.index = rowIndex;
-            validationError.error = `The field ${this.headers[field].name} (${field})
-              must be unique in all the collection. It repits ${exists} times`;
-            this.dataValidationErrors.push(validationError);
-            currentRowErrors.push(validationError);
-            errorFound = true;
-            console.error(`Theld ${this.headers[field].name} (${field})
-            must be unique in all the collection, in the record ${rowIndex}. It repits ${exists} times`);
-          }
-          /*
-            Comprobacion de datos compuestos (usando varias columnas), dependiendo del tipo de importacion
-            seleccionado
-          */
-          if (this.dataProvider.getDataType() === 'items') {
-            // console.log('validating compound items data');
-            if (field === 'itemType') {
-              rowToSave[field] = new Object() as ItemType;
-              rowToSave[field].code = row[field] as string;
-              rowToSave[field].name = '';
+            /*
+              Para el caso de la importacion de ordenes, hay ciertas columnas que no se van validar en esta iteracion.
+              Esas columnas a no iterar son las que se encuentran en el array skipedColumns.
+              Esas columnas que se encuentren dentro del array skipedColumns son referenciadas directamente.
+            */
+            if (this.dataProvider.getDataType() === 'orders' && this.skipedColumns.findIndex(column => column === field) > -1) {
+              // console.log('skipped field ', field);
+              continue;
             }
-            if (field === 'uom') {
-              rowToSave[field] = new Object() as UnityOfMeasure;
-              rowToSave[field].code = row[field] as string;
-              rowToSave[field].name = '';
+            // comprobando campos requeridos
+            if (this.headers[field].required && row[field] === undefined) {
+              // console.log('it is required?');
+              const validationError = new Object() as ValidationError;
+              validationError.index = rowIndex;
+              validationError.error = `The field ${this.headers[field].name} (${field}) is required`;
+              this.dataValidationErrors.push(validationError);
+              currentRowErrors.push(validationError);
+              errorFound = true;
+              console.error(`There's no exists the field ${field} in the record ${rowIndex}`);
             }
-          } else if (this.dataProvider.getDataType() === 'locations') {
-            // console.log('validating compound locations data');
-            // No hay datos compuestos por validar
-          } else if (this.dataProvider.getDataType() === 'orders') {
-            // console.log('validating compound orders data');
-            if (field === 'transport') {
-              rowToSave['transport'] = new Object() as Transport;
-              rowToSave[field].transportNumber = row[field];
-              rowToSave[field].route = row['route'] ? row['route'] : '';
-              rowToSave[field].name = row['routeName'] ? row['routeName'] : '';
-              rowToSave[field].dispatchPlatforms = row['dispatchPlatforms'] ? row['dispatchPlatforms'] : '';
-              rowToSave[field].carrierCode = row['carrierCode'] ? row['carrierCode'] : '';
+            if (this.headers[field].min && row[field] < this.headers[field].min) {
+              // console.log('it is lower than min?');
+              const validationError = new Object() as ValidationError;
+              validationError.index = rowIndex;
+              validationError.error = `The field ${this.headers[field].name} (${field})
+                must be greater than ${this.headers[field].min}`;
+              this.dataValidationErrors.push(validationError);
+              currentRowErrors.push(validationError);
+              errorFound = true;
+              console.error(`The field ${this.headers[field].name} (${field})
+              must be greater than ${this.headers[field].min} in the record ${rowIndex}`);
             }
-            if (field === 'customerNumber') {
-              rowToSave['customer'] = new Object() as Customer;
-              rowToSave['customer'].code = row[field];
-              rowToSave['customer'].name = row['customerName'] ? row['customerName'] : '';
-              rowToSave['customer'].address = row['address'] ? row['address'] : '';
+            if (this.headers[field].max && row[field] > this.headers[field].max) {
+              // console.log('it is greater than max?');
+              const validationError = new Object() as ValidationError;
+              validationError.index = rowIndex;
+              validationError.error = `The field ${this.headers[field].name} (${field})
+                must be lower than ${this.headers[field].max}`;
+              this.dataValidationErrors.push(validationError);
+              currentRowErrors.push(validationError);
+              errorFound = true;
+              console.error(`The field ${this.headers[field].name} (${field})
+              must be lower than ${this.headers[field].max} in the record ${rowIndex}`);
             }
-            if (field === 'sku') {
-              const orderLine = new Object() as OrderLine;
-              orderLine.item = new Object() as Item;
-              orderLine.item.sku = row['sku'];
-              orderLine.item.description = row['description'] ? row['description'] : '';
-              orderLine.item.itemType = row['itemType'] ? row['itemType'] : '';
-              orderLine.item.uom = row['codeUom'] ? row['codeUom'] : '';
+            // comprobando si el campo es unico
+            exists = 0;
+            // usamos un forEach en lugar de findIndex o find, para contar el numero de apariciones
+            copyData.forEach((element, index) => {
+              // console.log(`index & rowIndex ${index}, ${rowIndex}`);
+              if (index !== rowIndex) {
+                // console.log(`exists!!`);
+                exists += element[field] == row[field] ? 1 : 0;
+              }
+            });
+            console.log(`field ${field} repeat ${exists} times`);
+            // comprobando si el campo es unico
+            if (this.headers[field].unique && row[field] !== ''  && exists > 0) {
+              const validationError = new Object() as ValidationError;
+              validationError.index = rowIndex;
+              validationError.error = `The field ${this.headers[field].name} (${field})
+                must be unique in all the collection. It repits ${exists} times`;
+              this.dataValidationErrors.push(validationError);
+              currentRowErrors.push(validationError);
+              errorFound = true;
+              console.error(`Theld ${this.headers[field].name} (${field})
+              must be unique in all the collection, in the record ${rowIndex}. It repits ${exists} times`);
+            }
+            /*
+              Comprobacion de datos compuestos (usando varias columnas), dependiendo del tipo de importacion
+              seleccionado
+            */
+            if (this.dataProvider.getDataType() === 'items') {
+              // console.log('validating compound items data');
+              if (field === 'itemType') {
+                const aux = row.itemType;
+                rowToSave[field] = new Object() as ItemType;
+                rowToSave[field].code = aux;
+                rowToSave[field].name = '';
+                rowToSave[field].description = '';
+              }
+              if (field === 'uom') {
+                const aux = row.uom;
+                rowToSave[field] = new Object() as UnityOfMeasure;
+                rowToSave[field].code = aux;
+                rowToSave[field].description = '';
+              }
+              // añadimos campos por defecto
+              rowToSave.itemState = Item.ItemStateEnum.Active;
+            } else if (this.dataProvider.getDataType() === 'locations') {
+              // console.log('validating compound locations data');
+              // No hay datos compuestos por validar
+            } else if (this.dataProvider.getDataType() === 'orders') {
+              // console.log('validating compound orders data');
+              if (field === 'transport') {
+                rowToSave['transport'] = new Object() as Transport;
+                rowToSave[field].transportNumber = row[field];
+                rowToSave[field].route = row['route'] ? row['route'] : '';
+                rowToSave[field].name = row['routeName'] ? row['routeName'] : '';
+                rowToSave[field].dispatchPlatforms = row['dispatchPlatforms'] ? row['dispatchPlatforms'] : '';
+                rowToSave[field].carrierCode = row['carrierCode'] ? row['carrierCode'] : '';
+              }
+              if (field === 'customerNumber') {
+                rowToSave['customer'] = new Object() as Customer;
+                rowToSave['customer'].code = row[field];
+                rowToSave['customer'].name = row['customerName'] ? row['customerName'] : '';
+                rowToSave['customer'].address = row['address'] ? row['address'] : '';
+              }
+              if (field === 'sku') {
+                const orderLine = new Object() as OrderLine;
+                orderLine.item = new Object() as Item;
+                orderLine.item.sku = row['sku'];
+                orderLine.item.description = row['description'] ? row['description'] : '';
+                orderLine.item.itemType = row['itemType'] ? row['itemType'] : '';
+                orderLine.item.uom = row['codeUom'] ? row['codeUom'] : '';
 
-              orderLine.qtyToPicked = row['qtyToPicked'] ? row['qtyToPicked'] : '';
-              orderLine.expiryDate = row['expiryDate'] ? row['expiryDate'] : '';
-              orderLine.serial = row['serial'] ? row['serial'] : '';
+                orderLine.qtyToPicked = row['qtyToPicked'] ? row['qtyToPicked'] : '';
+                orderLine.expiryDate = row['expiryDate'] ? row['expiryDate'] : '';
+                orderLine.serial = row['serial'] ? row['serial'] : '';
 
-              orderLine.location = new Object() as Location;
-              orderLine.location.code = row['codeLocation'] ? row['codeLocation'] : '';
+                orderLine.location = new Object() as Location;
+                orderLine.location.code = row['codeLocation'] ? row['codeLocation'] : '';
 
-              orderLine.baseItemOverride = row['baseItemOverride'] ? row['baseItemOverride'] : '';
-              orderLine.caseLabelCheckDigits = row['caseLabelCheckDigits'] ? row['caseLabelCheckDigits'] : '';
-              orderLine.cartonCode = row['cartonCode'] ? row['cartonCode'] : '';
-              orderLine.cartonCode = row['pickSequenceNumber'] ? row['pickSequenceNumber'] : '';
-              orderLine.workCode = row['workCode'] ? row['workCode'] : '';
+                orderLine.baseItemOverride = row['baseItemOverride'] ? row['baseItemOverride'] : '';
+                orderLine.caseLabelCheckDigits = row['caseLabelCheckDigits'] ? row['caseLabelCheckDigits'] : '';
+                orderLine.cartonCode = row['cartonCode'] ? row['cartonCode'] : '';
+                orderLine.cartonCode = row['pickSequenceNumber'] ? row['pickSequenceNumber'] : '';
+                orderLine.workCode = row['workCode'] ? row['workCode'] : '';
 
-              rowToSave['orderLine'] = orderLine;
+                rowToSave['orderLine'] = orderLine;
+              }
+              if (field === 'departureDateTime' || field === 'departureDateTime') {
+                rowToSave[field] = new Date(row[field]);
+              }
             }
-            if (field === 'departureDateTime' || field === 'departureDateTime') {
-              rowToSave[field] = new Date(row[field]);
-            }
-          }
           }
         }
         /*
@@ -412,6 +440,9 @@ export class ImportComponent implements OnInit {
   }
 
   editRow(index: number) {
+    console.log('row to send to edit dialog', this.dataSource.data[index]);
+    console.log('map to send to edit dialog',
+    this.utilities.dataTypesModelMaps[this.dataProvider.getDataType()]);
     const dialogRef = this.dialog.open(EditRowDialogComponent,
       {
         data: {
@@ -431,10 +462,17 @@ export class ImportComponent implements OnInit {
   }
 
   getValidationAlertMessage() {
-    return this.dataValidationErrors.length > 0 ?
-    `There are ${this.invalidRows.length} invalid records wich you neeed to fix.
-    Please, fix them and try again` :
-    'Data validated successfully. Press next to continue';
+    let message = '';
+    if (this.dataValidationErrors.length > 0) {
+      message = `There are ${this.invalidRows.length} invalid records wich you neeed to fix.
+                Please, fix them and try again`;
+    } else {
+      message = 'Data validated successfully. Press next to continue';
+    }
+    if (this.isDataSaved) {
+      message = 'Data saved successfully';
+    }
+    return message;
   }
 
   getValidateBtnText() {
@@ -452,6 +490,17 @@ export class ImportComponent implements OnInit {
     if (this.dataSource.data.length > 0 && this.isReadyToSend && !this.isLoadingResults) {
       return 'Next';
     }
+  }
+
+  addRecentOrigin(type: string) {
+    const newOrigin = new RecentOrigin();
+    newOrigin.filename = this.dataProvider.getFileName();
+    newOrigin.filepath = this.dataProvider.filePath;
+    newOrigin.invalidRows = this.dataSource.data.filter(row => row.invalid).length; // numero de registros invalidos
+    newOrigin.totalRows = this.dataToSend.length; // numero de registros
+    newOrigin.importedRows = 0; // numero de registros aceptados en la bd api
+    newOrigin.rejectedRows = 0; // numero de registros no aceptados en la bd api
+    this.recentOriginsService.addRecentOrigin(type, newOrigin);
   }
 
   ngOnInit() {

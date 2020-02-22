@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LayoutModule } from '@angular/cdk/layout';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -20,6 +21,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { PagesModule } from './pages/pages.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -35,6 +37,7 @@ import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/rad
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { DataStorage } from './services/data-provider';
+import { AuthService } from './services/auth.service';
 import { BASE_PATH } from '@pickvoice/pickvoice-api';
 import { environment } from '../environments/environment';
 
@@ -56,6 +59,7 @@ import { environment } from '../environments/environment';
     AppRoutingModule,
     BrowserAnimationsModule,
     LayoutModule,
+    MatSlideToggleModule,
     MatInputModule,
     MatProgressSpinnerModule,
     MatDialogModule,
@@ -71,6 +75,7 @@ import { environment } from '../environments/environment';
     MatMenuModule,
     MatRadioModule,
     MatTabsModule,
+    MatCheckboxModule,
     PagesModule,
     FormsModule,
     ReactiveFormsModule,
@@ -84,7 +89,8 @@ import { environment } from '../environments/environment';
   providers: [
     { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }},
     { provide: BASE_PATH, useValue: environment.apiBaseUrl },
-    DataStorage
+    DataStorage,
+    AuthService
   ],
   bootstrap: [AppComponent]
 })

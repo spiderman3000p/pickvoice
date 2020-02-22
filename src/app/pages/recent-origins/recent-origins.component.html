@@ -1,1 +1,55 @@
-<p>recent-origins works!</p>
+<mat-tab-group>
+    <mat-tab label="Items">
+      <div class="container-fluid p-3">
+        <div class="row">
+          <div class="col-sm-12">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title>
+                  Recent Origins For Items
+                  <button mat-raised-button color="primary" class="more-button" (click)="clearStorage()">
+                    <mat-icon>delete_sweep</mat-icon> <span class="ml-3">Clear All</span>
+                  </button>
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="example-loading-shade" *ngIf="isLoadingResults">
+                  <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+                </div>
+                <mat-form-field class="w-100">
+                  <mat-label>Filter</mat-label>
+                  <input matInput (keyup)="applyFilterItems($event)" placeholder="Ex. Feb, 14 2019" >
+                </mat-form-field>
+                  
+                <div class="mat-elevation-z8">
+                  <table mat-table [dataSource]="itemsDataSource" matSort>
+                    <!-- ID Column -->
+                    <ng-container [matColumnDef]="column" *ngFor="let column of itemsDisplayedColumns">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ itemsHeaders[column].name | uppercase }} </th>
+                      <td mat-cell *matCellDef="let element"> {{ renderColumnData(itemsHeaders[column].type, element[column]) }} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="itemsDisplayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: itemsDisplayedColumns;">
+                    </tr>
+                  </table>
+                
+                  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+      </div>
+    </div>
+  </mat-tab>
+  <mat-tab label="Locations">
+      <div class="container-fluid">
+          
+      </div>
+  </mat-tab>
+  <mat-tab label="Orders">
+      <div class="container-fluid">
+          
+      </div>
+  </mat-tab>
+</mat-tab-group>
