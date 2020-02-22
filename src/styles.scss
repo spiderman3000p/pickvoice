@@ -17,7 +17,8 @@ table{
   width: 100%;
 }
 table.mat-table {
-  display: table;
+  width: 100%;
+  display: block;
 }
 th.mat-header-cell {
   padding-left: 24px !important;

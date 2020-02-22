@@ -47,7 +47,11 @@ export class ImportComponent implements OnInit {
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
     this.paginator = mp;
     this.initPaginatorSort();
-    }
+  }
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.initPaginatorSort();
+  }
 
   constructor(
     private dialog: MatDialog, private itemsService: ItemsService, private ordersService: OrderService,
