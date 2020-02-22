@@ -73,6 +73,7 @@ export class FileImportComponent implements OnInit {
         wsname = key;
         ws = wb.Sheets[key];
         parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false, defval: ''});
+        console.log('initial parsed data', parsedData);
         const sheet = {} as any;
         sheet.name = wsname;
         sheet.rowData = parsedData;
@@ -89,9 +90,6 @@ export class FileImportComponent implements OnInit {
       this.dataProvider.setSheets(sheets);
       this.dataProvider.setFileName(this.file.name);
       this.dataProvider.filePath = 'unknown'; /*this.file.webkitRelativePath;*/
-      /*this.dataProvider.data = {
-        sheets: sheets
-      };*/
       console.log('dataProvider data seted', sheets);
 
       // console.log('parsed xlsx data', this.parsedData);

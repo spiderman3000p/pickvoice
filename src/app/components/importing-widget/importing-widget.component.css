@@ -11,13 +11,12 @@ mat-list-item{
 }
 
 mat-drawer{
-    position: relative;
     max-width: 250px;
     min-width: 200px;
 }
 
 mat-drawer-content{
-    margin-left: 0px !important;
+    /*margin-left: 0px !important;*/
     width: 100% !important;
 }
 .mat-dialog-content{

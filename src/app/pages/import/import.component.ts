@@ -27,13 +27,11 @@ export interface ValidationError {
   styleUrls: ['./import.component.css']
 })
 export class ImportComponent implements OnInit {
-  // headers: any = ModelMap.ItemMap;
   headers: any; // contendra las cabeceras de las columnas a mostrar en la tabla
   validationRequested = false;
   invalidRows: any[] = [];
   dataSource: MatTableDataSource<any>;
   dataToSend: any[];
-  // displayedColumns = Object.keys(ModelMap.ItemMap);
   displayedColumns = []; // contendra las columnas de la entidad a impotar: items, locations u orders
   pageSizeOptions = [5, 10]; // si se mustran mas por pantalla se sale del contenedor
   filter: FormControl;
@@ -43,16 +41,20 @@ export class ImportComponent implements OnInit {
   dataValidationErrors: ValidationError[];
   skipedColumns = ['sku', 'description', 'itemType', 'codeUom', 'qtyToPicked',
   'expiryDate', 'serial', 'codeLocation', 'baseItemOverride', 'caseLabelCheckDigits',
-  'cartonCode', 'workCode'];
+  'cartonCode', 'workCode']; // solo para orders
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.initPaginatorSort();
+    }
 
   constructor(
     private dialog: MatDialog, private itemsService: ItemsService, private ordersService: OrderService,
     private locationsService: LocationsService, private utilities: UtilitiesService,
     private dataProvider: DataStorage, private recentOriginsService: RecentOriginsService,
     private cdr: ChangeDetectorRef ) {
-    
+
     this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
     this.dataValidationErrors = [];
@@ -63,7 +65,7 @@ export class ImportComponent implements OnInit {
       this.headers = this.utilities.dataTypesModelMaps[dataType];
       console.log('headers in import component', this.headers);
     });
-    this.initPaginatorSort();
+    // this.initPaginatorSort();
   }
 
   importWidget() {
@@ -86,49 +88,29 @@ export class ImportComponent implements OnInit {
           this.utilities.showSnackBar('Error in data format', 'OK');
           return;
         }
+        let aux;
         const newData = result.map((element, index) => {
           element.index = index;
+          /*if (this.dataProvider.getDataType() === 'items') {
+            console.lo
+            aux = element.itemType.code;
+            element.itemType = aux;
+            aux = element.uom.code;
+            element.uom = aux;
+          }*/
           return element;
         });
-        this.dataSource.data = newData;
-        setTimeout(() => this.initPaginatorSort(), 500);
+        if (this.dataSource === undefined) {
+          this.dataSource = new MatTableDataSource(newData);
+        } else {
+          this.dataSource.data = newData;
+        }
+        // setTimeout(() => this.initPaginatorSort(), 500);
         this.sendData();
       }
     });
   }
-/* TODO: eliminar
-  importFile(_type: string) {
-    this.isDataSaved = false;
-    this.isLoadingResults = true;
-    const dialogRef = this.dialog.open(ImportDialogComponent,
-      {
-        data: {
-          type: _type
-        },
-        width: '350px',
-        height: '250px'
-      });
-    dialogRef.afterClosed().subscribe(result => {
-      this.isLoadingResults = false;
-      if (result && result.length > 0) {
-        const receivedKeys: any[] = Object.keys(result[0]);
 
-        if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
-          console.log('received keys', receivedKeys);
-          console.log('required keys', this.displayedColumns);
-          console.error('the received data schema is invaid');
-          this.utilities.showSnackBar('Error in data format', 'OK');
-          return;
-        }
-        this.dataSource.data = result.map((element, index) => {
-          element.index = index;
-          return element;
-        });
-        console.log('data final', this.dataSource.data);
-      }
-    });
-  }
-*/
   renderColumnData(type: string, data: any) {
     return this.utilities.renderColumnData(type, data);
   }
@@ -464,7 +446,7 @@ export class ImportComponent implements OnInit {
         });*/
         let row = this.dataSource.data[index];
         row = result;
-        this.initPaginatorSort();
+        // this.initPaginatorSort();
       }
     });
   }
@@ -517,6 +499,9 @@ export class ImportComponent implements OnInit {
   }
 
   ngOnInit() {
+    // this.initPaginatorSort();
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
 }

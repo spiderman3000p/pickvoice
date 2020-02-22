@@ -26,12 +26,12 @@ export class DataPreviewComponent implements OnInit {
       console.log('new columnDefs arrived', columnDefs);
       if (columnDefs) {
         this.columnDefs = columnDefs.map(col => {
-          col['filter'] = true;
-          col['editable'] = true;
-          col['sortable'] = true;
+          col.filter = true;
+          col.editable = true;
+          col.sortable = true;
           return col;
         });
-        // this.columnDefs = columnDefs;
+        console.log('columnDefs sortable', this.columnDefs);
       }
     });
     console.log('in data-preview initial sheets', this.sheets);
@@ -57,6 +57,7 @@ export class DataPreviewComponent implements OnInit {
         col.sortable = true;
         return col;
       });
+      console.log('columnDefs sortable', this.columnDefs);
     }
     this.dataProvider.data = this.rowData;
   }

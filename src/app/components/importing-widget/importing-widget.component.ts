@@ -47,10 +47,14 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
-    // validamos los datos
-    // this.validateData();
     // cerramos el dialogo enviando los datos en formato json al componente llamante.
     this.init();
+    /*
+      El valor de dataProvider.data es asignado desde el componente data-preview.
+      El envio de datos a traves del metodo close puede suprimirse y usar el provider en el componente
+      llamante una vez que se cierre este dialogo.
+    */
+    console.log('dataProvider.data a retornar', this.dataProvider.data);
     this.dialogRef.close(this.dataProvider.data);
   }
 
