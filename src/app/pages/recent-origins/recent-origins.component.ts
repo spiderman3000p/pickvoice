@@ -116,6 +116,14 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
     this.ordersSubscriber.unsubscribe();
   }
 
+  applyFilter(filterValue: string, type) {
+    this[`${type}DataSource`].filter = filterValue.trim().toLowerCase();
+
+    if (this[`${type}DataSource`].paginator) {
+      this[`${type}DataSource`].paginator.firstPage();
+    }
+  }
+
   initItemsPaginatorSort() {
     this.itemsDataSource.paginator = this.itemsPaginator;
     this.itemsDataSource.sort = this.itemsSort;

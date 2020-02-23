@@ -18,7 +18,7 @@
                 </div>
                 <mat-form-field class="w-100">
                   <mat-label>Filter</mat-label>
-                  <input matInput (keyup)="applyFilterItems($event, 'items')" placeholder="Ex. Feb, 14 2019" >
+                  <input matInput (keyup)="applyFilter($event.target.value, 'items')" placeholder="Ex. Feb, 14 2019" >
                 </mat-form-field>
                   
                 <div class="mat-elevation-z8">
@@ -61,7 +61,7 @@
               </div>
               <mat-form-field class="w-100">
                 <mat-label>Filter</mat-label>
-                <input matInput (keyup)="applyFilter($event, 'locations')" placeholder="Ex. Feb, 14 2019" >
+                <input matInput (keyup)="applyFilter($event.target.value, 'locations')" placeholder="Ex. Feb, 14 2019" >
               </mat-form-field>
                 
               <div class="mat-elevation-z8">
@@ -104,7 +104,7 @@
                   </div>
                   <mat-form-field class="w-100">
                     <mat-label>Filter</mat-label>
-                    <input matInput (keyup)="applyFilter($event, 'orders')" placeholder="Ex. Feb, 14 2019" >
+                    <input matInput (keyup)="applyFilter($event.target.value, 'orders')" placeholder="Ex. Feb, 14 2019" >
                   </mat-form-field>
                     
                   <div class="mat-elevation-z8">

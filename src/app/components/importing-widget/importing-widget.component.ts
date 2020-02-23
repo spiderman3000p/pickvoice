@@ -29,19 +29,19 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
       this.mobileQuery.addListener(this._mobileQueryListener);
 
       this.dataProvider.sheets.subscribe(sheets => {
-        console.log('Sheets on importing-widget', sheets);
+        this.utilities.log('Sheets on importing-widget', sheets);
         if (sheets) {
           this.sheets = sheets;
         }
       }, error => {
-        console.error('Error obtaining file sheets');
+        this.utilities.error('Error obtaining file sheets');
         this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
       });
       this.dataProvider.fileName.subscribe(fileName => {
-        console.log('fileName on importing-widget', fileName);
+        this.utilities.log('fileName on importing-widget', fileName);
         this.fileName = fileName;
       }, error => {
-        console.error('Error obtaining file name');
+        this.utilities.error('Error obtaining file name');
         this.utilities.showSnackBar('Error obtaining file name', 'OK');
       });
       this.router.navigate([{outlets: {importing: 'importing'}}]);
@@ -60,7 +60,7 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
       El envio de datos a traves del metodo close puede suprimirse y usar el provider en el componente
       llamante una vez que se cierre este dialogo.
     */
-    console.log('dataProvider.data a retornar', this.dataProvider.data);
+    this.utilities.log('dataProvider.data a retornar', this.dataProvider.data);
     this.dialogRef.close(this.dataProvider.data);
   }
 
@@ -76,7 +76,7 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
   }
 
   changeSheet(sheet: any) {
-    console.log('change sheet requested');
+    this.utilities.log('change sheet requested');
     this.dataProvider.data = sheet.rowData;
     this.dataProvider.setRowData(sheet.rowData);
     this.dataProvider.setColumnDefs(sheet.columnDefs);
