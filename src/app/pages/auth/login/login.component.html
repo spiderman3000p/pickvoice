@@ -1,34 +1,36 @@
 <main>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-4 text-center p-6">
+      <div class="col-sm-12 col-md-4 col-lg-4 text-center p-6">
         <div class="example-loading-shade" *ngIf="isLoadingResults">
             <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
         </div>
-        <form class="form-signin" (ngSubmit)="doLogin()">
-          <img class="mb-4" src="assets/images/logo.png" alt="" width="72" height="72">
-          <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-          <mat-form-field class="w-100">
-            <mat-label for="inputUsername">Username</mat-label>
-            <input matInput type="text" id="inputUsername" placeholder="Username" required="" autofocus="" [formControl]="username">
-          </mat-form-field>
-          <mat-form-field class="w-100">
-            <mat-label for="inputPassword">Password</mat-label>
-            <input matInput [type]="showPassword ? 'text' : 'password'" id="inputPassword" placeholder="Password" required="" [formControl]="password">
-            <a matSuffix  href="javascript:void(0)" (click)="showPassword = !showPassword ">
-              <mat-icon >
-                {{ !showPassword ? 'visibility' : 'visibility_off'}}
-              </mat-icon>
-            </a>
-          </mat-form-field>
-          <div class="checkbox mb-3 pull-left text-left">
-              <mat-checkbox (click)="remember = !remember" class="text-left" color="primary">Remember me</mat-checkbox>
-          </div>
-          <button mat-raised-button class="btn btn-lg btn-block" type="submit" color="primary">Sign in</button>
-          <p class="mt-5 mb-3 text-muted"><a href="javascript: void(0)">Forgot password?</a></p>
-      </form>
+        <div class="login-container">
+          <form class="form-signin" (ngSubmit)="doLogin()">
+            <img class="mb-4" src="assets/images/logo.png" alt="" width="72" height="72">
+            <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+            <mat-form-field class="w-100">
+              <mat-label for="inputUsername">Username</mat-label>
+              <input matInput type="text" id="inputUsername" placeholder="Username" required="" autofocus="" [formControl]="username">
+            </mat-form-field>
+            <mat-form-field class="w-100">
+              <mat-label for="inputPassword">Password</mat-label>
+              <input matInput [type]="showPassword ? 'text' : 'password'" id="inputPassword" placeholder="Password" required="" [formControl]="password">
+              <a matSuffix  href="javascript:void(0)" (click)="showPassword = !showPassword ">
+                <mat-icon >
+                  {{ !showPassword ? 'visibility' : 'visibility_off'}}
+                </mat-icon>
+              </a>
+            </mat-form-field>
+            <div class="checkbox mb-3 pull-left text-left">
+                <mat-checkbox (click)="remember = !remember" class="text-left" color="primary">Remember me</mat-checkbox>
+            </div>
+            <button mat-raised-button class="btn btn-lg btn-block" type="submit" color="primary">Sign in</button>
+            <p class="mt-5 mb-3 text-muted"><a href="javascript: void(0)">Forgot password?</a></p>
+          </form>
+        </div>
       </div>
-      <div class="col-sm-8 p-0">
+      <div class="col-md-8 col-lg-8 p-0 login-sliders">
           <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel">
               <ol class="carousel-indicators">
                 <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>

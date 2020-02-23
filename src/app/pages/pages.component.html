@@ -48,13 +48,13 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="light">
-      <button
-        type="button"
-        aria-label="Toggle sidenav"
-        mat-icon-button
-        (click)="drawer.toggle()">
+      <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
+      <small class="toolbar-username">Logged in as {{ username }}</small>
+      <button type="button" mat-icon-button (click)="logout()" color="primary" class="logout-button">
+      <mat-icon aria-label="Logout">power_settings_new</mat-icon>
+    </button>
     </mat-toolbar>
     <router-outlet></router-outlet>
   </mat-sidenav-content>

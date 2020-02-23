@@ -1,6 +1,7 @@
 import { Inject, Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
+import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService,
          OrderService } from '@pickvoice/pickvoice-api';
 import { DataStorage } from '../../services/data-provider';
@@ -28,18 +29,18 @@ export class EditRowDialogComponent implements OnInit {
               private orderService: OrderService,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
     this.row = data.row; // object
-    console.log('row recibida', this.row);
+    this.utilities.log('row recibida', this.row);
     this.fields = data.map; // map of object
-    console.log('fields', this.fields);
+    this.utilities.log('fields', this.fields);
     this.type = data.type; // map of object
-    console.log('type', this.type);
+    this.utilities.log('type', this.type);
     this.remoteSync = data.remoteSync; // map of object
-    console.log('remoteSync', this.remoteSync);
+    this.utilities.log('remoteSync', this.remoteSync);
     const formControls = {};
     this.keys = Object.keys(this.fields);
-    console.log('keys', this.keys);
+    this.utilities.log('keys', this.keys);
     let value = '';
-    console.log('data type', this.type);
+    this.utilities.log('data type', this.type);
     this.keys.forEach((key, index) => {
       if (this.row === undefined) {
         return;
@@ -64,45 +65,54 @@ export class EditRowDialogComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('data to return', this.form.value);
+    const toReturn = this.form.value;
+    let toUpload;
+    this.utilities.log('data to return', toReturn);
     if (this.remoteSync) {
       this.isLoadingResults = true;
       if (this.type === 'items') {
-        const item = new Object(this.form.value) as any;
-        let aux = item.itemType;
-        item.itemType = {
+        toUpload = new Object(this.form.value) as any;
+        let aux = toUpload.itemType;
+        toUpload.itemType = {
           code: aux
         } as ItemType;
-        aux = item.uom;
-        item.uom = {
+        aux = toUpload.uom;
+        toUpload.uom = {
           code: aux
         } as UnityOfMeasure;
-        console.log('item to upload', item);
-        this.itemService.updateItem(item, this.row.id, 'response', false).pipe(retry(3))
+        this.utilities.log('data to upload', toUpload);
+        this.itemService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
         .subscribe(response => {
           this.isLoadingResults = false;
-          console.log('update response', response);
-          aux = item.itemType.code;
-          item.itemType = aux;
-          aux = item.uom.code;
-          item.uom = aux;
-          this.dialogRef.close(item);
+          this.utilities.log('update response', response);
+          aux = toUpload.itemType.code;
+          toUpload.itemType = aux;
+          aux = toUpload.uom.code;
+          toUpload.uom = aux;
+          this.dialogRef.close(toUpload);
         }, error => {
           this.isLoadingResults = false;
-          console.error('error on update', error);
+          this.utilities.showSnackBar('Error on edit row request', 'OK');
+          this.utilities.error('error on update', error);
         });
       }
+
       if (this.type === 'locations') {
-        this.locationService.updateLocation(this.form.value, this.row.id, 'response').pipe(retry(3))
+        toUpload = this.form.value;
+        this.locationService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(response => {
           this.isLoadingResults = false;
-          console.log('update locations response', response);
+          this.utilities.log('update locations response', response);
+          this.dialogRef.close(toUpload);
         }, error => {
           this.isLoadingResults = false;
+          this.dialogRef.close(toUpload);
           this.utilities.showSnackBar('Error on update data', 'OK');
-          console.log('update locations response', error);
+          this.utilities.log('update locations response', error);
         });
       }
+    } else {
+      this.dialogRef.close(toReturn);
     }
   }
 

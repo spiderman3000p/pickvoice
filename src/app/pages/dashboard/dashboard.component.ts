@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
+import { AuthService } from '../../services/auth.service';
+import { UtilitiesService } from '../../services/utilities.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,7 +14,7 @@ export class DashboardComponent {
   cards = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
     map(({ matches }) => {
       if (matches) {
-        console.log('is handset');
+        this.utilities.log('is handset');
         return [
           { title: 'Card 1', cols: 2, rows: 1 },
           { title: 'Card 2', cols: 2, rows: 1 },
@@ -20,7 +22,7 @@ export class DashboardComponent {
           { title: 'Card 4', cols: 2, rows: 1 }
         ];
       }
-      console.log('is not handset');
+      this.utilities.log('is not handset');
       return [
         { title: 'Card 1', cols: 1, rows: 1 },
         { title: 'Card 2', cols: 1, rows: 1 },
@@ -30,7 +32,8 @@ export class DashboardComponent {
     })
   );
 
-  constructor(private breakpointObserver: BreakpointObserver) {
-    
+  constructor(private breakpointObserver: BreakpointObserver, private authService: AuthService,
+              private utilities: UtilitiesService) {
+    this.utilities.log('last url', this.authService.redirectUrl);
   }
 }

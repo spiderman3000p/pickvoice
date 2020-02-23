@@ -6,7 +6,7 @@
 
 html, body { 
   height: 100%;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 body {
   margin: 0;
@@ -88,7 +88,7 @@ th.mat-header-cell {
     position: absolute;
     top: 0;
     left: 0;
-    bottom: 56px;
+    bottom: 0px;
     right: 0;
     background: rgba(0, 0, 0, 0.15);
     z-index: 1;

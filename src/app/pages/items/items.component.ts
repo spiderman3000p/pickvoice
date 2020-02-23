@@ -43,19 +43,19 @@ export class ItemsComponent implements OnInit {
       this.filter = new FormControl('');
       this.dataValidationErrors = [];
       this.dataToSend = [];
-      console.log('requesting items');
+      this.utilities.log('requesting items');
       this.isLoadingResults = true;
       this.apiService.retrieveAllItems('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
       .subscribe(response => {
         this.isLoadingResults = false;
-        console.log('items received', response.body);
+        this.utilities.log('items received', response.body);
         this.dataSource.data = response.body.map((element, index) => {
           return { index: index, ... element};
         });
       }, error => {
         this.isLoadingResults = false;
-        console.error('error on requesting data');
-        this.utilities.showSnackBar('Error on requesting data', 'OK');
+        this.utilities.error('error on requesting data');
+        this.utilities.showSnackBar('Error requesting data', 'OK');
       });
   }
 
@@ -65,7 +65,7 @@ export class ItemsComponent implements OnInit {
   }
 
   handleError(error: any) {
-    console.error('error sending data to api', error);
+    this.utilities.error('error sending data to api', error);
     this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
   }
 
@@ -82,8 +82,8 @@ export class ItemsComponent implements OnInit {
   }
 
   editRow(index: number) {
-    console.log('row to send to edit dialog', this.dataSource.data[index]);
-    console.log('map to send to edit dialog',
+    this.utilities.log('row to send to edit dialog', this.dataSource.data[index]);
+    this.utilities.log('map to send to edit dialog',
     this.utilities.dataTypesModelMaps.items);
     const dialogRef = this.dialog.open(EditRowDialogComponent, {
       data: {
@@ -94,7 +94,7 @@ export class ItemsComponent implements OnInit {
       }
     });
     dialogRef.afterClosed().subscribe(result => {
-      console.log('dialog result:', result);
+      this.utilities.log('dialog result:', result);
       if (result) {
         /*
           Aqui la asignacion del array de objetos deberia ser tan sencillo como: this.dataSource.data = result
@@ -109,30 +109,11 @@ export class ItemsComponent implements OnInit {
           }
         });
       }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
     });
-  }
-
-  getValidationAlertMessage() {
-    return this.dataValidationErrors.length > 0 ?
-    `Hay ${this.invalidRows.length} registros inválidos que debe corregir. Por favor revise, corrija y reintente nuevamente` :
-    'Datos validados correctamente. Presione Siguiente para continuar';
-  }
-
-  getValidateBtnText() {
-    if (this.dataSource.data.length > 0 && !this.isReadyToSend) {
-      if (!this.isLoadingResults) {
-        if (!this.validationRequested) {
-          return 'Validate';
-        } else {
-          return 'Validate Again';
-        }
-      } else {
-        return 'Validating...';
-      }
-    }
-    if (this.dataSource.data.length > 0 && this.isReadyToSend && !this.isLoadingResults) {
-      return 'Next';
-    }
   }
 
 }

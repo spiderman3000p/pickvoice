@@ -10,17 +10,6 @@
           <mat-card-header>
             <mat-card-title>
               Items
-              <!--button mat-raised-button color="primary" class="more-button" (click)="importWidget()">
-                <mat-icon>cloud_upload</mat-icon> <span class="ml-3">Import</span>
-              </button-->
-              <!--button mat-raised-button color="primary" class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
-                <mat-icon>add_circle_outline</mat-icon> <span class="ml-3">Importar</span>
-              </button>
-              <mat-menu #menu="matMenu" xPosition="before">
-                <button mat-menu-item (click)="importFile('csv')">Importar desde archivo CSV/XLSX</button>
-                <button mat-menu-item (click)="importFile('url')">Importar CSV/XLSX desde URL</button>
-                <button mat-menu-item (click)="importFile('api')">Importar CSV/XLSX desde API</button>
-              </mat-menu-->
             </mat-card-title>
           </mat-card-header>
           <mat-card-content>
@@ -43,18 +32,7 @@
               </table>
               <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
             </div>
-            <!--div *ngIf="validationRequested && !isLoadingResults" role="alert" class="alert" 
-            [ngClass]="{ 'alert-danger': (dataValidationErrors.length > 0), 'alert-success': isReadyToSend }">
-              {{ getValidationAlertMessage() }}
-            </div-->
           </mat-card-content>
-          <!--mat-card-actions align="end">
-            <button mat-raised-button [ngClass]="{'primary': !isReadyToSend, 'success': isReadyToSend}"
-            [disabled]="isLoadingResults" (click)="!isReadyToSend ? validateData() : sendData()" 
-            *ngIf="dataSource.data.length > 0 && !isReadyToSend">{{ getValidateBtnText() }}</button>
-            <button mat-raised-button (click)="sendData()" [disabled]="!isReadyToSend || isLoadingResults || isDataSaved"
-            color="primary">Next</button>
-          </mat-card-actions-->
         </mat-card>
       </div>
     </div>

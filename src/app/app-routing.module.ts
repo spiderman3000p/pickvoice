@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { LoginComponent } from './pages/auth/login/login.component';
-import { PagesComponent } from './pages/pages.component';
 import { AuthGuard } from './guards/auth.guard';
-import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
+
+import { PagesComponent } from './pages/pages.component';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
+import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
 
 const routes: Routes = [
@@ -13,13 +13,14 @@ const routes: Routes = [
     component: PagesComponent,
     loadChildren: () => import('./pages/pages.module')
       .then(m => m.PagesModule),
-    // canActivateChild: [AuthGuard]
+    canActivateChild: [AuthGuard]
   },
   {
     path: 'login',
-    component: LoginComponent,
+    // component: LoginComponent,
+    loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthModule),
+    canActivateChild: [AuthGuard]
   },
-  { path: '', redirectTo: 'pages', pathMatch: 'full' },
   { path: 'importing',
     outlet: 'importing',
     // canActivateChild: [AuthGuard],
@@ -27,14 +28,20 @@ const routes: Routes = [
       {
         path: 'import-type-selection',
         component: ImportTypeSelectionComponent
+        /*loadChildren: () => import('./components/importing-widget/pages/import-type-selection/import-type-selection.module')
+        .then(m => m.ImportTypeSelectionModule)*/
       },
       {
         path: 'file-import',
         component: FileImportComponent
+        /*loadChildren: () => import('./components/importing-widget/pages/file-import/file-import.module')
+        .then(m => m.FileImportModule)*/
       },
       {
         path: 'data-preview',
         component: DataPreviewComponent
+        /*loadChildren: () => import('./components/importing-widget/pages/data-preview/data-preview.module')
+        .then(m => m.DataPreviewModule)*/
       },
       {
         path: '',
@@ -47,6 +54,7 @@ const routes: Routes = [
       }
     ]
   },
+  { path: '', redirectTo: 'pages', pathMatch: 'full' },
   { path: '**', redirectTo: 'pages' },
 ];
 

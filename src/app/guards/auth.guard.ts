@@ -13,9 +13,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
     // TODO: check login status
-    const url = state.url;
-    // return this.checkLogin(url);
-    return this.checkLogin(url);
+    return this.checkLogin(state.url);
   }
 
   canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
@@ -23,12 +21,21 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   }
 
   checkLogin(url: string): boolean {
-    console.log('Checking login');
-    if (localStorage.getItem('remember') && localStorage.getItem('remember_username')) {
+    if (this.authService.getRemember() && this.authService.getUsername() &&
+        this.authService.getRememberUsername() === this.authService.getUsername()) {
       return true;
     }
-    if (this.authService.isLoggedIn) {
+    if (this.authService.isLoggedIn()) {
+      this.authService.redirectUrl = url;
+      if (url.includes('/login')) {
+        this.router.navigate(['/']);
+        return false;
+      }
       return true;
+    } else {
+      if (url.includes('/login')) {
+        return true;
+      }
     }
     this.authService.redirectUrl = url;
     this.router.navigate(['/login']);

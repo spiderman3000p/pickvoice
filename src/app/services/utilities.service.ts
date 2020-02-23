@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, of } from 'rxjs';
+import { Observer, Observable, of } from 'rxjs';
 import { ModelMap } from '../models/model-maps.model';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { CommonDialogComponent } from '../components/common-dialog/common-dialog.component';
+import { environment } from '../../environments/environment';
 
 export interface ValidationError {
   error: string;
@@ -17,7 +20,7 @@ export class UtilitiesService {
     locations: ModelMap.LocationMap,
     orders: ModelMap.OrderMap
   };
-  constructor(private snackBar: MatSnackBar) { }
+  constructor(private snackBar: MatSnackBar, private dialog: MatDialog) { }
 
   showSnackBar(message: string, action: string) {
     this.snackBar.open(message, action, {
@@ -54,5 +57,34 @@ export class UtilitiesService {
       }
     }
     return true;
+  }
+
+  public showCommonDialog(observer: Observer<any>, options?: any) {
+    const dialogRef = this.dialog.open(CommonDialogComponent,
+    {
+      data: {
+        title: options.title,
+        message: options.message,
+        positiveBtnText: options.positiveBtnText,
+        negativeBtnText: options.negativeBtnText,
+        positiveBtnCallback: options.positiveBtnCallback,
+        negativeBtnCallback: options.negativeBtnCallback,
+        showPositiveBtn: options.showPositiveBtn,
+        showNegativeBtn: options.showNegativeBtn
+      }
+    });
+    dialogRef.afterClosed().subscribe(observer);
+  }
+
+  public log(param1: any, param2?: any) {
+    if (environment.debug === true) {
+      console.log(param1, param2 ? param2 : '');
+    }
+  }
+
+  public error(param1: any, param2?: any) {
+    if (environment.debug === true) {
+      console.error(param1, param2 ? param2 : '');
+    }
   }
 }

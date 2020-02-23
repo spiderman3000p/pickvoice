@@ -18,30 +18,35 @@ export class LoginComponent implements OnInit {
   isLoadingResults = false;
   constructor(
     private autService: AuthService, private utilities: UtilitiesService, private router: Router) {
-
+      this.utilities.log('last url', this.autService.redirectUrl);
   }
 
   doLogin() {
-    console.log('Doing violin...', this.username, this.password);
+    this.utilities.log('Doing login ...', `${this.username}, ${this.password}`);
     this.isLoadingResults = true;
-    this.autService.login(this.username.value, this.password.value).pipe(retry(3)).subscribe(result => {
+    this.autService.login(this.username.value, this.password.value).pipe(retry(3))
+    .subscribe(result => {
       this.isLoadingResults = false;
-      console.log('resultado del login', result);
+      this.utilities.log('resultado del login', result);
       if (result) {
-        this.autService.isLoggedIn = true;
-        this.autService.username = this.username.value;
-        if (this.remember) {
-          localStorage.setItem('remember', 'true');
-          localStorage.setItem('remember_username', this.username.value);
-        }
-        this.utilities.showSnackBar(`Welcome ${this.username.value}`, '');
-        this.router.navigate(['/pages']);
+        this.enter();
       }
     }, error => {
       this.isLoadingResults = false;
       this.utilities.showSnackBar('Error on login', 'OK');
-      console.error('Error on login', error);
+      this.utilities.error('Error on login', error);
+      // this.enter();
     });
+  }
+
+  enter() {
+    this.autService.setLoggedIn(true);
+    this.autService.setUsername(this.username.value);
+    this.autService.setSessionStart(Date.now());
+    this.autService.setRemember(this.remember);
+
+    this.utilities.showSnackBar(`Welcome ${this.username.value}`, '');
+    this.router.navigate(['/pages']);
   }
 
   ngOnInit() {

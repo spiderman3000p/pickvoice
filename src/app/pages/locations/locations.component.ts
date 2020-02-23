@@ -46,18 +46,18 @@ export class LocationsComponent implements OnInit {
       this.dataValidationErrors = [];
       this.dataToSend = [];
       this.isLoadingResults = true;
-      console.log('requesting locations');
+      this.utilities.log('requesting locations');
       this.apiService.retrieveAllLocation('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
       .subscribe(response => {
         this.isLoadingResults = false;
-        console.log('locations received', response.body);
+        this.utilities.log('locations received', response.body);
         this.dataSource.data = response.body.map((element, index) => {
           return { index: index, ... element};
         });
       }, error => {
-        console.error('Error on requesting locations');
+        this.utilities.error('Error on requesting locations');
         this.isLoadingResults = false;
-        this.utilities.showSnackBar('Error on requesting data', 'OK');
+        this.utilities.showSnackBar('Error requesting data', 'OK');
       });
   }
 
@@ -67,7 +67,7 @@ export class LocationsComponent implements OnInit {
   }
 
   handleError(error: any) {
-    console.error('error sending data to api', error);
+    this.utilities.error('error sending data to api', error);
     this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
   }
 
@@ -96,36 +96,16 @@ export class LocationsComponent implements OnInit {
       }
     );
     dialogRef.afterClosed().subscribe(result => {
-      console.log('dialog result:', result);
+      this.utilities.log('dialog result:', result);
       if (result) {
         Object.keys(result).forEach(key => {
           this.dataSource.data[index][key] = result[key];
         });
       }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
     });
   }
-
-  getValidationAlertMessage() {
-    return this.dataValidationErrors.length > 0 ?
-    `Hay ${this.invalidRows.length} registros inválidos que debe corregir. Por favor revise, corrija y reintente nuevamente` :
-    'Datos validados correctamente. Presione Siguiente para continuar';
-  }
-
-  getValidateBtnText() {
-    if (this.dataSource.data.length > 0 && !this.isReadyToSend) {
-      if (!this.isLoadingResults) {
-        if (!this.validationRequested) {
-          return 'Validate';
-        } else {
-          return 'Validate Again';
-        }
-      } else {
-        return 'Validating...';
-      }
-    }
-    if (this.dataSource.data.length > 0 && this.isReadyToSend && !this.isLoadingResults) {
-      return 'Next';
-    }
-  }
-
 }

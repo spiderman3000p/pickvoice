@@ -47,9 +47,9 @@ export class ImportDialogComponent {
 
   validateFile(files: FileList) {
     this.file = files[0];
-    console.log('file', this.file);
-    console.log('file size', this.file.size);
-    console.log('file type', this.file.type);
+    this.utilities.log('file', this.file);
+    this.utilities.log('file size', this.file.size);
+    this.utilities.log('file type', this.file.type);
     if (this.file.size > (5 * 1024 * 1024)) {
       this.utilities.showSnackBar('The file size is bigger than 5MB', 'OK');
     }
@@ -63,80 +63,75 @@ export class ImportDialogComponent {
 
   loadUrl() {
 
-    if (this.urlInput.value.endsWith('.csv') || this.urlInput.value.endsWith('.txt') ||
-    this.urlInput.value.endsWith('.xls') || this.urlInput.value.endsWith('.xlsx')) {
-      this.isLoadingResults = true;
-      this.httpClient.get(this.urlInput.value, { responseType: 'blob'}).pipe(
-        tap(
-          data => {
-            console.log('data', data);
-          },
-          error => {
-            console.error('error', error);
-          }
-        )
-      ).subscribe(result => {
-        console.log('resultado obtenido', result);
-        console.log('tipo', typeof result);
-        this.isLoadingResults = false;
-        const reader: FileReader = new FileReader();
-        reader.onload = (e: any) => {
-          /* read workbook */
-          const bstr: string = e.target.result;
-          const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary'});
-          let wsname: string;
-          let ws: XLSX.WorkSheet;
-          let parsedData: any;
-          const sheets = [];
-          /*console.log('wb.Sheets', wb.Sheets);
-          console.log('wb.SheetNames', wb.SheetNames);*/
-    
-          /* grab first sheet */
-          wb.SheetNames.forEach((key, index) => {
-            wsname = key;
-            ws = wb.Sheets[key];
-            parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false});
-            const sheet = {} as any;
-            sheet.name = wsname;
-            sheet.rowData = parsedData;
-            sheet.columnDefs = Object.keys(parsedData[0]).map(column => {
-              return {field: column};
-            });
-            sheets.push(sheet);
-          });
-    
-          console.log('sheets', sheets);
-    
-          // guardando los datos en el provider
-          this.dataProvider.data = {
-            sheets: sheets
-          };
-          console.log('dataProvider data seted', this.dataProvider.data);
-          // console.log('parsed xlsx data', this.parsedData);
-          this.router.navigate ([{ outlets: { importing: 'importing/data-preview'}}]);
-          this.utilities.showSnackBar(`Data parsed successfully`, 'OK');
-          this.close();
-        };
-        reader.readAsBinaryString(result);
-      });
-    } else {
-      this.utilities.showSnackBar(`File extension is invalid`, 'OK');
+    if (!this.urlInput.value.endsWith('.csv') && !this.urlInput.value.endsWith('.txt') &&
+        !this.urlInput.value.endsWith('.xls') && !this.urlInput.value.endsWith('.xlsx')) {
+      this.utilities.showSnackBar(`File extension in url is invalid`, 'OK');
+      return;
     }
+    this.isLoadingResults = true;
+    this.httpClient.get(this.urlInput.value, { responseType: 'blob'}).pipe(
+      tap(
+        data => {
+          this.utilities.log('data', data);
+        },
+        error => {
+          this.utilities.error('error', error);
+        }
+      )
+    ).subscribe(result => {
+      this.utilities.log('resultado obtenido', result);
+      this.utilities.log('tipo', typeof result);
+      this.isLoadingResults = false;
+      const reader: FileReader = new FileReader();
+      reader.onload = (e: any) => {
+        /* read workbook */
+        const bstr: string = e.target.result;
+        const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary'});
+        let wsname: string;
+        let ws: XLSX.WorkSheet;
+        let parsedData: any;
+        const sheets = [];
+        /*this.utilities.log('wb.Sheets', wb.Sheets);
+        this.utilities.log('wb.SheetNames', wb.SheetNames);*/
+  
+        /* grab first sheet */
+        wb.SheetNames.forEach((key, index) => {
+          wsname = key;
+          ws = wb.Sheets[key];
+          parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false});
+          const sheet = {} as any;
+          sheet.name = wsname;
+          sheet.rowData = parsedData;
+          sheet.columnDefs = Object.keys(parsedData[0]).map(column => {
+            return {field: column};
+          });
+          sheets.push(sheet);
+        });
+  
+        this.utilities.log('sheets', sheets);
+  
+        // guardando los datos en el provider
+        this.dataProvider.data = {
+          sheets: sheets
+        };
+        this.utilities.log('dataProvider data seted', this.dataProvider.data);
+        // this.utilities.log('parsed xlsx data', this.parsedData);
+        this.router.navigate ([{ outlets: { importing: 'importing/data-preview'}}]);
+        this.utilities.showSnackBar(`Data parsed successfully`, 'OK');
+        this.close();
+      };
+      reader.readAsBinaryString(result);
+    }, error => {
+      this.utilities.error('Error on url request');
+      this.utilities.showSnackBar('Error on url request', 'OK');
+    });
   }
 
   loadApi() {
-      this.httpClient.get(this.urlInput.value, { responseType: 'blob'}).pipe(
-        tap(
-          data => {
-            console.log('data', data);
-          },
-          error => {
-            console.error('error', error);
-          }
-        )
-      ).subscribe(response => {
-        console.log('resultado obtenido', response);
-        console.log('tipo', typeof response);
+      this.httpClient.get(this.urlInput.value, { responseType: 'blob'})
+      .subscribe(response => {
+        this.utilities.log('resultado obtenido', response);
+        this.utilities.log('tipo', typeof response);
         this.isLoadingResults = false;
         const reader: FileReader = new FileReader();
         reader.onload = (e: any) => {
@@ -147,8 +142,8 @@ export class ImportDialogComponent {
           let ws: XLSX.WorkSheet;
           let parsedData: any;
           const sheets = [];
-          /*console.log('wb.Sheets', wb.Sheets);
-          console.log('wb.SheetNames', wb.SheetNames);*/
+          /*this.utilities.log('wb.Sheets', wb.Sheets);
+          this.utilities.log('wb.SheetNames', wb.SheetNames);*/
     
           /* grab first sheet */
           wb.SheetNames.forEach((key, index) => {
@@ -164,24 +159,27 @@ export class ImportDialogComponent {
             sheets.push(sheet);
           });
     
-          console.log('sheets', sheets);
+          this.utilities.log('sheets', sheets);
     
           // guardando los datos en el provider
           this.dataProvider.data = {
             sheets: sheets
           };
-          console.log('dataProvider data seted', this.dataProvider.data);
-          // console.log('parsed xlsx data', this.parsedData);
+          this.utilities.log('dataProvider data seted', this.dataProvider.data);
+          // this.utilities.log('parsed xlsx data', this.parsedData);
           this.router.navigate ([{ outlets: { importing: 'importing/data-preview'}}]);
           this.utilities.showSnackBar(`Data parsed successfully`, 'OK');
           this.close();
         };
         reader.readAsBinaryString(response);
+      }, error => {
+        this.utilities.error('Error on api request');
+        this.utilities.showSnackBar(`Error on api request`, 'OK');
       });
   }
 
   onSubmit() {
-    console.log('submiting');
+    this.utilities.log('submiting');
     if (this.importType === 'url') {
       this.loadUrl();
     }

@@ -63,12 +63,6 @@ export class ImportComponent implements OnInit {
     this.filter = new FormControl('');
     this.dataValidationErrors = [];
     this.dataToSend = [];
-    this.dataProvider.dataType.subscribe(dataType => {
-      this.displayedColumns = Object.keys(this.utilities.dataTypesModelMaps[dataType]);
-      console.log('displayedColumns in import component', this.displayedColumns);
-      this.headers = this.utilities.dataTypesModelMaps[dataType];
-      console.log('headers in import component', this.headers);
-    });
     // this.initPaginatorSort();
   }
 
@@ -80,23 +74,27 @@ export class ImportComponent implements OnInit {
       });
     dialogRef.afterClosed().subscribe(result => {
       this.isLoadingResults = false;
-      console.log('dialog result:', result);
+      this.utilities.log('dialog result:', result);
       if (result && result.length > 0) {
 
         const receivedKeys: any[] = Object.keys(result[0]);
+        const displayedColumns = Object.keys(
+          this.utilities.dataTypesModelMaps[this.dataProvider.getDataType()]
+        );
+        this.utilities.log('displayedColumns in import component', displayedColumns);
+        const headers = this.utilities.dataTypesModelMaps[this.dataProvider.getDataType()];
 
-        if (!this.utilities.equalArrays(receivedKeys, this.displayedColumns)) {
-          console.log('received keys', receivedKeys);
-          console.log('required keys', this.displayedColumns);
-          console.error('the received data schema is invalid');
+        if (!this.utilities.equalArrays(receivedKeys, displayedColumns)) {
+          this.utilities.log('received keys', receivedKeys);
+          this.utilities.log('required keys', displayedColumns);
+          this.utilities.error('the received data schema is invalid');
           this.utilities.showSnackBar('Error in data format', 'OK');
           return;
         }
-        let aux;
         const newData = result.map((element, index) => {
           element.index = index;
           /*if (this.dataProvider.getDataType() === 'items') {
-            console.lo
+            this.utilities.lo
             aux = element.itemType.code;
             element.itemType = aux;
             aux = element.uom.code;
@@ -107,6 +105,9 @@ export class ImportComponent implements OnInit {
         if (this.dataSource === undefined) {
           this.dataSource = new MatTableDataSource(newData);
         } else {
+          this.dataSource.data = []; // importante limpiar la data primero
+          this.displayedColumns = displayedColumns; // importante establecer las nuevas columnas
+          this.headers = headers; // importante establecer las nuevas cabeceras
           this.dataSource.data = newData;
         }
         // setTimeout(() => this.initPaginatorSort(), 500);
@@ -128,10 +129,10 @@ export class ImportComponent implements OnInit {
   }
 
   sendData() {
-    console.log('start sending data proccess...');
+    this.utilities.log('start sending data proccess...');
     this.validateData();
     if (this.dataValidationErrors.length === 0 && this.isReadyToSend) {
-      console.log('sending data to api...');
+      this.utilities.log('sending data to api...');
       this.isLoadingResults = true;
       if (this.dataProvider.getDataType() === 'items') {
         this.sendItemsData();
@@ -141,32 +142,31 @@ export class ImportComponent implements OnInit {
         this.sendOrdersData();
       }
     } else {
-      console.error('Data are not ready to be sent');
+      this.utilities.error('Data are not ready to be sent');
       this.utilities.showSnackBar('Data are not ready to be sent', 'OK');
     }
   }
 
   sendItemsData() {
-    this.itemsService.createItemsList(this.dataToSend, 'response', true).pipe(
-      retry(3)
-    ).subscribe(result => {
+    this.itemsService.createItemsList(this.dataToSend, 'response', true).pipe(retry(3))
+    .subscribe(result => {
       this.isLoadingResults = false;
       result = result as HttpResponse<any>;
       // result as HttpResponse is expected
-      console.log('api call result', result);
+      this.utilities.log('api call result', result);
       // status 201 is successfull response (CREATED)
       if (result && result.status === 201 && result.ok) {
         this.isDataSaved = true;
-        console.log('items created successfully');
+        this.utilities.log('Items created successfully');
         this.addRecentOrigin('items');
         this.utilities.showSnackBar('Items saved successfully', 'OK');
        } else {
         this.isDataSaved = false;
-        console.log('items could not be created');
+        this.utilities.log('Items could not be created');
         this.utilities.showSnackBar('Error saving items', 'OK');
       }
     }, error => {
-      console.error('error en request');
+      this.utilities.error('Error en request', error);
       this.utilities.showSnackBar('Error saving items', 'OK');
       this.isLoadingResults = false;
     });
@@ -179,50 +179,57 @@ export class ImportComponent implements OnInit {
       this.isLoadingResults = false;
       result = result as HttpResponse<any>;
       // result as HttpResponse is expected
-      console.log('api call result', result);
+      this.utilities.log('Api call result', result);
       // status 201 is successfull response (CREATED)
       if (result && result.status === 201 && result.ok) {
         this.isDataSaved = true;
-        console.log('locations created successfully');
+        this.utilities.log('Locations created successfully');
         this.addRecentOrigin('locations');
         this.utilities.showSnackBar('Locations saved successfully', 'OK');
        } else {
         this.isDataSaved = false;
-        console.log('locations could not be created');
+        this.utilities.log('Locations could not be created');
         this.utilities.showSnackBar('Error saving locations', 'OK');
       }
+    }, error => {
+      this.utilities.error('Error en request', error);
+      this.utilities.showSnackBar('Error saving locations', 'OK');
+      this.isLoadingResults = false;
     });
   }
 
   sendOrdersData() {
-    this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(
-      retry(3)
-    ).subscribe(result => {
+    this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(retry(3))
+    .subscribe(result => {
       this.isLoadingResults = false;
       result = result as HttpResponse<any>;
       // result as HttpResponse is expected
-      console.log('api call result', result);
+      this.utilities.log('api call result', result);
       // status 201 is successfull response (CREATED)
       if (result && result.status === 201 && result.ok) {
         this.isDataSaved = true;
-        console.log('orders created successfully');
+        this.utilities.log('orders created successfully');
         this.addRecentOrigin('orders');
         this.utilities.showSnackBar('Orders saved successfully', 'OK');
        } else {
         this.isDataSaved = false;
-        console.log('orders could not be created');
+        this.utilities.log('orders could not be created');
         this.utilities.showSnackBar('Error saving orders', 'OK');
       }
+    }, error => {
+      this.utilities.error('Error en request');
+      this.utilities.showSnackBar('Error saving orders', 'OK');
+      this.isLoadingResults = false;
     });
   }
 
   handleError(error: any) {
-    console.error('error sending data to api', error);
+    this.utilities.error('error sending data to api', error);
     this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
   }
 
   validateData() {
-    console.log(`starting data validation for ${this.dataProvider.getDataType()}`);
+    this.utilities.log(`starting data validation for ${this.dataProvider.getDataType()}`);
     if (this.dataSource.data.length > 0) {
       this.dataToSend = [];
       this.dataValidationErrors = [];
@@ -246,10 +253,10 @@ export class ImportComponent implements OnInit {
         }
         errorFound = false;
         currentRowErrors = [];
-        // console.log('headers before validate', this.headers);
+        // this.utilities.log('headers before validate', this.headers);
         for (const field in this.headers) {
           if (1) {// just for avoid lint error mark on visual studio code
-            // console.log('validating field ', field);
+            // this.utilities.log('validating field ', field);
             // arreglamos los valores booleanos en caso de que esten en formato texto mayusculas
             if (row[field] === 'TRUE' || row[field] === 'FALSE') {
               row[field] = row[field] === 'TRUE' ? true : false;
@@ -260,22 +267,22 @@ export class ImportComponent implements OnInit {
               Esas columnas que se encuentren dentro del array skipedColumns son referenciadas directamente.
             */
             if (this.dataProvider.getDataType() === 'orders' && this.skipedColumns.findIndex(column => column === field) > -1) {
-              // console.log('skipped field ', field);
+              // this.utilities.log('skipped field ', field);
               continue;
             }
             // comprobando campos requeridos
             if (this.headers[field].required && row[field] === undefined) {
-              // console.log('it is required?');
+              // this.utilities.log('it is required?');
               const validationError = new Object() as ValidationError;
               validationError.index = rowIndex;
               validationError.error = `The field ${this.headers[field].name} (${field}) is required`;
               this.dataValidationErrors.push(validationError);
               currentRowErrors.push(validationError);
               errorFound = true;
-              console.error(`There's no exists the field ${field} in the record ${rowIndex}`);
+              this.utilities.error(`There's no exists the field ${field} in the record ${rowIndex}`);
             }
             if (this.headers[field].min && row[field] < this.headers[field].min) {
-              // console.log('it is lower than min?');
+              // this.utilities.log('it is lower than min?');
               const validationError = new Object() as ValidationError;
               validationError.index = rowIndex;
               validationError.error = `The field ${this.headers[field].name} (${field})
@@ -283,11 +290,11 @@ export class ImportComponent implements OnInit {
               this.dataValidationErrors.push(validationError);
               currentRowErrors.push(validationError);
               errorFound = true;
-              console.error(`The field ${this.headers[field].name} (${field})
+              this.utilities.error(`The field ${this.headers[field].name} (${field})
               must be greater than ${this.headers[field].min} in the record ${rowIndex}`);
             }
             if (this.headers[field].max && row[field] > this.headers[field].max) {
-              // console.log('it is greater than max?');
+              // this.utilities.log('it is greater than max?');
               const validationError = new Object() as ValidationError;
               validationError.index = rowIndex;
               validationError.error = `The field ${this.headers[field].name} (${field})
@@ -295,20 +302,20 @@ export class ImportComponent implements OnInit {
               this.dataValidationErrors.push(validationError);
               currentRowErrors.push(validationError);
               errorFound = true;
-              console.error(`The field ${this.headers[field].name} (${field})
+              this.utilities.error(`The field ${this.headers[field].name} (${field})
               must be lower than ${this.headers[field].max} in the record ${rowIndex}`);
             }
             // comprobando si el campo es unico
             exists = 0;
             // usamos un forEach en lugar de findIndex o find, para contar el numero de apariciones
             copyData.forEach((element, index) => {
-              // console.log(`index & rowIndex ${index}, ${rowIndex}`);
+              // this.utilities.log(`index & rowIndex ${index}, ${rowIndex}`);
               if (index !== rowIndex) {
-                // console.log(`exists!!`);
+                // this.utilities.log(`exists!!`);
                 exists += element[field] == row[field] ? 1 : 0;
               }
             });
-            console.log(`field ${field} repeat ${exists} times`);
+            this.utilities.log(`field ${field} repeat ${exists} times`);
             // comprobando si el campo es unico
             if (this.headers[field].unique && row[field] !== ''  && exists > 0) {
               const validationError = new Object() as ValidationError;
@@ -318,7 +325,7 @@ export class ImportComponent implements OnInit {
               this.dataValidationErrors.push(validationError);
               currentRowErrors.push(validationError);
               errorFound = true;
-              console.error(`Theld ${this.headers[field].name} (${field})
+              this.utilities.error(`Theld ${this.headers[field].name} (${field})
               must be unique in all the collection, in the record ${rowIndex}. It repits ${exists} times`);
             }
             /*
@@ -326,7 +333,7 @@ export class ImportComponent implements OnInit {
               seleccionado
             */
             if (this.dataProvider.getDataType() === 'items') {
-              // console.log('validating compound items data');
+              // this.utilities.log('validating compound items data');
               if (field === 'itemType') {
                 const aux = row.itemType;
                 rowToSave[field] = new Object() as ItemType;
@@ -343,10 +350,10 @@ export class ImportComponent implements OnInit {
               // añadimos campos por defecto
               rowToSave.itemState = Item.ItemStateEnum.Active;
             } else if (this.dataProvider.getDataType() === 'locations') {
-              // console.log('validating compound locations data');
+              // this.utilities.log('validating compound locations data');
               // No hay datos compuestos por validar
             } else if (this.dataProvider.getDataType() === 'orders') {
-              // console.log('validating compound orders data');
+              // this.utilities.log('validating compound orders data');
               if (field === 'transport') {
                 rowToSave['transport'] = new Object() as Transport;
                 rowToSave[field].transportNumber = row[field];
@@ -403,12 +410,12 @@ export class ImportComponent implements OnInit {
           this.dataSource.data[rowIndex].tooltip = currentRowErrors.slice().map((_row, _index) => {
             return _row.error + ((_index < (currentRowErrors.length - 1)) ? ',' : '');
           }).toString();
-          console.error(`invalid row ${rowIndex}`, this.dataSource.data[rowIndex]);
+          this.utilities.error(`invalid row ${rowIndex}`, this.dataSource.data[rowIndex]);
           return;
         } else {
           this.dataSource.data[rowIndex].tooltip = null;
           this.dataSource.data[rowIndex].invalid = false;
-          console.log(`valid row ${rowIndex}`, this.dataSource.data[rowIndex]);
+          this.utilities.log(`valid row ${rowIndex}`, this.dataSource.data[rowIndex]);
         }
         // lo añadimos a la lista de datos a enviar, en caso de que cumpla con todas las validaciones
         this.dataToSend.push(rowToSave);
@@ -417,40 +424,42 @@ export class ImportComponent implements OnInit {
       this.validationRequested = true;
       this.isLoadingResults = false;
       this.isReadyToSend = this.dataValidationErrors.length === 0;
-      console.log('data to send', this.dataToSend);
-      console.log('ready to send? ', this.isReadyToSend);
-      console.log('validation errors', this.dataValidationErrors);
-      console.log('validation errors per row', this.invalidRows);
+      this.utilities.log('data to send', this.dataToSend);
+      this.utilities.log('ready to send? ', this.isReadyToSend);
+      this.utilities.log('validation errors', this.dataValidationErrors);
+      this.utilities.log('validation errors per row', this.invalidRows);
       if (this.dataValidationErrors.length > 0) {
         this.utilities.showSnackBar(`There are ${this.invalidRows.length} invalid records`, 'OK');
       }
     } else {
-      console.log('There is not data in the table');
+      this.utilities.log('There is not data in the table');
       this.utilities.showSnackBar(`There is no data to import`, 'OK');
     }
   }
 
   editRow(index: number) {
-    console.log('row to send to edit dialog', this.dataSource.data[index]);
-    console.log('map to send to edit dialog',
+    this.utilities.log('row to send to edit dialog', this.dataSource.data[index]);
+    this.utilities.log('map to send to edit dialog',
     this.utilities.dataTypesModelMaps[this.dataProvider.getDataType()]);
     const dialogRef = this.dialog.open(EditRowDialogComponent,
       {
         data: {
           row: this.dataSource.data[index],
-          map: this.utilities.dataTypesModelMaps[this.dataProvider.getDataType()]
+          map: this.utilities.dataTypesModelMaps[this.dataProvider.getDataType()],
+          type: this.dataProvider.getDataType(),
+          remoteSync: false // para mandar los datos a la BD por la API
         }
       }
     );
     dialogRef.afterClosed().subscribe(result => {
-      console.log('dialog result:', result);
+      this.utilities.log('dialog result:', result);
       if (result) {
-        /*Object.keys(result).forEach(key => {
+        Object.keys(result).forEach(key => {
           this.dataSource.data[index][key] = result[key];
-        });*/
+        });
+        /* Si se hace de esta forma no se muestran los cambios en la tabla mat-table
         let row = this.dataSource.data[index];
-        row = result;
-        // this.initPaginatorSort();
+        row = result;*/
       }
     });
   }
@@ -503,9 +512,7 @@ export class ImportComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.initPaginatorSort();
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.initPaginatorSort();
   }
 
 }

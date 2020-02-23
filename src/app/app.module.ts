@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LayoutModule } from '@angular/cdk/layout';
+
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,9 +22,10 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { LoginComponent } from './pages/auth/login/login.component';
+
 import { PagesModule } from './pages/pages.module';
+import { AuthModule } from './pages/auth/auth.module';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
 import { ImportingWidgetComponent } from './components/importing-widget/importing-widget.component';
@@ -32,25 +34,27 @@ import { HttpClientModule } from '@angular/common/http';
 import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
 import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
+import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
+
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
-import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { DataStorage } from './services/data-provider';
 import { AuthService } from './services/auth.service';
 import { BASE_PATH } from '@pickvoice/pickvoice-api';
 import { environment } from '../environments/environment';
+import { CommonDialogComponent } from './components/common-dialog/common-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
     ImportDialogComponent,
     EditRowDialogComponent,
     ImportingWidgetComponent,
-    FileImportComponent,
     ImportTypeSelectionComponent,
-    DataPreviewComponent
+    DataPreviewComponent,
+    FileImportComponent,
+    CommonDialogComponent
   ],
   imports: [
     ApiModule,
@@ -75,8 +79,10 @@ import { environment } from '../environments/environment';
     MatMenuModule,
     MatRadioModule,
     MatTabsModule,
-    MatCheckboxModule,
     PagesModule,
+    AuthModule,
+    // DataPreviewModule,
+    // FileImportModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,

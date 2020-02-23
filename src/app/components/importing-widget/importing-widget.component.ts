@@ -29,14 +29,20 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
       this.mobileQuery.addListener(this._mobileQueryListener);
 
       this.dataProvider.sheets.subscribe(sheets => {
-        console.log('sheets on importing-widget', sheets);
+        console.log('Sheets on importing-widget', sheets);
         if (sheets) {
           this.sheets = sheets;
         }
+      }, error => {
+        console.error('Error obtaining file sheets');
+        this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
       });
       this.dataProvider.fileName.subscribe(fileName => {
         console.log('fileName on importing-widget', fileName);
         this.fileName = fileName;
+      }, error => {
+        console.error('Error obtaining file name');
+        this.utilities.showSnackBar('Error obtaining file name', 'OK');
       });
       this.router.navigate([{outlets: {importing: 'importing'}}]);
   }

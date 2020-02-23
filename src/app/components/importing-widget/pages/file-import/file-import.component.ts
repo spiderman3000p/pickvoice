@@ -121,6 +121,9 @@ export class FileImportComponent implements OnInit {
           return;
         }
       }
+    }, error => {
+      console.error('Error after importing dialog close event');
+      this.utilities.showSnackBar('Error after importing dialog close event', 'OK');
     });
   }
 

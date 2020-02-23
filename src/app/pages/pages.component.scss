@@ -1,3 +1,6 @@
+body{
+    overflow-y: hidden;
+}
 mat-sidenav-container{
     height: 100%;
 }
@@ -19,4 +22,12 @@ mat-form-field.fluid{
 }
 .mat-expansion-panel-header {
     font-size: 16px;
+}
+.logout-button {
+    position: absolute !important;
+    right: 3%;
+}
+.toolbar-username{
+    position: absolute;
+    right: 10%;
 }

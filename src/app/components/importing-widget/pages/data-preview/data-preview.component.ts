@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataStorage } from '../../../../services/data-provider';
+import { UtilitiesService } from '../../../../services/utilities.service';
 
 @Component({
   selector: 'app-data-preview',
@@ -12,18 +13,20 @@ export class DataPreviewComponent implements OnInit {
   rowData: any[] = [];
   columnDefs: any[] = [];
 
-  constructor(private dataProvider: DataStorage, private router: Router) {
+  constructor(private dataProvider: DataStorage, private router: Router,
+              private utilities: UtilitiesService) {
     this.sheets = this.dataProvider.getSheets();
     this.dataProvider.rowData.subscribe(rowData => {
-      console.log('new rowData arrived', rowData);
+      this.utilities.log('new rowData arrived', rowData);
       if (rowData) {
         this.rowData = rowData;
       }
     }, error => {
-      console.error('error on request', error);
+      this.utilities.error('Error obtaining row data', error);
+      this.utilities.showSnackBar('Error obtaining row data', 'OK');
     });
     this.dataProvider.columnDefs.subscribe(columnDefs => {
-      console.log('new columnDefs arrived', columnDefs);
+      this.utilities.log('new columnDefs arrived', columnDefs);
       if (columnDefs) {
         this.columnDefs = columnDefs.map(col => {
           col.filter = true;
@@ -31,20 +34,26 @@ export class DataPreviewComponent implements OnInit {
           col.sortable = true;
           return col;
         });
-        console.log('columnDefs sortable', this.columnDefs);
+        this.utilities.log('columnDefs sortable', this.columnDefs);
       }
+    }, error => {
+      this.utilities.error('Error obtaining file columns definitions');
+      this.utilities.showSnackBar('Error obtaining columns definitions', 'OK');
     });
-    console.log('in data-preview initial sheets', this.sheets);
+    this.utilities.log('in data-preview initial sheets', this.sheets);
     if (this.sheets.length > 0) {
       this.setData();
     }
     this.dataProvider.sheets.subscribe(sheets => {
-      console.log('dataProvider data received', sheets);
+      this.utilities.log('dataProvider data received', sheets);
       if (sheets) {
         this.sheets = sheets;
         this.setData();
       }
-      console.log('final sheets', this.sheets);
+      this.utilities.log('final sheets', this.sheets);
+    }, error => {
+      this.utilities.error('Error obtaining file sheets');
+      this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
     });
   }
 
@@ -57,7 +66,7 @@ export class DataPreviewComponent implements OnInit {
         col.sortable = true;
         return col;
       });
-      console.log('columnDefs sortable', this.columnDefs);
+      this.utilities.log('columnDefs sortable', this.columnDefs);
     }
     this.dataProvider.data = this.rowData;
   }

@@ -1,61 +1,59 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { PagesComponent } from './pages.component';
-import { DashboardComponent } from '../pages/dashboard/dashboard.component';
-import { NotFoundComponent } from '../pages/not-found/not-found.component';
-import { ImportComponent } from '../pages/import/import.component';
-import { RecentOriginsComponent } from '../pages/recent-origins/recent-origins.component';
-import { ItemsComponent } from '../pages/items/items.component';
-import { LocationsComponent } from '../pages/locations/locations.component';
-import { ItemTypesComponent } from '../pages/item-types/item-types.component';
-import { CurrentActionsComponent } from '../pages/current-actions/current-actions.component';
-import { AdministrationComponent } from '../pages/administration/administration.component';
-import { PendingOrdersComponent } from '../pages/pending-orders/pending-orders.component';
 
 const routes: Routes = [
   {
     path: 'import',
-    component: ImportComponent,
+    // component: ImportComponent,
+    loadChildren: () => import('./import/import.module').then(m => m.ImportModule),
     pathMatch: 'full'
   },
   {
     path: 'recent-origins',
-    component: RecentOriginsComponent,
+    // component: RecentOriginsComponent,
+    loadChildren: () => import('./recent-origins/recent-origins.module').then(m => m.RecentOriginsModule),
     pathMatch: 'full'
   },
   {
     path: 'items',
-    component: ItemsComponent,
+    // component: ItemsComponent,
+    loadChildren: () => import('./items/items.module').then(m => m.ItemsModule),
     pathMatch: 'full'
   },
   {
     path: 'locations',
-    component: LocationsComponent,
+    // component: LocationsComponent,
+    loadChildren: () => import('./locations/locations.module').then(m => m.LocationsModule),
     pathMatch: 'full'
   },
   {
     path: 'item-types',
-    component: ItemTypesComponent,
+    // component: ItemTypesComponent,
+    loadChildren: () => import('./item-types/item-types.module').then(m => m.ItemTypesModule),
     pathMatch: 'full'
   },
   {
     path: 'administration',
-    component: AdministrationComponent,
+    // component: AdministrationComponent,
+    loadChildren: () => import('./administration/administration.module').then(m => m.AdministrationModule),
     pathMatch: 'full'
   },
   {
     path: 'pending-orders',
-    component: PendingOrdersComponent,
+    // component: PendingOrdersComponent,
+    loadChildren: () => import('./pending-orders/pending-orders.module').then(m => m.PendingOrdersModule),
     pathMatch: 'full'
   },
   {
     path: 'current-actions',
-    component: CurrentActionsComponent,
+    // component: CurrentActionsComponent,
+    loadChildren: () => import('./current-actions/current-actions.module').then(m => m.CurrentActionsModule),
     pathMatch: 'full'
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    // component: DashboardComponent,
+    loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
     pathMatch: 'full'
   },
   {
@@ -65,7 +63,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'not-found'
+    redirectTo: ''
   }
 ];
 

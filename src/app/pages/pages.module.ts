@@ -1,10 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PagesRoutingModule } from './pages-routing.module';
+
+import { AdministrationModule } from './administration/administration.module';
+import { PendingOrdersModule } from './pending-orders/pending-orders.module';
+import { CurrentActionsModule } from './current-actions/current-actions.module';
+import { ItemsModule } from './items/items.module';
+import { ItemTypesModule } from './item-types/item-types.module';
+import { LocationsModule } from './locations/locations.module';
+import { RecentOriginsModule } from './recent-origins/recent-origins.module';
+import { ImportModule } from './import/import.module';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DashboardComponent } from '../pages/dashboard/dashboard.component';
-import { NotFoundComponent } from '../pages/not-found/not-found.component';
-import { PagesComponent } from '../pages/pages.component';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material';
@@ -24,37 +32,32 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
-import { AdministrationComponent } from './administration/administration.component';
-import { PendingOrdersComponent } from './pending-orders/pending-orders.component';
-import { CurrentActionsComponent } from './current-actions/current-actions.component';
-import { ItemsComponent } from './items/items.component';
-import { ItemTypesComponent } from './item-types/item-types.component';
-import { LocationsComponent } from './locations/locations.component';
-import { RecentOriginsComponent } from './recent-origins/recent-origins.component';
-import { ImportComponent } from './import/import.component';
+
+import { PagesComponent } from './pages.component';
 
 @NgModule({
   declarations: [
-    DashboardComponent,
-    NotFoundComponent,
-    PagesComponent,
-    AdministrationComponent,
-    PendingOrdersComponent,
-    CurrentActionsComponent,
-    ItemsComponent,
-    ItemTypesComponent,
-    LocationsComponent,
-    RecentOriginsComponent,
-    ImportComponent
+    PagesComponent
   ],
   imports: [
     CommonModule,
+
     PagesRoutingModule,
+    AdministrationModule,
+    PendingOrdersModule,
+    CurrentActionsModule,
+    ItemsModule,
+    ItemTypesModule,
+    LocationsModule,
+    RecentOriginsModule,
+    ImportModule,
+
     ReactiveFormsModule,
+    FormsModule,
+
     MatProgressSpinnerModule,
     MatPaginatorModule,
     MatSortModule,
-    FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatTableModule,
