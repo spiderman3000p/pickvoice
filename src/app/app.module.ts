@@ -23,6 +23,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 
+import { NgScrollbarModule } from 'ngx-scrollbar';
+
 import { PagesModule } from './pages/pages.module';
 import { AuthModule } from './pages/auth/auth.module';
 
@@ -81,6 +83,7 @@ import { CommonDialogComponent } from './components/common-dialog/common-dialog.
     MatTabsModule,
     PagesModule,
     AuthModule,
+    NgScrollbarModule,
     // DataPreviewModule,
     // FileImportModule,
     FormsModule,

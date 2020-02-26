@@ -20,6 +20,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 
 import { PagesComponent } from './pages.component';
 
+import { NgScrollbarModule } from 'ngx-scrollbar';
+
 @NgModule({
   declarations: [
     PagesComponent
@@ -43,6 +45,8 @@ import { PagesComponent } from './pages.component';
     MatIconModule,
     MatListModule,
     MatExpansionModule,
+
+    NgScrollbarModule
   ],
   providers: [
   ]
