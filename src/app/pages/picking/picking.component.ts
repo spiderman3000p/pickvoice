@@ -40,7 +40,17 @@ export class PickingComponent implements OnInit {
   constructor(private apiService: ItemsService, private utilities: UtilitiesService) {
       this.initWindows();
       this.initPeriods();
-      this.utilities.log('requesting data');
+      this.getData();
+      console.log('periods', this.periods);
+  }
+
+  ngOnInit() {
+    
+  }
+
+  getData(window?: GridWindow){
+    this.utilities.log('requesting data');
+    if(!window){
       this.windows.forEach(loader => loader.isLoading = true);
       this.apiService.retrieveAllItems('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
       .subscribe(response => {
@@ -62,12 +72,27 @@ export class PickingComponent implements OnInit {
         this.utilities.error('error on requesting data');
         this.utilities.showSnackBar('Error requesting data', 'OK');
       });
-
-      console.log('periods', this.periods);
-  }
-
-  ngOnInit() {
-    
+    } else {
+      window.isLoading = true;
+      this.apiService.retrieveAllItems('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
+      .subscribe(response => {
+        this.utilities.log('items received', response.body);
+        if (response.body.length > 0) {
+          const colDefs = Object.keys(response.body[0]).map(col => {
+            return { field: col, filter: true, editable: true, sortable: true};
+          });
+          this.utilities.log('columnDefs sortable', colDefs);
+          window.isLoading = false;
+          window.data.rowData = response.body;
+          window.data.colDefs = colDefs;
+          console.log('new window', window);
+        }
+      }, error => {
+        window.isLoading = false;
+        this.utilities.error('error on requesting data');
+        this.utilities.showSnackBar('Error requesting data', 'OK');
+      });
+    }
   }
 
   initPeriods(){
@@ -139,7 +164,7 @@ export class PickingComponent implements OnInit {
       this.windows.sort(sortFunc);
       // marcamos el window seleccionado como expandido/contraido
       aux.expanded = true;
-      // elimino el window
+      // elimino el window del array
       this.windows.splice(this.windows.findIndex(_window => _window.position === aux.position), 1);
       // lo inserto nuevamente en el primer puesto
       this.windows.splice(0, 0, aux);
@@ -167,5 +192,6 @@ export class PickingComponent implements OnInit {
     configWindow.period = period;
     localStorage.setItem(window.id, JSON.stringify(configWindow));
     window.period = period;
+    this.getData(window);
   }
 }
