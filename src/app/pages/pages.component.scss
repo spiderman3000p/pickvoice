@@ -52,13 +52,13 @@ mat-sidenav{
 }
 .mat-list-base .mat-list-item{
     color: white;
-    height: unset;
+    height: 40px;
 }
 
 .mat-drawer .mat-nav-list .material-icons{
     font-size: 20px;
 }
-.mat-nav-list .mat-list-item{
+.mat-nav-list .mat-list-item, .mat-expansion-panel{
     transition: background 0.5s;
 }
 .mat-sidenav-content .mat-toolbar{
@@ -73,6 +73,8 @@ mat-form-field.fluid{
 .logout-button {
     position: absolute !important;
     right: 3%;
+    box-shadow: unset;
+    font-size: 16px;
 }
 .toolbar-username{
     position: absolute;

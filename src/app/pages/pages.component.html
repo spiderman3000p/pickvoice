@@ -4,7 +4,7 @@
         attr.role="navigation"
         [mode]="mobileQuery.matches ? 'over' : 'side'"
         [opened]="!mobileQuery.matches">
-      <ng-scrollbar>
+      <!--ng-scrollbar-->
         <mat-toolbar color="primary">Pick Voice</mat-toolbar>
         <mat-nav-list>
           <span *ngFor="let option of menuOptions">
@@ -47,7 +47,7 @@
             </mat-accordion>
           </span>
         </mat-nav-list>
-      </ng-scrollbar>
+      <!--/ng-scrollbar-->
     </mat-sidenav>
   
   <mat-sidenav-content>
@@ -55,10 +55,17 @@
       <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <small class="toolbar-username">Logged in as {{ username }}</small>
-      <button type="button" mat-icon-button (click)="logout()" color="primary" class="logout-button">
-      <mat-icon aria-label="Logout">power_settings_new</mat-icon>
-    </button>
+      <!--small class="toolbar-username">Logged in as {{ username }}</small-->
+      <!--button type="button" mat-icon-button (click)="logout()" color="primary" class="logout-button"-->
+        <!--mat-icon aria-label="Logout">power_settings_new</mat-icon>
+      <button/-->
+      <button mat-mini-fab color="primary" [matMenuTriggerFor]="userMenu" class="logout-button">{{username[0] | uppercase}}</button>
+      <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
+        <p class="p-3">Choose an option</p>
+        <button mat-menu-item>Option 1</button>
+        <button mat-menu-item>Option 2</button>
+        <button mat-menu-item (click)="logout()">Logout</button>
+      </mat-menu>
     </mat-toolbar>
     <router-outlet></router-outlet>
   </mat-sidenav-content>

@@ -22,8 +22,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
-
-import { NgScrollbarModule } from 'ngx-scrollbar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 import { PagesModule } from './pages/pages.module';
 import { AuthModule } from './pages/auth/auth.module';
@@ -38,11 +37,8 @@ import { FileImportComponent } from './components/importing-widget/pages/file-im
 import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
 
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
 import { AgGridModule } from 'ag-grid-angular';
-import { DataStorage } from './services/data-provider';
-import { AuthService } from './services/auth.service';
 import { BASE_PATH } from '@pickvoice/pickvoice-api';
 import { environment } from '../environments/environment';
 import { CommonDialogComponent } from './components/common-dialog/common-dialog.component';
@@ -65,6 +61,7 @@ import { CommonDialogComponent } from './components/common-dialog/common-dialog.
     AppRoutingModule,
     BrowserAnimationsModule,
     LayoutModule,
+
     MatSlideToggleModule,
     MatInputModule,
     MatProgressSpinnerModule,
@@ -81,15 +78,15 @@ import { CommonDialogComponent } from './components/common-dialog/common-dialog.
     MatMenuModule,
     MatRadioModule,
     MatTabsModule,
+    MatFormFieldModule,
+    MatTableModule,
+
     PagesModule,
     AuthModule,
-    NgScrollbarModule,
     // DataPreviewModule,
     // FileImportModule,
     FormsModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatTableModule,
     AgGridModule.withComponents([])
   ],
   entryComponents: [
@@ -97,9 +94,7 @@ import { CommonDialogComponent } from './components/common-dialog/common-dialog.
   ],
   providers: [
     { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }},
-    { provide: BASE_PATH, useValue: environment.apiBaseUrl },
-    DataStorage,
-    AuthService
+    { provide: BASE_PATH, useValue: environment.apiBaseUrl }
   ],
   bootstrap: [AppComponent]
 })

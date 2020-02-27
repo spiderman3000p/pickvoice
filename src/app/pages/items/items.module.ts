@@ -6,6 +6,9 @@ import { ItemsComponent } from './items.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +28,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     FormsModule,
     ReactiveFormsModule,
     
+    MatNativeDateModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
     MatSortModule,
@@ -34,6 +38,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
+    MatDatepickerModule,
+    MatTooltipModule
   ]
 })
 export class ItemsModule { }

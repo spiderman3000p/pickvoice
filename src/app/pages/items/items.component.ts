@@ -12,10 +12,6 @@ import { FormControl } from '@angular/forms';
 import { retry } from 'rxjs/operators';
 import { ItemsService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 
-export interface ValidationError {
-  error: string;
-  index: number;
-}
 @Component({
   selector: 'app-items',
   templateUrl: './items.component.html',
@@ -23,17 +19,12 @@ export interface ValidationError {
 })
 export class ItemsComponent implements OnInit {
   headers: any = ModelMap.ItemMap;
-  validationRequested = false;
-  invalidRows: any[] = [];
   dataSource: MatTableDataSource<Item>;
   dataToSend: Item[];
   displayedColumns = Object.keys(ModelMap.ItemMap);
   pageSizeOptions = [5, 10]; // si se mustran mas por pantalla se sale del contenedor
   filter: FormControl;
   isLoadingResults = false;
-  isDataSaved = false;
-  isReadyToSend = false;
-  dataValidationErrors: ValidationError[];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
@@ -41,7 +32,6 @@ export class ItemsComponent implements OnInit {
     private utilities: UtilitiesService) {
       this.dataSource = new MatTableDataSource([]);
       this.filter = new FormControl('');
-      this.dataValidationErrors = [];
       this.dataToSend = [];
       this.utilities.log('requesting items');
       this.isLoadingResults = true;

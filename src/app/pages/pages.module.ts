@@ -11,6 +11,7 @@ import { LocationsModule } from './locations/locations.module';
 import { RecentOriginsModule } from './recent-origins/recent-origins.module';
 import { ImportModule } from './import/import.module';
 
+import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -19,8 +20,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatExpansionModule } from '@angular/material/expansion';
 
 import { PagesComponent } from './pages.component';
-
-import { NgScrollbarModule } from 'ngx-scrollbar';
 
 @NgModule({
   declarations: [
@@ -44,9 +43,8 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
-    MatExpansionModule,
-
-    NgScrollbarModule
+    MatMenuModule,
+    MatExpansionModule
   ],
   providers: [
   ]

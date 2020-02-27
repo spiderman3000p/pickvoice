@@ -15,6 +15,12 @@ export class PagesComponent implements OnInit, OnDestroy  {
   mobileQuery: MediaQueryList;
   menuOptions = [
     {
+      text: 'Picking',
+      icon: 'pin_drop',
+      route: '/pages/picking',
+      children: []
+    },
+    {
       text: 'Maintenance',
       icon: 'settings',
       route: '',

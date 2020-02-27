@@ -3,6 +3,12 @@ import { Routes, RouterModule } from '@angular/router';
 
 const routes: Routes = [
   {
+    path: 'picking',
+    // component: ImportComponent,
+    loadChildren: () => import('./picking/picking.module').then(m => m.PickingModule),
+    pathMatch: 'full'
+  },
+  {
     path: 'import',
     // component: ImportComponent,
     loadChildren: () => import('./import/import.module').then(m => m.ImportModule),
