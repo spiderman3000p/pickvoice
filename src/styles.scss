@@ -178,9 +178,13 @@ table.mat-table {
   width: 100%;
   display: block;
 }
-th.mat-header-cell {
-  padding-left: 24px !important;
-  padding-right: 24px !important;
+
+td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+.mat-slide-toggle + span > label {
+  display: none !important;
 }
 .cdk-global-scrollblock{
   overflow: hidden;

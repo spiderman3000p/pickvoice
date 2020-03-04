@@ -39,18 +39,18 @@ export class LoginComponent implements OnInit {
         } else {
           message = 'Error on login';
         }
-        this.utilities.showSnackBar(message, 'OK');  
+        this.utilities.showSnackBar(message, 'OK');
       }
     }, error => {
       this.isLoadingResults = false;
       this.utilities.error('Error on login', error);
-      if (error && error.status === 500 && error.error.status === 'INTERNAL_SERVER_ERROR') {
+      if (error) {
         if (error.error.message) {
           message = error.error.message;
         } else {
           message = 'Error on login';
         }
-        this.utilities.showSnackBar(message, 'OK');  
+        this.utilities.showSnackBar(message, 'OK');
       }
     });
   }

@@ -20,107 +20,226 @@ export class ModelMap {
         sku: {
             name: 'item sku',
             required: true,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         upc: {
             name: 'upc',
             required: false,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         description: {
             name: 'item description',
             required: true,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         phonetic: {
             name: 'phonetic description',
             required: false,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         itemType: {
             name: 'item type',
             required: true,
-            type: 'itemType'
+            type: 'itemType',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'name'
+            }
         },
         uom: {
             name: 'item uom',
             required: true,
-            type: 'itemUom'
+            type: 'itemUom',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'name'
+            }
         },
         weightTolerance: {
             name: 'weight tolerance',
             required: true,
             min: 0,
             max: 100,
-            type: 'number'
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
         },
         scannedVerification: {
             name: 'scanner verification id',
             required: false,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         spokenVerification: {
             name: 'spoken verification id',
             required: false,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         weight: {
             name: 'item weight',
             required: false,
-            type: 'boolean'
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
         },
         variableWeight: {
             name: 'variable weight',
             required: true,
-            type: 'boolean'
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
         },
         expiryDate: {
             name: 'expiry date',
             required: false,
-            type: 'boolean'
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
         },
         serial: {
             name: 'item serial',
             required: false,
-            type: 'boolean'
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
         },
         batchNumber: {
             name: 'batch number',
             required: false,
-            type: 'boolean'
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
         }
     };
 
+    public static ItemTypeMap = {
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        name: {
+            name: 'name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        description: {
+            name: 'description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
     public static LocationMap = {
         code: {
             name: 'code',
             required: true,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        description: {
+            name: 'description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         section: {
             name: 'section',
             required: false,
-            type: 'string'
+            type: 'section',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'name'
+            }
         },
         lane: {
             name: 'lane',
             required: false,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
-        column: {
+        columnAt: {
             name: 'column',
             required: false,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         height: {
             name: 'height',
             required: false,
-            type: 'number'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         deep: {
             name: 'deep',
             required: false,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         checkDigit: {
             name: 'check digit',
@@ -130,12 +249,30 @@ export class ModelMap {
             min: 1,
             max: 99999,
             minlength: 1,
-            maxlength: 5
+            maxlength: 5,
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
         },
-        module: {
-            name: 'module',
+        type: {
+            name: 'type',
             required: false,
-            type: 'string'
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                displayIndex: null,
+                valueIndex: null
+            }
+        },
+        state: {
+            name: 'status',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
         }
     };
 
@@ -143,40 +280,111 @@ export class ModelMap {
         orderNumber:  {
             name: 'order number',
             required: true,
-            unique: true
+            unique: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
         },
         deliveryDate: {
             name: 'delivery date',
             required: false,
-            type: 'date'
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
+            }
         },
         transport: {
             name: 'transport',
-            required: false
+            required: false,
+            type: 'transport',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'name'
+            }
         },
+        customer: {
+            name: 'customer',
+            required: false,
+            type: 'customer',
+            forFile: false,
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'name'
+            }
+        },
+        orderLine: {
+            name: 'order line',
+            required: false,
+            type: 'orderLine',
+            forFile: false,
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'name'
+            }
+        },
+
         route: {
             name: 'route',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         routeName: {
             name: 'route name',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         dispatchPlatforms: {
             name: 'route',
-            required: false
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
         },
         carrierCode: {
             name: 'route',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         customerNumber: {
             name: 'customer number',
-            required: true
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         customerName: {
             name: 'customer name',
-            required: true
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         address: {
             name: 'address',
@@ -184,28 +392,61 @@ export class ModelMap {
         },
         sku: {
             name: 'sku',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         description: {
             name: 'description',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         itemType: {
             name: 'item type',
-            required: false
+            required: false,
+            type: 'itemType',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'name'
+            }
         },
         codeUom: {
             name: 'uom',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'name'
+            }
         },
         qtyToPicked: {
             name: 'qty picked',
-            required: false
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
         },
         expiryDate: {
             name: 'expiry date',
             required: false,
-            type: 'date'
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
+            }
         },
         /*serial: {
             name: 'serial',
@@ -213,44 +454,93 @@ export class ModelMap {
         },*/
         batchNumber: {
             name: 'batch number',
-            required: false
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
         },
         codeLocation: {
             name: 'code location',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         baseItemOverride: {
             name: 'base item override',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         caseLabelCheckDigits: {
             name: 'check digits',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         cartonCode: {
             name: 'carton code',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
         pickSequenceNumber: {
             name: 'pick sequence',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         },
-        workCode: {
+        /*workCode: {
             name: 'work code',
-            required: false
-        },
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },*/
         goalTime: {
             name: 'goal time',
-            required: false
+            required: false,
+            type: 'nomber',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
         },
         departureDateTime: {
             name: 'departure date',
             required: false,
-            type: 'date'
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
+            }
         },
         rootWorkCode: {
             name: 'root code',
-            required: false
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         }
     };
     public static RecentOriginMap = {
@@ -274,8 +564,12 @@ export class ModelMap {
             name: 'total rows',
             type: 'number'
         },
-        invalidRows: {
-            name: 'invalid rows',
+        rejectedRows: {
+            name: 'rejected rows',
+            type: 'number'
+        },
+        importedRows: {
+            name: 'imported rows',
             type: 'number'
         }
     };

@@ -13,7 +13,7 @@ const routes: Routes = [
     component: PagesComponent,
     loadChildren: () => import('./pages/pages.module')
       .then(m => m.PagesModule),
-    canActivateChild: [AuthGuard]
+    // canActivateChild: [AuthGuard]
   },
   {
     path: 'login',

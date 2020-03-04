@@ -55,6 +55,12 @@ export class PagesComponent implements OnInit, OnDestroy  {
               children: []
             },
             {
+              text: 'Orders',
+              icon: 'home',
+              route: '/pages/orders',
+              children: []
+            },
+            {
               text: 'Item Types',
               icon: 'home',
               route: '/pages/item-types',

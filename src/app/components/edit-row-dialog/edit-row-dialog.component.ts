@@ -2,8 +2,8 @@ import { Inject, Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
-import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService,
-         OrderService } from '@pickvoice/pickvoice-api';
+import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService, ItemTypeService,
+         OrderService, Customer, OrderLine } from '@pickvoice/pickvoice-api';
 import { DataStorage } from '../../services/data-provider';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { from, Observable } from 'rxjs';
@@ -19,25 +19,25 @@ export class EditRowDialogComponent implements OnInit {
   form: FormGroup;
   dialogTitle = '';
   type: string;
-  fields: any;
+  dataMap: any;
   remoteSync: boolean;
   keys: string[];
   row: any;
   isLoadingResults = false;
   constructor(public dialogRef: MatDialogRef<EditRowDialogComponent>, private dataProvider: DataStorage,
               private itemService: ItemsService, private locationService: LocationsService,
-              private orderService: OrderService,
+              private orderService: OrderService, private itemTypeService: ItemTypeService,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
     this.row = data.row; // object
     this.utilities.log('row recibida', this.row);
-    this.fields = data.map; // map of object
-    this.utilities.log('fields', this.fields);
+    this.dataMap = data.map; // map of object
+    this.utilities.log('fields', this.dataMap);
     this.type = data.type; // map of object
     this.utilities.log('type', this.type);
     this.remoteSync = data.remoteSync; // map of object
     this.utilities.log('remoteSync', this.remoteSync);
     const formControls = {};
-    this.keys = Object.keys(this.fields);
+    this.keys = Object.keys(this.dataMap);
     this.utilities.log('keys', this.keys);
     let value = '';
     this.utilities.log('data type', this.type);
@@ -45,16 +45,8 @@ export class EditRowDialogComponent implements OnInit {
       if (this.row === undefined) {
         return;
       }
-      value = this.row[key];
-      if (this.type === 'items') {
-        if (key === 'itemType') {
-          value = this.row.itemType.code;
-        }
-        if (key === 'uom') {
-          value = this.row.uom.code;
-        }
-      }
-      if (this.fields[key].required) {
+      value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
+      if (this.dataMap[key].required) {
         formControls[key] = new FormControl(value, Validators.required);
       } else {
         formControls[key] = new FormControl(value);
@@ -65,12 +57,30 @@ export class EditRowDialogComponent implements OnInit {
   }
 
   onSubmit() {
-    const toReturn = this.form.value;
-    let toUpload;
-    this.utilities.log('data to return', toReturn);
+    this.utilities.log('onSubmit');
+    const formData = this.form.value;
+    const toUpload = this.row;
+    this.utilities.log('form data', formData);
     if (this.remoteSync) {
       this.isLoadingResults = true;
-      if (this.type === 'items') {
+      // Necesitamos guardar los cambios en el objeto recibido
+      for (const key in toUpload) {
+        if (this.type === 'items' && typeof toUpload[key] === 'object' && toUpload[key] &&
+          toUpload[key].code && formData[key]) {
+            // mapear los datos de las propiedades tipo objeto de la entidad item
+          toUpload[key].code = formData[key];
+        } else if (this.type === 'locations' && typeof toUpload[key] === 'object' && toUpload[key] &&
+          formData[key]) {
+            // TODO: mapear los datos de las propiedades tipo objeto de la entidad location
+        } else if (this.type === 'orders' && typeof toUpload[key] === 'object' && toUpload[key] &&
+          formData[key]) {
+            // TODO: mapear los datos de las propiedades tipo objeto de la entidad order
+        } else if (formData[key]) {
+          // las propiedades simples (que no son objetos)
+          toUpload[key] = formData[key];
+        }
+      }
+      /*if (this.type === 'items') {
         toUpload = new Object(this.form.value) as any;
         let aux = toUpload.itemType;
         toUpload.itemType = {
@@ -80,39 +90,49 @@ export class EditRowDialogComponent implements OnInit {
         toUpload.uom = {
           code: aux
         } as UnityOfMeasure;
-        this.utilities.log('data to upload', toUpload);
-        this.itemService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
-        .subscribe(response => {
+      */
+      const observer = {
+        next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          aux = toUpload.itemType.code;
+          /*aux = toUpload.itemType.code;
           toUpload.itemType = aux;
           aux = toUpload.uom.code;
-          toUpload.uom = aux;
+          toUpload.uom = aux;*/
+          if ((response.status === 204 || response.status === 200 || response.status === 201)
+            && response.statusText === 'OK') {
+            this.utilities.showSnackBar('Update Successfull', 'OK');
+          }
           this.dialogRef.close(toUpload);
-        }, error => {
+        },
+        error: (error) => {
           this.isLoadingResults = false;
           this.utilities.showSnackBar('Error on edit row request', 'OK');
           this.utilities.error('error on update', error);
-        });
+        }
+      };
+      this.utilities.log('data to upload', toUpload);
+      if (this.type === 'items') {
+        this.itemService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
+        .subscribe(observer);
       }
 
       if (this.type === 'locations') {
-        toUpload = this.form.value;
         this.locationService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(response => {
-          this.isLoadingResults = false;
-          this.utilities.log('update locations response', response);
-          this.dialogRef.close(toUpload);
-        }, error => {
-          this.isLoadingResults = false;
-          this.dialogRef.close(toUpload);
-          this.utilities.showSnackBar('Error on update data', 'OK');
-          this.utilities.log('update locations response', error);
-        });
+        .subscribe(observer);
+      }
+
+      if (this.type === 'orders') {
+        this.orderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === 'itemTypes') {
+        this.itemTypeService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
       }
     } else {
-      this.dialogRef.close(toReturn);
+      this.dialogRef.close(toUpload);
     }
   }
 

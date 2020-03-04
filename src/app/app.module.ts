@@ -23,6 +23,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSelectModule } from '@angular/material/select';
 
 import { PagesModule } from './pages/pages.module';
 import { AuthModule } from './pages/auth/auth.module';
@@ -33,6 +34,7 @@ import { ImportingWidgetComponent } from './components/importing-widget/importin
 import { ApiModule } from '@pickvoice/pickvoice-api';
 import { HttpClientModule } from '@angular/common/http';
 import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
+import { AddRowDialogComponent } from './components/add-row-dialog/add-row-dialog.component';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
 import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
@@ -48,6 +50,7 @@ import { CommonDialogComponent } from './components/common-dialog/common-dialog.
     AppComponent,
     ImportDialogComponent,
     EditRowDialogComponent,
+    AddRowDialogComponent,
     ImportingWidgetComponent,
     ImportTypeSelectionComponent,
     DataPreviewComponent,
@@ -80,11 +83,10 @@ import { CommonDialogComponent } from './components/common-dialog/common-dialog.
     MatTabsModule,
     MatFormFieldModule,
     MatTableModule,
+    MatSelectModule,
 
     PagesModule,
     AuthModule,
-    // DataPreviewModule,
-    // FileImportModule,
     FormsModule,
     ReactiveFormsModule,
     AgGridModule.withComponents([])

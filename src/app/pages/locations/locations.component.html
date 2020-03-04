@@ -5,6 +5,11 @@
               <div class="title actionbar-section align-content-top">
                   <h1>Locations List</h1>
               </div>
+              <div class="actions actionbar-section right">
+                <button mat-raised-button color="accent" (click)="addRow()">
+                    <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                </button>
+              </div>
           </div>
       </div>
       <div>
@@ -14,7 +19,7 @@
         <mat-form-field class="w-100">
           <input matInput [formControl]="filter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
         </mat-form-field>
-        <table mat-table [dataSource]="dataSource" matSort>
+        <table mat-table [dataSource]="dataSource" #matTable matSort>
           <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ headers[column].name | uppercase}} </th>
             <td mat-cell *matCellDef="let element"> {{ renderColumnData(headers[column].type, element[column]) }} </td>

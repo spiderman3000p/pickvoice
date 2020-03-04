@@ -32,14 +32,32 @@
                   </button>
                   <mat-menu #menu="matMenu" xPosition="before">
                     <button mat-menu-item (click)="expandWindow(window)">{{window.expanded ? 'Contract' : 'Expand'}}</button>
+                    <button mat-menu-item [matMenuTriggerFor]="toggleColumns" (click)="$event.stopPropagation()">Toggle Columns</button>
+                    <mat-menu #toggleColumns="matMenu">
+                      <span (click)="$event.stopPropagation()">
+                        <button mat-menu-item (click)="toggleColumn(window)">Show all</button>
+                        <button mat-menu-item *ngFor="let column of window.data.defaultColDef" (click)="toggleColumn(window, column)">
+                          <mat-icon>{{column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                          {{column.field}}
+                        </button>
+                      </span>
+                    </mat-menu>
                   </mat-menu>
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
                 <div class="container-fluid" [ngStyle]="{position: 'absolute', height: 'calc(100% - 50px)'}">
                   <ag-grid-angular
+                  #agGrid
                   style="height: calc(100% - 40px);"
                   class="ag-theme-balham"
+                  (gridReady)="onGridReady($event, window)"
+                  [modules]="agGridModules"
+                  [animateRows]="true"
+                  [sideBar]="window.data.sideBar"
+                  [statusBar]="window.data.statusBar"
+                  [enableRangeSelection]="true"
+                  [defaultColDef]="window.data.defaultColDefs"
                   [rowData]="window.data.rowData"
                   [columnDefs]="window.data.colDefs">
                   </ag-grid-angular>

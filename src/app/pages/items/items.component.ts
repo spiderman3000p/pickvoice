@@ -4,6 +4,7 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
 import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
+import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { ModelMap } from '../../models/model-maps.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -39,8 +40,8 @@ export class ItemsComponent implements OnInit {
       .subscribe(response => {
         this.isLoadingResults = false;
         this.utilities.log('items received', response.body);
-        this.dataSource.data = response.body.map((element, index) => {
-          return { index: index, ... element};
+        this.dataSource.data = response.body.map((element, i) => {
+          return { index: i, ... element};
         });
       }, error => {
         this.isLoadingResults = false;
@@ -86,24 +87,57 @@ export class ItemsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
-        /*
-          Aqui la asignacion del array de objetos deberia ser tan sencillo como: this.dataSource.data = result
-          Pero de esa forma no se refresca la tabla. Asi que la unica forma para que se reflejen los cambios
-          inmediatamente en la tabla es editando registro por registro. Para eso usamos un ForEach
-        */
-        Object.keys(result).forEach(key => {
-          if (key === 'itemType' || key === 'uom') {
-            this.dataSource.data[index][key].code = result[key];
-          } else {
-            this.dataSource.data[index][key] = result[key];
-          }
-        });
+            this.dataSource.data[index] = result;
+            this.refreshTable();
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
     });
+  }
+
+  addRow() {
+    this.utilities.log('map to send to add dialog',
+    this.utilities.dataTypesModelMaps.items);
+    const dialogRef = this.dialog.open(AddRowDialogComponent, {
+      data: {
+        map: this.utilities.dataTypesModelMaps.items,
+        type: 'items',
+        remoteSync: true // para mandar los datos a la BD por la API
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+        this.dataSource.data.push(result);
+        this.refreshTable();
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
+    });
+  }
+
+  /*
+    Esta funcion se encarga de refrescar la tabla cuando el contenido cambia.
+    TODO: mejorar esta funcion usando this.dataSource y no el filtro
+  */
+  private refreshTable() {
+    // If there's no data in filter we do update using pagination, next page or previous page
+    if (this.dataSource.filter === '') {
+      const aux = this.dataSource.filter;
+      this.dataSource.filter = 'XXX';
+      this.dataSource.filter = aux;
+      // If there's something in filter, we reset it to 0 and then put back old value
+    } else {
+      const aux = this.dataSource.filter;
+      this.dataSource.filter = '';
+      this.dataSource.filter = aux;
+    }
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
 }

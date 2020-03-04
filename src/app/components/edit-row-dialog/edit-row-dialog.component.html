@@ -5,22 +5,22 @@
             <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
         </div>
         <span *ngFor="let key of keys">
-            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [appearance]="fields[key].type === 'boolean' ? 'none' : ''">
-                <mat-label>{{fields[key].name}} {{fields[key].required ? '*' : ''}}</mat-label>
+            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''">
+                <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                 <!-- campos number -->
-                <input class="w-100" matInput type="number" [formControlName]="key" *ngIf="fields[key].type === 'number'">
+                <input class="w-100" matInput type="number" [formControlName]="key" *ngIf="dataMap[key].type === 'number'">
                 <!-- campos date -->
-                <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="fields[key].type === 'date'" readonly>
-                <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="fields[key].type === 'date'"></mat-datepicker-toggle>
+                <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="dataMap[key].type === 'date'" readonly>
+                <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].type === 'date'"></mat-datepicker-toggle>
                 <mat-datepicker #pickerDate ></mat-datepicker>
                 <!-- campos string -->
                 <input class="w-100" matInput type="text" [formControlName]="key"
-                *ngIf="fields[key].type !== 'number' && fields[key].type !== 'boolean' && fields[key].type !== 'date'">
+                *ngIf="dataMap[key].type !== 'number' && dataMap[key].type !== 'boolean' && dataMap[key].type !== 'date'">
                 <!-- campos boolean -->
                 <input matInput [formControlName]="key" hidden>
-                <mat-slide-toggle  *ngIf="fields[key].type === 'boolean'" color="primary"
+                <mat-slide-toggle  *ngIf="dataMap[key].type === 'boolean'" color="primary"
                 (change)="form.get(key).setValue(!form.get(key).value)" [checked]="form.get(key).value">
-                    {{fields[key].name}}
+                    {{dataMap[key].name}}
                 </mat-slide-toggle>
             </mat-form-field>
         </span>

@@ -5,6 +5,11 @@
                 <div class="title actionbar-section align-content-top">
                     <h1>Item Types</h1>
                 </div>
+                <div class="actions actionbar-section right">
+                    <button mat-raised-button color="accent" (click)="addRow()">
+                        <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                    </button>
+                </div>
             </div>
         </div>
         <div>
@@ -22,7 +27,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [matTooltip]="row.tooltip"
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
             [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row.index)"></tr>
             </table>
             <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>

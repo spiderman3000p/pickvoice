@@ -60,7 +60,7 @@ export class FileImportComponent implements OnInit {
     reader.onload = (e: any) => {
       /* read workbook */
       const bstr: string = e.target.result;
-      const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary'});
+      const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary', cellDates: true});
       let wsname: string;
       let ws: XLSX.WorkSheet;
       let parsedData: any;
@@ -72,14 +72,19 @@ export class FileImportComponent implements OnInit {
       wb.SheetNames.forEach((key, index) => {
         wsname = key;
         ws = wb.Sheets[key];
-        parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false, defval: ''});
+        parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false, defval: '', raw: true});
         this.utilities.log('initial parsed data', parsedData);
         const sheet = {} as any;
         sheet.name = wsname;
         sheet.rowData = parsedData;
         this.utilities.log('keys parsed', Object.keys(parsedData[0]));
         sheet.columnDefs = Object.keys(parsedData[0]).map(column => {
-          return {field: column};
+          return {
+            field: column,
+            filter: true,
+            editable: true,
+            sortable: true
+          };
         });
         sheets.push(sheet);
       });

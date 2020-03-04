@@ -33,6 +33,12 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'orders',
+    // component: LocationsComponent,
+    loadChildren: () => import('./orders/orders.module').then(m => m.OrdersModule),
+    pathMatch: 'full'
+  },
+  {
     path: 'item-types',
     // component: ItemTypesComponent,
     loadChildren: () => import('./item-types/item-types.module').then(m => m.ItemTypesModule),

@@ -17,6 +17,7 @@ export interface ValidationError {
 export class UtilitiesService {
   public dataTypesModelMaps = {
     items: ModelMap.ItemMap,
+    itemTypes: ModelMap.ItemTypeMap,
     locations: ModelMap.LocationMap,
     orders: ModelMap.OrderMap
   };
@@ -36,12 +37,19 @@ export class UtilitiesService {
       case 'date':
         if (typeof data === 'string') {
           dataValue = new Intl.DateTimeFormat('en-US').format(new Date(data));
+        } else if (typeof data === 'number') {
+          // esta conversion sale de aqui: https://github.com/SheetJS/sheetjs/issues/1623
+          dataValue = new Date(1000 * 60 * 60 * 24 * (data - 25569));
+        } else if (typeof data === 'object') {
+          dataValue = data;
         } else {
           dataValue = data;
         }
         break;
       case 'itemType': dataValue = data.code; break;
       case 'itemUom': dataValue = data.code; break;
+      case 'section': dataValue = data.code; break;
+      case 'transport': dataValue = data.transportNumber; break;
       default: dataValue = data;
     }
     return dataValue;

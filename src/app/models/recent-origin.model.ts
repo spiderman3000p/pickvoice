@@ -7,7 +7,6 @@ export class RecentOrigin {
     filepath: string;
     date: Date;
     totalRows: number;
-    invalidRows: number;
     importedRows: number;
     rejectedRows: number;
     user: string;
@@ -15,11 +14,10 @@ export class RecentOrigin {
 
     constructor() {
         this.id = 'origin_' + Date.now();
-        this.filename = 'unknow';
-        this.filepath = 'unknow';
+        this.filename = 'unknown';
+        this.filepath = 'unknown';
         this.date = new Date();
         this.totalRows = 0;
-        this.invalidRows = 0;
         this.importedRows = 0;
         this.rejectedRows = 0;
         this.user = 'unknow';
