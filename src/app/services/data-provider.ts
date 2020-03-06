@@ -16,6 +16,8 @@ export class DataStorage {
     public filePath: string; /* guarda el path del archivo seleccionado, no es subject porque
     no se requiere obtener su cambio en tiempo real
     */
+    public sharedData: any; // para guardar el datos enviados de un componente a otro
+    public returnData: any; // para guardar los datos devueltos por el componente
     _fileName: string;
     _dataType: string;
     _sheets: any[];

@@ -19,7 +19,7 @@ interface RecentOriginsFilters {
 export class RecentOriginsService {
     itemsRecentOrigins: RecentOrigin[];
     locationsRecentOrigins: RecentOrigin[];
-    ordersRecentOrigins: RecentOrigin[];
+    ordersDtoRecentOrigins: RecentOrigin[];
     itemsFilters: RecentOriginsFilters;
     locationsFilters: RecentOriginsFilters;
     ordersFilters: RecentOriginsFilters;
@@ -30,12 +30,11 @@ export class RecentOriginsService {
         }
         this.itemsRecentOrigins = [];
         this.locationsRecentOrigins = [];
-        this.ordersRecentOrigins = [];
+        this.ordersDtoRecentOrigins = [];
     }
 
     getRecentOrigins(type: string, filters?: RecentOriginsFilters): Observable<RecentOrigin[]> {
         // TODO: obtener origenes recientes desde bd local
-        // localStorage.clear();
         return new Observable(suscriber => {
             // this.utilities.log('localStorage', localStorage);
             let origin: RecentOrigin;

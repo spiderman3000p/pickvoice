@@ -59,7 +59,7 @@
       <!--button type="button" mat-icon-button (click)="logout()" color="primary" class="logout-button"-->
         <!--mat-icon aria-label="Logout">power_settings_new</mat-icon>
       <button/-->
-      <button mat-mini-fab color="primary" [matMenuTriggerFor]="userMenu" class="logout-button">{{ username ? username[0] : '' | uppercase}}</button>
+      <button mat-mini-fab color="primary" [matMenuTriggerFor]="userMenu" class="logout-button">{{ (username ? username[0] : '') | uppercase}}</button>
       <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
         <p class="p-3">Choose an option</p>
         <button mat-menu-item>Option 1</button>

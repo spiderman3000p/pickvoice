@@ -1,4 +1,5 @@
 <div class="content-area">
+    <button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button>
     <div class="content">
       <div class="section-wrapper">
           <div class="header actionbar align-content-top">
@@ -16,21 +17,73 @@
         <div class="example-loading-shade" *ngIf="isLoadingResults">
           <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
         </div>
-        <mat-form-field class="w-100">
+        <mat-form-field class="col-sm-5">
           <input matInput [formControl]="filter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+        <mat-form-field class="col-sm-5">
+            <mat-label>Action for selected rows</mat-label>
+            <mat-select [formControl]="actionForSelected">
+                <mat-option>Select an action</mat-option>
+                <mat-option value="delete">Delete</mat-option>
+            </mat-select>
         </mat-form-field>
         <div>
           <table mat-table [dataSource]="dataSource" matSort>
-            <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ headers[column].name | uppercase}} </th>
-              <td mat-cell *matCellDef="let element"> {{ renderColumnData(headers[column].type, element[column]) }} </td>
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+            <!-- Data Columns -->
+            <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
+                <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
+            </ng-container>
+            <!-- Options Sticky Column -->
+            <ng-container matColumnDef="options" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef class="more-button-header">
+                    <button mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    
+                    <mat-menu #toggleColumns="matMenu">
+                        <span (click)="$event.stopPropagation()">
+                            <button mat-menu-item (click)="toggleColumn()">Show all</button>
+                            <button mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                            (click)="toggleColumn(column)">
+                                <mat-icon>{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                                {{column.name}}
+                            </button>
+                        </span>
+                    </mat-menu>
+                </th>
+                <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                    <button mat-icon-button (click)="deletePrompt(element)">
+                        <mat-icon color="accent">delete</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="editRow(element)">
+                        <mat-icon color="accent">search</mat-icon>
+                    </button>
+                </td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-            [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row.index)"></tr>
-          </table>
-          <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+            <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+            <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+            [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
         </div>
       </div>
     </div>

@@ -13,7 +13,7 @@ const routes: Routes = [
     component: PagesComponent,
     loadChildren: () => import('./pages/pages.module')
       .then(m => m.PagesModule),
-    // canActivateChild: [AuthGuard]
+    canActivateChild: [AuthGuard]
   },
   {
     path: 'login',
@@ -23,7 +23,7 @@ const routes: Routes = [
   },
   { path: 'importing',
     outlet: 'importing',
-    // canActivateChild: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'import-type-selection',

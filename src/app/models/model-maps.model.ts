@@ -1,3 +1,9 @@
+export const IMPORTING_TYPES = {
+    ITEMS: 'items',
+    LOCATIONS: 'locations',
+    ORDERS: 'ordersDto',
+    ITEM_TYPE: 'itemTypes'
+};
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
     Cada propiedad aqui especificada, corresponde a las columnas de los archivos de importacion
@@ -16,6 +22,10 @@
     a los campos de texto)
 */
 export class ModelMap {
+    /*********************************************
+    *           Object's for CRUD's
+    **********************************************/
+    /* item object map for CRUD */
     public static ItemMap = {
         sku: {
             name: 'item sku',
@@ -29,10 +39,10 @@ export class ModelMap {
         upc: {
             name: 'upc',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         description: {
@@ -89,19 +99,19 @@ export class ModelMap {
         scannedVerification: {
             name: 'scanner verification id',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         spokenVerification: {
             name: 'spoken verification id',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         weight: {
@@ -144,8 +154,19 @@ export class ModelMap {
                 control: 'toggle'
             }
         }
+        /*
+            Aqui esta faltand itemState, per no se agrega porque no sera parte de los archivos de importacion.
+            Este campo se añade por defecto al momento de importar.
+            itemState: {
+            name: 'item state',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select'
+            }
+        */
     };
-
+    /* item type object map for CRUD */
     public static ItemTypeMap = {
         code: {
             name: 'code',
@@ -175,6 +196,7 @@ export class ModelMap {
             }
         }
     };
+    /* locationr object map for CRUD */
     public static LocationMap = {
         code: {
             name: 'code',
@@ -275,7 +297,7 @@ export class ModelMap {
             }
         }
     };
-
+    /* order object map for CRUD */
     public static OrderMap = {
         orderNumber:  {
             name: 'order number',
@@ -543,6 +565,7 @@ export class ModelMap {
             }
         }
     };
+    /* recent origin object map for CRUD */
     public static RecentOriginMap = {
         filename: {
             name: 'file name',
@@ -571,6 +594,200 @@ export class ModelMap {
         importedRows: {
             name: 'imported rows',
             type: 'number'
+        }
+    };
+
+    /*********************************************
+    *                   DTO's
+    **********************************************/
+
+    /* order dto map (for importing proccess) */
+    public static OrderDtoMap = {
+        orderNumber:  {
+            name: 'order number',
+            required: true,
+            unique: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        purchaseNumber:  {
+            name: 'purchase number',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        incoiceNumber:  {
+            name: 'invoice number',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        orderDate:  {
+            name: 'order date',
+            required: true,
+            unique: false,
+            type: 'date',
+            formControl: {
+                control: 'date'
+            }
+        },
+        deliveryDate:  {
+            name: 'delivery date',
+            required: true,
+            unique: false,
+            type: 'date',
+            formControl: {
+                control: 'date'
+            }
+        },
+        customerNumber:  {
+            name: 'customer number',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        customerName:  {
+            name: 'customer name',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        customerAddress:  {
+            name: 'customer address',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        orderType:  {
+            name: 'order type',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        priority:  {
+            name: 'priority',
+            required: true,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        note:  {
+            name: 'note',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        sku:  {
+            name: 'sku',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        qtyRequired:  {
+            name: 'qty required',
+            required: true,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        uomCode:  {
+            name: 'uom code',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        batchNumber:  {
+            name: 'batch number',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        createDate:  {
+            name: 'create date',
+            required: true,
+            unique: false,
+            type: 'date',
+            formControl: {
+                control: 'date'
+            }
+        },
+        expirateDate:  {
+            name: 'expirate date',
+            required: true,
+            unique: false,
+            type: 'date',
+            formControl: {
+                control: 'date'
+            }
+        },
+        serial:  {
+            name: 'serial',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        qualityState:  {
+            name: 'quality state',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
         }
     };
 

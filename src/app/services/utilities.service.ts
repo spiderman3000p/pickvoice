@@ -19,7 +19,8 @@ export class UtilitiesService {
     items: ModelMap.ItemMap,
     itemTypes: ModelMap.ItemTypeMap,
     locations: ModelMap.LocationMap,
-    orders: ModelMap.OrderMap
+    orders: ModelMap.OrderMap,
+    ordersDto: ModelMap.OrderDtoMap
   };
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) { }
 

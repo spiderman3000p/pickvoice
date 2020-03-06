@@ -19,7 +19,7 @@
             <input matInput [formControl]="filter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
         </mat-form-field>
         <div *ngIf="dataSource.data.length > 0">
-            <table mat-table [dataSource]="dataSource" matSort>
+            <table mat-table [dataSource]="dataSource" #importTable matSort>
             <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header [id]="column"> {{ headers[column].name | uppercase}} </th>
                 <td mat-cell *matCellDef="let element"> {{ renderColumnData(headers[column].type, element[column]) }} </td>
