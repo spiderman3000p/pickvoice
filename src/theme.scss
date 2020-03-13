@@ -97,9 +97,43 @@ $md-alegra-light: (
       A700 : #000000,
   )
 );
+$md-alegra-warn: (
+  50 : #fefefe,
+  100 : #fbfcfd,
+  200 : #f9fafb,
+  300 : #f7f8f9,
+  400 : #f5f7f8,
+  500 : #f3f5f7,
+  600 : #f1f4f6,
+  700 : #eff2f5,
+  800 : #edf0f3,
+  900 : #eaeef1,
+  A100 : #ffffff,
+  A200 : #ffffff,
+  A400 : #ffffff,
+  A700 : #ffffff,
+  contrast: (
+      50 : #000000,
+      100 : #000000,
+      200 : #000000,
+      300 : #000000,
+      400 : #000000,
+      500 : #000000,
+      600 : #000000,
+      700 : #000000,
+      800 : #000000,
+      900 : #000000,
+      A100 : #000000,
+      A200 : #000000,
+      A400 : #000000,
+      A700 : #000000,
+  )
+);
+
+
 $my-app-light: mat-palette($md-alegra-light);
 $my-app-primary: mat-palette($md-alegra-primary);
 $my-app-accent:  mat-palette($md-alegra-accent, 500, 900, A100);
-$my-app-warn:    mat-palette($md-alegra-primary);
+$my-app-warn:    mat-palette($md-alegra-warn);
 $my-app-theme: mat-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
 @include angular-material-theme($my-app-theme);

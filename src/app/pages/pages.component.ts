@@ -4,6 +4,7 @@ import { AuthService } from '../services/auth.service';
 import { UtilitiesService } from '../services/utilities.service';
 import { Observer } from 'rxjs';
 import { Router } from '@angular/router';
+import { IMPORTING_TYPES } from '../models/model-maps.model';
 
 @Component({
   selector: 'app-pages',
@@ -45,25 +46,31 @@ export class PagesComponent implements OnInit, OnDestroy  {
             {
               text: 'Items',
               icon: 'home',
-              route: '/pages/items',
+              route: '/pages/' + IMPORTING_TYPES.ITEMS,
               children: []
             },
             {
               text: 'Locations',
               icon: 'home',
-              route: '/pages/locations',
+              route: '/pages/' + IMPORTING_TYPES.LOCATIONS,
               children: []
             },
             {
               text: 'Orders',
               icon: 'home',
-              route: '/pages/orders',
+              route: '/pages/' + IMPORTING_TYPES.ORDERS,
               children: []
             },
             {
               text: 'Item Types',
               icon: 'home',
-              route: '/pages/item-types',
+              route: '/pages/' + IMPORTING_TYPES.ITEM_TYPE,
+              children: []
+            },
+            {
+              text: 'Uoms',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.UOMS,
               children: []
             }
           ]

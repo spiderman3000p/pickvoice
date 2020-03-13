@@ -5,8 +5,14 @@
 export const environment = {
   production: false,
   apiBaseUrl: 'https://tau-tech.co:8443/api',
-  sessionDuration: 360,
-  debug: true
+  sessionDuration: 360, // session duration in minutes
+  sessionInactivityTime: 30, // session inativity time in minutes
+  debug: true,
+  companyName: 'Pickvoice',
+  companyEmail: '',
+  companyPhones: '',
+  companyAddress: '',
+  footer: ''
 };
 
 /*

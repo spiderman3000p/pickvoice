@@ -27,7 +27,7 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;" [matTooltip]="row.tooltip"
-            [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row.index)"></tr>
+            [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr>
             </table>
             <mat-paginator [length]="dataSource.data.length" pageSize="5" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
         </div>

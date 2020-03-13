@@ -1,8 +1,10 @@
 export const IMPORTING_TYPES = {
     ITEMS: 'items',
     LOCATIONS: 'locations',
-    ORDERS: 'ordersDto',
-    ITEM_TYPE: 'itemTypes'
+    ORDERS: 'orders',
+    ORDERS_DTO: 'ordersDto',
+    ITEM_TYPE: 'itemTypes',
+    UOMS: 'uoms',
 };
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
@@ -39,10 +41,10 @@ export class ModelMap {
         upc: {
             name: 'upc',
             required: false,
-            type: 'number',
+            type: 'string',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'text'
             }
         },
         description: {
@@ -196,6 +198,27 @@ export class ModelMap {
             }
         }
     };
+    /* unity of measure object map for CRUD */
+    public static UomMap = {
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        name: {
+            name: 'name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
     /* locationr object map for CRUD */
     public static LocationMap = {
         code: {
@@ -303,10 +326,39 @@ export class ModelMap {
             name: 'order number',
             required: true,
             unique: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        purchaseNumber:  {
+            name: 'purchase number',
+            required: false,
+            unique: false,
             type: 'number',
             formControl: {
                 control: 'input',
                 type: 'number'
+            }
+        },
+        invoiceNumber:  {
+            name: 'invoice number',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        orderDate: {
+            name: 'order date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
             }
         },
         deliveryDate: {
@@ -318,6 +370,37 @@ export class ModelMap {
                 type: 'normal'
             }
         },
+        orderType: {
+            name: 'type',
+            required: false,
+            type: 'orderType',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'code',
+                displayIndex: 'description'
+            }
+        },
+        priority:  {
+            name: 'priority',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        note:  {
+            name: 'note',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
         transport: {
             name: 'transport',
             required: false,
@@ -325,8 +408,8 @@ export class ModelMap {
             formControl: {
                 control: 'select',
                 type: 'normal',
-                valueIndex: 'code',
-                displayIndex: 'name'
+                valueIndex: 'transportNumber',
+                displayIndex: 'nameRoute'
             }
         },
         customer: {
@@ -337,231 +420,8 @@ export class ModelMap {
             formControl: {
                 control: 'select',
                 type: 'normal',
-                valueIndex: 'code',
+                valueIndex: 'customerNumber',
                 displayIndex: 'name'
-            }
-        },
-        orderLine: {
-            name: 'order line',
-            required: false,
-            type: 'orderLine',
-            forFile: false,
-            formControl: {
-                control: 'select',
-                type: 'normal',
-                valueIndex: 'code',
-                displayIndex: 'name'
-            }
-        },
-
-        route: {
-            name: 'route',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        routeName: {
-            name: 'route name',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        dispatchPlatforms: {
-            name: 'route',
-            required: false,
-            type: 'number',
-            formControl: {
-                control: 'input',
-                type: 'number'
-            }
-        },
-        carrierCode: {
-            name: 'route',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        customerNumber: {
-            name: 'customer number',
-            required: true,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        customerName: {
-            name: 'customer name',
-            required: true,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        address: {
-            name: 'address',
-            required: false
-        },
-        sku: {
-            name: 'sku',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        description: {
-            name: 'description',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        itemType: {
-            name: 'item type',
-            required: false,
-            type: 'itemType',
-            formControl: {
-                control: 'select',
-                type: 'normal',
-                valueIndex: 'code',
-                displayIndex: 'name'
-            }
-        },
-        codeUom: {
-            name: 'uom',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'select',
-                type: 'normal',
-                valueIndex: 'code',
-                displayIndex: 'name'
-            }
-        },
-        qtyToPicked: {
-            name: 'qty picked',
-            required: false,
-            type: 'number',
-            formControl: {
-                control: 'input',
-                type: 'number'
-            }
-        },
-        expiryDate: {
-            name: 'expiry date',
-            required: false,
-            type: 'date',
-            formControl: {
-                control: 'date',
-                type: 'normal'
-            }
-        },
-        /*serial: {
-            name: 'serial',
-            required: false
-        },*/
-        batchNumber: {
-            name: 'batch number',
-            required: false,
-            type: 'number',
-            formControl: {
-                control: 'input',
-                type: 'number'
-            }
-        },
-        codeLocation: {
-            name: 'code location',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        baseItemOverride: {
-            name: 'base item override',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        caseLabelCheckDigits: {
-            name: 'check digits',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        cartonCode: {
-            name: 'carton code',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        pickSequenceNumber: {
-            name: 'pick sequence',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
-        /*workCode: {
-            name: 'work code',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },*/
-        goalTime: {
-            name: 'goal time',
-            required: false,
-            type: 'nomber',
-            formControl: {
-                control: 'input',
-                type: 'number'
-            }
-        },
-        departureDateTime: {
-            name: 'departure date',
-            required: false,
-            type: 'date',
-            formControl: {
-                control: 'date',
-                type: 'normal'
-            }
-        },
-        rootWorkCode: {
-            name: 'root code',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
             }
         }
     };

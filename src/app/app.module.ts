@@ -27,35 +27,43 @@ import { MatSelectModule } from '@angular/material/select';
 
 import { PagesModule } from './pages/pages.module';
 import { AuthModule } from './pages/auth/auth.module';
+import { ApiModule } from '@pickvoice/pickvoice-api';
+import { BASE_PATH } from '@pickvoice/pickvoice-api';
 
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { EditRowComponent } from './pages/edit-row/edit-row.component';
+import { AddRowDialogComponent } from './components/add-row-dialog/add-row-dialog.component';
+import { PrintComponent } from './components/print/print.component';
+import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
 import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
 import { ImportingWidgetComponent } from './components/importing-widget/importing-widget.component';
-import { ApiModule } from '@pickvoice/pickvoice-api';
-import { HttpClientModule } from '@angular/common/http';
-import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
-import { AddRowDialogComponent } from './components/add-row-dialog/add-row-dialog.component';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
 import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
+import { CommonDialogComponent } from './components/common-dialog/common-dialog.component';
 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
 import { AgGridModule } from 'ag-grid-angular';
-import { BASE_PATH } from '@pickvoice/pickvoice-api';
+import { NgxPrintModule } from 'ngx-print';
+
 import { environment } from '../environments/environment';
-import { CommonDialogComponent } from './components/common-dialog/common-dialog.component';
+
+
 
 @NgModule({
   declarations: [
     AppComponent,
     ImportDialogComponent,
-    EditRowDialogComponent,
-    AddRowDialogComponent,
     ImportingWidgetComponent,
     ImportTypeSelectionComponent,
     DataPreviewComponent,
     FileImportComponent,
-    CommonDialogComponent
+    CommonDialogComponent,
+    EditRowComponent,
+    AddRowDialogComponent,
+    PrintComponent,
+    PrintLayoutComponent
   ],
   imports: [
     ApiModule,
@@ -89,6 +97,7 @@ import { CommonDialogComponent } from './components/common-dialog/common-dialog.
     AuthModule,
     FormsModule,
     ReactiveFormsModule,
+    NgxPrintModule,
     AgGridModule.withComponents([])
   ],
   entryComponents: [

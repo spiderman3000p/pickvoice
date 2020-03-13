@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PagesRoutingModule } from './pages-routing.module';
-
 import { AdministrationModule } from './administration/administration.module';
 import { PendingOrdersModule } from './pending-orders/pending-orders.module';
 import { CurrentActionsModule } from './current-actions/current-actions.module';

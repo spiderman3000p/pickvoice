@@ -4,8 +4,11 @@ import { tap, delay } from 'rxjs/operators';
 import { UserService } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
-const SESSION_DURATION = environment.sessionDuration; // 6 horas limites de session
+const SESSION_DURATION = environment.sessionDuration;
+const SESSION_INACTIVITY_TIME = environment.sessionInactivityTime;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,8 +19,9 @@ export class AuthService {
   rememberUsername: string;
   remember: Boolean;
   sessionStart: number;
-
-  constructor(private userService: UserService, private utilities: UtilitiesService) { }
+  inactivityInterval: any;
+  constructor(private userService: UserService, private utilities: UtilitiesService,
+              private router: Router) { }
   // Dummy login function
   public login(username: string, password: string): Observable<any> {
     return this.userService.loginUser(username, password, 'response', false);
@@ -30,6 +34,9 @@ export class AuthService {
     this.remember = null;
     this.rememberUsername = null;
     this.sessionStart = null;
+    if (this.inactivityInterval !== undefined) {
+      clearInterval(this.inactivityInterval);
+    }
     localStorage.removeItem('username');
     localStorage.removeItem('rememberUsername');
     localStorage.removeItem('remember');
@@ -96,6 +103,32 @@ export class AuthService {
     let sessionStart = null;
     let remember = false as Boolean;
     let sessionDuration = 0; // in minutes
+    let lastActivity;
+    let diffDates;
+    if (!localStorage.getItem('last_activity')) {
+      localStorage.setItem('last_activity', String(Date.now()));
+      console.log('last_activity establecido en db', String(Date.now()));
+    }
+    /*if (this.inactivityInterval !== undefined) {
+      clearInterval(this.inactivityInterval);
+      this.inactivityInterval = undefined;
+    }
+    if (this.inactivityInterval === undefined) {
+      this.inactivityInterval = setInterval(() => {
+        lastActivity = Number(localStorage.getItem('last_activity'));
+        console.log('lastActivity', lastActivity);
+        diffDates = (Date.now() - lastActivity) / (1000 * 60);
+        if (diffDates > SESSION_INACTIVITY_TIME) {
+          console.error(`inactivity es mayor que ${SESSION_INACTIVITY_TIME}`, diffDates);
+          this.logout();
+          isLogged = false;
+          this.router.navigate(['/login']);
+        } else {
+          console.log('tiempo de inactividad', diffDates);
+          localStorage.setItem('last_activity', String(Date.now()));
+        }
+      }, 30000);
+    }*/
     if (this.isLogged === undefined) {
       if (localStorage.getItem('isLoggedIn') && localStorage.getItem('sessionStart')) {
         isLogged = JSON.parse(localStorage.getItem('isLoggedIn'));

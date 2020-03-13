@@ -21,17 +21,22 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatListModule } from '@angular/material/list';
 
 @NgModule({
-  declarations: [LocationsComponent],
+  declarations: [
+    LocationsComponent
+  ],
   imports: [
     CommonModule,
     LocationsRoutingModule,
 
     FormsModule,
     ReactiveFormsModule,
-    
-    MatTooltipModule,
+
+    MatNativeDateModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
     MatSortModule,
@@ -42,10 +47,12 @@ import { MatSelectModule } from '@angular/material/select';
     MatIconModule,
     MatCardModule,
     MatDatepickerModule,
-    MatNativeDateModule,
     MatCheckboxModule,
     MatMenuModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatExpansionModule,
+    MatListModule
   ]
 })
 export class LocationsModule { }
