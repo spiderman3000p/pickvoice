@@ -12,6 +12,7 @@ import { ItemsResolverService } from './pages/items/items-resolver.service';
 import { LocationsResolverService } from './pages/locations/locations-resolver.service';
 import { OrdersResolverService } from './pages/orders/orders-resolver.service';
 import { ItemTypesResolverService } from './pages/item-types/item-types-resolver.service';
+import { UomsResolverService } from './pages/uoms/uoms-resolver.service';
 import { IMPORTING_TYPES } from './models/model-maps.model';
 
 const routes: Routes = [
@@ -112,6 +113,18 @@ const routes: Routes = [
             type: IMPORTING_TYPES.ITEM_TYPE,
             format: 'single',
             title: 'Print Item Type'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.UOMS + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: UomsResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.UOMS,
+            format: 'single',
+            title: 'Print Unity of Measure'
           }
         }
     ]

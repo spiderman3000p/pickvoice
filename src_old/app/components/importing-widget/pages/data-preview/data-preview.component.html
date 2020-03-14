@@ -1,0 +1,16 @@
+<div class="example-loading-shade" *ngIf="isLoadingResults">
+    <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+</div>
+<mat-toolbar color="primary">
+    <button mat-icon-button type="button" (click)="goBack()">
+        <mat-icon>arrow_back_ios</mat-icon>
+        <!--span class="btn-label">Back</span-->
+    </button>
+    <h3 class="pl-4">Data Preview</h3>
+</mat-toolbar>
+<ag-grid-angular
+style="width: 100%; height: 80%;"
+class="ag-theme-balham"
+[rowData]="rowData"
+[columnDefs]="columnDefs">
+</ag-grid-angular>

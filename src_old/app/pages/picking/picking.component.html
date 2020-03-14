@@ -1,0 +1,72 @@
+  <div class="content-area">
+    <button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button>
+    <div class="content">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Picking</h1>
+              </div>
+          </div>
+      </div>
+    </div>
+    <div>
+      <mat-grid-list cols="2" rowHeight="2:1" cdkDropList (cdkDropListDropped)="drop($event)">
+        <mat-grid-tile *ngFor="let window of windows; let i=index" [colspan]="window.expanded ? 2 : 1" [rowspan]="window.expanded ? 2 : 1">
+            <div class="example-loading-shade" *ngIf="window.isLoading">
+                <mat-spinner class="spinner"></mat-spinner>
+            </div>
+            <mat-card class="dashboard-card">
+              <mat-card-header>
+                <mat-card-title>
+                  {{window.title}}
+                  <mat-form-field class="date-selector">
+                    <mat-label>Time period</mat-label>
+                    <mat-select>
+                      <mat-option *ngFor="let period of periods" (click)="selectPeriod(window, period)"
+                      [value]="period.value">
+                        {{period.title}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu" xPosition="before">
+                    <button mat-menu-item (click)="expandWindow(window)">{{window.expanded ? 'Contract' : 'Expand'}}</button>
+                    <button mat-menu-item [matMenuTriggerFor]="toggleColumns" (click)="$event.stopPropagation()">Toggle Columns</button>
+                    <mat-menu #toggleColumns="matMenu">
+                      <span (click)="$event.stopPropagation()">
+                        <button mat-menu-item (click)="toggleColumn(window)">Show all</button>
+                        <button mat-menu-item *ngFor="let column of window.data.defaultColDef" (click)="toggleColumn(window, column)">
+                          <mat-icon>{{column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                          {{column.field}}
+                        </button>
+                      </span>
+                    </mat-menu>
+                  </mat-menu>
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="container-fluid" [ngStyle]="{position: 'absolute', height: 'calc(100% - 50px)'}">
+                  <ag-grid-angular
+                  #agGrid
+                  style="height: calc(100% - 40px);"
+                  class="ag-theme-balham"
+                  (gridReady)="onGridReady($event, window)"
+                  [modules]="agGridModules"
+                  [animateRows]="true"
+                  [sideBar]="window.data.sideBar"
+                  [statusBar]="window.data.statusBar"
+                  [enableRangeSelection]="true"
+                  [defaultColDef]="window.data.defaultColDefs"
+                  [rowData]="window.data.rowData"
+                  [columnDefs]="window.data.colDefs">
+                  </ag-grid-angular>
+                </div>
+              </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </div>
+  </div>
+    

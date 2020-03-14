@@ -4,7 +4,7 @@ import { UtilitiesService } from '../../../../services/utilities.service';
 import { DataStorage } from '../../../../services/data-provider';
 import { MatDialog } from '@angular/material/dialog';
 import { ImportDialogComponent } from '../../../import-dialog/import-dialog.component';
-import { ModelMap } from '../../../../models/model-maps.model';
+import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
 import * as XLSX from 'xlsx';
 import { of, from } from 'rxjs';
 
@@ -23,6 +23,7 @@ export class ImportTypeSelectionComponent implements OnInit {
   file: File;
   displayedColumns: string[];
   parsedData: any;
+  types = IMPORTING_TYPES;
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
               private dataProvider: DataStorage) {
     // this.displayedColumns = Object.keys(ModelMap.LocationMap);

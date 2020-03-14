@@ -5,6 +5,7 @@ import { ItemTypesComponent } from './item-types.component';
 import { EditRowComponent } from '../edit-row/edit-row.component';
 import { ItemTypesResolverService } from './item-types-resolver.service';
 import { NotFoundComponent } from '../not-found/not-found.component';
+import { IMPORTING_TYPES } from '../../models/model-maps.model';
 
 const routes: Routes = [
     {
@@ -14,7 +15,8 @@ const routes: Routes = [
             row: ItemTypesResolverService,
         },
         data: {
-            viewMode: 'edit'
+            viewMode: 'edit',
+            type: IMPORTING_TYPES.ITEM_TYPE
         }
     },
     {
@@ -24,7 +26,8 @@ const routes: Routes = [
             row: ItemTypesResolverService,
         },
         data: {
-            viewMode: 'view'
+            viewMode: 'view',
+            type: IMPORTING_TYPES.ITEM_TYPE
         }
     },
     {

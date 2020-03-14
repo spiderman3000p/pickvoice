@@ -127,7 +127,7 @@ export class ImportComponent implements OnInit {
         this.sendItemsData();
       } else if (selectedType === IMPORTING_TYPES.LOCATIONS) {
         this.sendLocationsData();
-      } else if (selectedType === IMPORTING_TYPES.ORDERS) {
+      } else if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
         this.sendOrdersData();
       }
     } else {
@@ -164,25 +164,35 @@ export class ImportComponent implements OnInit {
   }
 
   sendOrdersData() {
-    this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(retry(3))
+    /*this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(retry(3))
     .subscribe(result => {
       this.isLoadingResults = false;
       result = result as HttpResponse<any>;
-      this.handleApiCallResult(result, IMPORTING_TYPES.ORDERS);
+      this.handleApiCallResult(result, IMPORTING_TYPES.ORDERS_DTO);
     }, error => {
       this.utilities.error('Error en request');
       this.utilities.showSnackBar('Error saving orders', 'OK');
       this.isLoadingResults = false;
-    });
+    });*/
+  }
+
+  getComparationField(type: string): string {
+    let comparationField: string;
+    switch (type) {
+      case IMPORTING_TYPES.ITEMS: comparationField = 'sku'; break;
+      case IMPORTING_TYPES.LOCATIONS: comparationField = 'code'; break;
+      case IMPORTING_TYPES.ORDERS_DTO: comparationField = 'code'; break;
+    }
+    return comparationField;
   }
 
   handleApiCallResult(result: any, type: string) {
     let snackMessage = '';
     let importedRows = 0;
     let rejectedRows = 0;
+    const comparationField = this.getComparationField(type);
     // result as HttpResponse is expected
     this.utilities.log('api call result', result);
-
     if (result && result.status === 201 && result.ok) {
       rejectedRows = result.body.rowErrors === null ? 0 : result.body.rowErrors.length;
       importedRows = this.dataToSend.length - rejectedRows;
@@ -204,13 +214,15 @@ export class ImportComponent implements OnInit {
 
       } else if (result.body.code === 500 && result.body.rowErrors !== null &&
         result.body.status === 'INTERNAL_SERVER_ERROR') {
-
+        this.utilities.error('Some error occur in server', result.body.message);
         this.isDataSaved = false;
         this.invalidRows = result.body.rowErrors;
         this.dataValidationErrors = result.body.rowErrors;
+        this.utilities.log('dataSource rows', this.dataSource.data);
+        this.utilities.log('invalid rows', this.invalidRows);
         snackMessage = result.body.message ? result.body.message : `Error saving data`;
         this.utilities.error(snackMessage);
-        this.showErrorsOnTable(result.body.rowErrors);
+        this.showErrorsOnTable(result.body.rowErrors, comparationField);
       } else {
         this.errorOnSave = true;
       }
@@ -223,10 +235,10 @@ export class ImportComponent implements OnInit {
     this.utilities.showSnackBar(snackMessage, 'OK');
   }
 
-  showErrorsOnTable(errors: any[]) {
+  showErrorsOnTable(errors: any[], comparationField: string) {
     let dataRow: any;
     errors.forEach(error => {
-      dataRow = this.dataSource.data.find(row => row.sku == error.element.sku);
+      dataRow = this.dataSource.data.find(row => row[comparationField] == error.element[comparationField]);
       dataRow.invalid = true;
       dataRow.tooltip = '';
       for (const errorType in error.errors) {
@@ -262,7 +274,7 @@ export class ImportComponent implements OnInit {
         if (selectedType === IMPORTING_TYPES.LOCATIONS) {
           rowToSave = Object.assign(row) as Location;
         }
-        if (selectedType === IMPORTING_TYPES.ORDERS) {
+        if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
           rowToSave = Object.assign(row) as Order;
         }
         errorFound = false;
@@ -408,7 +420,7 @@ export class ImportComponent implements OnInit {
             row.section.description = '';
             row.section.name = '';
           }
-        } else if (selectedType === IMPORTING_TYPES.ORDERS) {
+        } else if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
           // this.utilities.log('validating compound orders data');
           // no hay datos compuestos en orders dto
         }
@@ -432,8 +444,6 @@ export class ImportComponent implements OnInit {
     this.utilities.dataTypesModelMaps[selectedType]);
     const dialogRef = this.dialog.open(EditRowDialogComponent,
       {
-        width: '100vw',
-        height: '100vh',
         data: {
           row: rowToEdit,
           map: this.utilities.dataTypesModelMaps[selectedType],

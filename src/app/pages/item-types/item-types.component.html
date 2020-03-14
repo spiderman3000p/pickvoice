@@ -139,16 +139,16 @@
                             <!--button mat-icon-button (click)="editRowOnPage(element)">
                                 <img src="assets/icons/zoom.png">
                             </button-->
-                            <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
+                            <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
                                 <img src="assets/icons/zoom.png">
                             </button>
-                            <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
+                            <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
                                 <img src="assets/icons/page_edit.png">
                             </button>
                             <!--button mat-icon-button (click)="printRow(element)">
                                 <img src="assets/icons/printer.png">
                             </button-->
-                            <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
+                            <a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
                                 <img src="assets/icons/printer.png">
                             </a>
                             <button mat-icon-button (click)="deletePrompt(element)">
@@ -161,7 +161,7 @@
                     <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                     [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
                     <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                    [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
+                    [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.code]"></tr>
                 </table>
                 <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
             </div>

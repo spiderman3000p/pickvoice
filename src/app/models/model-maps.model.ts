@@ -397,8 +397,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'textarea'
             }
         },
         transport: {
@@ -416,14 +415,22 @@ export class ModelMap {
             name: 'customer',
             required: false,
             type: 'customer',
-            forFile: false,
             formControl: {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'customerNumber',
                 displayIndex: 'name'
             }
-        }
+        },
+        orderLineList: {
+            name: 'order lines',
+            required: false,
+            type: 'orderLineList',
+            formControl: {
+                control: 'table',
+                type: 'normal'
+            }
+        },
     };
     /* recent origin object map for CRUD */
     public static RecentOriginMap = {
@@ -483,7 +490,7 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        incoiceNumber:  {
+        invoiceNumber:  {
             name: 'invoice number',
             required: true,
             unique: false,

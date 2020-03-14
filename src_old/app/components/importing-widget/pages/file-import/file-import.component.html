@@ -1,0 +1,29 @@
+<!-- toolbar con opciones -->
+<mat-toolbar color="primary">
+    <button mat-icon-button type="button" (click)="goBack()">
+        <mat-icon>arrow_back_ios</mat-icon>
+        <!--span class="btn-label">Back</span-->
+    </button>
+    <h3 class="pl-4">Import data for {{dataTypeToImport}}</h3>
+</mat-toolbar>
+<!-- TODO: mostrar una lista de formatos de archivos aceptados -->
+<mat-nav-list>
+    <a mat-list-item href="javascript: void(0)" (click)="excelFile.click()">
+        <input type="file" #excelFile (change)="validateFile($event.target.files)" class="hide" style="display: none;">
+        <mat-icon mat-list-icon>description</mat-icon>
+        From excel/csv/text file
+    </a>
+    <!--a mat-list-item href="javascript: void(0)" (click)="csvFile.click()">
+        <input type="file" #csvFile (change)="validateFile($event.target.files)" class="hide" style="display: none;">
+        <mat-icon mat-list-icon>subject</mat-icon>
+        From text/csv file
+    </a-->
+    <a mat-list-item href="javascript: void(0)" (click)="importUrl('url')">
+        <mat-icon mat-list-icon>http</mat-icon>
+        From url
+    </a>
+    <a mat-list-item href="javascript: void(0)" (click)="importUrl('api')">
+        <mat-icon mat-list-icon>http</mat-icon>
+        From API
+    </a>
+</mat-nav-list>

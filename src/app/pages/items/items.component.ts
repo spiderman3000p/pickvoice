@@ -183,21 +183,35 @@ export class ItemsComponent implements OnInit, AfterViewInit {
   }
 
   deleteRow(row: any) {
-    this.selection.deselect(row);
+    if (this.selection.isSelected(row)) {
+      this.selection.deselect(row);
+    }
     const index = this.dataSource.data.findIndex(_row => _row === row);
-    return this.dataSource.data.splice(index, 1);
+    this.utilities.log('index to delete', index);
+    this.dataSource.data.splice(index, 1);
+    this.refreshTable();
+    return true;
   }
 
   deleteRows(rows: any) {
+    let deletedCounter = 0;
     const observer = {
       next: (result) => {
         if (result) {
           this.deleteRow(rows);
+          this.utilities.log('Row deleted');
+          if (deletedCounter === 0) {
+            this.utilities.showSnackBar('Row deleted', 'OK');
+          }
+          deletedCounter++;
         }
       },
       error: (error) => {
         this.utilities.error('Error on delete rows', error);
-        this.utilities.showSnackBar('Error on delete rows', 'OK');
+        if (deletedCounter === 0) {
+          this.utilities.showSnackBar('Error on delete rows', 'OK');
+        }
+        deletedCounter++;
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {

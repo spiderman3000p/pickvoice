@@ -22,7 +22,7 @@ export class FileImportComponent implements OnInit {
 
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
               private dataProvider: DataStorage) {
-    // TODO: obtener de la ruta el tipo de datos a importar: items, locations u orders
+    // TODO: obtener de la ruta el tipo de datos a importar: items, locations u orders_dto
     this.dataTypeToImport = this.dataProvider.getDataType();
     this.utilities.log('data type to import', this.dataTypeToImport);
     // Obtener las columnas a mostrar segun el tipo de datos recibidos
@@ -74,6 +74,10 @@ export class FileImportComponent implements OnInit {
         ws = wb.Sheets[key];
         parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false, defval: '', raw: true});
         this.utilities.log('initial parsed data', parsedData);
+        if (parsedData.length === 0) {
+          this.utilities.error('empty parsed data', parsedData);
+          return;
+        }
         const sheet = {} as any;
         sheet.name = wsname;
         sheet.rowData = parsedData;

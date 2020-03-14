@@ -4,6 +4,7 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService, ItemTypeService,
          OrderService, Customer, OrderLine } from '@pickvoice/pickvoice-api';
+import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { DataStorage } from '../../services/data-provider';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { from, Observable } from 'rxjs';
@@ -61,44 +62,31 @@ export class EditRowDialogComponent implements OnInit {
     const formData = this.form.value;
     const toUpload = this.row;
     this.utilities.log('form data', formData);
+    for (const key in toUpload) {
+      if (this.type === IMPORTING_TYPES.ITEMS && typeof toUpload[key] === 'object' && toUpload[key] &&
+        toUpload[key].code && formData[key]) {
+          // mapear los datos de las propiedades tipo objeto de la entidad item
+        toUpload[key].code = formData[key];
+      } else if (this.type === IMPORTING_TYPES.LOCATIONS && typeof toUpload[key] === 'object' && toUpload[key] &&
+        formData[key]) {
+          // TODO: mapear los datos de las propiedades tipo objeto de la entidad location
+      } else if (this.type === IMPORTING_TYPES.ORDERS_DTO && typeof toUpload[key] === 'object' && toUpload[key] &&
+      formData[key]) {
+        // TODO: mapear los datos de las propiedades tipo objeto de la entidad order_dto
+      } else if (this.type === IMPORTING_TYPES.ORDERS && typeof toUpload[key] === 'object' && toUpload[key] &&
+        formData[key]) {
+          // TODO: mapear los datos de las propiedades tipo objeto de la entidad order
+      } else if (formData[key]) {
+        // las propiedades simples (que no son objetos)
+        toUpload[key] = formData[key];
+      }
+    }
     if (this.remoteSync) {
       this.isLoadingResults = true;
-      // Necesitamos guardar los cambios en el objeto recibido
-      for (const key in toUpload) {
-        if (this.type === 'items' && typeof toUpload[key] === 'object' && toUpload[key] &&
-          toUpload[key].code && formData[key]) {
-            // mapear los datos de las propiedades tipo objeto de la entidad item
-          toUpload[key].code = formData[key];
-        } else if (this.type === 'locations' && typeof toUpload[key] === 'object' && toUpload[key] &&
-          formData[key]) {
-            // TODO: mapear los datos de las propiedades tipo objeto de la entidad location
-        } else if (this.type === 'orders' && typeof toUpload[key] === 'object' && toUpload[key] &&
-          formData[key]) {
-            // TODO: mapear los datos de las propiedades tipo objeto de la entidad order
-        } else if (formData[key]) {
-          // las propiedades simples (que no son objetos)
-          toUpload[key] = formData[key];
-        }
-      }
-      /*if (this.type === 'items') {
-        toUpload = new Object(this.form.value) as any;
-        let aux = toUpload.itemType;
-        toUpload.itemType = {
-          code: aux
-        } as ItemType;
-        aux = toUpload.uom;
-        toUpload.uom = {
-          code: aux
-        } as UnityOfMeasure;
-      */
       const observer = {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          /*aux = toUpload.itemType.code;
-          toUpload.itemType = aux;
-          aux = toUpload.uom.code;
-          toUpload.uom = aux;*/
           if ((response.status === 204 || response.status === 200 || response.status === 201)
             && response.statusText === 'OK') {
             this.utilities.showSnackBar('Update Successfull', 'OK');
@@ -112,22 +100,22 @@ export class EditRowDialogComponent implements OnInit {
         }
       };
       this.utilities.log('data to upload', toUpload);
-      if (this.type === 'items') {
+      if (this.type === IMPORTING_TYPES.ITEMS) {
         this.itemService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
         .subscribe(observer);
       }
 
-      if (this.type === 'locations') {
+      if (this.type === IMPORTING_TYPES.LOCATIONS) {
         this.locationService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
 
-      if (this.type === 'orders') {
+      if (this.type === IMPORTING_TYPES.ORDERS_DTO) {
         this.orderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
 
-      if (this.type === 'itemTypes') {
+      if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
         this.itemTypeService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }

@@ -47,18 +47,17 @@ export class UtilitiesService {
         } else if (typeof data === 'number') {
           // esta conversion sale de aqui: https://github.com/SheetJS/sheetjs/issues/1623
           dataValue = new Date(1000 * 60 * 60 * 24 * (data - 25569));
-        } else if (typeof data === 'object') {
-          dataValue = data;
         } else {
           dataValue = data;
         }
         break;
-      case 'itemType': dataValue = data.code; break;
-      case 'itemUom': dataValue = data.code; break;
-      case 'section': dataValue = data.code; break;
-      case 'transport': dataValue = data.nameRoute; break;
-      case 'customer': dataValue = data.name; break;
-      case 'orderType': dataValue = data.code; break;
+      case 'itemType': dataValue = data && data.code ? data.code : ''; break;
+      case 'itemUom': dataValue = data && data.code ? data.code : ''; break;
+      case 'section': dataValue = data && data.code ? data.code : ''; break;
+      case 'transport': dataValue = data && data.nameRoute ? data.nameRoute : ''; break;
+      case 'customer': dataValue = data && data.name ? data.name : ''; break;
+      case 'orderType': dataValue = data && data.code ? data.code : ''; break;
+      case 'orderLineList': dataValue = data && data.length ? `${data.length} orders` : 'none'; break;
       default: dataValue = data;
     }
     return dataValue;

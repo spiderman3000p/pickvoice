@@ -32,6 +32,7 @@ import { BASE_PATH } from '@pickvoice/pickvoice-api';
 
 import { EditRowComponent } from './pages/edit-row/edit-row.component';
 import { AddRowDialogComponent } from './components/add-row-dialog/add-row-dialog.component';
+import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
 import { PrintComponent } from './components/print/print.component';
 import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
 import { ImportDialogComponent } from './components/import-dialog/import-dialog.component';
@@ -62,6 +63,7 @@ import { environment } from '../environments/environment';
     CommonDialogComponent,
     EditRowComponent,
     AddRowDialogComponent,
+    EditRowDialogComponent,
     PrintComponent,
     PrintLayoutComponent
   ],

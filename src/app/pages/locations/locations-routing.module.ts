@@ -5,6 +5,7 @@ import { LocationsComponent } from './locations.component';
 import { EditRowComponent } from '../edit-row/edit-row.component';
 import { LocationsResolverService } from './locations-resolver.service';
 import { NotFoundComponent } from '../not-found/not-found.component';
+import { IMPORTING_TYPES } from '../../models/model-maps.model';
 
 const routes: Routes = [
     {
@@ -14,7 +15,8 @@ const routes: Routes = [
             row: LocationsResolverService,
         },
         data: {
-            viewMode: 'edit'
+            viewMode: 'edit',
+            type: IMPORTING_TYPES.LOCATIONS
         }
     },
     {
@@ -24,7 +26,8 @@ const routes: Routes = [
             row: LocationsResolverService,
         },
         data: {
-            viewMode: 'view'
+            viewMode: 'view',
+            type: IMPORTING_TYPES.LOCATIONS
         }
     },
     {
