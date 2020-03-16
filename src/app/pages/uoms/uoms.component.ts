@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
+import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { UomService, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 

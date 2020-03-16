@@ -71,6 +71,7 @@ body {
   margin: 0 auto;
   position: relative;
   overflow: auto;
+  overflow-x: hidden;
 }
 header, #plan-consumption-container .header {
   background: 0;

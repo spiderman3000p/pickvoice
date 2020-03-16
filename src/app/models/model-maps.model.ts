@@ -2,6 +2,7 @@ export const IMPORTING_TYPES = {
     ITEMS: 'items',
     LOCATIONS: 'locations',
     ORDERS: 'orders',
+    ORDER_LINE: 'orderLine',
     ORDERS_DTO: 'ordersDto',
     ITEM_TYPE: 'itemTypes',
     UOMS: 'uoms',
@@ -422,7 +423,7 @@ export class ModelMap {
                 displayIndex: 'name'
             }
         },
-        orderLineList: {
+        orderLines: {
             name: 'order lines',
             required: false,
             type: 'orderLineList',
@@ -431,6 +432,89 @@ export class ModelMap {
                 type: 'normal'
             }
         },
+    };
+    /* order line object map for CRUD */
+    public static OrderLineMap = {
+        item:  {
+            name: 'item',
+            required: true,
+            unique: true,
+            type: 'item',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'sku',
+                displayIndex: 'description'
+            }
+        },
+        order:  {
+            name: 'order',
+            required: false,
+            unique: false,
+            type: 'order',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: 'orderNumber',
+                displayIndex: 'orderNumber'
+            }
+        },
+        qtyRequired:  {
+            name: 'qty required',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        batchNumber: {
+            name: 'batch number',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        createDate: {
+            name: 'create date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
+            }
+        },
+        expiryDate: {
+            name: 'expiry date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
+            }
+        },
+        serial: {
+            name: 'serial',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        qualityState:  {
+            name: 'qlity state',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
     };
     /* recent origin object map for CRUD */
     public static RecentOriginMap = {

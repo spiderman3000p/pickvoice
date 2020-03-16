@@ -125,7 +125,7 @@ export class ModelFactory {
     public static newEmptyOrderLine(): OrderLine {
         const object = new Object() as OrderLine;
         object.order = {} as Order;
-        object.item = this.newEmptyItem();
+        object.item = {} as Item;
         object.qtyRequired = 0;
         object.batchNumber = '';
         object.createDate = '';

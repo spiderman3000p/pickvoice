@@ -24,6 +24,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { PagesModule } from './pages/pages.module';
 import { AuthModule } from './pages/auth/auth.module';
@@ -49,8 +51,6 @@ import { AgGridModule } from 'ag-grid-angular';
 import { NgxPrintModule } from 'ngx-print';
 
 import { environment } from '../environments/environment';
-
-
 
 @NgModule({
   declarations: [
@@ -94,6 +94,8 @@ import { environment } from '../environments/environment';
     MatFormFieldModule,
     MatTableModule,
     MatSelectModule,
+    MatPaginatorModule,
+    MatCheckboxModule,
 
     PagesModule,
     AuthModule,

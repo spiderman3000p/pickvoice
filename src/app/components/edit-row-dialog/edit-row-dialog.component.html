@@ -16,6 +16,9 @@
                 <!-- campos string -->
                 <input class="w-100" matInput type="text" [formControlName]="key"
                 *ngIf="dataMap[key].type !== 'number' && dataMap[key].type !== 'boolean' && dataMap[key].type !== 'date'">
+                <textarea class="w-100" matInput [formControlName]="key"
+                *ngIf="dataMap[key].type === 'string' && dataMap[key].formControl.control === 'textarea'">
+                </textarea>
                 <!-- campos boolean -->
                 <input matInput [formControlName]="key" hidden>
                 <mat-slide-toggle  *ngIf="dataMap[key].type === 'boolean'" color="primary"

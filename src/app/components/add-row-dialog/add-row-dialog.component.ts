@@ -115,14 +115,6 @@ export class AddRowDialogComponent implements OnInit {
 
   getSectionList() {
     this.locationsData.sectionList = this.sectionService.retrieveAllSections();
-    /*this.locationsData.sectionList = new Observable(suscriber => {
-      const sectionList = [
-        new Object({code: 'MEZ1', name: 'Mezanine', description: 'string'}) as Section,
-        new Object({code: 'MEZ1', name: 'Mezanine', description: 'string'}) as Section
-      ];
-      suscriber.next(sectionList);
-      suscriber.complete();
-    });*/
   }
 
   getTypeList() {
@@ -136,7 +128,6 @@ export class AddRowDialogComponent implements OnInit {
       suscriber.next(types);
       suscriber.complete();
     });
-    // this.locationsData.typeList.subscribe(result => console.log('type result', result));
   }
 
   getItemTypeList() {

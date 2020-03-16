@@ -27,31 +27,122 @@
             <mat-card-content>
                 <div mat-dialog-content>
                     <span *ngFor="let key of keys">
-                        <mat-form-field [readonly]="viewMode === 'view'" class="col-sm-12 col-md-4 col-lg-3"
-                        [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''">
+                        <mat-form-field  class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'"
+                        [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''"
+                        *ngIf="dataMap[key].formControl.control !== 'table'"
+                        >
                             <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                             <!-- campos number -->
                             <input class="w-100" matInput type="number" [formControlName]="key" *ngIf="dataMap[key].type === 'number'"
-                            [readonly]="viewMode === 'view'">
+                            [class.readonly]="viewMode === 'view'"
+                            >
+                            <!-- campos compuestos/objetos select -->
+                            <mat-select *ngIf="dataMap[key].formControl.control === 'select'" [formControlName]="key" [class.readonly]="viewMode === 'view'">
+                                <mat-option *ngFor="let data of getSelectInputData(key) | async" [value]="getSelectIndexValue(data, key)">
+                                    {{ 
+                                        getSelectDisplayData(data, key)
+                                    }}
+                                </mat-option>
+                            </mat-select>
                             <!-- campos date -->
                             <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="dataMap[key].type === 'date'"
-                            readonly>
-                            <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].type === 'date' && viewMode === 'edit'" ></mat-datepicker-toggle>
+                            [class.readonly]="viewMode === 'view'" readonly>
+                            <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].type === 'date' && viewMode === 'edit'" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
                             <mat-datepicker #pickerDate ></mat-datepicker>
                             <!-- campos string -->
-                            <input class="w-100" matInput type="text" [formControlName]="key"
-                            [readonly]="viewMode === 'view'"
-                            *ngIf="dataMap[key].type !== 'number' && dataMap[key].type !== 'boolean' && dataMap[key].type !== 'date'">
+                            <input class="w-100" matInput type="text" [formControlName]="key" [class.readonly]="viewMode === 'view'"
+                            *ngIf="dataMap[key].type === 'string' && dataMap[key].formControl.control === 'input' &&
+                            dataMap[key].formControl.type === 'text'">
                             <!-- campos boolean -->
-                            <input matInput [formControlName]="key" [readonly]="viewMode === 'view'" hidden>
+                            <input matInput [formControlName]="key"  hidden>
                             <mat-slide-toggle  *ngIf="dataMap[key].type === 'boolean'" color="primary"
-                            [disabled]="viewMode === 'view'"
+                            [class.readonly]="viewMode === 'view'"
                             (change)="form.get(key).setValue(!form.get(key).value)" [checked]="form.get(key).value">
                                 {{dataMap[key].name}}
                             </mat-slide-toggle>
                         </mat-form-field>
-                        <span *ngIf="viewMode === 'view'">
-
+                        <!--span *ngIf="key === 'orderLines'">
+                            <ag-grid-angular style="width: 100%; height: 400px;"
+                                class="ag-theme-balham" *ngIf="key === 'orderLines'"
+                                [rowData]="rowData"
+                                [columnDefs]="columnDefs">
+                            </ag-grid-angular>
+                        </span-->
+                        <span *ngIf="key === 'orderLines'">
+                            <table mat-table [dataSource]="dataSource" matSort>
+                                <!-- Checkbox Column -->
+                                <ng-container matColumnDef="select">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-checkbox (change)="$event ? masterToggle() : null"
+                                            [checked]="selection.hasValue() && isAllSelected()"
+                                            [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                            [aria-label]="checkboxLabel()">
+                                        </mat-checkbox>
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        <mat-checkbox (click)="$event.stopPropagation()"
+                                            (change)="$event ? selection.toggle(row) : null"
+                                            [checked]="selection.isSelected(row)"
+                                            [aria-label]="checkboxLabel(row)">
+                                        </mat-checkbox>
+                                    </td>
+                                </ng-container>
+                                <!-- Data Columns -->
+                                <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
+                                    <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
+                                </ng-container>
+                                <!-- Options Sticky Column -->
+                                <ng-container matColumnDef="options" stickyEnd>
+                                    <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+                                        {{'Options' | uppercase}}
+                                        <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                                            <mat-icon>more_vert</mat-icon>
+                                        </a>
+                                        
+                                        <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                                            <span>
+                                                <a mat-menu-item (click)="toggleColumn()">Show all</a>
+                                                <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                                                (click)="toggleColumn(column)">
+                                                    <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                                                    {{column.name}}
+                                                </a>
+                                            </span>
+                                        </mat-menu>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                                        <a mat-icon-button (click)="editRowOnDialog(element, 'view')">
+                                            <img src="assets/icons/zoom.png">
+                                        </a>
+                                        <a mat-icon-button (click)="editRowOnDialog(element, 'edit')">
+                                            <img src="assets/icons/page_edit.png">
+                                        </a>
+                                        <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
+                                            <img src="assets/icons/zoom.png">
+                                        </a>
+                                        <a mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
+                                            <img src="assets/icons/page_edit.png">
+                                        </a-->
+                                        <!--button mat-icon-button (click)="printRow(element)">
+                                            <img src="assets/icons/printer.png">
+                                        </button-->
+                                        <a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
+                                            <img src="assets/icons/printer.png">
+                                        </a>
+                                        <a mat-icon-button (click)="deletePrompt(element)">
+                                            <img src="assets/icons/delete.png">
+                                        </a>
+                                    </td>
+                                </ng-container>
+                
+                                <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+                                <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                                [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
+                                <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                                [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.code]"></tr>
+                            </table>
+                            <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                         </span>
                     </span>
                 </div>

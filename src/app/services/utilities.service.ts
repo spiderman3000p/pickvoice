@@ -51,6 +51,8 @@ export class UtilitiesService {
           dataValue = data;
         }
         break;
+      case 'item': dataValue = data && data.description ? data.description : ''; break;
+      case 'order': dataValue = data && data.orderNumber ? data.orderNumber : ''; break;
       case 'itemType': dataValue = data && data.code ? data.code : ''; break;
       case 'itemUom': dataValue = data && data.code ? data.code : ''; break;
       case 'section': dataValue = data && data.code ? data.code : ''; break;
@@ -59,6 +61,9 @@ export class UtilitiesService {
       case 'orderType': dataValue = data && data.code ? data.code : ''; break;
       case 'orderLineList': dataValue = data && data.length ? `${data.length} orders` : 'none'; break;
       default: dataValue = data;
+    }
+    if(type === 'itemType'){
+      console.log('dataValue', dataValue);
     }
     return dataValue;
   }
