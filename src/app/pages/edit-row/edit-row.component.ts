@@ -4,7 +4,7 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService,
          ItemTypeService, OrderService, Customer, OrderLine, UomService, Section, OrderType,
-         SectionService, Transport } from '@pickvoice/pickvoice-api';
+         SectionService, Transport, CustomerService, OrderTypeService } from '@pickvoice/pickvoice-api';
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
@@ -78,7 +78,8 @@ export class EditRowComponent implements OnInit {
     private itemService: ItemsService, private locationService: LocationsService,
     private activatedRoute: ActivatedRoute, private orderService: OrderService,
     private sectionService: SectionService, private itemTypeService: ItemTypeService,
-    private router: Router, private uomsService: UomService, private dialog: MatDialog
+    private router: Router, private uomsService: UomService, private dialog: MatDialog,
+    private orderTypeService: OrderTypeService, private customerService: CustomerService
   ) {
     // const data = this.dataProvider.sharedData;
     // this.row = data.row; // object
@@ -95,11 +96,11 @@ export class EditRowComponent implements OnInit {
   }
 
   init() {
-    // this.utilities.log('type', this.type);
+    this.utilities.log('type', this.type);
     // this.remoteSync = data.remoteSync; // map of object
     this.dataMap = this.utilities.dataTypesModelMaps[this.type];
-    // this.utilities.log('remoteSync', this.remoteSync);
-    // this.utilities.log('dataMap', this.dataMap);
+    this.utilities.log('remoteSync', this.remoteSync);
+    this.utilities.log('dataMap', this.dataMap);
     const formControls = {};
     this.keys = Object.keys(this.dataMap);
     // this.utilities.log('keys', this.keys);
@@ -168,6 +169,18 @@ export class EditRowComponent implements OnInit {
       // this.row = ModelFactory.newEmptyUnityOfMeasure();
       this.utilities.log('uom', this.row);
     }
+    if (this.type === IMPORTING_TYPES.CUSTOMERS) {
+      // this.row = ModelFactory.newEmptyUnityOfMeasure();
+      this.utilities.log('customer', this.row);
+    }
+    if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
+      // this.row = ModelFactory.newEmptyUnityOfMeasure();
+      this.utilities.log('order type', this.row);
+    }
+    if (this.type === IMPORTING_TYPES.SECTIONS) {
+      // this.row = ModelFactory.newEmptyUnityOfMeasure();
+      this.utilities.log('section', this.row);
+    }
     console.log('columnDefs', this.columnDefs);
     console.log('rowData', this.rowData);
     this.keys.forEach((key, index) => {
@@ -186,7 +199,7 @@ export class EditRowComponent implements OnInit {
     /*if (this.viewMode === 'view') {
       this.form.disable();
     }*/
-    // this.utilities.log('formControls', formControls);
+    this.utilities.log('formControls', formControls);
   }
 
   initColumnsDefs() {
@@ -479,24 +492,24 @@ export class EditRowComponent implements OnInit {
   }
 
   getOrderTypeList() {
-    // this.ordersData.orderTypeList = this.orderTypeService.retrieveAll();
-    this.ordersData.orderTypeList = new Observable(suscriber => {
+    this.ordersData.orderTypeList = this.orderTypeService.retrieveAllOrderType();
+    /*this.ordersData.orderTypeList = new Observable(suscriber => {
       suscriber.next([
         { code: 'Factura', description: 'Factura'}
       ]);
       suscriber.complete();
-    });
+    });*/
   }
 
   getCustomerList() {
-    // this.ordersData.orderTypeList = this.orderTypeService.retrieveAll();
-    this.ordersData.customerList = new Observable(suscriber => {
+    this.ordersData.customerList = this.customerService.retrieveAllCustomers();
+    /*this.ordersData.customerList = new Observable(suscriber => {
       suscriber.next([
         { customerNumber: 'CU01', name: 'CUSTOMER 1', contact: '', phone: '', address: ''},
         { customerNumber: 'CU02', name: 'CUSTOMER 2', contact: '', phone: '', address: ''},
       ]);
       suscriber.complete();
-    });
+    });*/
   }
 
   getTransportList() {
@@ -645,6 +658,21 @@ export class EditRowComponent implements OnInit {
         this.uomsService.updateUom(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
+
+      if (this.type === IMPORTING_TYPES.CUSTOMERS) {
+        this.customerService.updateCustomer(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
+        this.orderTypeService.updateorderType(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === IMPORTING_TYPES.SECTIONS) {
+        this.sectionService.updateSection(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
     } else {
       this.dataProvider.returnData = toUpload;
       this.location.back();
@@ -688,6 +716,18 @@ export class EditRowComponent implements OnInit {
         console.log('object is an uom');
         this.row = data.row as UnityOfMeasure;
         this.cardTitle = 'Unity of measure ' + this.row.description;
+      } else if (this.type === IMPORTING_TYPES.CUSTOMERS) {
+        console.log('object is a customer');
+        this.row = data.row as Customer;
+        this.cardTitle = 'Customer ' + this.row.name;
+      } else if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
+        console.log('object is an order type');
+        this.row = data.row as OrderType;
+        this.cardTitle = 'Order Type ' + this.row.description;
+      } else if (this.type === IMPORTING_TYPES.SECTIONS) {
+        console.log('object is a section');
+        this.row = data.row as OrderType;
+        this.cardTitle = 'Section ' + this.row.code;
       } else {
         this.cardTitle = 'Unknown object type';
         console.error('object is unknown');

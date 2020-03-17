@@ -2,9 +2,9 @@ import { Inject, Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
-import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService,
+import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService, CustomerService,
          ItemTypeService, OrderService, Customer, OrderLine, Section, UomService, SectionService,
-         OrderType, Transport } from '@pickvoice/pickvoice-api';
+         OrderType, Transport, OrderTypeService } from '@pickvoice/pickvoice-api';
 import { DataStorage } from '../../services/data-provider';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { from, Observable } from 'rxjs';
@@ -50,6 +50,7 @@ export class AddRowDialogComponent implements OnInit {
               private itemService: ItemsService, private locationService: LocationsService,
               private orderService: OrderService, private itemTypeService: ItemTypeService,
               private uomService: UomService, private sectionService: SectionService,
+              private customerService: CustomerService, private orderTypeService: OrderTypeService,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
     // init variables
     this.itemsData = new Object() as ItemsData;
@@ -91,6 +92,18 @@ export class AddRowDialogComponent implements OnInit {
     if (this.type === IMPORTING_TYPES.UOMS) {
       this.row = ModelFactory.newEmptyUnityOfMeasure();
       this.utilities.log('new empty uom', this.row);
+    }
+    if (this.type === IMPORTING_TYPES.CUSTOMERS) {
+      this.row = ModelFactory.newEmptyCustomer();
+      this.utilities.log('new empty uom', this.row);
+    }
+    if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
+      this.row = ModelFactory.newEmptyOrderType();
+      this.utilities.log('new empty order type', this.row);
+    }
+    if (this.type === IMPORTING_TYPES.SECTIONS) {
+      this.row = ModelFactory.newEmptySection();
+      this.utilities.log('new empty section', this.row);
     }
     // init variables end
 
@@ -139,24 +152,24 @@ export class AddRowDialogComponent implements OnInit {
   }
 
   getOrderTypeList() {
-    // this.ordersData.orderTypeList = this.orderTypeService.retrieveAll();
-    this.ordersData.orderTypeList = new Observable(suscriber => {
+    this.ordersData.orderTypeList = this.orderTypeService.retrieveAllOrderType();
+    /*this.ordersData.orderTypeList = new Observable(suscriber => {
       suscriber.next([
         { code: 'Factura', description: 'Factura'}
       ]);
       suscriber.complete();
-    });
+    });*/
   }
 
   getCustomerList() {
-    // this.ordersData.orderTypeList = this.orderTypeService.retrieveAll();
-    this.ordersData.customerList = new Observable(suscriber => {
+    this.ordersData.customerList = this.customerService.retrieveAllCustomers();
+    /*this.ordersData.customerList = new Observable(suscriber => {
       suscriber.next([
         { customerNumber: 'CU01', name: 'CUSTOMER 1', contact: '', phone: '', address: ''},
         { customerNumber: 'CU02', name: 'CUSTOMER 2', contact: '', phone: '', address: ''},
       ]);
       suscriber.complete();
-    });
+    });*/
   }
 
   getTransportList() {
@@ -272,9 +285,32 @@ export class AddRowDialogComponent implements OnInit {
         this.uomService.createUom(toUpload, 'response').pipe(retry(3))
         .subscribe(observer);
       }
+
+      if (this.type === IMPORTING_TYPES.CUSTOMERS) {
+        this.customerService.createCustomer(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
+        this.orderTypeService.createOrderType(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === IMPORTING_TYPES.SECTIONS) {
+        this.sectionService.createSection(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
     } else {
       this.dialogRef.close(toUpload);
     }
+  }
+
+  getColumnsClasses() {
+    let classes = 'col-sm-12 col-md-4 col-lg-3';
+    if (this.keys.length < 3) {
+      classes = 'col-sm-12 col-md-6 col-lg-6';
+    }
+    return classes;
   }
 
   ngOnInit(): void {

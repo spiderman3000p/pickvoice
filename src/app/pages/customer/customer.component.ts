@@ -4,7 +4,7 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { UomService, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+import { CustomerService, Customer } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -18,14 +18,14 @@ import { Observer } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-uoms',
-  templateUrl: './uoms.component.html',
-  styleUrls: ['./uoms.component.css']
+  selector: 'app-customer',
+  templateUrl: './customer.component.html',
+  styleUrls: ['./customer.component.css']
 })
-export class UomsComponent implements OnInit, AfterViewInit {
-  definitions: any = ModelMap.UomMap;
-  dataSource: MatTableDataSource<UnityOfMeasure>;
-  dataToSend: UnityOfMeasure[];
+export class CustomerComponent implements OnInit, AfterViewInit {
+  definitions: any = ModelMap.CustomerMap;
+  dataSource: MatTableDataSource<Customer>;
+  dataToSend: Customer[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
@@ -38,19 +38,19 @@ export class UomsComponent implements OnInit, AfterViewInit {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.UOMS;
-  
+  type = IMPORTING_TYPES.CUSTOMERS;
+  printableData: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
-    private dialog: MatDialog, private apiService: UomService, private router: Router,
+    private dialog: MatDialog, private apiService: CustomerService, private router: Router,
     private utilities: UtilitiesService) {
       this.dataSource = new MatTableDataSource([]);
       this.filter = new FormControl('');
       this.dataToSend = [];
       this.actionForSelected = new FormControl('');
-      this.displayedDataColumns = Object.keys(ModelMap.UomMap);
-      this.displayedHeadersColumns = ['select'].concat(Object.keys(ModelMap.UomMap));
+      this.displayedDataColumns = Object.keys(ModelMap.CustomerMap);
+      this.displayedHeadersColumns = ['select'].concat(Object.keys(ModelMap.CustomerMap));
       this.displayedHeadersColumns.push('options');
 
       this.initColumnsDefs(); // columnas a mostrarse
@@ -80,8 +80,8 @@ export class UomsComponent implements OnInit, AfterViewInit {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInUomsPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInUomsPage'));
+    if (localStorage.getItem('displayedColumnsInCustomersPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInCustomersPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -99,13 +99,13 @@ export class UomsComponent implements OnInit, AfterViewInit {
       if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
-        filter.name = ModelMap.UomMap[column.name].name;
+        filter.name = ModelMap.CustomerMap[column.name].name;
         filter.key = column.name;
         formControls[column.name] = new FormControl('');
         this.utilities.log(`new formControl formControls[${column.name}]`, formControls[column.name]);
         this.utilities.log('formControls', formControls);
         filter.control = formControls[column.name];
-        filter.formControl = ModelMap.UomMap[column.name].formControl;
+        filter.formControl = ModelMap.CustomerMap[column.name].formControl;
         this.filters.push(filter);
       }
     });
@@ -115,6 +115,13 @@ export class UomsComponent implements OnInit, AfterViewInit {
 
   getDisplayedHeadersColumns() {
     return this.columnDefs.filter(col => col.show).map(col => col.name);
+  }
+
+  getPrintableColumns() {
+    const headersColumns = this.getDisplayedHeadersColumns();
+    headersColumns.shift();
+    headersColumns.pop();
+    return headersColumns;
   }
 
   getDefaultHeadersColumns() {
@@ -135,7 +142,7 @@ export class UomsComponent implements OnInit, AfterViewInit {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInUomsPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInCustomersPage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -209,10 +216,10 @@ export class UomsComponent implements OnInit, AfterViewInit {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.apiService.deleteUom(row.id, 'response', false).subscribe(observer);
+        this.apiService.deleteCustomer(row.id, 'response', false).subscribe(observer);
       });
     } else {
-      this.apiService.deleteUom(rows.id, 'response', false).subscribe(observer);
+      this.apiService.deleteCustomer(rows.id, 'response', false).subscribe(observer);
     }
   }
 
@@ -262,7 +269,7 @@ export class UomsComponent implements OnInit, AfterViewInit {
       data: {
         row: element,
         map: this.definitions,
-        type: IMPORTING_TYPES.UOMS,
+        type: IMPORTING_TYPES.CUSTOMERS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -280,12 +287,12 @@ export class UomsComponent implements OnInit, AfterViewInit {
   }
 
   loadData() {
-    this.utilities.log('requesting uoms');
+    this.utilities.log('requesting customers');
     this.isLoadingResults = true;
-    this.apiService.retrieveAllUom('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
+    this.apiService.retrieveAllCustomers('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
     .subscribe(response => {
       this.isLoadingResults = false;
-      this.utilities.log('uoms received', response.body);
+      this.utilities.log('customers received', response.body);
       this.dataSource.data = response.body.map((element, i) => {
         return { index: i, ... element};
       });
@@ -304,11 +311,11 @@ export class UomsComponent implements OnInit, AfterViewInit {
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.uoms);
+    this.utilities.dataTypesModelMaps.customers);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.definitions,
-        type: IMPORTING_TYPES.UOMS,
+        type: IMPORTING_TYPES.CUSTOMERS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -330,7 +337,25 @@ export class UomsComponent implements OnInit, AfterViewInit {
       delete row.id;
       delete row.index;
     });
-    this.utilities.exportToXlsx(dataToExport, 'Uoms List');
+    this.utilities.exportToXlsx(dataToExport, 'Customers List');
+  }
+
+  printRow(data: any) {
+    this.printableData = data;
+    setTimeout(() => {
+      if (this.utilities.print('printSection')) {
+        this.printableData = null;
+      }
+    }, 1000);
+  }
+
+  printRows() {
+    this.printableData = this.selection.selected;
+    setTimeout(() => {
+      if (this.utilities.print('printSection')) {
+        this.printableData = null;
+      }
+    }, 1000);
   }
 
   /*

@@ -39,6 +39,18 @@ const routes: Routes = [
     loadChildren: () => import('./uoms/uoms.module').then(m => m.UomsModule)
   },
   {
+    path: IMPORTING_TYPES.CUSTOMERS,
+    loadChildren: () => import('./customer/customer.module').then(m => m.CustomerModule)
+  },
+  {
+    path: IMPORTING_TYPES.ORDER_TYPE,
+    loadChildren: () => import('./order-type/order-type.module').then(m => m.OrderTypeModule)
+  },
+  {
+    path: IMPORTING_TYPES.SECTIONS,
+    loadChildren: () => import('./sections/sections.module').then(m => m.SectionsModule)
+  },
+  {
     path: 'administration',
     loadChildren: () => import('./administration/administration.module').then(m => m.AdministrationModule),
     pathMatch: 'full'

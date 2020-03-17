@@ -4,7 +4,7 @@
           <div class="section-wrapper">
               <div class="header actionbar align-content-top">
                   <div class="title actionbar-section align-content-top">
-                      <h1>Unities of Measure List</h1>
+                      <h1>Order Types List</h1>
                   </div>
                   <div class="actions actionbar-section right">
                     <button mat-raised-button color="warn" (click)="export()">
@@ -136,16 +136,16 @@
                             <!--button mat-icon-button (click)="editRowOnPage(element)">
                                 <img src="assets/icons/zoom.png">
                             </button-->
-                            <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
+                            <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
                                 <img src="assets/icons/zoom.png">
                             </button>
-                            <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
+                            <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
                                 <img src="assets/icons/page_edit.png">
                             </button>
                             <!--button mat-icon-button (click)="printRow(element)">
                                 <img src="assets/icons/printer.png">
                             </button-->
-                            <a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
+                            <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
                                 <img src="assets/icons/printer.png">
                             </a>
                             <button mat-icon-button (click)="deletePrompt(element)">
@@ -158,7 +158,7 @@
                     <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                     [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
                     <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                    [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.code]"></tr>
+                    [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
                 </table>
                 <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
             </div>

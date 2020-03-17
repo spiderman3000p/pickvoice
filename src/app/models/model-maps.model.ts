@@ -6,6 +6,9 @@ export const IMPORTING_TYPES = {
     ORDERS_DTO: 'ordersDto',
     ITEM_TYPE: 'itemTypes',
     UOMS: 'uoms',
+    CUSTOMERS: 'customers',
+    ORDER_TYPE: 'orderTypes',
+    SECTIONS: 'sections'
 };
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
@@ -28,6 +31,54 @@ export class ModelMap {
     /*********************************************
     *           Object's for CRUD's
     **********************************************/
+    /* customer object map for CRUD */
+    public static CustomerMap = {
+        customerNumber: {
+            name: 'number',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        name: {
+            name: 'name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        contact: {
+            name: 'contact',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        phone: {
+            name: 'phone',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        address: {
+            name: 'address',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
     /* item object map for CRUD */
     public static ItemMap = {
         sku: {
@@ -212,6 +263,36 @@ export class ModelMap {
         },
         name: {
             name: 'name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
+    /* Section object map for CRUD */
+    public static SectionMap = {
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        name: {
+            name: 'name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        description: {
+            name: 'description',
             required: false,
             type: 'string',
             formControl: {
@@ -432,6 +513,27 @@ export class ModelMap {
                 type: 'normal'
             }
         },
+    };
+    /* order type object map for CRUD */
+    public static OrderTypeMap = {
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        description: {
+            name: 'description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
     };
     /* order line object map for CRUD */
     public static OrderLineMap = {

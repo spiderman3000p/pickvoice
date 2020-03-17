@@ -22,7 +22,10 @@ export class UtilitiesService {
     locations: ModelMap.LocationMap,
     orders: ModelMap.OrderMap,
     uoms: ModelMap.UomMap,
-    ordersDto: ModelMap.OrderDtoMap
+    ordersDto: ModelMap.OrderDtoMap,
+    customers: ModelMap.CustomerMap,
+    orderTypes: ModelMap.OrderTypeMap,
+    sections: ModelMap.SectionMap
   };
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) { }
 
@@ -61,9 +64,6 @@ export class UtilitiesService {
       case 'orderType': dataValue = data && data.code ? data.code : ''; break;
       case 'orderLineList': dataValue = data && data.length ? `${data.length} orders` : 'none'; break;
       default: dataValue = data;
-    }
-    if(type === 'itemType'){
-      console.log('dataValue', dataValue);
     }
     return dataValue;
   }

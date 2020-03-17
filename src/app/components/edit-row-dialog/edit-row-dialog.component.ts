@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService, ItemTypeService,
-         OrderService, Customer, OrderLine } from '@pickvoice/pickvoice-api';
+         OrderService, Customer, OrderLine, OrderTypeService } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { DataStorage } from '../../services/data-provider';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -28,6 +28,7 @@ export class EditRowDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<EditRowDialogComponent>, private dataProvider: DataStorage,
               private itemService: ItemsService, private locationService: LocationsService,
               private orderService: OrderService, private itemTypeService: ItemTypeService,
+              private orderTypeService: OrderTypeService,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
     this.row = data.row; // object
     this.utilities.log('row recibida', this.row);
@@ -117,6 +118,16 @@ export class EditRowDialogComponent implements OnInit {
 
       if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
         this.itemTypeService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === IMPORTING_TYPES.ORDERS) {
+        this.orderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
+        this.orderTypeService.updateorderType(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
     } else {

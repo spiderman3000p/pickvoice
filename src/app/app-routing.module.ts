@@ -9,9 +9,12 @@ import { DataPreviewComponent } from './components/importing-widget/pages/data-p
 import { PrintComponent } from './components/print/print.component';
 import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
 import { ItemsResolverService } from './pages/items/items-resolver.service';
+import { SectionsResolverService } from './pages/sections/sections-resolver.service';
 import { LocationsResolverService } from './pages/locations/locations-resolver.service';
+import { CustomerResolverService } from './pages/customer/customer-resolver.service';
 import { OrdersResolverService } from './pages/orders/orders-resolver.service';
 import { ItemTypesResolverService } from './pages/item-types/item-types-resolver.service';
+import { OrderTypeResolverService } from './pages/order-type/order-type-resolver.service';
 import { UomsResolverService } from './pages/uoms/uoms-resolver.service';
 import { IMPORTING_TYPES } from './models/model-maps.model';
 
@@ -125,6 +128,42 @@ const routes: Routes = [
             type: IMPORTING_TYPES.UOMS,
             format: 'single',
             title: 'Print Unity of Measure'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.ORDER_TYPE + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: OrderTypeResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.ORDER_TYPE,
+            format: 'single',
+            title: 'Print Order Type'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.SECTIONS + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: SectionsResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.SECTIONS,
+            format: 'single',
+            title: 'Print Section'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.CUSTOMERS + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: CustomerResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.CUSTOMERS,
+            format: 'single',
+            title: 'Print Customer'
           }
         }
     ]

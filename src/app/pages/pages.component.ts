@@ -72,6 +72,24 @@ export class PagesComponent implements OnInit, OnDestroy  {
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.UOMS,
               children: []
+            },
+            {
+              text: 'Customers',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.CUSTOMERS,
+              children: []
+            },
+            {
+              text: 'Order Types',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.ORDER_TYPE,
+              children: []
+            },
+            {
+              text: 'Sections',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.SECTIONS,
+              children: []
             }
           ]
         }
