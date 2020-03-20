@@ -1,0 +1,256 @@
+<div class="content-area">
+    <div class="content">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>{{ pageTitle }}</h1>
+              </div>
+              <div class="actions actionbar-section right">
+                <button mat-raised-button color="accent" (click)="print()">
+                    <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
+                </button>
+                <button mat-raised-button color="warn" (click)="export()">
+                    <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                </button>
+              </div>
+          </div>
+      </div>
+      <mat-card>
+        <div class="example-loading-shade" *ngIf="isLoadingResults" style="z-index: 99999">
+            <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+        </div>
+          <mat-card-content>
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <mat-tab-group class="tab-orders">
+                    <mat-tab label="General">
+                        <ng-template matTabContent>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Order Number</mat-label>
+                                <input class="w-100" matInput type="text" formControlName="orderNumber" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Purchase Number</mat-label>
+                                <input class="w-100" matInput type="text" formControlName="purchaseNumber" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Invoice Number</mat-label>
+                                <input class="w-100" matInput type="text" formControlName="invoiceNumber" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Order Date</mat-label>
+                                <input matInput formControlName="orderDate" [matDatepicker]="orderDate" [class.readonly]="viewMode === 'view'" readonly>
+                                <mat-datepicker-toggle matSuffix [for]="orderDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
+                                <mat-datepicker #orderDate ></mat-datepicker>
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Delivery Date</mat-label>
+                                <input matInput formControlName="deliveryDate" [matDatepicker]="deliveryDate" [class.readonly]="viewMode === 'view'" readonly>
+                                <mat-datepicker-toggle matSuffix [for]="deliveryDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
+                                <mat-datepicker #deliveryDate ></mat-datepicker>
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Order Type</mat-label>
+                                <mat-select formControlName="orderType" [class.readonly]="viewMode === 'view'">
+                                    <mat-option *ngFor="let type of ordersData.orderTypeList" [value]="type">
+                                        {{ type.description }}
+                                    </mat-option>
+                                </mat-select>
+                                <!-- hint, link o button -->
+                                <mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
+                                    <a (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')" color="primary">
+                                        <mat-icon>add</mat-icon> Add new order type
+                                    </a>
+                                </mat-hint>
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Priority</mat-label>
+                                <input class="w-100" matInput type="number" formControlName="priority" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Note</mat-label>
+                                <textarea class="w-100" matInput formControlName="note" [class.readonly]="viewMode === 'view'">
+                                </textarea>
+                            </mat-form-field>
+                            <h4>Order Lines</h4>
+                            <div class="col-sm-12 text-right mb-3">
+                                <a mat-raised-button color="warn" (click)="exportOrderLines()">
+                                    <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                                </a>
+                                <a mat-raised-button color="accent" (click)="addOrderLine()" class="ml-2"
+                                    *ngIf="viewMode === 'edit'">
+                                    <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                                </a>
+                            </div>
+                            <table mat-table [dataSource]="dataSource" matSort>
+                                <!-- Checkbox Column -->
+                                <ng-container matColumnDef="select">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        <mat-checkbox (change)="$event ? masterToggle() : null"
+                                            [checked]="selection.hasValue() && isAllSelected()"
+                                            [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                            [aria-label]="checkboxLabel()">
+                                        </mat-checkbox>
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        <mat-checkbox (click)="$event.stopPropagation()"
+                                            (change)="$event ? selection.toggle(row) : null"
+                                            [checked]="selection.isSelected(row)"
+                                            [aria-label]="checkboxLabel(row)">
+                                        </mat-checkbox>
+                                    </td>
+                                </ng-container>
+                                <!-- Data Columns -->
+                                <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
+                                    <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
+                                </ng-container>
+                                <!-- Options Sticky Column -->
+                                <ng-container matColumnDef="options" stickyEnd>
+                                    <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+                                        {{'Options' | uppercase}}
+                                        <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                                            <mat-icon>more_vert</mat-icon>
+                                        </a>
+                                        
+                                        <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                                            <span>
+                                                <a mat-menu-item (click)="toggleColumn()">Show all</a>
+                                                <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                                                (click)="toggleColumn(column)">
+                                                    <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                                                    {{column.name}}
+                                                </a>
+                                            </span>
+                                        </mat-menu>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                                        <a mat-icon-button (click)="editOrderLineOnDialog(element, 'view')">
+                                            <img src="assets/icons/zoom.png">
+                                        </a>
+                                        <a mat-icon-button (click)="editOrderLineOnDialog(element, 'edit')">
+                                            <img src="assets/icons/page_edit.png">
+                                        </a>
+                                        <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
+                                            <img src="assets/icons/zoom.png">
+                                        </a>
+                                        <a mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
+                                            <img src="assets/icons/page_edit.png">
+                                        </a-->
+                                        <!--button mat-icon-button (click)="printRow(element)">
+                                            <img src="assets/icons/printer.png">
+                                        </button-->
+                                        <!--a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
+                                            <img src="assets/icons/printer.png">
+                                        </a-->
+                                        <a mat-icon-button (click)="deleteOrderLinePrompt(element)">
+                                            <img src="assets/icons/delete.png">
+                                        </a>
+                                    </td>
+                                </ng-container>
+                
+                                <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+                                <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                                [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
+                                <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                                [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.code]"></tr>
+                            </table>
+                            <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                        </ng-template>
+                    </mat-tab>
+                    <mat-tab label="Customer">
+                        <ng-template matTabContent>
+                            <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Customer</mat-label>
+                                <mat-select formControlName="customer">
+                                    <mat-option *ngFor="let customer of ordersData.customerList" [value]="customer">
+                                        {{ customer.name }}
+                                    </mat-option>
+                                </mat-select>
+                                <!-- hint, link o button -->
+                                <mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
+                                    <a (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')" color="primary">
+                                        <mat-icon>add</mat-icon> Add new customer
+                                    </a>
+                                </mat-hint>
+                            </mat-form-field>
+                            <br><br>
+                            <h6>Customer Details</h6>
+                            <hr>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                <mat-label>Customer Number</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('customer').value.customerNumber" [class.readonly]="true">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                <mat-label>Name</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('customer').value.name" [class.readonly]="true">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                <mat-label>Contact</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('customer').value.contact" [class.readonly]="true">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Phone</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('customer').value.phone" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Address</mat-label>
+                                <textarea class="w-100" matInput [value]="form.get('customer').value.address" [class.readonly]="viewMode === 'view'">
+                                </textarea>
+                            </mat-form-field>
+                        </ng-template>
+                    </mat-tab>
+                    <mat-tab label="Transport">
+                        <ng-template matTabContent *ngIf="form.get('transport').value">
+                            <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Transport</mat-label>
+                                <mat-select formControlName="transport">
+                                    <mat-option *ngFor="let transport of ordersData.transportList" [value]="transport">
+                                        {{ transport.nameRoute }}
+                                    </mat-option>
+                                </mat-select>
+                                <!-- hint, link o button -->
+                                <mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
+                                    <a (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')" color="primary">
+                                        <mat-icon>add</mat-icon> Add new transport
+                                    </a>
+                                </mat-hint>
+                            </mat-form-field>
+                            <br><br>
+                            <h5>Transport Details</h5>
+                            <hr>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Transport Number</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('transport').value.transportNumber" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Route</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('transport').value.route" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Name Route</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('transport').value.nameRoute" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Dispatch Platforms</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('transport').value.dispatchPlatforms" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Carrier Code</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('transport').value.carrierCode" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Transport State</mat-label>
+                                <input class="w-100" matInput type="text" [value]="form.get('transport').value.transportState" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                        </ng-template>
+                    </mat-tab>
+                </mat-tab-group>
+                <div class="col-sm-12 text-right">
+                    <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </div>
+            </form>
+          </mat-card-content>
+      </mat-card>
+    </div>
+</div>

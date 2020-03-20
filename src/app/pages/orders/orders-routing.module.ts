@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { OrdersComponent } from './orders.component';
 import { EditRowComponent } from '../edit-row/edit-row.component';
+import { EditOrderComponent } from '../edit-order/edit-order.component';
 import { OrdersResolverService } from './orders-resolver.service';
 import { NotFoundComponent } from '../not-found/not-found.component';
 import { IMPORTING_TYPES } from '../../models/model-maps.model';
@@ -10,7 +11,7 @@ import { IMPORTING_TYPES } from '../../models/model-maps.model';
 const routes: Routes = [
     {
         path: 'edit/:id',
-        component: EditRowComponent,
+        component: EditOrderComponent,
         resolve: {
             row: OrdersResolverService,
         },
@@ -21,7 +22,7 @@ const routes: Routes = [
     },
     {
         path: 'view/:id',
-        component: EditRowComponent,
+        component: EditOrderComponent,
         resolve: {
             row: OrdersResolverService,
         },

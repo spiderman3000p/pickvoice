@@ -355,6 +355,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
+      return row;
     });
 
     this.utilities.exportToXlsx(dataToExport, 'Orders List');

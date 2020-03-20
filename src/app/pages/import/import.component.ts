@@ -164,7 +164,7 @@ export class ImportComponent implements OnInit {
   }
 
   sendOrdersData() {
-    /*this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(retry(3))
+    this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(retry(3))
     .subscribe(result => {
       this.isLoadingResults = false;
       result = result as HttpResponse<any>;
@@ -173,7 +173,7 @@ export class ImportComponent implements OnInit {
       this.utilities.error('Error en request');
       this.utilities.showSnackBar('Error saving orders', 'OK');
       this.isLoadingResults = false;
-    });*/
+    });
   }
 
   getComparationField(type: string): string {

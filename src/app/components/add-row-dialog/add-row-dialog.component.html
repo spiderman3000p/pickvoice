@@ -5,26 +5,52 @@
             <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
         </div>
         <span *ngFor="let key of keys">
-            <mat-form-field [ngClass]="getColumnsClasses()" [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''">
+            <!-- campos compuestos/objetos -->
+            <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'select'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                <!-- campos compuestos/objetos -->
-                <mat-select *ngIf="dataMap[key].formControl.control === 'select'" [formControlName]="key">
-                    <mat-option *ngFor="let data of getSelectInputData(key) | async" [value]="data">
+                <mat-select [formControlName]="key">
+                    <mat-option *ngFor="let data of getSelectInputData(key)" [value]="data">
                         {{ 
                             getSelectDisplayData(data, key)
                         }}
                     </mat-option>
                 </mat-select>
-                <!-- campos number -->
-                <input class="w-100" matInput type="number" [formControlName]="key" *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'number'">
-                <!-- campos date -->
-                <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="dataMap[key].formControl.control === 'date'" readonly>
+                <!-- hint, link o button -->
+                <mat-hint *ngIf="dataMap[key].addNew !== undefined " color="primary" class="add-new-link">
+                    <a *ngIf="dataMap[key].addNew.linkType === 'link'" (click)="addNewObject(dataMap[key].addNew.modelType, dataMap[key].addNew.text)"
+                    color="primary">
+                        <mat-icon>{{ dataMap[key].addNew.icon }}</mat-icon> {{ dataMap[key].addNew.text }}
+                    </a>
+                    <button *ngIf="dataMap[key].addNew.linkType === 'button'" (click)="addNewObject(dataMap[key].addNew.modelType, dataMap[key].addNew.text)"
+                    color="primary">
+                        <mat-icon>{{ dataMap[key].addNew.icon }}</mat-icon> {{ dataMap[key].addNew.text }}
+                    </button>
+                </mat-hint>
+            </mat-form-field>
+            <!-- campos number -->
+            <mat-form-field [ngClass]="getColumnsClasses()"
+            *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'number'">
+                <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
+                <input class="w-100" matInput type="number" [formControlName]="key" >
+            </mat-form-field>
+            <!-- campos date -->
+            <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'date'">
+                <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
+                <input matInput [formControlName]="key" [matDatepicker]="pickerDate"  readonly>
                 <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].formControl.control === 'date'"></mat-datepicker-toggle>
                 <mat-datepicker #pickerDate ></mat-datepicker>
-                <!-- campos string -->
+            </mat-form-field>
+            <!-- campos string -->
+            <mat-form-field [ngClass]="getColumnsClasses()"
+            *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'text'">
+                <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                 <input class="w-100" matInput type="text" [formControlName]="key"
-                *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'text'">
-                <!-- campos boolean -->
+                >
+            </mat-form-field>
+            <!-- campos boolean -->
+            <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'toggle'"
+            [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''">
+                <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                 <input matInput [formControlName]="key" hidden>
                 <mat-slide-toggle  *ngIf="dataMap[key].formControl.control === 'toggle'" color="primary"
                 (change)="form.get(key).setValue(!form.get(key).value)" [checked]="form.get(key).value">
@@ -34,6 +60,7 @@
         </span>
     </div>
     <div mat-dialog-actions align="end">
+        <small class="footer-label">Required fields are marked with *</small>
         <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
         <button mat-button mat-dialog-close [disabled]="isLoadingResults">CANCEL</button>
     </div>

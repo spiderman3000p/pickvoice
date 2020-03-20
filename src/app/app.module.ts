@@ -23,6 +23,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatNativeDateModule } from '@angular/material/core';
+import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule,
+         MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -32,6 +35,7 @@ import { AuthModule } from './pages/auth/auth.module';
 import { ApiModule } from '@pickvoice/pickvoice-api';
 import { BASE_PATH } from '@pickvoice/pickvoice-api';
 
+import { EditOrderComponent } from './pages/edit-order/edit-order.component';
 import { EditRowComponent } from './pages/edit-row/edit-row.component';
 import { AddRowDialogComponent } from './components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
@@ -52,6 +56,19 @@ import { NgxPrintModule } from 'ngx-print';
 
 import { environment } from '../environments/environment';
 
+// See the Moment.js docs for the meaning of these formats:
+// https://momentjs.com/docs/#/displaying/format/
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'l',
+  },
+  display: {
+    dateInput: 'l',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 @NgModule({
   declarations: [
     AppComponent,
@@ -62,6 +79,7 @@ import { environment } from '../environments/environment';
     FileImportComponent,
     CommonDialogComponent,
     EditRowComponent,
+    EditOrderComponent,
     AddRowDialogComponent,
     EditRowDialogComponent,
     PrintComponent,
@@ -83,6 +101,7 @@ import { environment } from '../environments/environment';
     MatToolbarModule,
     MatButtonModule,
     MatDatepickerModule,
+    MatNativeDateModule,
     MatSidenavModule,
     MatIconModule,
     MatListModule,
@@ -109,7 +128,8 @@ import { environment } from '../environments/environment';
   ],
   providers: [
     { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }},
-    { provide: BASE_PATH, useValue: environment.apiBaseUrl }
+    { provide: BASE_PATH, useValue: environment.apiBaseUrl },
+    { provide: MAT_DATE_LOCALE, useValue: 'es'}
   ],
   bootstrap: [AppComponent]
 })

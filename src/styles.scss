@@ -412,9 +412,32 @@ a.mat-list-item.active .mat-list-item-content:before {
   width: 2px;
   left: 0px;
 }
-
 .mat-slide-toggle-thumb-container, .mat-table-sticky {
   z-index: 0 !important;
+}
+.tab-orders .mat-tab-body-content {
+  margin-top: 3% !important;
+  height: unset;
+}
+a:not([href]):hover {
+  color: #00b19d;
+  text-decoration: underline;
+}
+.readonly {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+.add-new-link{
+  cursor: pointer;
+}
+.mat-form-field.mat-form-field-invalid .mat-form-field-label {
+  color: #f74343;
+}
+.mat-form-field.mat-form-field-invalid .mat-form-field-ripple, .mat-form-field.mat-form-field-invalid .mat-form-field-ripple.mat-accent {
+  background-color: #f74343;
+}
+.footer-label{
+  float: inherit; flex: auto; display: flex; left: 0;
 }
 @media screen and (max-width:480px){
   .toolbar-username {

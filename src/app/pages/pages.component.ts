@@ -16,12 +16,6 @@ export class PagesComponent implements OnInit, OnDestroy  {
   mobileQuery: MediaQueryList;
   menuOptions = [
     {
-      text: 'Picking',
-      icon: 'pin_drop',
-      route: '/pages/picking',
-      children: []
-    },
-    {
       text: 'Maintenance',
       icon: 'settings',
       route: '',
@@ -39,26 +33,13 @@ export class PagesComponent implements OnInit, OnDestroy  {
           children: []
         },
         {
-          text: 'Settings',
-          icon: 'settings',
-          route: '',
+          text: 'Item Master',
+          icon: 'clock',
           children: [
             {
               text: 'Items',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.ITEMS,
-              children: []
-            },
-            {
-              text: 'Locations',
-              icon: 'home',
-              route: '/pages/' + IMPORTING_TYPES.LOCATIONS,
-              children: []
-            },
-            {
-              text: 'Orders',
-              icon: 'home',
-              route: '/pages/' + IMPORTING_TYPES.ORDERS,
               children: []
             },
             {
@@ -72,7 +53,32 @@ export class PagesComponent implements OnInit, OnDestroy  {
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.UOMS,
               children: []
+            }
+          ]
+        },
+        {
+          text: 'Location Master',
+          icon: '',
+          children: [
+            {
+              text: 'Locations',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.LOCATIONS,
+              children: []
             },
+            {
+              text: 'Sections',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.SECTIONS,
+              children: []
+            }
+          ]
+        },
+        {
+          text: 'Settings',
+          icon: 'settings',
+          route: '',
+          children: [
             {
               text: 'Customers',
               icon: 'home',
@@ -85,12 +91,6 @@ export class PagesComponent implements OnInit, OnDestroy  {
               route: '/pages/' + IMPORTING_TYPES.ORDER_TYPE,
               children: []
             },
-            {
-              text: 'Sections',
-              icon: 'home',
-              route: '/pages/' + IMPORTING_TYPES.SECTIONS,
-              children: []
-            }
           ]
         }
       ]
@@ -101,16 +101,48 @@ export class PagesComponent implements OnInit, OnDestroy  {
       route: '/pages/administration',
       children: [
         {
-          text: 'Pending Orders',
-          icon: 'restore',
+          text: 'Inbound',
+          icon: '',
           route: '/pages/pending-orders',
           children: []
         },
         {
-          text: 'Current Actions',
-          icon: 'query_builder',
+          text: 'Outbound',
+          icon: '',
           route: '/pages/current-actions',
-          children: []
+          children: [
+            {
+              text: 'Orders',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.ORDERS,
+              children: []
+            },
+            {
+              text: 'Picking',
+              icon: '',
+              route: '/pages/picking',
+              children: []
+            }
+          ]
+        },
+        {
+          text: 'Storage',
+          icon: '',
+          route: '',
+          children: [
+            {
+              text: 'Lpns',
+              icon: '',
+              route: '/pages/lpns',
+              children: []
+            },
+            {
+              text: 'Inventory',
+              icon: '',
+              route: '/pages/inventory',
+              children: []
+            }
+          ]
         }
       ]
     }

@@ -27,48 +27,75 @@
             <mat-card-content>
                 <div mat-dialog-content>
                     <span *ngFor="let key of keys">
-                        <mat-form-field  class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'"
-                        [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''"
-                        *ngIf="dataMap[key].formControl.control !== 'table'"
-                        >
+                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        *ngIf="dataMap[key].formControl.control === 'select'">
                             <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                            <!-- campos number -->
-                            <input class="w-100" matInput type="number" [formControlName]="key" *ngIf="dataMap[key].type === 'number'"
-                            [class.readonly]="viewMode === 'view'"
-                            >
                             <!-- campos compuestos/objetos select -->
-                            <mat-select *ngIf="dataMap[key].formControl.control === 'select'" [formControlName]="key" [class.readonly]="viewMode === 'view'">
-                                <mat-option *ngFor="let data of getSelectInputData(key) | async" [value]="getSelectIndexValue(data, key)">
-                                    {{ 
-                                        getSelectDisplayData(data, key)
-                                    }}
+                            <mat-select [formControlName]="key" [class.readonly]="viewMode === 'view'">
+                                <mat-option *ngFor="let data of getSelectInputData(key)" [value]="getSelectIndexValue(data, key)">
+                                    {{ getSelectDisplayData(data, key) }}
                                 </mat-option>
                             </mat-select>
+                            <!-- hint, link o button -->
+                            <mat-hint *ngIf="dataMap[key].addNew !== undefined && viewMode === 'edit'" color="primary" class="add-new-link">
+                                <a *ngIf="dataMap[key].addNew.linkType === 'link'" (click)="addNewObject(dataMap[key].addNew.modelType, dataMap[key].addNew.text)"
+                                color="primary">
+                                    <mat-icon>{{ dataMap[key].addNew.icon }}</mat-icon> {{ dataMap[key].addNew.text }}
+                                </a>
+                                <button *ngIf="dataMap[key].addNew.linkType === 'button'" (click)="addNewObject(dataMap[key].addNew.modelType, dataMap[key].addNew.text)"
+                                color="primary">
+                                    <mat-icon>{{ dataMap[key].addNew.icon }}</mat-icon> {{ dataMap[key].addNew.text }}
+                                </button>
+                            </mat-hint>
+                        </mat-form-field>
+                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        *ngIf="dataMap[key].formControl.control === 'input' &&
+                        dataMap[key].formControl.type === 'number'">
+                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
+                            <!-- campos number -->
+                            <input class="w-100" matInput type="number" [formControlName]="key" 
+                            [class.readonly]="viewMode === 'view'">
+                        </mat-form-field>
+                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        *ngIf="dataMap[key].formControl.control === 'date'">
+                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                             <!-- campos date -->
                             <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="dataMap[key].type === 'date'"
                             [class.readonly]="viewMode === 'view'" readonly>
                             <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].type === 'date' && viewMode === 'edit'" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
                             <mat-datepicker #pickerDate ></mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'text'">
+                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                             <!-- campos string -->
-                            <input class="w-100" matInput type="text" [formControlName]="key" [class.readonly]="viewMode === 'view'"
-                            *ngIf="dataMap[key].type === 'string' && dataMap[key].formControl.control === 'input' &&
-                            dataMap[key].formControl.type === 'text'">
+                            <input class="w-100" matInput type="text" [formControlName]="key" [class.readonly]="viewMode === 'view'">
+                        </mat-form-field>
+                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''"
+                        *ngIf="dataMap[key].formControl.control === 'toggle'">
+                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                             <!-- campos boolean -->
                             <input matInput [formControlName]="key"  hidden>
-                            <mat-slide-toggle  *ngIf="dataMap[key].type === 'boolean'" color="primary"
-                            [class.readonly]="viewMode === 'view'"
+                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
                             (change)="form.get(key).setValue(!form.get(key).value)" [checked]="form.get(key).value">
                                 {{dataMap[key].name}}
                             </mat-slide-toggle>
                         </mat-form-field>
-                        <!--span *ngIf="key === 'orderLines'">
-                            <ag-grid-angular style="width: 100%; height: 400px;"
-                                class="ag-theme-balham" *ngIf="key === 'orderLines'"
-                                [rowData]="rowData"
-                                [columnDefs]="columnDefs">
-                            </ag-grid-angular>
-                        </span-->
                         <span *ngIf="key === 'orderLines'">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <h3>Order Lines</h3>
+                                </div>
+                                <div class="col-sm-6 text-right">
+                                    <button mat-raised-button color="warn" (click)="export()">
+                                        <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                                    </button>
+                                    <button mat-raised-button color="accent" (click)="addRow()" class="ml-2">
+                                        <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                                    </button>
+                                </div>
+                            </div>
                             <table mat-table [dataSource]="dataSource" matSort>
                                 <!-- Checkbox Column -->
                                 <ng-container matColumnDef="select">
@@ -147,7 +174,8 @@
                     </span>
                 </div>
             </mat-card-content>
-            <mat-card-actions align="end">
+            <mat-card-actions align="end" [ngClass]="'mb-0'">
+                <small class="footer-label col-sm-12" *ngIf="viewMode === 'edit'">Required fields are marked with *</small>
                 <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
                 <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
             </mat-card-actions>

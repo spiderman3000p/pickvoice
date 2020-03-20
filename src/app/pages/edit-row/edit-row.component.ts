@@ -22,19 +22,25 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 interface ItemsData {
-  itemTypeList: Observable<ItemType[]>;
-  unityOfMeasureList: Observable<UnityOfMeasure[]>;
+  itemTypeList: ItemType[];
+  unityOfMeasureList: UnityOfMeasure[];
+  itemStateList: string[];
 }
 
 interface LocationsData {
-  sectionList: Observable<Section[]>;
-  typeList: Observable<string[]>;
+  sectionList: Section[];
+  typeList: string[];
+}
+
+interface OrderLinesData {
+  ordersList: Order[];
+  itemsList: Item[];
 }
 
 interface OrdersData {
-  orderTypeList: Observable<OrderType[]>;
-  transportList: Observable<Transport[]>;
-  customerList: Observable<Customer[]>;
+  orderTypeList: OrderType[];
+  transportList: Transport[];
+  customerList: Customer[];
 }
 @Component({
   selector: 'app-edit-row',
@@ -58,6 +64,7 @@ export class EditRowComponent implements OnInit {
   itemsData: ItemsData; // para los datos compuestos de Item
   locationsData: LocationsData; // para los datos compuestos de Location
   ordersData: OrdersData;
+  orderLinesData: OrderLinesData;
   columnDefs: any[]; // para el agGrid
   rowData: any[];
   dataSource: MatTableDataSource<any>;
@@ -92,6 +99,7 @@ export class EditRowComponent implements OnInit {
     this.itemsData = new Object() as ItemsData;
     this.locationsData = new Object() as LocationsData;
     this.ordersData = new Object() as OrdersData;
+    this.orderLinesData = new Object() as OrderLinesData;
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Row' : 'View Row';
   }
 
@@ -111,6 +119,7 @@ export class EditRowComponent implements OnInit {
       this.utilities.log('item', this.row);
       this.getItemTypeList();
       this.getUnityOfMeasureList();
+      this.getItemStateList();
     }
     if (this.type === IMPORTING_TYPES.LOCATIONS) {
       // this.row = ModelFactory.newEmptyLocation();
@@ -181,8 +190,8 @@ export class EditRowComponent implements OnInit {
       // this.row = ModelFactory.newEmptyUnityOfMeasure();
       this.utilities.log('section', this.row);
     }
-    console.log('columnDefs', this.columnDefs);
-    console.log('rowData', this.rowData);
+    // console.log('columnDefs', this.columnDefs);
+    // console.log('rowData', this.rowData);
     this.keys.forEach((key, index) => {
       if (this.row === undefined) {
         return;
@@ -199,7 +208,7 @@ export class EditRowComponent implements OnInit {
     /*if (this.viewMode === 'view') {
       this.form.disable();
     }*/
-    this.utilities.log('formControls', formControls);
+    // this.utilities.log('formControls', formControls);
   }
 
   initColumnsDefs() {
@@ -407,7 +416,7 @@ export class EditRowComponent implements OnInit {
     });
   }
 
-  addRow() {
+  addOrderLine() {
     this.utilities.log('map to send to add dialog', ModelMap.OrderLineMap);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
@@ -429,7 +438,7 @@ export class EditRowComponent implements OnInit {
     });
   }
 
-  export() {
+  exportOrderLines() {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
@@ -466,33 +475,93 @@ export class EditRowComponent implements OnInit {
   applyFilters() {
   }
 
-  getSectionList() {
-    this.locationsData.sectionList = this.sectionService.retrieveAllSections();
-  }
-
-  getTypeList() {
-    const types: string[] = [];
-    this.locationsData.typeList = new Observable(suscriber => {
-      for (const key in Location.TypeEnum) {
-        if (1) {
-          types.push(key);
+  addNewObject(objectType: string, myTitle: string) {
+    this.utilities.log('map to send to add dialog', this.utilities.dataTypesModelMaps[objectType]);
+    const dialogRef = this.dialog.open(AddRowDialogComponent, {
+      data: {
+        map: this.utilities.dataTypesModelMaps[objectType],
+        type: objectType,
+        title: myTitle,
+        remoteSync: true // para mandar los datos a la BD por la API
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+        if (objectType === IMPORTING_TYPES.ITEM_TYPE) {
+          this.itemsData.itemTypeList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.UOMS) {
+          this.itemsData.unityOfMeasureList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.SECTIONS) {
+          this.locationsData.sectionList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.TRANSPORTS) {
+          this.ordersData.transportList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.ORDER_TYPE) {
+          this.ordersData.orderTypeList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.CUSTOMERS) {
+          this.ordersData.customerList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.ITEMS) {
+          this.orderLinesData.itemsList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.ORDERS) {
+          this.orderLinesData.ordersList.push(result);
         }
       }
-      suscriber.next(types);
-      suscriber.complete();
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
     });
   }
 
+  getItemsList() {
+    this.itemService.retrieveAllItems().subscribe(results => {
+      this.orderLinesData.itemsList = results;
+    });
+  }
+
+  getOrdersList() {
+    this.orderService.retrieveAllOrders().subscribe(results => {
+      this.orderLinesData.ordersList = results;
+    });
+  }
+
+  getSectionList() {
+    this.sectionService.retrieveAllSections().subscribe(results => {
+      this.locationsData.sectionList = results;
+    });
+  }
+
+  getTypeList() {
+      this.locationsData.typeList = Object.keys(Location.TypeEnum);
+  }
+
+  getItemStateList() {
+    this.itemsData.itemStateList = Object.keys(Item.ItemStateEnum);
+}
+
   getItemTypeList() {
-    this.itemsData.itemTypeList = this.itemTypeService.retrieveAllItemTypes();
+    this.itemTypeService.retrieveAllItemTypes().subscribe(results => {
+      this.itemsData.itemTypeList = results;
+    });
   }
 
   getUnityOfMeasureList() {
-    this.itemsData.unityOfMeasureList = this.uomsService.retrieveAllUom();
+    this.uomsService.retrieveAllUom().subscribe(results => {
+      this.itemsData.unityOfMeasureList = results;
+    });
   }
 
   getOrderTypeList() {
-    this.ordersData.orderTypeList = this.orderTypeService.retrieveAllOrderType();
+    this.orderTypeService.retrieveAllOrderType().subscribe(results => {
+      this.ordersData.orderTypeList = results;
+    });
     /*this.ordersData.orderTypeList = new Observable(suscriber => {
       suscriber.next([
         { code: 'Factura', description: 'Factura'}
@@ -502,7 +571,9 @@ export class EditRowComponent implements OnInit {
   }
 
   getCustomerList() {
-    this.ordersData.customerList = this.customerService.retrieveAllCustomers();
+    this.customerService.retrieveAllCustomers().subscribe(results => {
+      this.ordersData.customerList = results;
+    });
     /*this.ordersData.customerList = new Observable(suscriber => {
       suscriber.next([
         { customerNumber: 'CU01', name: 'CUSTOMER 1', contact: '', phone: '', address: ''},
@@ -514,7 +585,7 @@ export class EditRowComponent implements OnInit {
 
   getTransportList() {
     // this.ordersData.orderTypeList = this.orderTypeService.retrieveAll();
-    this.ordersData.transportList = new Observable(suscriber => {
+    const obs = new Observable<Transport[]>(suscriber => {
       suscriber.next([
         { transportNumber: 'T01', route: 'ROUTE 1', nameRoute: 'ROUTE 02', dispatchPlatforms: '',
           carrierCode: 'T01', transportState: Transport.TransportStateEnum.Pending
@@ -524,6 +595,8 @@ export class EditRowComponent implements OnInit {
         }
       ]);
       suscriber.complete();
+    }).subscribe(results => {
+      this.ordersData.transportList = results;
     });
   }
 
@@ -543,12 +616,13 @@ export class EditRowComponent implements OnInit {
     (data ? data : '-') : '-'));
   }
 
-  getSelectInputData(key: string): Observable<any[]> {
-    let data: Observable<any[]>;
+  getSelectInputData(key: string): any[] {
+    let data: any[];
     if (this.type === IMPORTING_TYPES.ITEMS) {
       switch (key) {
         case 'itemType': data = this.itemsData.itemTypeList; break;
         case 'uom': data = this.itemsData.unityOfMeasureList; break;
+        case 'itemState': data = this.itemsData.itemStateList; break;
         default: break;
       }
     }
@@ -579,6 +653,11 @@ export class EditRowComponent implements OnInit {
   }
 
   onSubmit() {
+    if (!this.form.valid) {
+      this.utilities.error('formulario invalido');
+      this.utilities.showSnackBar('Please check the required fields', 'OK');
+      return;
+    }
     this.utilities.log('onSubmit');
     const formData = this.form.value;
     const toUpload = this.row;
@@ -677,6 +756,14 @@ export class EditRowComponent implements OnInit {
       this.dataProvider.returnData = toUpload;
       this.location.back();
     }
+  }
+
+  getColumnsClasses() {
+    let classes = 'col-sm-12 col-md-4 col-lg-3';
+    if (this.keys.length < 3) {
+      classes = 'col-sm-12 col-md-6 col-lg-6';
+    }
+    return classes;
   }
 
   back() {

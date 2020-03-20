@@ -24,6 +24,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,9 @@ import { MatListModule } from '@angular/material/list';
   imports: [
     CommonModule,
     OrdersRoutingModule,
+
+    FormsModule,
+    ReactiveFormsModule,
 
     MatNativeDateModule,
     MatProgressSpinnerModule,
@@ -49,7 +53,8 @@ import { MatListModule } from '@angular/material/list';
     MatSelectModule,
     MatSlideToggleModule,
     MatExpansionModule,
-    MatListModule
+    MatListModule,
+    MatTabsModule
   ]
 })
 export class OrdersModule { }

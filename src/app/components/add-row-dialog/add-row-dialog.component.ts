@@ -13,19 +13,29 @@ import { ModelFactory } from '../../models/model-factory.class';
 import { IMPORTING_TYPES } from '../../models/model-maps.model';
 
 interface ItemsData {
-  itemTypeList: Observable<ItemType[]>;
-  unityOfMeasureList: Observable<UnityOfMeasure[]>;
+  itemTypeList: ItemType[];
+  unityOfMeasureList: UnityOfMeasure[];
+  itemStateList: string[];
 }
 
 interface LocationsData {
-  sectionList: Observable<Section[]>;
-  typeList: Observable<string[]>;
+  sectionList: Section[];
+  typeList: string[];
+}
+
+interface OrderLinesData {
+  ordersList: Order[];
+  itemsList: Item[];
 }
 
 interface OrdersData {
-  orderTypeList: Observable<OrderType[]>;
-  transportList: Observable<Transport[]>;
-  customerList: Observable<Customer[]>;
+  orderTypeList: OrderType[];
+  transportList: Transport[];
+  customerList: Customer[];
+}
+
+interface TransportsData {
+  transportStateList: string[];
 }
 
 @Component({
@@ -46,20 +56,27 @@ export class AddRowDialogComponent implements OnInit {
   itemsData: ItemsData; // para los datos compuestos de Item
   locationsData: LocationsData; // para los datos compuestos de Location
   ordersData: OrdersData;
+  orderLinesData: OrderLinesData;
+  transportsData: TransportsData;
   constructor(public dialogRef: MatDialogRef<AddRowDialogComponent>, private dataProvider: DataStorage,
               private itemService: ItemsService, private locationService: LocationsService,
               private orderService: OrderService, private itemTypeService: ItemTypeService,
               private uomService: UomService, private sectionService: SectionService,
               private customerService: CustomerService, private orderTypeService: OrderTypeService,
+              private dialog: MatDialog,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
     // init variables
     this.itemsData = new Object() as ItemsData;
     this.locationsData = new Object() as LocationsData;
     this.ordersData = new Object() as OrdersData;
+    this.orderLinesData = new Object() as OrderLinesData;
+    this.transportsData = new Object() as TransportsData;
     this.dataMap = data.map; // map of object
     this.utilities.log('fields', this.dataMap);
-    this.type = data.type; // map of object
+    this.type = data.type;
     this.utilities.log('type', this.type);
+    this.dialogTitle = data.title;
+    this.utilities.log('title', this.dialogTitle);
     this.remoteSync = data.remoteSync; // map of object
     this.utilities.log('remoteSync', this.remoteSync);
     const formControls = {};
@@ -71,6 +88,7 @@ export class AddRowDialogComponent implements OnInit {
       this.utilities.log('new empty item', this.row);
       this.getItemTypeList();
       this.getUnityOfMeasureList();
+      this.getItemStateList();
     }
     if (this.type === IMPORTING_TYPES.LOCATIONS) {
       this.row = ModelFactory.newEmptyLocation();
@@ -95,20 +113,29 @@ export class AddRowDialogComponent implements OnInit {
     }
     if (this.type === IMPORTING_TYPES.CUSTOMERS) {
       this.row = ModelFactory.newEmptyCustomer();
-      this.utilities.log('new empty uom', this.row);
+      this.utilities.log('new empty customer', this.row);
     }
     if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
       this.row = ModelFactory.newEmptyOrderType();
       this.utilities.log('new empty order type', this.row);
     }
+    if (this.type === IMPORTING_TYPES.ORDER_LINE) {
+      this.row = ModelFactory.newEmptyOrderLine();
+      this.utilities.log('new empty order line', this.row);
+      this.getItemsList();
+      this.getOrdersList();
+    }
     if (this.type === IMPORTING_TYPES.SECTIONS) {
       this.row = ModelFactory.newEmptySection();
       this.utilities.log('new empty section', this.row);
     }
+    if (this.type === IMPORTING_TYPES.TRANSPORTS) {
+      this.row = ModelFactory.newEmptyTransport();
+      this.getTransportStateList();
+      this.utilities.log('new empty transport', this.row);
+    }
     // init variables end
-
     this.utilities.log('row recibida', this.row);
-
     // build form group
     this.keys.forEach((key, index) => {
       if (this.row === undefined) {
@@ -121,60 +148,112 @@ export class AddRowDialogComponent implements OnInit {
         formControls[key] = new FormControl(value);
       }
     });
-    console.log('form controls', formControls);
-    this.dialogTitle = 'Add Row';
+    // console.log('form controls', formControls);
     this.form = new FormGroup(formControls);
   }
 
-  getSectionList() {
-    this.locationsData.sectionList = this.sectionService.retrieveAllSections();
-  }
-
-  getTypeList() {
-    const types: string[] = [];
-    this.locationsData.typeList = new Observable(suscriber => {
-      for (const key in Location.TypeEnum) {
-        if (1) {
-          types.push(key);
+  addNewObject(objectType: string, myTitle: string) {
+    this.utilities.log('map to send to add dialog', this.utilities.dataTypesModelMaps[objectType]);
+    const dialogRef = this.dialog.open(AddRowDialogComponent, {
+      data: {
+        map: this.utilities.dataTypesModelMaps[objectType],
+        type: objectType,
+        title: myTitle,
+        remoteSync: true // para mandar los datos a la BD por la API
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+        if (objectType === IMPORTING_TYPES.ITEM_TYPE) {
+          this.itemsData.itemTypeList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.UOMS) {
+          this.itemsData.unityOfMeasureList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.SECTIONS) {
+          this.locationsData.sectionList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.TRANSPORTS) {
+          this.ordersData.transportList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.ORDER_TYPE) {
+          this.ordersData.orderTypeList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.CUSTOMERS) {
+          this.ordersData.customerList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.ITEMS) {
+          this.orderLinesData.itemsList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.ORDERS) {
+          this.orderLinesData.ordersList.push(result);
         }
       }
-      suscriber.next(types);
-      suscriber.complete();
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
     });
   }
 
+  getItemsList() {
+    this.itemService.retrieveAllItems().subscribe(results => {
+      this.orderLinesData.itemsList = results;
+    });
+  }
+
+  getOrdersList() {
+    this.orderService.retrieveAllOrders().subscribe(results => {
+      this.orderLinesData.ordersList = results;
+    });
+  }
+
+  getSectionList() {
+    this.sectionService.retrieveAllSections().subscribe(results => {
+      this.locationsData.sectionList = results;
+    });
+  }
+
+  getTransportStateList() {
+    this.transportsData.transportStateList = Object.keys(Transport.TransportStateEnum);
+  }
+
+  getTypeList() {
+    this.locationsData.typeList = Object.keys(Location.TypeEnum);
+  }
+
+  getItemStateList() {
+    this.itemsData.itemStateList = Object.keys(Item.ItemStateEnum);
+}
+
   getItemTypeList() {
-    this.itemsData.itemTypeList = this.itemTypeService.retrieveAllItemTypes();
+    this.itemTypeService.retrieveAllItemTypes().subscribe(results => {
+      this.itemsData.itemTypeList = results;
+    });
   }
 
   getUnityOfMeasureList() {
-    this.itemsData.unityOfMeasureList = this.uomService.retrieveAllUom();
+    this.uomService.retrieveAllUom().subscribe(results => {
+      this.itemsData.unityOfMeasureList = results;
+    });
   }
 
   getOrderTypeList() {
-    this.ordersData.orderTypeList = this.orderTypeService.retrieveAllOrderType();
-    /*this.ordersData.orderTypeList = new Observable(suscriber => {
-      suscriber.next([
-        { code: 'Factura', description: 'Factura'}
-      ]);
-      suscriber.complete();
-    });*/
+    this.orderTypeService.retrieveAllOrderType().subscribe(results => {
+      this.ordersData.orderTypeList = results;
+    });
   }
 
   getCustomerList() {
-    this.ordersData.customerList = this.customerService.retrieveAllCustomers();
-    /*this.ordersData.customerList = new Observable(suscriber => {
-      suscriber.next([
-        { customerNumber: 'CU01', name: 'CUSTOMER 1', contact: '', phone: '', address: ''},
-        { customerNumber: 'CU02', name: 'CUSTOMER 2', contact: '', phone: '', address: ''},
-      ]);
-      suscriber.complete();
-    });*/
+    this.customerService.retrieveAllCustomers().subscribe(results => {
+      this.ordersData.customerList = results;
+    });
   }
 
   getTransportList() {
     // this.ordersData.orderTypeList = this.orderTypeService.retrieveAll();
-    this.ordersData.transportList = new Observable(suscriber => {
+    const obs = new Observable<Transport[]>(suscriber => {
       suscriber.next([
         { transportNumber: 'T01', route: 'ROUTE 1', nameRoute: 'ROUTE 02', dispatchPlatforms: '',
           carrierCode: 'T01', transportState: Transport.TransportStateEnum.Pending
@@ -184,6 +263,8 @@ export class AddRowDialogComponent implements OnInit {
         }
       ]);
       suscriber.complete();
+    }).subscribe(results => {
+      this.ordersData.transportList = results;
     });
   }
 
@@ -195,12 +276,13 @@ export class AddRowDialogComponent implements OnInit {
     (data ? data : '-') : '-'));
   }
 
-  getSelectInputData(key: string): Observable<any[]> {
-    let data: Observable<any[]>;
+  getSelectInputData(key: string): any[] {
+    let data: any[];
     if (this.type === IMPORTING_TYPES.ITEMS) {
       switch (key) {
         case 'itemType': data = this.itemsData.itemTypeList; break;
         case 'uom': data = this.itemsData.unityOfMeasureList; break;
+        case 'itemState': data = this.itemsData.itemStateList; break;
         default: break;
       }
     }
@@ -219,12 +301,30 @@ export class AddRowDialogComponent implements OnInit {
         default: break;
       }
     }
+    if (this.type === IMPORTING_TYPES.ORDER_LINE) {
+      switch (key) {
+        case 'item': data = this.orderLinesData.itemsList; break;
+        case 'order': data = this.orderLinesData.ordersList; break;
+        default: break;
+      }
+    }
+    if (this.type === IMPORTING_TYPES.TRANSPORTS) {
+      switch (key) {
+        case 'transportState': data = this.transportsData.transportStateList; break;
+        default: break;
+      }
+    }
     // data.subscribe(result => console.log('data on select', result));
     // console.log(`getSelectInputData: key = '${key}', data:`, data);
     return data;
   }
 
   onSubmit() {
+    if (!this.form.valid) {
+      this.utilities.error('formulario invalido');
+      this.utilities.showSnackBar('Please check the required fields', 'OK');
+      return;
+    }
     this.utilities.log('onSubmit');
     const formData = this.form.value;
     const toUpload = this.row;
@@ -276,6 +376,11 @@ export class AddRowDialogComponent implements OnInit {
         .subscribe(observer);
       }
 
+      if (this.type === IMPORTING_TYPES.ORDER_LINE) {
+        this.orderService.createOrder(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
       if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
         this.itemTypeService.createItemType(toUpload, 'response').pipe(retry(3))
         .subscribe(observer);
@@ -300,6 +405,15 @@ export class AddRowDialogComponent implements OnInit {
         this.sectionService.createSection(toUpload, 'response').pipe(retry(3))
         .subscribe(observer);
       }
+
+      if (this.type === IMPORTING_TYPES.TRANSPORTS) {
+        setTimeout(() => {
+          this.isLoadingResults = false;
+          this.utilities.showSnackBar('This function is on development', 'OK');
+        }, 2000);
+        /* this.transportService.createTransport(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer);*/
+      }
     } else {
       this.dialogRef.close(toUpload);
     }
@@ -307,8 +421,14 @@ export class AddRowDialogComponent implements OnInit {
 
   getColumnsClasses() {
     let classes = 'col-sm-12 col-md-4 col-lg-3';
-    if (this.keys.length < 3) {
+    if (this.keys.length > 1) {
       classes = 'col-sm-12 col-md-6 col-lg-6';
+    }
+    if (this.keys.length >= 3) {
+      classes = 'col-sm-12 col-md-4 col-lg-4';
+    }
+    if (this.keys.length >= 5) {
+      classes = 'col-sm-12 col-md-4 col-lg-3';
     }
     return classes;
   }

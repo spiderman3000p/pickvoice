@@ -6,7 +6,9 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CommonDialogComponent } from '../components/common-dialog/common-dialog.component';
 import { environment } from '../../environments/environment';
 import * as XLSX from 'xlsx';
-
+import * as moment from 'moment';
+import 'moment/locale/es';
+moment.locale('es');
 export interface ValidationError {
   error: string;
   index: number;
@@ -25,7 +27,8 @@ export class UtilitiesService {
     ordersDto: ModelMap.OrderDtoMap,
     customers: ModelMap.CustomerMap,
     orderTypes: ModelMap.OrderTypeMap,
-    sections: ModelMap.SectionMap
+    sections: ModelMap.SectionMap,
+    transports: ModelMap.TransportMap
   };
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) { }
 
@@ -41,18 +44,16 @@ export class UtilitiesService {
     let dataValue;
     switch (type) {
       case 'date':
-        if (typeof data === 'string') {
-          if (data.length > 0) {
-            dataValue = new Intl.DateTimeFormat('en-US').format(new Date(data));
-          } else {
-            dataValue = new Intl.DateTimeFormat('en-US').format(new Date());
-          }
-        } else if (typeof data === 'number') {
+        let date;
+        if (typeof data === 'number') {
           // esta conversion sale de aqui: https://github.com/SheetJS/sheetjs/issues/1623
-          dataValue = new Date(1000 * 60 * 60 * 24 * (data - 25569));
+          date = new Date(1000 * 60 * 60 * 24 * (data - 25569));
         } else {
-          dataValue = data;
+          date = data;
         }
+        dataValue = moment(date).format('D/M/YYYY');
+        // console.log('date value', dataValue);
+        // dataValue = date;
         break;
       case 'item': dataValue = data && data.description ? data.description : ''; break;
       case 'order': dataValue = data && data.orderNumber ? data.orderNumber : ''; break;

@@ -8,7 +8,8 @@ export const IMPORTING_TYPES = {
     UOMS: 'uoms',
     CUSTOMERS: 'customers',
     ORDER_TYPE: 'orderTypes',
-    SECTIONS: 'sections'
+    SECTIONS: 'sections',
+    TRANSPORTS: 'transports'
 };
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
@@ -126,6 +127,12 @@ export class ModelMap {
                 type: 'normal',
                 valueIndex: 'code',
                 displayIndex: 'name'
+            },
+            addNew: {
+                text: 'Add new type',
+                icon: 'add',
+                linkType: 'link', // hint | link | button
+                modelType: IMPORTING_TYPES.ITEM_TYPE
             }
         },
         uom: {
@@ -137,6 +144,12 @@ export class ModelMap {
                 type: 'normal',
                 valueIndex: 'code',
                 displayIndex: 'name'
+            },
+            addNew: {
+                text: 'Add new unity',
+                icon: 'add',
+                linkType: 'link', //  link | button
+                modelType: IMPORTING_TYPES.UOMS
             }
         },
         weightTolerance: {
@@ -207,18 +220,18 @@ export class ModelMap {
             formControl: {
                 control: 'toggle'
             }
-        }
-        /*
-            Aqui esta faltand itemState, per no se agrega porque no sera parte de los archivos de importacion.
-            Este campo se añade por defecto al momento de importar.
-            itemState: {
+        },
+        itemState: {
             name: 'item state',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
-                control: 'select'
+                control: 'select',
+                type: 'normal',
+                displayIndex: null,
+                valueIndex: null
             }
-        */
+        }
     };
     /* item type object map for CRUD */
     public static ItemTypeMap = {
@@ -330,6 +343,12 @@ export class ModelMap {
                 type: 'normal',
                 valueIndex: 'code',
                 displayIndex: 'name'
+            },
+            addNew: {
+                text: 'Add new section',
+                icon: 'add',
+                linkType: 'link', // hint | link | button
+                modelType: IMPORTING_TYPES.SECTIONS
             }
         },
         lane: {
@@ -491,6 +510,12 @@ export class ModelMap {
                 type: 'normal',
                 valueIndex: 'transportNumber',
                 displayIndex: 'nameRoute'
+            },
+            addNew: {
+                text: 'Add new transport',
+                icon: 'add',
+                linkType: 'link', // hint | link | button
+                modelType: IMPORTING_TYPES.TRANSPORTS
             }
         },
         customer: {
@@ -502,6 +527,12 @@ export class ModelMap {
                 type: 'normal',
                 valueIndex: 'customerNumber',
                 displayIndex: 'name'
+            },
+            addNew: {
+                text: 'Add new customer',
+                icon: 'add',
+                linkType: 'link', // hint | link | button
+                modelType: IMPORTING_TYPES.CUSTOMERS
             }
         },
         orderLines: {
@@ -511,6 +542,12 @@ export class ModelMap {
             formControl: {
                 control: 'table',
                 type: 'normal'
+            },
+            addNew: {
+                text: 'Add new order line',
+                icon: 'add',
+                linkType: 'link', // hint | link | button
+                modelType: IMPORTING_TYPES.ORDER_LINE
             }
         },
     };
@@ -535,6 +572,65 @@ export class ModelMap {
             }
         }
     };
+    /* transport object map for CRUD */
+    public static TransportMap = {
+        transportNumber: {
+            name: 'number',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        route: {
+            name: 'route',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        nameRoute: {
+            name: 'route name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        dispatchPlatforms: {
+            name: 'dispatch `platforms',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        carrierCode: {
+            name: 'carrier code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        transportState: {
+            name: 'state',
+            required: false,
+            type: 'transportState',
+            formControl: {
+                control: 'select',
+                type: 'normal',
+                valueIndex: null,
+                displayIndex: null
+            }
+        }
+    };
     /* order line object map for CRUD */
     public static OrderLineMap = {
         item:  {
@@ -547,6 +643,12 @@ export class ModelMap {
                 type: 'normal',
                 valueIndex: 'sku',
                 displayIndex: 'description'
+            },
+            addNew: {
+                text: 'Add new item',
+                icon: 'add',
+                linkType: 'link', // hint | link | button
+                modelType: IMPORTING_TYPES.ITEMS
             }
         },
         order:  {
@@ -559,6 +661,12 @@ export class ModelMap {
                 type: 'normal',
                 valueIndex: 'orderNumber',
                 displayIndex: 'orderNumber'
+            },
+            addNew: {
+                text: 'Add new order',
+                icon: 'add',
+                linkType: 'link', // hint | link | button
+                modelType: IMPORTING_TYPES.ORDERS
             }
         },
         qtyRequired:  {

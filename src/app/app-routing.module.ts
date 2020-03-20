@@ -165,6 +165,18 @@ const routes: Routes = [
             format: 'single',
             title: 'Print Customer'
           }
+        },
+        {
+          path: IMPORTING_TYPES.ORDER_LINE + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: CustomerResolverService, // TODO: implementar OrderLineResolver
+          },
+          data: {
+            type: IMPORTING_TYPES.ORDER_LINE,
+            format: 'single',
+            title: 'Print Order Line'
+          }
         }
     ]
   },
