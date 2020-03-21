@@ -28,7 +28,8 @@ export class UtilitiesService {
     customers: ModelMap.CustomerMap,
     orderTypes: ModelMap.OrderTypeMap,
     sections: ModelMap.SectionMap,
-    transports: ModelMap.TransportMap
+    transports: ModelMap.TransportMap,
+    loadPicksDto: ModelMap.LoadPickDtoMap
   };
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) { }
 
@@ -47,11 +48,11 @@ export class UtilitiesService {
         let date;
         if (typeof data === 'number') {
           // esta conversion sale de aqui: https://github.com/SheetJS/sheetjs/issues/1623
-          date = new Date(1000 * 60 * 60 * 24 * (data - 25569));
+          date = 1000 * 60 * 60 * 24 * (data - 25569);
         } else {
           date = data;
         }
-        dataValue = moment(date).format('D/M/YYYY');
+        dataValue = this.parseDate(date);
         // console.log('date value', dataValue);
         // dataValue = date;
         break;
@@ -70,20 +71,24 @@ export class UtilitiesService {
   }
 
   equalArrays(array1: any[], array2: any[]) {
-    console.log('comparando array1', array1);
-    console.log('con array2', array2);
+    /*this.log('comparando array1', array1);
+    this.log('con array2', array2);*/
 
     if (array1.length !== array2.length) {
-      console.error(`los array no son de igual tamaño array 1: ${array1.length}, array 2: ${array2.length}`);
+      this.error(`los array no son de igual tamaño array 1: ${array1.length}, array 2: ${array2.length}`);
       return false;
     }
     for (const element of array1) {
       if (!array2.includes(element)) {
-        console.error('hay un elemento en el array1 que noesta en el array2', element);
+        this.error('hay un elemento en el array1 que no esta en el array2', element);
         return false;
       }
     }
     return true;
+  }
+
+  parseDate(date: any): string {
+    return moment(date, 'DD/MM/YYYY').format('DD/MM/YYYY');
   }
 
   public showCommonDialog(observer: Observer<any>, options?: any) {

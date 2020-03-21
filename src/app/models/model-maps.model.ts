@@ -9,7 +9,8 @@ export const IMPORTING_TYPES = {
     CUSTOMERS: 'customers',
     ORDER_TYPE: 'orderTypes',
     SECTIONS: 'sections',
-    TRANSPORTS: 'transports'
+    TRANSPORTS: 'transports',
+    LOADPICKS_DTO: 'loadPicksDto'
 };
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
@@ -131,7 +132,7 @@ export class ModelMap {
             addNew: {
                 text: 'Add new type',
                 icon: 'add',
-                linkType: 'link', // hint | link | button
+                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.ITEM_TYPE
             }
         },
@@ -347,7 +348,7 @@ export class ModelMap {
             addNew: {
                 text: 'Add new section',
                 icon: 'add',
-                linkType: 'link', // hint | link | button
+                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.SECTIONS
             }
         },
@@ -426,7 +427,7 @@ export class ModelMap {
         orderNumber:  {
             name: 'order number',
             required: true,
-            unique: true,
+            unique: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -480,6 +481,12 @@ export class ModelMap {
                 type: 'normal',
                 valueIndex: 'code',
                 displayIndex: 'description'
+            },
+            addNew: {
+                text: 'Add new order type',
+                icon: 'add',
+                linkType: 'link', // link | button
+                modelType: IMPORTING_TYPES.ORDER_TYPE
             }
         },
         priority:  {
@@ -514,7 +521,7 @@ export class ModelMap {
             addNew: {
                 text: 'Add new transport',
                 icon: 'add',
-                linkType: 'link', // hint | link | button
+                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.TRANSPORTS
             }
         },
@@ -531,11 +538,11 @@ export class ModelMap {
             addNew: {
                 text: 'Add new customer',
                 icon: 'add',
-                linkType: 'link', // hint | link | button
+                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.CUSTOMERS
             }
         },
-        orderLines: {
+        orderLineList: {
             name: 'order lines',
             required: false,
             type: 'orderLineList',
@@ -546,7 +553,7 @@ export class ModelMap {
             addNew: {
                 text: 'Add new order line',
                 icon: 'add',
-                linkType: 'link', // hint | link | button
+                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.ORDER_LINE
             }
         },
@@ -647,7 +654,7 @@ export class ModelMap {
             addNew: {
                 text: 'Add new item',
                 icon: 'add',
-                linkType: 'link', // hint | link | button
+                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.ITEMS
             }
         },
@@ -665,7 +672,7 @@ export class ModelMap {
             addNew: {
                 text: 'Add new order',
                 icon: 'add',
-                linkType: 'link', // hint | link | button
+                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.ORDERS
             }
         },
@@ -767,7 +774,7 @@ export class ModelMap {
         orderNumber:  {
             name: 'order number',
             required: true,
-            unique: true,
+            unique: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -948,6 +955,316 @@ export class ModelMap {
             formControl: {
                 control: 'input',
                 type: 'text'
+            }
+        }
+    };
+    /* loadPick map (for importing proccess) */
+    public static LoadPickDtoMap = {
+        batchNumber: {
+            name: 'batch number',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        carrierCode: {
+            name: 'carrier code',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        cartonCode: {
+            name: 'carton code',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        customerNumber: {
+            name: 'customer number',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        customerName: {
+            name: 'customer name',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        customerAddress: {
+            name: 'customer address',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        deliveryDate: {
+            name: 'delivery date',
+            required: true,
+            unique: false,
+            type: 'date',
+            formControl: {
+                control: 'date'
+            }
+        },
+        departureDateTime: {
+            name: 'departure time',
+            required: false,
+            unique: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
+            }
+        },
+        dispatchPlatforms: {
+            name: 'dispatch platforms',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        expiryDate: {
+            name: 'expiry date',
+            required: false,
+            unique: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
+            }
+        },
+        goalTime: {
+            name: 'goal item',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        orderNumber: {
+            name: 'order number',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        pickSequenceNumber: {
+            name: 'pick sequence',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        qtyToPicked: {
+            name: 'qty to picked',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        route: {
+            name: 'route',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        routeName: {
+            name: 'route name',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        serial: {
+            name: 'serial',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        sku: {
+            name: 'sku',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        skuDescription: {
+            name: 'sku description',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        transportNumber: {
+            name: 'trnasport',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        workType: {
+            name: 'work type',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        orderTypeCode: {
+            name: 'order type',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        itemTypeCode: {
+            name: 'item type',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        uomCode: {
+            name: 'uom',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        createDate: {
+            name: 'create date',
+            required: false,
+            unique: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'normal'
+            }
+        },
+        qualityState: {
+            name: 'quality state',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationCode: {
+            name: 'location',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        childrenWork: {
+            name: 'children work',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        rootWork: {
+            name: 'root work',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        caseLabelCheckDigits: {
+            name: 'case label check digits',
+            required: false,
+            unique: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        baseItemOverride: {
+            name: 'base item',
+            required: false,
+            unique: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
             }
         }
     };

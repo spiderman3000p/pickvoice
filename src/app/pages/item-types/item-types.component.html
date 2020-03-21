@@ -27,7 +27,7 @@
             <!--mat-form-field class="col-sm-5">
               <input matInput [formControl]="filter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
             </mat-form-field-->
-            <!--mat-accordion>
+            <mat-accordion>
                 <mat-expansion-panel (opened)="showFilters = true" (closed)="showFilters = false">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
@@ -74,7 +74,7 @@
                         </div>
                     </div>
                 </mat-expansion-panel>
-            </mat-accordion-->
+            </mat-accordion>
             <!--button mat-raised-button color="primary" (click)="toggleFilters()">
                 <mat-icon>{{ !showFilters? ''}}</mat-icon>
                 {{ !showFilters ? 'Show' : 'Hide'}} Filters

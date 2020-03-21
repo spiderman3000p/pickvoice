@@ -26,7 +26,6 @@ export class ImportTypeSelectionComponent implements OnInit {
   types = IMPORTING_TYPES;
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
               private dataProvider: DataStorage) {
-    // this.displayedColumns = Object.keys(ModelMap.LocationMap);
   }
 
   ngOnInit(): void {

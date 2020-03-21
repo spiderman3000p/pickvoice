@@ -314,10 +314,10 @@ mat-datepicker{
 .mat-elevation-z0{
     box-shadow: unset;
 }
-.fiters-panel{
-  display: flex;
+.filters-panel{
+  display: flex !important;
 }
-.fiters-panel .filters-list .mat-selection-list .mat-list-option{
+.filters-panel .filters-list .mat-selection-list .mat-list-option{
   height: auto !important;
   font-size: 11px !important;
 }

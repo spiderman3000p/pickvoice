@@ -355,6 +355,7 @@ export class ItemTypesComponent implements OnInit, AfterViewInit {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
+      return row;
     });
     this.utilities.exportToXlsx(dataToExport, 'Item Types List');
   }
@@ -399,8 +400,6 @@ export class ItemTypesComponent implements OnInit, AfterViewInit {
 
   toggleFilters() {
     this.showFilters = !this.showFilters;
-
-
   }
 
   applyFilters() {

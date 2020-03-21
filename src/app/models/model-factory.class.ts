@@ -1,5 +1,5 @@
 import {Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, OrderDto, Transport,
-        Section, Order } from '@pickvoice/pickvoice-api';
+        Section, Order, LoadPick } from '@pickvoice/pickvoice-api';
 
 export class ModelFactory {
 
@@ -142,6 +142,41 @@ export class ModelFactory {
         object.contact = '';
         object.phone = '';
         object.address = '';
+        return object;
+    }
+
+    public static newEmptyLoadPickDto(): LoadPick {
+        const object = new Object() as LoadPick;
+        object.baseItemOverride = false;
+        object.batchNumber = '';
+        object.carrierCode = '';
+        object.cartonCode = '';
+        object.caseLabelCheckDigits = false;
+        object.customerAddress = '';
+        object.customerName = '';
+        object.customerNumber = '';
+        object.deliveryDate = '';
+        object.departureDateTime = '';
+        object.dispatchPlatforms = '';
+        object.expiryDate = '';
+        object.goalTime = 0;
+        object.orderNumber = '';
+        object.pickSequenceNumber = 0;
+        object.qtyToPicked = 0;
+        object.route = '';
+        object.serial = '';
+        object.sku = '';
+        object.skuDescription = '';
+        object.transportNumber = '';
+        object.workType = LoadPick.WorkTypeEnum[0];
+        object.orderTypeCode = '';
+        object.itemTypeCode = '';
+        object.uomCode = '';
+        object.createDate = '';
+        object.qualityState = '';
+        object.locationCode = '';
+        object.childrenWork = '';
+        object.rootWork = '';
         return object;
     }
 }

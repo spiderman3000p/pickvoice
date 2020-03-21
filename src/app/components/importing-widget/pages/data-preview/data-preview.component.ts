@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataStorage } from '../../../../services/data-provider';
 import { UtilitiesService } from '../../../../services/utilities.service';
-
+import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
 @Component({
   selector: 'app-data-preview',
   templateUrl: './data-preview.component.html',
@@ -12,7 +12,7 @@ export class DataPreviewComponent implements OnInit {
   sheets: any[] = []; // hojas del libro excel
   rowData: any[] = [];
   columnDefs: any[] = [];
-
+  title: string = '';
   constructor(private dataProvider: DataStorage, private router: Router,
               private utilities: UtilitiesService) {
     this.sheets = this.dataProvider.getSheets();
@@ -55,6 +55,19 @@ export class DataPreviewComponent implements OnInit {
       this.utilities.error('Error obtaining file sheets');
       this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
     });
+    const dataTypeToImport = this.dataProvider.getDataType();
+    if (dataTypeToImport === IMPORTING_TYPES.ITEMS) {
+      this.title = 'Importing Items';
+    }
+    if (dataTypeToImport === IMPORTING_TYPES.LOCATIONS) {
+      this.title = 'Importing Locations';
+    }
+    if (dataTypeToImport === IMPORTING_TYPES.ORDERS_DTO) {
+      this.title = 'Importing Orders';
+    }
+    if (dataTypeToImport === IMPORTING_TYPES.LOADPICKS_DTO) {
+      this.title = 'Importing Load Picks';
+    }
   }
 
   setData() {

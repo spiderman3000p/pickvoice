@@ -338,7 +338,10 @@ export class AddRowDialogComponent implements OnInit {
           this.utilities.log(`key ${key}`);
           this.utilities.log(`toUpload[${key}]`, toUpload[key]);
           this.utilities.log(`formData[${key}]`, formData[key]);
-
+          // transformar fechas al formato esperado D/M/YYYY
+          if (this.dataMap[key].type === 'date') {
+            formData[key] = this.utilities.parseDate(formData[key]);
+          }
           toUpload[key] = formData[key];
 
           this.utilities.log(`toUpload`, toUpload);

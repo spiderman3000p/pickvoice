@@ -24,7 +24,7 @@
     "@angular/platform-browser": "~9.0.0-rc.12",
     "@angular/platform-browser-dynamic": "~9.0.0-rc.12",
     "@angular/router": "~9.0.0-rc.12",
-    "@pickvoice/pickvoice-api": "^0.1.5",
+    "@pickvoice/pickvoice-api": "^0.1.6",
     "ag-grid-angular": "^22.1.1",
     "ag-grid-community": "^22.1.1",
     "ag-grid-enterprise": "^22.1.1",

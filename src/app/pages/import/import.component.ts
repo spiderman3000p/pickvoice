@@ -13,8 +13,9 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
 import { map, catchError, retry } from 'rxjs/operators';
-import { LocationsService, ItemsService, Item, ItemType, OrderService, Customer, OrderLine, OrderDto,
-         Order, Transport, Location, UnityOfMeasure, Section } from '@pickvoice/pickvoice-api';
+import { LocationsService, ItemsService, Item, ItemType, OrderService, Customer,
+         OrderLine, OrderDto, Order, Transport, Location, UnityOfMeasure, Section,
+         LoadPickService, LoadPick } from '@pickvoice/pickvoice-api';
 import { HttpResponse } from '@angular/common/http';
 
 export interface ValidationError {
@@ -56,7 +57,7 @@ export class ImportComponent implements OnInit {
     private dialog: MatDialog, private itemsService: ItemsService, private ordersService: OrderService,
     private locationsService: LocationsService, private utilities: UtilitiesService,
     private dataProvider: DataStorage, private recentOriginsService: RecentOriginsService,
-    private cdr: ChangeDetectorRef ) {
+    private cdr: ChangeDetectorRef, private loadPicksService: LoadPickService ) {
 
     this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
@@ -79,7 +80,11 @@ export class ImportComponent implements OnInit {
       if (jsonResult && jsonResult.length > 0) {
         const receivedKeys: any[] = Object.keys(jsonResult[0]);
         const headers = this.utilities.dataTypesModelMaps[selectedType];
-        const displayedColumns = Object.keys(headers);
+        let displayedColumns = Object.keys(headers);
+        // eliminar campos por defecto
+        if (selectedType === IMPORTING_TYPES.ITEMS) {
+          displayedColumns = displayedColumns.filter(column => column !== 'itemState');
+        }
         this.utilities.log('displayedColumns in import component', displayedColumns);
 
         if (!this.utilities.equalArrays(receivedKeys, displayedColumns)) {
@@ -129,6 +134,8 @@ export class ImportComponent implements OnInit {
         this.sendLocationsData();
       } else if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
         this.sendOrdersData();
+      } else if (selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
+        this.sendLoadPicksData();
       }
     } else {
       this.utilities.error('Data are not ready to be sent');
@@ -176,12 +183,28 @@ export class ImportComponent implements OnInit {
     });
   }
 
-  getComparationField(type: string): string {
-    let comparationField: string;
+  sendLoadPicksData() {
+    this.loadPicksService.createLoadPick(this.dataToSend, 'response', true).pipe(retry(3))
+    .subscribe(result => {
+      this.isLoadingResults = false;
+      result = result as HttpResponse<any>;
+      this.handleApiCallResult(result, IMPORTING_TYPES.LOADPICKS_DTO);
+    }, error => {
+      this.utilities.error('Error en request');
+      this.utilities.showSnackBar('Error saving load picks', 'OK');
+      this.isLoadingResults = false;
+    });
+  }
+  // retorna el campo indice (unico por cada fila) por el cual se haran comparaciones dentro de la tabla
+  getComparationField(type: string): string | string[] {
+    let comparationField: any;
     switch (type) {
       case IMPORTING_TYPES.ITEMS: comparationField = 'sku'; break;
       case IMPORTING_TYPES.LOCATIONS: comparationField = 'code'; break;
       case IMPORTING_TYPES.ORDERS_DTO: comparationField = 'code'; break;
+      case IMPORTING_TYPES.LOADPICKS_DTO:
+        // comparationField = ['orderNumber', 'transportNumber', 'sku', 'childrenWork', 'rootWork']; break;
+        comparationField = 'cartonCode'; break;
     }
     return comparationField;
   }
@@ -235,10 +258,23 @@ export class ImportComponent implements OnInit {
     this.utilities.showSnackBar(snackMessage, 'OK');
   }
 
-  showErrorsOnTable(errors: any[], comparationField: string) {
+  showErrorsOnTable(errors: any[], comparationField: string | string[]) {
     let dataRow: any;
     errors.forEach(error => {
-      dataRow = this.dataSource.data.find(row => row[comparationField] == error.element[comparationField]);
+      dataRow = this.dataSource.data.find(row => {
+        if (typeof comparationField === 'string') {
+          if ((row && row[comparationField] && error && error.element && error.element[comparationField]) &&
+             (row[comparationField] == error.element[comparationField])) {
+            return true;
+          }
+        } else if (Array.isArray(comparationField)) {
+          return comparationField.every((field: string) => (row && row[field] &&
+           error && error.element && error.element[field]) && (row[field] == error.element[field]));
+        }
+      });
+      if (dataRow === undefined || dataRow === null) {
+        dataRow = new Object();
+      }
       dataRow.invalid = true;
       dataRow.tooltip = '';
       for (const errorType in error.errors) {
@@ -275,7 +311,10 @@ export class ImportComponent implements OnInit {
           rowToSave = Object.assign(row) as Location;
         }
         if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
-          rowToSave = Object.assign(row) as Order;
+          rowToSave = Object.assign(row) as OrderDto;
+        }
+        if (selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
+          rowToSave = Object.assign(row) as LoadPick;
         }
         errorFound = false;
         currentRowErrors = [];
@@ -396,14 +435,14 @@ export class ImportComponent implements OnInit {
         */
         if (selectedType === IMPORTING_TYPES.ITEMS) {
           // this.utilities.log('validating compound items data');
-          if (field === 'itemType') {
+          if (field === 'itemType' && typeof row.itemType !== 'object') {
             const aux = row.itemType;
             row.itemType = new Object() as ItemType;
             row.itemType.code = aux;
             row.itemType.name = '';
             row.itemType.description = '';
           }
-          if (field === 'uom') {
+          if (field === 'uom' && typeof row.uom !== 'object') {
             const aux = row.uom;
             row.uom = new Object() as UnityOfMeasure;
             row.uom.code = aux;
@@ -413,7 +452,7 @@ export class ImportComponent implements OnInit {
           row.itemState = Item.ItemStateEnum.Active;
         } else if (selectedType === IMPORTING_TYPES.LOCATIONS) {
           // this.utilities.log('validating compound locations data');
-          if (field === 'section') {
+          if (field === 'section' && typeof row.section !== 'object') {
             const aux = row.section;
             row.section = new Object() as Section;
             row.section.code = aux;
@@ -423,6 +462,9 @@ export class ImportComponent implements OnInit {
         } else if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
           // this.utilities.log('validating compound orders data');
           // no hay datos compuestos en orders dto
+        } else if (selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
+          // this.utilities.log('validating compound orders data');
+          // no hay datos compuestos en loadpicks dto
         }
       }
     }
@@ -448,6 +490,7 @@ export class ImportComponent implements OnInit {
           row: rowToEdit,
           map: this.utilities.dataTypesModelMaps[selectedType],
           type: selectedType,
+          viewMode: 'edit',
           remoteSync: false // para mandar los datos a la BD por la API
         }
       }
@@ -458,12 +501,6 @@ export class ImportComponent implements OnInit {
         result = this.mapTableRow(result);
         rowToEdit = result;
         this.refreshTable();
-        /*Object.keys(result).forEach(key => {
-          this.dataSource.data[index][key] = result[key];
-        });*/
-        /* Si se hace de esta forma no se muestran los cambios en la tabla mat-table
-        let row = this.dataSource.data[index];
-        row = result;*/
       }
     });
   }

@@ -6,17 +6,16 @@
         </div>
         <span *ngFor="let key of keys">
             <!-- campos compuestos/objetos -->
-            <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'select'">
+            <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'select'"
+            [class.readonly]="viewMode === 'view'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                <mat-select [formControlName]="key">
+                <mat-select [compareWith]="compareFn" [formControlName]="key">
                     <mat-option *ngFor="let data of getSelectInputData(key)" [value]="data">
-                        {{ 
-                            getSelectDisplayData(data, key)
-                        }}
+                        {{ getSelectDisplayData(data, key) }}
                     </mat-option>
                 </mat-select>
                 <!-- hint, link o button -->
-                <mat-hint *ngIf="dataMap[key].addNew !== undefined " color="primary" class="add-new-link">
+                <mat-hint *ngIf="dataMap[key].addNew !== undefined " color="primary" class="add-new-link" >
                     <a *ngIf="dataMap[key].addNew.linkType === 'link'" (click)="addNewObject(dataMap[key].addNew.modelType)"
                     color="primary">
                         <mat-icon>{{ dataMap[key].addNew.icon }}</mat-icon> {{ dataMap[key].addNew.text }}
@@ -28,20 +27,22 @@
                 </mat-hint>
             </mat-form-field>
             <!-- campos number -->
-            <mat-form-field [ngClass]="getColumnsClasses()"
+            <mat-form-field [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
             *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'number'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                <input class="w-100" matInput type="number" [formControlName]="key" >
+                <input class="w-100" matInput type="number" [formControlName]="key">
             </mat-form-field>
             <!-- campos date -->
-            <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'date'">
+            <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'date'"
+            [class.readonly]="viewMode === 'view'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                 <input matInput [formControlName]="key" [matDatepicker]="pickerDate"  readonly>
-                <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].formControl.control === 'date'"></mat-datepicker-toggle>
+                <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].formControl.control === 'date'">
+                </mat-datepicker-toggle>
                 <mat-datepicker #pickerDate ></mat-datepicker>
             </mat-form-field>
             <!-- campos string -->
-            <mat-form-field [ngClass]="getColumnsClasses()"
+            <mat-form-field [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
             *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'text'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                 <input class="w-100" matInput type="text" [formControlName]="key"
@@ -49,7 +50,7 @@
             </mat-form-field>
             <!-- campos boolean -->
             <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'toggle'"
-            [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''">
+            [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''" [class.readonly]="viewMode === 'view'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                 <input matInput [formControlName]="key" hidden>
                 <mat-slide-toggle  *ngIf="dataMap[key].formControl.control === 'toggle'" color="primary"

@@ -250,24 +250,11 @@ export class EditRowDialogComponent implements OnInit {
     const toUpload = this.row;
     this.utilities.log('form data', formData);
     for (const key in toUpload) {
-      if (this.type === IMPORTING_TYPES.ITEMS && typeof toUpload[key] === 'object' && toUpload[key] &&
-        toUpload[key].code && formData[key]) {
-          // mapear los datos de las propiedades tipo objeto de la entidad item
-        toUpload[key].code = formData[key];
-      } else if (this.type === IMPORTING_TYPES.LOCATIONS && typeof toUpload[key] === 'object' && toUpload[key] &&
-        formData[key]) {
-          // TODO: mapear los datos de las propiedades tipo objeto de la entidad location
-      } else if (this.type === IMPORTING_TYPES.ORDERS_DTO && typeof toUpload[key] === 'object' && toUpload[key] &&
-      formData[key]) {
-        // TODO: mapear los datos de las propiedades tipo objeto de la entidad order_dto
-      } else if (this.type === IMPORTING_TYPES.ORDERS && typeof toUpload[key] === 'object' && toUpload[key] &&
-        formData[key]) {
-          // TODO: mapear los datos de las propiedades tipo objeto de la entidad order
-      } else if (formData[key]) {
-        // las propiedades simples (que no son objetos)
+      if (formData[key]) {
         toUpload[key] = formData[key];
       }
     }
+    // si esta activada la opcion de sincronizacion remota, se envian los datos a la api
     if (this.remoteSync) {
       this.isLoadingResults = true;
       const observer = {
@@ -384,6 +371,12 @@ export class EditRowDialogComponent implements OnInit {
       classes = 'col-sm-12 col-md-4 col-lg-3';
     }
     return classes;
+  }
+
+  compareFn(c1: any, c2: any): boolean {
+    /*console.log('c1', c1);
+    console.log('c2', c2);*/
+    return c1.id === c2.id;
   }
 
   ngOnInit(): void {

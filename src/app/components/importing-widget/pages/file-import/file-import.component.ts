@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ImportDialogComponent } from '../../../import-dialog/import-dialog.component';
 import * as XLSX from 'xlsx';
 import { of, from } from 'rxjs';
-
+import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
 @Component({
   selector: 'app-file-import',
   templateUrl: './file-import.component.html',
@@ -19,7 +19,7 @@ export class FileImportComponent implements OnInit {
   file: File;
   displayedColumns: string[];
   parsedData: any;
-
+  title: string = '';
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
               private dataProvider: DataStorage) {
     // TODO: obtener de la ruta el tipo de datos a importar: items, locations u orders_dto
@@ -27,6 +27,20 @@ export class FileImportComponent implements OnInit {
     this.utilities.log('data type to import', this.dataTypeToImport);
     // Obtener las columnas a mostrar segun el tipo de datos recibidos
     this.displayedColumns = Object.keys(this.utilities.dataTypesModelMaps[this.dataTypeToImport]);
+    // eliminar campos por defecto y demas settings segun el tipo de datos seleccionado
+    if (this.dataTypeToImport === IMPORTING_TYPES.ITEMS) {
+      this.title = 'Importing Items';
+      this.displayedColumns = this.displayedColumns.filter(column => column !== 'itemState');
+    }
+    if (this.dataTypeToImport === IMPORTING_TYPES.LOCATIONS) {
+      this.title = 'Importing Locations';
+    }
+    if (this.dataTypeToImport === IMPORTING_TYPES.ORDERS_DTO) {
+      this.title = 'Importing Orders';
+    }
+    if (this.dataTypeToImport === IMPORTING_TYPES.LOADPICKS_DTO) {
+      this.title = 'Importing Load Picks';
+    }
     this.utilities.log('displayedColumns', this.displayedColumns);
   }
 
@@ -60,7 +74,7 @@ export class FileImportComponent implements OnInit {
     reader.onload = (e: any) => {
       /* read workbook */
       const bstr: string = e.target.result;
-      const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary', cellDates: true});
+      const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary', cellDates: true, dateNF: 'dd/mm/yyyy'});
       let wsname: string;
       let ws: XLSX.WorkSheet;
       let parsedData: any;
@@ -72,7 +86,7 @@ export class FileImportComponent implements OnInit {
       wb.SheetNames.forEach((key, index) => {
         wsname = key;
         ws = wb.Sheets[key];
-        parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false, defval: '', raw: true});
+        parsedData = XLSX.utils.sheet_to_json(ws, {blankrows: false, defval: '', raw: false, dateNF: 'dd/mm/yyyy'});
         this.utilities.log('initial parsed data', parsedData);
         if (parsedData.length === 0) {
           this.utilities.error('empty parsed data', parsedData);
