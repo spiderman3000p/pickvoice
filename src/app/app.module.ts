@@ -55,6 +55,7 @@ import { AgGridModule } from 'ag-grid-angular';
 import { NgxPrintModule } from 'ngx-print';
 
 import { environment } from '../environments/environment';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 // See the Moment.js docs for the meaning of these formats:
 // https://momentjs.com/docs/#/displaying/format/
@@ -121,7 +122,8 @@ export const MY_FORMATS = {
     FormsModule,
     ReactiveFormsModule,
     NgxPrintModule,
-    AgGridModule.withComponents([])
+    AgGridModule.withComponents([]),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   entryComponents: [
     ImportDialogComponent

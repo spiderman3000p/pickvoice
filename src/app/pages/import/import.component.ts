@@ -77,41 +77,6 @@ export class ImportComponent implements OnInit {
     this.downloadingProgress = 0;
     this.importingProgressMode = 'determinate';
     this.uploadingResponseMessage = '';
-    // this.initPaginatorSort();
-    // this.simulateImportingProcessing();
-  }
-
-  simulateImportingProcessing() {
-    setTimeout(() => {
-      this.showProcessingPopup = true;
-      let calc;
-      setInterval(() => {
-        calc = calc + 1000 * 25555 * 555;
-        if (this.mapedRows < 20361) {
-          this.mapedRows++;
-          this.isProcessingData = true;
-          this.mapingProgress = (this.mapedRows * 100) / 20361;
-          // console.log(`maping progress ${this.mapingProgress}%`);
-        }
-        if (this.mapingProgress === 100 && this.processingProgress < 100) {
-          this.processedRows++;
-          this.isUploadingData = true;
-          this.processingProgress = (this.processedRows * 100) / 20361;
-          // console.log(`processing progress ${this.processingProgress}%`);
-        }
-        if (this.processingProgress === 100) {
-          if (this.downloadingProgress < 20361) {
-            this.isUploadingData = false;
-            this.downloadingProgress++;
-            // console.log(`downloading progress ${this.downloadingProgress}%`);
-          }
-        }
-        if (this.downloadingProgress === 20361) {
-          // console.log(`processing finished`);
-         return;
-        }
-      });
-    }, 5000);
   }
 
   importWidget() {
@@ -184,9 +149,8 @@ export class ImportComponent implements OnInit {
     } else {
       // Web Workers are not supported in this environment.
       // You should add a fallback so that your program still executes correctly.
-      this.utilities.error(`Web Workers no es soportado por este navegador, el proceso tardará
-      y la interfaz se congelará hasta que termine`);
-      this.utilities.showSnackBar('This web browser cant use web workers, the process will be slower', 'OK');
+      this.utilities.error(`Web Workers no es soportado por este navegador. Por favor actualice su navegador`);
+      this.utilities.showSnackBar('This web browser cant use web workers. Please, update your web browser', 'OK');
     }
   }
 

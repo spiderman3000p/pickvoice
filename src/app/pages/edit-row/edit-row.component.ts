@@ -438,6 +438,10 @@ export class EditRowComponent implements OnInit {
     });
   }
 
+  export(){
+    
+  }
+
   exportOrderLines() {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;

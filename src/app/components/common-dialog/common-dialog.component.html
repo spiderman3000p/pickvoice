@@ -1,11 +1,8 @@
 <h2 mat-dialog-title>{{ title }}</h2>
 <div mat-dialog-content>
-    <div class="example-loading-shade" *ngIf="isLoadingResults">
-        <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
-    </div>
     <p>{{ message }}</p>
 </div>
 <div mat-dialog-actions align="end">
-    <button mat-button [disabled]="isLoadingResults" (click)="positiveBtnClick()">{{ positiveBtnText }}</button>
-    <button mat-button [disabled]="isLoadingResults" (click)="negativeBtnClick()">{{ negativeBtnText }}</button>
+    <button mat-button (click)="positiveBtnClick()">{{ positiveBtnText }}</button>
+    <button mat-button (click)="negativeBtnClick()">{{ negativeBtnText }}</button>
 </div>

@@ -254,6 +254,10 @@ export class PickingComponent implements OnInit {
     this.getData(window);
   }
 
+  reloadData(){
+    
+  }
+
   toggleColumn(window: GridWindow, column?: any){
     console.log('displayed column until now', window.data.colDefs);
     if (column) {

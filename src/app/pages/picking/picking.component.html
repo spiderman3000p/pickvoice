@@ -10,7 +10,7 @@
       </div>
     </div>
     <div>
-      <mat-grid-list cols="2" rowHeight="2:1" cdkDropList (cdkDropListDropped)="drop($event)">
+      <mat-grid-list cols="2" rowHeight="2:1">
         <mat-grid-tile *ngFor="let window of windows; let i=index" [colspan]="window.expanded ? 2 : 1" [rowspan]="window.expanded ? 2 : 1">
             <div class="example-loading-shade" *ngIf="window.isLoading">
                 <mat-spinner class="spinner"></mat-spinner>
