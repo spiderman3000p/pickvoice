@@ -57,11 +57,13 @@ export class RecentOriginsService {
         });
     }
 
-    addRecentOrigin(type: string, origin: RecentOrigin): Observable<any> {
+    addRecentOrigin(type: string, origin: RecentOrigin): Observable<boolean> {
         // TODO: guardar un origen en la bd local
-        localStorage.setItem(`${type}_origin_${origin.date.getTime()}`, JSON.stringify(origin));
-        const response = Observable.create(true);
-        return response;
+        return new Observable(suscriber => {
+            localStorage.setItem(`${type}_origin_${origin.date.getTime()}`, JSON.stringify(origin));
+            suscriber.next(true);
+            suscriber.complete();
+        });
     }
 
     clearStorage(type: string): Observable<boolean> {

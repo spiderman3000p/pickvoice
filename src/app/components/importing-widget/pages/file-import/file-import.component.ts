@@ -117,7 +117,7 @@ export class FileImportComponent implements OnInit {
 
       // this.utilities.log('parsed xlsx data', this.parsedData);
       this.router.navigate ([{ outlets: { importing: 'importing/data-preview'}}]);
-      this.utilities.showSnackBar(`Data parsed successfully`, 'OK');
+      // this.utilities.showSnackBar(`Data parsed successfully`, 'OK');
     };
     reader.readAsBinaryString(this.file);
   }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
+import { DataCacheService } from '../../services/data-cache.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
@@ -39,12 +40,12 @@ export class SectionsComponent implements OnInit, AfterViewInit {
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
   type = IMPORTING_TYPES.SECTIONS;
-  
+
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private dialog: MatDialog, private apiService: SectionService, private router: Router,
-    private utilities: UtilitiesService) {
+    private utilities: UtilitiesService, private cacheService: DataCacheService) {
       this.dataSource = new MatTableDataSource([]);
       this.filter = new FormControl('');
       this.dataToSend = [];
@@ -279,17 +280,18 @@ export class SectionsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  loadData() {
+  loadData(useCache = true) {
     this.utilities.log('requesting sections');
     this.isLoadingResults = true;
-    this.apiService.retrieveAllSections('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
-    .subscribe(response => {
+    this.cacheService.getCachedData(this.type, 'sectionsList', useCache).subscribe(results => {
       this.isLoadingResults = false;
-      this.utilities.log('sections received', response.body);
-      this.dataSource.data = response.body.map((element, i) => {
-        return { index: i, ... element};
-      });
-      this.refreshTable();
+      this.utilities.log('sections received', results);
+      if (results && results.length > 0) {
+        this.dataSource.data = results.map((element, i) => {
+          return { index: i, ... element};
+        });
+        this.refreshTable();
+      }
     }, error => {
       this.isLoadingResults = false;
       this.utilities.error('error on requesting data');
@@ -299,7 +301,7 @@ export class SectionsComponent implements OnInit, AfterViewInit {
 
   reloadData() {
     this.selection.clear();
-    this.loadData();
+    this.loadData(false);
   }
 
   addRow() {

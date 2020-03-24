@@ -92,11 +92,11 @@ export class EditRowDialogComponent implements OnInit {
       if (this.row === undefined) {
         return;
       }
-      value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
+      // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
       if (this.dataMap[key].required) {
-        formControls[key] = new FormControl(value, Validators.required);
+        formControls[key] = new FormControl(this.row[key], Validators.required);
       } else {
-        formControls[key] = new FormControl(value);
+        formControls[key] = new FormControl(this.row[key]);
       }
     });
     this.form = new FormGroup(formControls);
@@ -308,6 +308,14 @@ export class EditRowDialogComponent implements OnInit {
     }
   }
 
+  getSelectIndexValue(data: any, key: string) {
+    // console.log(`${key} on data select display`, data);
+    return (typeof data === 'object' ?
+    (data[this.dataMap[key].formControl.valueIndex] ? data[this.dataMap[key].formControl.valueIndex] : '-') :
+    (typeof data === 'string' ?
+    (data ? data : '-') : '-'));
+  }
+
   getSelectDisplayData(data: any, key: string) {
     // console.log(`${key} on data select display`, data);
     return (typeof data === 'object' ?
@@ -371,12 +379,6 @@ export class EditRowDialogComponent implements OnInit {
       classes = 'col-sm-12 col-md-4 col-lg-3';
     }
     return classes;
-  }
-
-  compareFn(c1: any, c2: any): boolean {
-    /*console.log('c1', c1);
-    console.log('c2', c2);*/
-    return c1.id === c2.id;
   }
 
   ngOnInit(): void {

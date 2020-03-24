@@ -127,12 +127,14 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'code',
-                displayIndex: 'name'
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
             },
             addNew: {
                 text: 'Add new type',
                 icon: 'add',
-                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.ITEM_TYPE
             }
         },
@@ -144,12 +146,14 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'code',
-                displayIndex: 'name'
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
             },
             addNew: {
                 text: 'Add new unity',
                 icon: 'add',
-                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.UOMS
             }
         },
@@ -230,7 +234,10 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 displayIndex: null,
-                valueIndex: null
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
             }
         }
     };
@@ -343,12 +350,14 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'code',
-                displayIndex: 'name'
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
             },
             addNew: {
                 text: 'Add new section',
                 icon: 'add',
-                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.SECTIONS
             }
         },
@@ -410,7 +419,10 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 displayIndex: null,
-                valueIndex: null
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
             }
         },
         state: {
@@ -480,12 +492,14 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'code',
-                displayIndex: 'description'
+                displayIndex: 'description',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
             },
             addNew: {
                 text: 'Add new order type',
                 icon: 'add',
-                linkType: 'link', // link | button
                 modelType: IMPORTING_TYPES.ORDER_TYPE
             }
         },
@@ -516,12 +530,14 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'transportNumber',
-                displayIndex: 'nameRoute'
+                displayIndex: 'nameRoute',
+                compareFn: (c1, c2) => {
+                    return c1.transportNumber === c2.transportNumber;
+                }
             },
             addNew: {
                 text: 'Add new transport',
                 icon: 'add',
-                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.TRANSPORTS
             }
         },
@@ -533,12 +549,14 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'customerNumber',
-                displayIndex: 'name'
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.customerNumber === c2.customerNumber;
+                }
             },
             addNew: {
                 text: 'Add new customer',
                 icon: 'add',
-                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.CUSTOMERS
             }
         },
@@ -553,7 +571,6 @@ export class ModelMap {
             addNew: {
                 text: 'Add new order line',
                 icon: 'add',
-                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.ORDER_LINE
             }
         },
@@ -634,7 +651,10 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: null,
-                displayIndex: null
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
             }
         }
     };
@@ -649,12 +669,14 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'sku',
-                displayIndex: 'description'
+                displayIndex: 'description',
+                compareFn: (c1, c2) => {
+                    return c1.sku === c2.sku;
+                }
             },
             addNew: {
                 text: 'Add new item',
                 icon: 'add',
-                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.ITEMS
             }
         },
@@ -667,12 +689,14 @@ export class ModelMap {
                 control: 'select',
                 type: 'normal',
                 valueIndex: 'orderNumber',
-                displayIndex: 'orderNumber'
+                displayIndex: 'orderNumber',
+                compareFn: (c1, c2) => {
+                    return c1.orderNumber === c2.orderNumber;
+                }
             },
             addNew: {
                 text: 'Add new order',
                 icon: 'add',
-                linkType: 'link', //  link | button
                 modelType: IMPORTING_TYPES.ORDERS
             }
         },
@@ -739,10 +763,6 @@ export class ModelMap {
             name: 'file name',
             type: 'string'
         },
-        filepath: {
-            name: 'file path',
-            type: 'string'
-        },
         date: {
             name: 'date',
             type: 'date'
@@ -783,7 +803,7 @@ export class ModelMap {
         },
         purchaseNumber:  {
             name: 'purchase number',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -793,7 +813,7 @@ export class ModelMap {
         },
         invoiceNumber:  {
             name: 'invoice number',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -803,7 +823,7 @@ export class ModelMap {
         },
         orderDate:  {
             name: 'order date',
-            required: true,
+            required: false,
             unique: false,
             type: 'date',
             formControl: {
@@ -812,7 +832,7 @@ export class ModelMap {
         },
         deliveryDate:  {
             name: 'delivery date',
-            required: true,
+            required: false,
             unique: false,
             type: 'date',
             formControl: {
@@ -821,7 +841,7 @@ export class ModelMap {
         },
         customerNumber:  {
             name: 'customer number',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -831,7 +851,7 @@ export class ModelMap {
         },
         customerName:  {
             name: 'customer name',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -841,7 +861,7 @@ export class ModelMap {
         },
         customerAddress:  {
             name: 'customer address',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -851,7 +871,7 @@ export class ModelMap {
         },
         orderType:  {
             name: 'order type',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -861,7 +881,7 @@ export class ModelMap {
         },
         priority:  {
             name: 'priority',
-            required: true,
+            required: false,
             unique: false,
             type: 'number',
             formControl: {
@@ -871,7 +891,7 @@ export class ModelMap {
         },
         note:  {
             name: 'note',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -881,7 +901,7 @@ export class ModelMap {
         },
         sku:  {
             name: 'sku',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -891,7 +911,7 @@ export class ModelMap {
         },
         qtyRequired:  {
             name: 'qty required',
-            required: true,
+            required: false,
             unique: false,
             type: 'number',
             formControl: {
@@ -901,7 +921,7 @@ export class ModelMap {
         },
         uomCode:  {
             name: 'uom code',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -911,7 +931,7 @@ export class ModelMap {
         },
         batchNumber:  {
             name: 'batch number',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -921,7 +941,7 @@ export class ModelMap {
         },
         createDate:  {
             name: 'create date',
-            required: true,
+            required: false,
             unique: false,
             type: 'date',
             formControl: {
@@ -930,7 +950,7 @@ export class ModelMap {
         },
         expirateDate:  {
             name: 'expirate date',
-            required: true,
+            required: false,
             unique: false,
             type: 'date',
             formControl: {
@@ -939,7 +959,7 @@ export class ModelMap {
         },
         serial:  {
             name: 'serial',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {
@@ -949,7 +969,7 @@ export class ModelMap {
         },
         qualityState:  {
             name: 'quality state',
-            required: true,
+            required: false,
             unique: false,
             type: 'string',
             formControl: {

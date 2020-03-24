@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { RecentOriginsService } from '../../services/recent-origins.service';
@@ -12,16 +12,14 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-import { map, catchError, retry } from 'rxjs/operators';
+import { map, retry, tap, last } from 'rxjs/operators';
 import { LocationsService, ItemsService, Item, ItemType, OrderService, Customer,
          OrderLine, OrderDto, Order, Transport, Location, UnityOfMeasure, Section,
          LoadPickService, LoadPick } from '@pickvoice/pickvoice-api';
-import { HttpResponse } from '@angular/common/http';
+import { HttpResponse, HttpEventType } from '@angular/common/http';
+import { Observable, Subscription } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
-export interface ValidationError {
-  error: string;
-  index: number;
-}
 @Component({
   selector: 'app-import',
   templateUrl: './import.component.html',
@@ -30,17 +28,31 @@ export interface ValidationError {
 export class ImportComponent implements OnInit {
   headers: any; // contendra las cabeceras de las columnas a mostrar en la tabla
   validationRequested = false;
-  invalidRows: any[] = [];
   dataSource: MatTableDataSource<any>;
-  dataToSend: any[];
+  dataToSendLength: number;
   displayedColumns = []; // contendra las columnas de la entidad a impotar: items, locations u orders
   pageSizeOptions = [5, 10]; // si se mustran mas por pantalla se sale del contenedor
   filter: FormControl;
-  isLoadingResults = false;
+  subscription: Subscription;
+  loadingText = '';
+  isProcessingData = false;
+  isUploadingData = false;
   isDataSaved = false;
   isReadyToSend = false;
   errorOnSave = false;
-  dataValidationErrors: ValidationError[];
+  uploadingDone = false;
+  mapingProgress = 0;
+  mapedRows = 0;
+  processedRows = 0;
+  importedRows = 0;
+  rejectedRows = 0;
+  selectedType: string;
+  importingProgressMode: string;
+  processingProgress: number;
+  uploadingProgress: number;
+  downloadingProgress: number;
+  uploadingResponseMessage: string;
+  showProcessingPopup = false;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatTable, {static: true}) table: MatTable<any>;
@@ -57,13 +69,49 @@ export class ImportComponent implements OnInit {
     private dialog: MatDialog, private itemsService: ItemsService, private ordersService: OrderService,
     private locationsService: LocationsService, private utilities: UtilitiesService,
     private dataProvider: DataStorage, private recentOriginsService: RecentOriginsService,
-    private cdr: ChangeDetectorRef, private loadPicksService: LoadPickService ) {
-
+    private loadPicksService: LoadPickService) {
     this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
-    this.dataValidationErrors = [];
-    this.dataToSend = [];
+    this.processingProgress = 0;
+    this.uploadingProgress = 0;
+    this.downloadingProgress = 0;
+    this.importingProgressMode = 'determinate';
+    this.uploadingResponseMessage = '';
     // this.initPaginatorSort();
+    // this.simulateImportingProcessing();
+  }
+
+  simulateImportingProcessing() {
+    setTimeout(() => {
+      this.showProcessingPopup = true;
+      let calc;
+      setInterval(() => {
+        calc = calc + 1000 * 25555 * 555;
+        if (this.mapedRows < 20361) {
+          this.mapedRows++;
+          this.isProcessingData = true;
+          this.mapingProgress = (this.mapedRows * 100) / 20361;
+          // console.log(`maping progress ${this.mapingProgress}%`);
+        }
+        if (this.mapingProgress === 100 && this.processingProgress < 100) {
+          this.processedRows++;
+          this.isUploadingData = true;
+          this.processingProgress = (this.processedRows * 100) / 20361;
+          // console.log(`processing progress ${this.processingProgress}%`);
+        }
+        if (this.processingProgress === 100) {
+          if (this.downloadingProgress < 20361) {
+            this.isUploadingData = false;
+            this.downloadingProgress++;
+            // console.log(`downloading progress ${this.downloadingProgress}%`);
+          }
+        }
+        if (this.downloadingProgress === 20361) {
+          // console.log(`processing finished`);
+         return;
+        }
+      });
+    }, 5000);
   }
 
   importWidget() {
@@ -73,16 +121,15 @@ export class ImportComponent implements OnInit {
         height: '90vh'
       });
     dialogRef.afterClosed().subscribe(jsonResult => {
-      this.isLoadingResults = false;
       this.utilities.log('dialog result:', jsonResult);
-      const selectedType = this.dataProvider.getDataType();
+      this.selectedType = this.dataProvider.getDataType();
 
       if (jsonResult && jsonResult.length > 0) {
         const receivedKeys: any[] = Object.keys(jsonResult[0]);
-        const headers = this.utilities.dataTypesModelMaps[selectedType];
+        const headers = this.utilities.dataTypesModelMaps[this.selectedType];
         let displayedColumns = Object.keys(headers);
         // eliminar campos por defecto
-        if (selectedType === IMPORTING_TYPES.ITEMS) {
+        if (this.selectedType === IMPORTING_TYPES.ITEMS) {
           displayedColumns = displayedColumns.filter(column => column !== 'itemState');
         }
         this.utilities.log('displayedColumns in import component', displayedColumns);
@@ -95,18 +142,147 @@ export class ImportComponent implements OnInit {
           return;
         }
         // agregamos el campo indice a todos los elementos del resultado
-        jsonResult = jsonResult.map((element, i) => new Object({index: i, ...element}));
+        // jsonResult = jsonResult.map((element, i) => new Object({index: i, ...element}));
         if (this.dataSource === undefined) {
           this.dataSource = new MatTableDataSource<any>(jsonResult);
         } else {
           this.dataSource.data = []; // importante limpiar la data primero
           this.displayedColumns = displayedColumns; // importante establecer las nuevas columnas a mostrar
           this.headers = headers; // importante establecer las nuevas cabeceras
-          this.dataSource.data = this.mapTableData(jsonResult); // formar objetos a partir del json
+          // this.dataSource.data = jsonResult; // formar objetos a partir del json
         }
-        this.sendData();
+        this.initMapData(jsonResult);
       }
     });
+  }
+
+  initMapData(jsonData) {
+    if (typeof Worker !== 'undefined') {
+      this.loadingText = 'Maping Data... Please, wait';
+      this.showProcessingPopup = true;
+      this.dataSource.data = [];
+      // Create a new
+      const worker = new Worker('./import.worker', {type: 'module'});
+      worker.onmessage = ({ data }) => {
+        // console.log(`page got message:`, data);
+        if (data.type === 'error') {
+          this.utilities.error(data.message, data.data ? data.data : '');
+          this.utilities.showSnackBar(data.message, 'OK');
+        }
+        if (data.type === 'event') {
+          // this.utilities.log('maping message', data);
+          this.processWorkerMapingResponse(data, jsonData.length);
+        }
+      };
+      const dataMessage = {
+        action: 'mapData',
+        selectedType: this.selectedType,
+        data: jsonData,
+        offset: environment.importOffset
+      };
+      worker.postMessage(dataMessage);
+    } else {
+      // Web Workers are not supported in this environment.
+      // You should add a fallback so that your program still executes correctly.
+      this.utilities.error(`Web Workers no es soportado por este navegador, el proceso tardará
+      y la interfaz se congelará hasta que termine`);
+      this.utilities.showSnackBar('This web browser cant use web workers, the process will be slower', 'OK');
+    }
+  }
+
+  processWorkerMapingResponse(data, dataLength) {
+    if (data.mapedRowsBatch !== undefined && data.mapedRowsBatch !== null) {
+      this.mapedRows = data.mapedRowsCounter;
+      this.mapingProgress = Math.floor((data.mapedRowsCounter * 100) / dataLength);
+      this.dataSource.data = this.dataSource.data.concat(data.mapedRowsBatch);
+      // console.log('table data until now', this.dataSource.data);
+      if (data.mapedRowsCounter === dataLength) {
+        this.initValidateData();
+      }
+    }
+  }
+
+  initValidateData() {
+    if (this.dataSource.data === undefined || this.dataSource.data === null || this.dataSource.data.length === 0) {
+      this.utilities.error('table data is empty or invalid. Can not validate');
+      return;
+    }
+    this.importedRows = 0;
+    this.rejectedRows = 0;
+    const jsonData = this.dataSource.data;
+    const dataLength = Number(jsonData.length);
+    if (typeof Worker !== 'undefined') {
+      this.showProcessingPopup = true;
+      // Create a new
+      const worker = new Worker('./import.worker', {type: 'module'});
+      worker.onmessage = ({ data }) => {
+        // console.log(`page got message:`, data);
+        if (data.type === 'error') {
+          this.utilities.error(data.message, data.data ? data.data : '');
+          this.utilities.showSnackBar(data.message, 'OK');
+        }
+        if (data.type === 'event') {
+          // this.utilities.log('validating message', data);
+          this.processWorkerValidationResponse(data, dataLength);
+        }
+      };
+      const dataMessage = {
+        action: 'validateData',
+        selectedType: this.selectedType,
+        data: jsonData,
+        offset: environment.importOffset
+      };
+      this.validationRequested = true;
+      this.isProcessingData = true;
+      worker.postMessage(dataMessage);
+    } else {
+      // Web Workers are not supported in this environment.
+      // You should add a fallback so that your program still executes correctly.
+      this.utilities.error(`Web Workers no es soportado por este navegador, el proceso tardará
+      y la interfaz se congelará hasta que termine`);
+      this.utilities.showSnackBar('This web browser cant use web workers, the process will be slower', 'OK');
+    }
+  }
+
+  processWorkerValidationResponse(data, dataLength) {
+    if (data.validatedRowsBatch !== undefined && data.validatedRowsBatch !== null) {
+        this.processedRows = data.processedRowsCounter;
+        this.processingProgress = Math.floor((data.processedRowsCounter * 100) / dataLength);
+        if (data.validatedRowsBatch) {
+          data.validatedRowsBatch.forEach(row => {
+            this.dataSource.data[row.index].tooltip = row.tooltip;
+            this.dataSource.data[row.index].invalid = row.invalid;
+          });
+        }
+        if (data.processedRowsCounter === dataLength) {
+          this.initUploadProccess();
+        }
+    }
+  }
+
+  initUploadProccess() {
+    this.isProcessingData = false;
+    this.downloadingProgress = 0;
+    this.errorOnSave = false;
+    this.isDataSaved = false;
+    this.uploadingProgress = 0;
+    this.uploadingDone = false;
+    this.isUploadingData = false;
+    this.importedRows = 0;
+    this.rejectedRows = 0;
+    const dataToSend = this.getValidRows();
+    this.dataToSendLength = dataToSend.length;
+    this.isReadyToSend = dataToSend.length > 0;
+    this.utilities.log('ready to send? ', this.isReadyToSend);
+    if (this.isReadyToSend) {
+      this.utilities.log('sending data to api:', dataToSend);
+      this.startUploadProcess(dataToSend);
+    }
+    if (!this.isReadyToSend) {
+      this.utilities.error('Data are not ready to be sent', this.dataSource.data);
+      // this.utilities.showSnackBar('Data are not ready to be sent', 'OK');
+      // this.utilities.showSnackBar(`There are ${this.invalidRows.length} invalid records`, 'OK');
+    }
   }
 
   renderColumnData(type: string, data: any) {
@@ -121,386 +297,259 @@ export class ImportComponent implements OnInit {
     }
   }
 
-  sendData() {
-    this.utilities.log('start sending data proccess...');
-    this.validateData();
-    if (this.dataValidationErrors.length === 0 && this.isReadyToSend) {
-      this.utilities.log('sending data to api...');
-      this.isLoadingResults = true;
-      const selectedType = this.dataProvider.getDataType();
-      if (selectedType === IMPORTING_TYPES.ITEMS) {
-        this.sendItemsData();
-      } else if (selectedType === IMPORTING_TYPES.LOCATIONS) {
-        this.sendLocationsData();
-      } else if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
-        this.sendOrdersData();
-      } else if (selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
-        this.sendLoadPicksData();
+  startUploadProcess(dataToSend: any[]) {
+    let request;
+    this.isUploadingData = true;
+    this.uploadingDone = false;
+    this.uploadingProgress = 0;
+    if (this.selectedType === IMPORTING_TYPES.ITEMS) {
+      request = this.sendItemsData(dataToSend);
+    } else if (this.selectedType === IMPORTING_TYPES.LOCATIONS) {
+      request = this.sendLocationsData(dataToSend);
+    } else if (this.selectedType === IMPORTING_TYPES.ORDERS_DTO) {
+      request = this.sendOrdersData(dataToSend);
+    } else if (this.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
+      request = this.sendLoadPicksData(dataToSend);
+    }
+
+    this.subscription = request.pipe(map(event => this.getEventMessage(event)))
+    .subscribe(result => {
+      if (result && result instanceof HttpResponse && result.body ) {
+        this.isUploadingData = false;
+        this.uploadingDone = true;
+        this.handleApiCallResult(result, dataToSend);
       }
-    } else {
-      this.utilities.error('Data are not ready to be sent');
-      this.utilities.showSnackBar('Data are not ready to be sent', 'OK');
-    }
-  }
-
-  sendItemsData() {
-    this.itemsService.createItemsList(this.dataToSend, 'response', true).pipe(retry(3))
-    .subscribe(result => {
-      this.isLoadingResults = false;
-      result = result as HttpResponse<any>;
-      this.handleApiCallResult(result, IMPORTING_TYPES.ITEMS);
     }, error => {
       this.utilities.error('Error en request', error);
-      this.utilities.showSnackBar('Error saving items', 'OK');
-      this.isLoadingResults = false;
+      // this.utilities.showSnackBar('Error saving items', 'OK');
+      this.isDataSaved = false;
+      this.isUploadingData = false;
+      this.errorOnSave = true;
+      this.isReadyToSend = false;
+      this.uploadingDone = true;
+      if (error && error.error && error.error.message) {
+        this.uploadingResponseMessage = error.error.message;
+      } else {
+        this.uploadingResponseMessage = 'Unknown error';
+      }
     });
   }
 
-  sendLocationsData() {
-    this.locationsService.createLocationsList(this.dataToSend, 'response', true).pipe(
-      retry(3)
-    ).subscribe(result => {
-      this.isLoadingResults = false;
-      result = result as HttpResponse<any>;
-      this.handleApiCallResult(result, IMPORTING_TYPES.LOCATIONS);
-    }, error => {
-      this.utilities.error('Error en request', error);
-      this.utilities.showSnackBar('Error saving locations', 'OK');
-      this.isLoadingResults = false;
-    });
-  }
+  cancelImportingProcess() {
+    this.showProcessingPopup = false;
 
-  sendOrdersData() {
-    this.ordersService.createOrderList(this.dataToSend, 'response', true).pipe(retry(3))
-    .subscribe(result => {
-      this.isLoadingResults = false;
-      result = result as HttpResponse<any>;
-      this.handleApiCallResult(result, IMPORTING_TYPES.ORDERS_DTO);
-    }, error => {
-      this.utilities.error('Error en request');
-      this.utilities.showSnackBar('Error saving orders', 'OK');
-      this.isLoadingResults = false;
-    });
-  }
-
-  sendLoadPicksData() {
-    this.loadPicksService.createLoadPick(this.dataToSend, 'response', true).pipe(retry(3))
-    .subscribe(result => {
-      this.isLoadingResults = false;
-      result = result as HttpResponse<any>;
-      this.handleApiCallResult(result, IMPORTING_TYPES.LOADPICKS_DTO);
-    }, error => {
-      this.utilities.error('Error en request');
-      this.utilities.showSnackBar('Error saving load picks', 'OK');
-      this.isLoadingResults = false;
-    });
-  }
-  // retorna el campo indice (unico por cada fila) por el cual se haran comparaciones dentro de la tabla
-  getComparationField(type: string): string | string[] {
-    let comparationField: any;
-    switch (type) {
-      case IMPORTING_TYPES.ITEMS: comparationField = 'sku'; break;
-      case IMPORTING_TYPES.LOCATIONS: comparationField = 'code'; break;
-      case IMPORTING_TYPES.ORDERS_DTO: comparationField = 'code'; break;
-      case IMPORTING_TYPES.LOADPICKS_DTO:
-        // comparationField = ['orderNumber', 'transportNumber', 'sku', 'childrenWork', 'rootWork']; break;
-        comparationField = 'cartonCode'; break;
+    if (this.subscription) {
+      this.utilities.log('canceling http request...');
+      this.subscription.unsubscribe();
     }
-    return comparationField;
+    this.isDataSaved = false;
+    this.downloadingProgress = 0;
+    this.errorOnSave = false;
+    this.importedRows = 0;
+    this.validationRequested = false;
+    this.uploadingProgress = 0;
+    this.uploadingDone = false;
+    this.rejectedRows = 0;
+    this.processingProgress = 0;
+    this.processedRows = 0;
+    this.mapingProgress = 0;
+    this.isProcessingData = false;
+    this.isUploadingData = false;
+    this.isReadyToSend = false;
   }
 
-  handleApiCallResult(result: any, type: string) {
+  getDownloadingMessage() {
+    if (this.isUploadingData && !this.uploadingDone) {
+      return 'We are waiting response from server';
+    }
+    if (!this.isUploadingData && this.uploadingDone) {
+      return 'Response received';
+    }
+    return '';
+  }
+
+  getDownloadingResponse() {
+
+  }
+
+  getEventMessage(event: any): string {
+    // this.utilities.log('event recived:', event);
+    switch (event.type) {
+      case HttpEventType.Sent: {
+        // this.utilities.log(`making http request...`);
+        break;
+      }
+      case HttpEventType.UploadProgress: {
+        const progress = Math.round(100 * event.loaded / event.total);
+        this.uploadingProgress = progress;
+        // this.utilities.log(`uploaded ${progress}%`);
+        break;
+      }
+      case HttpEventType.DownloadProgress: {
+        this.downloadingProgress = event.loaded;
+        // this.utilities.log(`downloaded ${this.downloadingProgress}%`);
+        break;
+      }
+      case HttpEventType.Response: {
+        return event;
+      }
+    }
+    return null;
+  }
+
+  sendItemsData(dataToSend: any[]) {
+    this.utilities.log('sending items');
+    return this.itemsService.createItemsList(dataToSend, 'events', true);
+  }
+
+  sendLocationsData(dataToSend: any[]) {
+    this.utilities.log('sending locations');
+    return this.locationsService.createLocationsList(dataToSend, 'events', true);
+  }
+
+  sendOrdersData(dataToSend: any[]) {
+    this.utilities.log('sending orders');
+    return this.ordersService.createOrderList(dataToSend, 'events', true);
+  }
+
+  sendLoadPicksData(dataToSend: any[]) {
+    this.utilities.log('sending load picks');
+    return this.loadPicksService.createLoadPick(dataToSend, 'events', true);
+  }
+
+  handleApiCallResult(result: any, dataToSend: any[]) {
     let snackMessage = '';
-    let importedRows = 0;
-    let rejectedRows = 0;
-    const comparationField = this.getComparationField(type);
+    this.importedRows = 0;
+    this.rejectedRows = 0;
     // result as HttpResponse is expected
     this.utilities.log('api call result', result);
-    if (result && result.status === 201 && result.ok) {
-      rejectedRows = result.body.rowErrors === null ? 0 : result.body.rowErrors.length;
-      importedRows = this.dataToSend.length - rejectedRows;
-      if (importedRows > 0) {
+    if (result && result.status === 201 && result.ok && result.body) {
+      this.rejectedRows = result.body.rowErrors === null ? 0 : result.body.rowErrors.length;
+      this.importedRows = dataToSend.length - this.rejectedRows;
+      if (this.importedRows > 0) {
         const newOrigin = new RecentOrigin();
         newOrigin.filename = this.dataProvider.getFileName();
         newOrigin.filepath = this.dataProvider.filePath;
-        newOrigin.totalRows = this.dataToSend.length; // numero de registros
-        newOrigin.importedRows = importedRows; // numero de registros aceptados en la bd api
-        newOrigin.rejectedRows = rejectedRows; // numero de registros no aceptados en la bd api
-        this.addRecentOrigin(newOrigin, type);
+        newOrigin.totalRows = dataToSend.length; // numero de registros
+        newOrigin.importedRows = this.importedRows; // numero de registros aceptados en la bd api
+        newOrigin.rejectedRows = this.rejectedRows; // numero de registros no aceptados en la bd api
+        this.addRecentOrigin(newOrigin, this.selectedType);
       }
       if ((result.body.code === 200 || result.body.code === 201) &&
            result.body.rowErrors === null && result.body.status === 'OK') {
-
         this.isDataSaved = true;
-        snackMessage = `data imported successfully`;
+        this.errorOnSave = false;
+        snackMessage = `All data imported successfully`;
+        this.uploadingResponseMessage = snackMessage;
         this.utilities.log(snackMessage);
-
       } else if (result.body.code === 500 && result.body.rowErrors !== null &&
         result.body.status === 'INTERNAL_SERVER_ERROR') {
-        this.utilities.error('Some error occur in server', result.body.message);
-        this.isDataSaved = false;
-        this.invalidRows = result.body.rowErrors;
-        this.dataValidationErrors = result.body.rowErrors;
-        this.utilities.log('dataSource rows', this.dataSource.data);
-        this.utilities.log('invalid rows', this.invalidRows);
-        snackMessage = result.body.message ? result.body.message : `Error saving data`;
-        this.utilities.error(snackMessage);
-        this.showErrorsOnTable(result.body.rowErrors, comparationField);
-      } else {
+        this.utilities.error('Some data could not be saved', result.body.message);
         this.errorOnSave = true;
+        this.isReadyToSend = false;
+        snackMessage = result.body.message ? result.body.message : `Error saving data`;
+        this.uploadingResponseMessage = snackMessage;
+        this.utilities.error(snackMessage);
+        this.showErrorsOnTable(result.body.rowErrors);
+      } else {
+        this.rejectedRows = 0;
+        this.importedRows = 0;
+        this.isDataSaved = false;
+        this.errorOnSave = true;
+        this.isReadyToSend = false;
+        this.uploadingResponseMessage = 'Error saving data. Some error ocurred';
       }
       /*
         Dejamos en la tabla solo los registros invalidos, si no hay registros invalidos la tabla
         quedara vacia y no se mostrara en pantalla.
       */
-      this.dataSource.data = this.dataSource.data.filter(row => row.invalid);
+      this.dataSource.data = this.getInvalidRows();
+      this.refreshTable();
     }
-    this.utilities.showSnackBar(snackMessage, 'OK');
+    // this.utilities.showSnackBar(snackMessage, 'OK');
   }
 
-  showErrorsOnTable(errors: any[], comparationField: string | string[]) {
+  retryUploading() {
+    this.initUploadProccess();
+  }
+
+  showErrorsOnTable(errors: any[]) {
     let dataRow: any;
+    this.utilities.log('first element in data source', this.dataSource.data[0]);
     errors.forEach(error => {
-      dataRow = this.dataSource.data.find(row => {
-        if (typeof comparationField === 'string') {
-          if ((row && row[comparationField] && error && error.element && error.element[comparationField]) &&
-             (row[comparationField] == error.element[comparationField])) {
+      const existentIndex = this.dataSource.data.findIndex(row => {
+        if (this.selectedType === IMPORTING_TYPES.ITEMS) {
+          if ((row && row.sku && error && error.element && error.element.sku) &&
+             (row.sku == error.element.sku)) {
             return true;
           }
-        } else if (Array.isArray(comparationField)) {
-          return comparationField.every((field: string) => (row && row[field] &&
-           error && error.element && error.element[field]) && (row[field] == error.element[field]));
         }
+        if (this.selectedType === IMPORTING_TYPES.LOCATIONS) {
+          if ((row && row.code && error && error.element && error.element.code) &&
+             (row.code == error.element.code)) {
+            return true;
+          }
+        }
+        if (this.selectedType === IMPORTING_TYPES.ORDERS_DTO) {
+          if ((row && row.code && error && error.element && error.element.code) &&
+             (row.code == error.element.code)) {
+            return true;
+          }
+        }
+        if (this.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
+          if ((row && row.cartonCode && error && error.element && error.element.cartonCode) &&
+             (row.cartonCode == error.element.cartonCode)) {
+            return true;
+          }
+        }
+        return false;
       });
-      if (dataRow === undefined || dataRow === null) {
-        dataRow = new Object();
+      if (existentIndex > -1) {
+        dataRow = this.dataSource.data[existentIndex];
       }
-      dataRow.invalid = true;
-      dataRow.tooltip = '';
-      for (const errorType in error.errors) {
-        if (1) {
-          dataRow.tooltip += error.errors[errorType] + ',';
+      if (dataRow !== undefined && dataRow !== null) {
+        dataRow.invalid = true;
+        dataRow.tooltip = '';
+        for (const errorType in error.errors) {
+          if (1) {
+            dataRow.tooltip += error.errors[errorType] + ',';
+          }
         }
+      } else {
+        this.utilities.error('row no encontrada en la tabla para marcar error. elemento:',
+        error.element);
       }
     });
-  }
-
-  handleError(error: any) {
-    this.utilities.error('error sending data to api', error);
-    this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
-  }
-
-  validateData() {
-    this.utilities.log(`starting data validation for ${this.dataProvider.getDataType()}`);
-    if (this.dataSource.data.length > 0) {
-      this.dataToSend = [];
-      this.dataValidationErrors = [];
-      this.invalidRows = [];
-      let currentRowErrors = [];
-      let errorFound: boolean;
-      this.isLoadingResults = true;
-      let exists;
-      const copyData = this.dataSource.data.slice();
-      let rowToSave: any;
-      const selectedType = this.dataProvider.getDataType();
-      copyData.forEach((row, rowIndex) => {
-        if (selectedType === IMPORTING_TYPES.ITEMS) {
-          rowToSave = Object.assign(row) as Item;
-        }
-        if (selectedType === IMPORTING_TYPES.LOCATIONS) {
-          rowToSave = Object.assign(row) as Location;
-        }
-        if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
-          rowToSave = Object.assign(row) as OrderDto;
-        }
-        if (selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
-          rowToSave = Object.assign(row) as LoadPick;
-        }
-        errorFound = false;
-        currentRowErrors = [];
-        for (const field in this.headers) {
-          if (1) {// just for avoid lint error mark on visual studio code
-            // comprobando campos requeridos
-            if (this.headers[field].required && row[field] === undefined) {
-              // this.utilities.log('it is required?');
-              const validationError = new Object() as ValidationError;
-              validationError.index = rowIndex;
-              validationError.error = `The field ${this.headers[field].name} (${field}) is required`;
-              this.dataValidationErrors.push(validationError);
-              currentRowErrors.push(validationError);
-              errorFound = true;
-              this.utilities.error(`There's no exists the field ${field} in the record ${rowIndex}`);
-            }
-            if (this.headers[field].min && row[field] < this.headers[field].min) {
-              // this.utilities.log('it is lower than min?');
-              const validationError = new Object() as ValidationError;
-              validationError.index = rowIndex;
-              validationError.error = `The field ${this.headers[field].name} (${field})
-                must be greater than ${this.headers[field].min}`;
-              this.dataValidationErrors.push(validationError);
-              currentRowErrors.push(validationError);
-              errorFound = true;
-              this.utilities.error(`The field ${this.headers[field].name} (${field})
-              must be greater than ${this.headers[field].min} in the record ${rowIndex}`);
-            }
-            if (this.headers[field].max && row[field] > this.headers[field].max) {
-              // this.utilities.log('it is greater than max?');
-              const validationError = new Object() as ValidationError;
-              validationError.index = rowIndex;
-              validationError.error = `The field ${this.headers[field].name} (${field})
-                must be lower than ${this.headers[field].max}`;
-              this.dataValidationErrors.push(validationError);
-              currentRowErrors.push(validationError);
-              errorFound = true;
-              this.utilities.error(`The field ${this.headers[field].name} (${field})
-              must be lower than ${this.headers[field].max} in the record ${rowIndex}`);
-            }
-            // comprobando si el campo es unico
-            exists = 0;
-            // usamos un forEach en lugar de findIndex o find, para contar el numero de apariciones
-            copyData.forEach((element, index) => {
-              if (index !== rowIndex) {
-                /*
-                usamos == en la comparacion en lugar de === ya que podria haber problemas con los
-                tipos de datos y el json
-                */
-                exists += element[field] == row[field] ? 1 : 0;
-              }
-            });
-            if (this.headers[field].unique && row[field] !== ''  && exists > 0) {
-              const validationError = new Object() as ValidationError;
-              validationError.index = rowIndex;
-              validationError.error = `The field ${this.headers[field].name} (${field})
-                must be unique in all the collection. It repits ${exists} times`;
-              this.dataValidationErrors.push(validationError);
-              currentRowErrors.push(validationError);
-              errorFound = true;
-              this.utilities.error(`The field ${this.headers[field].name} (${field})
-              must be unique in all the collection, in the record ${rowIndex}. It repits ${exists} times`);
-            }
-          }
-        }
-        /*
-          agregamos un campo indice para poder usarlo en el mat-table.
-          TODO: debe haber alguna forma de obtener el indice en el mat-table, sin necesidad de hacer esto
-          pero por los momentos es una solucion
-        */
-        this.dataSource.data[rowIndex].index = rowIndex;
-        // omitimos el registro si hay algun error de validacion en él
-        if (errorFound) {
-          this.invalidRows.push({ row: rowIndex, errors: currentRowErrors.slice() });
-          this.dataSource.data[rowIndex].invalid = true;
-          this.dataSource.data[rowIndex].tooltip = currentRowErrors.slice().map((_row, _index) => {
-            return _row.error + ((_index < (currentRowErrors.length - 1)) ? ',' : '');
-          }).toString();
-          this.utilities.error(`invalid row ${rowIndex}`, this.dataSource.data[rowIndex]);
-          return;
-        } else {
-          this.dataSource.data[rowIndex].tooltip = null;
-          this.dataSource.data[rowIndex].invalid = false;
-          this.utilities.log(`valid row ${rowIndex}`, this.dataSource.data[rowIndex]);
-        }
-        // lo añadimos a la lista de datos a enviar, en caso de que cumpla con todas las validaciones
-        this.dataToSend.push(rowToSave);
-      });
-
-      this.validationRequested = true;
-      this.isLoadingResults = false;
-      this.isReadyToSend = this.dataValidationErrors.length === 0;
-      this.utilities.log('data to send', this.dataToSend);
-      this.utilities.log('ready to send? ', this.isReadyToSend);
-      this.utilities.log('validation errors', this.dataValidationErrors);
-      this.utilities.log('validation errors per row', this.invalidRows);
-      if (this.dataValidationErrors.length > 0) {
-        this.utilities.showSnackBar(`There are ${this.invalidRows.length} invalid records`, 'OK');
-      }
-    } else {
-      this.utilities.log('There is not data in the table');
-      this.utilities.showSnackBar(`There is no data to import`, 'OK');
-    }
-  }
-
-  mapTableRow(row: any): any {
-    const selectedType = this.dataProvider.getDataType();
-    for (const field in this.headers) {
-      if (1) {// just for avoid lint error mark on visual studio code
-        // arreglamos los valores booleanos en caso de que esten en formato texto mayusculas
-        if (row[field] === 'TRUE' || row[field] === 'FALSE') {
-          row[field] = row[field] === 'TRUE' ? true : false;
-        }
-        /*
-          Comprobacion de datos compuestos (usando varias columnas), dependiendo del tipo de importacion
-          seleccionado
-          TODO: eliminar estas comprobaciones al usar dto's
-        */
-        if (selectedType === IMPORTING_TYPES.ITEMS) {
-          // this.utilities.log('validating compound items data');
-          if (field === 'itemType' && typeof row.itemType !== 'object') {
-            const aux = row.itemType;
-            row.itemType = new Object() as ItemType;
-            row.itemType.code = aux;
-            row.itemType.name = '';
-            row.itemType.description = '';
-          }
-          if (field === 'uom' && typeof row.uom !== 'object') {
-            const aux = row.uom;
-            row.uom = new Object() as UnityOfMeasure;
-            row.uom.code = aux;
-            row.uom.description = '';
-          }
-          // añadimos campos por defecto
-          row.itemState = Item.ItemStateEnum.Active;
-        } else if (selectedType === IMPORTING_TYPES.LOCATIONS) {
-          // this.utilities.log('validating compound locations data');
-          if (field === 'section' && typeof row.section !== 'object') {
-            const aux = row.section;
-            row.section = new Object() as Section;
-            row.section.code = aux;
-            row.section.description = '';
-            row.section.name = '';
-          }
-        } else if (selectedType === IMPORTING_TYPES.ORDERS_DTO) {
-          // this.utilities.log('validating compound orders data');
-          // no hay datos compuestos en orders dto
-        } else if (selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
-          // this.utilities.log('validating compound orders data');
-          // no hay datos compuestos en loadpicks dto
-        }
-      }
-    }
-    return row;
-  }
-
-  mapTableData(data: any[]): any[] {
-    this.utilities.log(`starting data mapping for ${this.dataProvider.getDataType()}`);
-    data.forEach((row, rowIndex) => {
-      row = this.mapTableRow(row);
-    });
-    return data;
   }
 
   editRow(rowToEdit: any) {
-    const selectedType = this.dataProvider.getDataType();
     this.utilities.log('row to send to edit dialog', rowToEdit);
     this.utilities.log('map to send to edit dialog',
-    this.utilities.dataTypesModelMaps[selectedType]);
+    this.utilities.dataTypesModelMaps[this.selectedType]);
     const dialogRef = this.dialog.open(EditRowDialogComponent,
       {
         data: {
           row: rowToEdit,
-          map: this.utilities.dataTypesModelMaps[selectedType],
-          type: selectedType,
+          map: this.utilities.dataTypesModelMaps[this.selectedType],
+          type: this.selectedType,
           viewMode: 'edit',
           remoteSync: false // para mandar los datos a la BD por la API
         }
       }
     );
     dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
       if (result) {
-        result = this.mapTableRow(result);
+        if (JSON.stringify(result) !== JSON.stringify(rowToEdit)) {
+          result.invalid = false;
+          result.tooltip = '';
+        }
+        result.invalid = false;
+        result.tooltip = '';
+        this.utilities.log('dialog result:', result);
         rowToEdit = result;
         this.refreshTable();
+      } else {
+        this.utilities.log('dialog result is invalid', result);
       }
     });
   }
@@ -530,35 +579,28 @@ export class ImportComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
+  getInvalidRows() {
+    return this.dataSource.data.filter(row => row.invalid === true);
+  }
+
+  getValidRows() {
+    return this.dataSource.data.filter(row => row.invalid === false);
+  }
+
   getValidationAlertMessage() {
     let message = '';
-    if (this.dataValidationErrors.length > 0) {
-      message = `There are ${this.invalidRows.length} invalid records. Please, fix them and try again`;
-    } else if (this.dataValidationErrors.length === 0 && !this.isDataSaved && !this.errorOnSave) {
-      message = 'Data validated successfully. Press next to continue';
-    } else if (this.errorOnSave) {
-      message = 'Error on saving data';
-    } else if (this.dataValidationErrors.length === 0 && this.isDataSaved) {
+    const invalidRows = this.getInvalidRows().length;
+    if (invalidRows > 0) {
+      message = `There are ${invalidRows} invalid records. Please, fix them and try again`;
+    } else if (invalidRows === 0 && !this.isDataSaved && !this.errorOnSave) {
+      message = 'Data validated successfully';
+    } else if (invalidRows === 0 && this.errorOnSave) {
+      message = 'Error on saving data' + (this.uploadingResponseMessage && this.uploadingResponseMessage.length > 0 ?
+      (': ' + this.uploadingResponseMessage) :  '');
+    } else if (this.isDataSaved) {
       message = 'Data saved successfully';
     }
     return message;
-  }
-
-  getValidateBtnText() {
-    if (this.dataSource.data.length > 0 && !this.isReadyToSend) {
-      if (!this.isLoadingResults) {
-        if (!this.validationRequested) {
-          return 'Validate';
-        } else {
-          return 'Validate Again';
-        }
-      } else {
-        return 'Validating...';
-      }
-    }
-    if (this.dataSource.data.length > 0 && this.isReadyToSend && !this.isLoadingResults) {
-      return 'Next';
-    }
   }
 
   addRecentOrigin(newOrigin: RecentOrigin, type: string) {

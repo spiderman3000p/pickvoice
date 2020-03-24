@@ -54,13 +54,22 @@
                                     <mat-option *ngFor="let type of ordersData.orderTypeList" [value]="type">
                                         {{ type.description }}
                                     </mat-option>
+                                    <div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
+                                        <span class="select-footer-content">
+                                            <a href="javascript: void(0)"
+                                            (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')">
+                                                <mat-icon *ngIf="dataMap.orderType.addNew.icon">{{ dataMap.orderType.addNew.icon }}</mat-icon>
+                                                <span>{{ dataMap.orderType.addNew.text }}</span>
+                                            </a>
+                                        </span>
+                                    </div>
                                 </mat-select>
                                 <!-- hint, link o button -->
-                                <mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
+                                <!--mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
                                     <a (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')" color="primary">
                                         <mat-icon>add</mat-icon> Add new order type
                                     </a>
-                                </mat-hint>
+                                </mat-hint-->
                             </mat-form-field>
                             <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                                 <mat-label>Priority</mat-label>
@@ -81,13 +90,22 @@
                                     <mat-option *ngFor="let customer of ordersData.customerList" [value]="customer">
                                         {{ customer.name }}
                                     </mat-option>
+                                    <div class="select-footer" *ngIf="dataMap.customer.addNew && viewMode === 'edit'">
+                                        <span class="select-footer-content">
+                                            <a href="javascript: void(0)"
+                                            (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')">
+                                                <mat-icon *ngIf="dataMap.customer.addNew.icon">{{ dataMap.customer.addNew.icon }}</mat-icon>
+                                                {{ dataMap.customer.addNew.text }}
+                                            </a>
+                                        </span>
+                                    </div>
                                 </mat-select>
                                 <!-- hint, link o button -->
-                                <mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
+                                <!--mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
                                     <a (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')" color="primary">
                                         <mat-icon>add</mat-icon> Add new customer
                                     </a>
-                                </mat-hint>
+                                </mat-hint-->
                             </mat-form-field>
                             <br><br>
                             <h6>Customer Details</h6>
@@ -123,13 +141,22 @@
                                     <mat-option *ngFor="let transport of ordersData.transportList" [value]="transport">
                                         {{ transport.nameRoute }}
                                     </mat-option>
+                                    <div class="select-footer" *ngIf="dataMap.transport.addNew && viewMode === 'edit'">
+                                        <span class="select-footer-content">
+                                            <a href="javascript: void(0)"
+                                            (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')">
+                                                <mat-icon *ngIf="dataMap.transport.addNew.icon">{{ dataMap.transport.addNew.icon }}</mat-icon>
+                                                {{ dataMap.transport.addNew.text }}
+                                            </a>
+                                        </span>
+                                    </div>
                                 </mat-select>
                                 <!-- hint, link o button -->
-                                <mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
+                                <!--mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
                                     <a (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')" color="primary">
                                         <mat-icon>add</mat-icon> Add new transport
                                     </a>
-                                </mat-hint>
+                                </mat-hint-->
                             </mat-form-field>
                             <br><br>
                             <h5>Transport Details</h5>

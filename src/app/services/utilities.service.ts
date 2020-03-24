@@ -40,6 +40,10 @@ export class UtilitiesService {
 
     return true;
   }
+  // calcula tiempo transcurrido en segundos desde un timestamp
+  public getElapsedTime(timestamp: number) {
+    return (new Date().getTime() - timestamp) / 1000;
+  }
 
   renderColumnData(type: string, data: any) {
     let dataValue;
@@ -49,10 +53,11 @@ export class UtilitiesService {
         if (typeof data === 'number') {
           // esta conversion sale de aqui: https://github.com/SheetJS/sheetjs/issues/1623
           date = 1000 * 60 * 60 * 24 * (data - 25569);
+        } else if (data !== '') {
+          dataValue = this.parseDate(data);
         } else {
-          date = data;
+          dataValue = data;
         }
-        dataValue = this.parseDate(date);
         // console.log('date value', dataValue);
         // dataValue = date;
         break;

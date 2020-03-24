@@ -196,12 +196,12 @@ export class EditRowComponent implements OnInit {
       if (this.row === undefined) {
         return;
       }
-      value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
+      // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
 
       if (this.dataMap[key].required) {
-        formControls[key] = new FormControl(value, Validators.required);
+        formControls[key] = new FormControl(this.row[key], Validators.required);
       } else {
-        formControls[key] = new FormControl(value);
+        formControls[key] = new FormControl(this.row[key]);
       }
     });
     this.form = new FormGroup(formControls);
@@ -662,44 +662,17 @@ export class EditRowComponent implements OnInit {
     const formData = this.form.value;
     const toUpload = this.row;
     this.utilities.log('form data', formData);
+    for (const key in toUpload) {
+      if (formData[key]) {
+        toUpload[key] = formData[key];
+      }
+    }
     if (this.remoteSync) {
       this.isLoadingResults = true;
-      // Necesitamos guardar los cambios en el objeto recibido
-      for (const key in toUpload) {
-        if (this.type === IMPORTING_TYPES.ITEMS && typeof toUpload[key] === 'object' && toUpload[key] &&
-          toUpload[key].code && formData[key]) {
-            // mapear los datos de las propiedades tipo objeto de la entidad item
-          toUpload[key].code = formData[key];
-        } else if (this.type === IMPORTING_TYPES.LOCATIONS && typeof toUpload[key] === 'object' && toUpload[key] &&
-          formData[key]) {
-            // TODO: mapear los datos de las propiedades tipo objeto de la entidad location
-        } else if (this.type === IMPORTING_TYPES.ORDERS && typeof toUpload[key] === 'object' && toUpload[key] &&
-          formData[key]) {
-            // TODO: mapear los datos de las propiedades tipo objeto de la entidad order
-        } else if (formData[key]) {
-          // las propiedades simples (que no son objetos)
-          toUpload[key] = formData[key];
-        }
-      }
-      /*if (this.type === 'items') {
-        toUpload = new Object(this.form.value) as any;
-        let aux = toUpload.itemType;
-        toUpload.itemType = {
-          code: aux
-        } as ItemType;
-        aux = toUpload.uom;
-        toUpload.uom = {
-          code: aux
-        } as UnityOfMeasure;
-      */
       const observer = {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          /*aux = toUpload.itemType.code;
-          toUpload.itemType = aux;
-          aux = toUpload.uom.code;
-          toUpload.uom = aux;*/
           if ((response.status === 204 || response.status === 200 || response.status === 201)
             && response.statusText === 'OK') {
             this.utilities.showSnackBar('Update Successfull', 'OK');

@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+$primary: #00b19d;
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
@@ -31,7 +32,7 @@ body {
   color: #767681;
 }
 .user-menu .mat-menu-item:hover{
-  color: #00b19d !important;
+  color: $primary !important;
 }
 .user-menu:before, .user-menu:after {
   bottom: 100%;
@@ -307,6 +308,14 @@ mat-label{
   align-items: center;
   justify-content: center;
 }
+.example-loading-shade .loading-popup{
+  background: white;
+  padding: 3%;
+  border-radius: 10px;
+  -webkit-box-shadow: 0px 5px 20px 1px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 5px 20px 1px rgba(0,0,0,0.75);
+  box-shadow: 0px 5px 20px 1px rgba(0,0,0,0.75);
+}
 mat-datepicker{
   z-index: 1000;
 }
@@ -419,16 +428,13 @@ a.mat-list-item.active .mat-list-item-content:before {
   margin-top: 3% !important;
   height: unset;
 }
-a:not([href]):hover {
-  color: #00b19d;
+a:hover {
+  color: $primary;
   text-decoration: underline;
 }
 .readonly {
   pointer-events: none !important;
   cursor: not-allowed !important;
-}
-.add-new-link{
-  cursor: pointer;
 }
 .mat-form-field.mat-form-field-invalid .mat-form-field-label {
   color: #f74343;
@@ -438,6 +444,26 @@ a:not([href]):hover {
 }
 .footer-label{
   float: inherit; flex: auto; display: flex; left: 0;
+}
+.select-footer{
+  box-shadow: inherit;
+  position: sticky;
+  bottom: 0;
+  text-align: center;
+  padding: 3%;
+  background: inherit;
+}
+.select-footer .select-footer-content{
+  color: $primary;
+  font-size: inherit;
+}
+.select-footer .select-footer-content a{
+  vertical-align: middle;
+  display: inline-flex;
+  text-decoration: none;
+}
+.select-footer .select-footer-content a > span{
+  text-decoration: underline;
 }
 @media screen and (max-width:480px){
   .toolbar-username {

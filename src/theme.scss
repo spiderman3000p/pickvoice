@@ -64,7 +64,6 @@ $md-alegra-accent: (
       A700 : #000000,
   )
 );
-
 $md-alegra-light: (
   50 : #ffffff,
   100 : #ffffff,
@@ -129,8 +128,6 @@ $md-alegra-warn: (
       A700 : #000000,
   )
 );
-
-
 $my-app-light: mat-palette($md-alegra-light);
 $my-app-primary: mat-palette($md-alegra-primary);
 $my-app-accent:  mat-palette($md-alegra-accent, 500, 900, A100);

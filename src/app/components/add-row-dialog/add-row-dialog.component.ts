@@ -141,11 +141,11 @@ export class AddRowDialogComponent implements OnInit {
       if (this.row === undefined) {
         return;
       }
-      value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
+      // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
       if (this.dataMap[key].required) {
-        formControls[key] = new FormControl(value, Validators.required);
+        formControls[key] = new FormControl(this.row[key], Validators.required);
       } else {
-        formControls[key] = new FormControl(value);
+        formControls[key] = new FormControl(this.row[key]);
       }
     });
     // console.log('form controls', formControls);
@@ -329,11 +329,16 @@ export class AddRowDialogComponent implements OnInit {
     const formData = this.form.value;
     const toUpload = this.row;
     this.utilities.log('form data', formData);
+    for (const key in toUpload) {
+      if (formData[key]) {
+        toUpload[key] = formData[key];
+      }
+    }
     this.utilities.log('row data', toUpload);
     if (this.remoteSync) {
       this.isLoadingResults = true;
       // Necesitamos guardar los cambios en el objeto recibido
-      for (let key in formData) {
+      /*for (let key in formData) {
         if (1) {
           this.utilities.log(`key ${key}`);
           this.utilities.log(`toUpload[${key}]`, toUpload[key]);
@@ -346,8 +351,7 @@ export class AddRowDialogComponent implements OnInit {
 
           this.utilities.log(`toUpload`, toUpload);
         }
-      }
-      this.utilities.log('data to upload', toUpload);
+      }*/
       const observer = {
         next: (response) => {
           this.isLoadingResults = false;

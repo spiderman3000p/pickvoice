@@ -12,7 +12,9 @@ export const environment = {
   companyEmail: '',
   companyPhones: '',
   companyAddress: '',
-  footer: ''
+  footer: '',
+  dataCacheDuration: 600, // duracion de datos cacheados, en segundos
+  importOffset: 1000 // limite de registros a enviar por peticion
 };
 
 /*

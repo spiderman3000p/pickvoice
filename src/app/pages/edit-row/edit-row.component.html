@@ -31,13 +31,22 @@
                         *ngIf="dataMap[key].formControl.control === 'select'">
                             <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                             <!-- campos compuestos/objetos select -->
-                            <mat-select [formControlName]="key" [class.readonly]="viewMode === 'view'">
-                                <mat-option *ngFor="let data of getSelectInputData(key)" [value]="getSelectIndexValue(data, key)">
+                            <mat-select [compareWith]="dataMap[key].formControl.compareFn" [formControlName]="key" [class.readonly]="viewMode === 'view'">
+                                <mat-option *ngFor="let data of getSelectInputData(key)" [value]="data">
                                     {{ getSelectDisplayData(data, key) }}
                                 </mat-option>
+                                <div class="select-footer" *ngIf="dataMap[key].addNew && viewMode === 'edit'">
+                                    <span class="select-footer-content">
+                                        <a href="javascript: void(0)"
+                                        (click)="addNewObject(dataMap[key].addNew.modelType)">
+                                            <mat-icon *ngIf="dataMap[key].addNew.icon">{{ dataMap[key].addNew.icon }}</mat-icon>
+                                            <span>{{ dataMap[key].addNew.text }}</span>
+                                        </a>
+                                    </span>
+                                </div>
                             </mat-select>
                             <!-- hint, link o button -->
-                            <mat-hint *ngIf="dataMap[key].addNew !== undefined && viewMode === 'edit'" color="primary" class="add-new-link">
+                            <!--mat-hint *ngIf="dataMap[key].addNew !== undefined && viewMode === 'edit'" color="primary" class="add-new-link">
                                 <a *ngIf="dataMap[key].addNew.linkType === 'link'" (click)="addNewObject(dataMap[key].addNew.modelType, dataMap[key].addNew.text)"
                                 color="primary">
                                     <mat-icon>{{ dataMap[key].addNew.icon }}</mat-icon> {{ dataMap[key].addNew.text }}
@@ -46,7 +55,7 @@
                                 color="primary">
                                     <mat-icon>{{ dataMap[key].addNew.icon }}</mat-icon> {{ dataMap[key].addNew.text }}
                                 </button>
-                            </mat-hint>
+                            </mat-hint-->
                         </mat-form-field>
                         <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
                         *ngIf="dataMap[key].formControl.control === 'input' &&

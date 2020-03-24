@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { UtilitiesService } from '../../services/utilities.service';
 import { RecentOriginsService } from '../../services/recent-origins.service';
-import { ModelMap } from '../../models/model-maps.model';
+import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { RecentOrigin } from '../../models/recent-origin.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -18,6 +18,7 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
   itemsDataSource: MatTableDataSource<RecentOrigin>;
   locationsDataSource: MatTableDataSource<RecentOrigin>;
   ordersDataSource: MatTableDataSource<RecentOrigin>;
+  loadPicksDataSource: MatTableDataSource<RecentOrigin>;
   displayedColumns = Object.keys(ModelMap.RecentOriginMap);
   headers: any = ModelMap.RecentOriginMap;
   filter: FormControl;
@@ -28,12 +29,15 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
   itemsSubscriber: Subscription;
   locationsSubscriber: Subscription;
   ordersSubscriber: Subscription;
+  loadPicksSubscriber: Subscription;
   @ViewChild(MatPaginator, {static: true}) itemsPaginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) locationsPaginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) ordersPaginator: MatPaginator;
+  @ViewChild(MatPaginator, {static: true}) loadPicksPaginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) itemsSort: MatSort;
   @ViewChild(MatSort, {static: true}) locationsSort: MatSort;
   @ViewChild(MatSort, {static: true}) ordersSort: MatSort;
+  @ViewChild(MatSort, {static: true}) loadPicksSort: MatSort;
   @ViewChild(MatPaginator) set matItemsPaginator(mp: MatPaginator) {
     this.itemsPaginator = mp;
     this.initItemsPaginatorSort();
@@ -45,6 +49,10 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) set matOrdersPaginator(mp: MatPaginator) {
     this.ordersPaginator = mp;
     this.initOrdersPaginatorSort();
+  }
+  @ViewChild(MatPaginator) set matLoadPicksPaginator(mp: MatPaginator) {
+    this.loadPicksPaginator = mp;
+    this.initLoadPicksPaginatorSort();
   }
   @ViewChild(MatSort) set matItemsSort(ms: MatSort) {
     this.itemsSort = ms;
@@ -58,10 +66,15 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
     this.ordersSort = ms;
     this.initOrdersPaginatorSort();
   }
+  @ViewChild(MatSort) set matLoadPicksSort(ms: MatSort) {
+    this.loadPicksSort = ms;
+    this.initLoadPicksPaginatorSort();
+  }
   constructor(private recentOriginsService: RecentOriginsService, private utilities: UtilitiesService) {
     this.itemsDataSource = new MatTableDataSource([]);
     this.locationsDataSource = new MatTableDataSource([]);
     this.ordersDataSource = new MatTableDataSource([]);
+    this.loadPicksDataSource = new MatTableDataSource([]);
 
     const itemsObserver = {
       next: (origins) => {
@@ -98,10 +111,26 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
         this.utilities.showSnackBar('Error requesting orders recent origins', 'OK');
       }
     };
+    const loadPicksObserver = {
+      next: (origins) => {
+        this.utilities.log('load picks results type ', typeof origins);
+        this.utilities.log('load picks recent origins', origins);
+        this.loadPicksDataSource.data = origins;
+      },
+      error: (error) => {
+        this.utilities.error('error requesting load picks recent origins: ', error);
+        this.utilities.showSnackBar('Error requesting load picks recent origins', 'OK');
+      }
+    };
 
-    this.itemsSubscriber = this.recentOriginsService.getRecentOrigins('items').subscribe(itemsObserver);
-    this.locationsSubscriber = this.recentOriginsService.getRecentOrigins('locations').subscribe(locationsObserver);
-    this.ordersSubscriber = this.recentOriginsService.getRecentOrigins('orders').subscribe(ordersObserver);
+    this.itemsSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.ITEMS).
+    subscribe(itemsObserver);
+    this.locationsSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOCATIONS).
+    subscribe(locationsObserver);
+    this.ordersSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.ORDERS_DTO).
+    subscribe(ordersObserver);
+    this.loadPicksSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADPICKS_DTO).
+    subscribe(loadPicksObserver);
   }
 
   ngOnInit(): void {
@@ -114,6 +143,7 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
     this.itemsSubscriber.unsubscribe();
     this.locationsSubscriber.unsubscribe();
     this.ordersSubscriber.unsubscribe();
+    this.loadPicksSubscriber.unsubscribe();
   }
 
   applyFilter(filterValue: string, type) {
@@ -137,6 +167,11 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
   initOrdersPaginatorSort() {
     this.ordersDataSource.paginator = this.ordersPaginator;
     this.ordersDataSource.sort = this.ordersSort;
+  }
+
+  initLoadPicksPaginatorSort() {
+    this.loadPicksDataSource.paginator = this.loadPicksPaginator;
+    this.loadPicksDataSource.sort = this.loadPicksSort;
   }
 
   renderColumnData(type: string, column: any) {

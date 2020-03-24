@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
+import { DataCacheService } from '../../services/data-cache.service';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
@@ -44,7 +45,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private dialog: MatDialog, private apiService: OrderService, private router: Router,
-    private utilities: UtilitiesService) {
+    private utilities: UtilitiesService, private cacheService: DataCacheService) {
       this.dataSource = new MatTableDataSource([]);
       this.filter = new FormControl('');
       this.dataToSend = [];
@@ -305,17 +306,18 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     });
   }
 
-  loadData() {
+  loadData(useCache = true) {
     this.utilities.log('requesting orders');
     this.isLoadingResults = true;
-    this.apiService.retrieveAllOrders('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
-    .subscribe(response => {
+    this.cacheService.getCachedData(this.type, 'ordersList', useCache).subscribe(results => {
       this.isLoadingResults = false;
-      this.utilities.log('orders received', response.body);
-      this.dataSource.data = response.body.map((element, i) => {
-        return { index: i, ... element};
-      });
-      this.refreshTable();
+      this.utilities.log('orders received', results);
+      if (results && results.length > 0) {
+        this.dataSource.data = results.map((element, i) => {
+          return { index: i, ... element};
+        });
+        this.refreshTable();
+      }
     }, error => {
       this.isLoadingResults = false;
       this.utilities.error('error on requesting data');
@@ -325,7 +327,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
 
   reloadData() {
     this.selection.clear();
-    this.loadData();
+    this.loadData(false);
   }
 
   addRow() {
