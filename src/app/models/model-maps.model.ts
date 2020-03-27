@@ -10,7 +10,10 @@ export const IMPORTING_TYPES = {
     ORDER_TYPE: 'orderTypes',
     SECTIONS: 'sections',
     TRANSPORTS: 'transports',
-    LOADPICKS_DTO: 'loadPicksDto'
+    LOADPICKS_DTO: 'loadPicksDto',
+    LOCATION_TYPE: 'locationTypes',
+    TRANSPORT_STATE: 'transportState',
+    ITEM_STATE: 'itemState'
 };
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
@@ -35,8 +38,8 @@ export class ModelMap {
     **********************************************/
     /* customer object map for CRUD */
     public static CustomerMap = {
-        customerNumber: {
-            name: 'number',
+        code: {
+            name: 'code',
             required: false,
             type: 'string',
             formControl: {
@@ -122,10 +125,10 @@ export class ModelMap {
         itemType: {
             name: 'item type',
             required: true,
-            type: 'itemType',
+            type: IMPORTING_TYPES.ITEM_TYPE,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.ITEM_TYPE,
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
@@ -141,10 +144,10 @@ export class ModelMap {
         uom: {
             name: 'item uom',
             required: true,
-            type: 'itemUom',
+            type: IMPORTING_TYPES.UOMS,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.UOMS,
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
@@ -229,10 +232,10 @@ export class ModelMap {
         itemState: {
             name: 'item state',
             required: true,
-            type: 'string',
+            type: IMPORTING_TYPES.ITEM_STATE,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.ITEM_STATE,
                 displayIndex: null,
                 valueIndex: null,
                 compareFn: (c1, c2) => {
@@ -345,10 +348,10 @@ export class ModelMap {
         section: {
             name: 'section',
             required: false,
-            type: 'section',
+            type: IMPORTING_TYPES.SECTIONS,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.SECTIONS,
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
@@ -414,10 +417,10 @@ export class ModelMap {
         type: {
             name: 'type',
             required: false,
-            type: 'string',
+            type: IMPORTING_TYPES.LOCATION_TYPE,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.LOCATION_TYPE,
                 displayIndex: null,
                 valueIndex: null,
                 compareFn: (c1, c2) => {
@@ -487,10 +490,10 @@ export class ModelMap {
         orderType: {
             name: 'type',
             required: false,
-            type: 'orderType',
+            type: IMPORTING_TYPES.ORDER_TYPE,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.ORDER_TYPE,
                 valueIndex: 'code',
                 displayIndex: 'description',
                 compareFn: (c1, c2) => {
@@ -522,15 +525,15 @@ export class ModelMap {
                 control: 'textarea'
             }
         },
-        transport: {
+        idTransport: {
             name: 'transport',
             required: false,
-            type: 'transport',
+            type: IMPORTING_TYPES.TRANSPORTS,
             formControl: {
                 control: 'select',
-                type: 'normal',
-                valueIndex: 'transportNumber',
-                displayIndex: 'nameRoute',
+                type: IMPORTING_TYPES.TRANSPORTS,
+                valueIndex: 'id',
+                displayIndex: 'transportNumber',
                 compareFn: (c1, c2) => {
                     return c1.transportNumber === c2.transportNumber;
                 }
@@ -544,10 +547,10 @@ export class ModelMap {
         customer: {
             name: 'customer',
             required: false,
-            type: 'customer',
+            type: IMPORTING_TYPES.CUSTOMERS,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.CUSTOMERS,
                 valueIndex: 'customerNumber',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
@@ -560,10 +563,10 @@ export class ModelMap {
                 modelType: IMPORTING_TYPES.CUSTOMERS
             }
         },
-        orderLineList: {
+        orderLines: {
             name: 'order lines',
             required: false,
-            type: 'orderLineList',
+            type: IMPORTING_TYPES.ORDER_LINE,
             formControl: {
                 control: 'table',
                 type: 'normal'
@@ -646,10 +649,10 @@ export class ModelMap {
         transportState: {
             name: 'state',
             required: false,
-            type: 'transportState',
+            type: IMPORTING_TYPES.TRANSPORT_STATE,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.TRANSPORT_STATE,
                 valueIndex: null,
                 displayIndex: null,
                 compareFn: (c1, c2) => {
@@ -664,10 +667,10 @@ export class ModelMap {
             name: 'item',
             required: true,
             unique: true,
-            type: 'item',
+            type: IMPORTING_TYPES.ITEMS,
             formControl: {
                 control: 'select',
-                type: 'normal',
+                type: IMPORTING_TYPES.ITEMS,
                 valueIndex: 'sku',
                 displayIndex: 'description',
                 compareFn: (c1, c2) => {
@@ -678,26 +681,6 @@ export class ModelMap {
                 text: 'Add new item',
                 icon: 'add',
                 modelType: IMPORTING_TYPES.ITEMS
-            }
-        },
-        order:  {
-            name: 'order',
-            required: false,
-            unique: false,
-            type: 'order',
-            formControl: {
-                control: 'select',
-                type: 'normal',
-                valueIndex: 'orderNumber',
-                displayIndex: 'orderNumber',
-                compareFn: (c1, c2) => {
-                    return c1.orderNumber === c2.orderNumber;
-                }
-            },
-            addNew: {
-                text: 'Add new order',
-                icon: 'add',
-                modelType: IMPORTING_TYPES.ORDERS
             }
         },
         qtyRequired:  {
@@ -1288,7 +1271,4 @@ export class ModelMap {
             }
         }
     };
-
-    constructor() {
-    }
 }

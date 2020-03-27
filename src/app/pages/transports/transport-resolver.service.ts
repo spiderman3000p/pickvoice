@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Router, Resolve, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
-import { Order } from '@pickvoice/pickvoice-api/model/order';
+import { Transport } from '@pickvoice/pickvoice-api/model/transport';
 import { DataProviderService} from '../../services/data-provider.service';
 import { Observable } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'
 })
-export class OrdersResolverService implements Resolve<Order> {
+export class TransportResolverService implements Resolve<Transport> {
 
   constructor(private dataProviderService: DataProviderService, private router: Router) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Order> {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Transport> {
     const id = Number(route.paramMap.get('id'));
-    return this.dataProviderService.getOrder(id);
+    return this.dataProviderService.getTransport(id);
   }
 }

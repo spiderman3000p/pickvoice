@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DataStorage } from '../../../../services/data-provider';
+import { SharedDataService } from '../../../../services/shared-data.service';
 import { UtilitiesService } from '../../../../services/utilities.service';
 import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
 @Component({
@@ -12,11 +12,11 @@ export class DataPreviewComponent implements OnInit {
   sheets: any[] = []; // hojas del libro excel
   rowData: any[] = [];
   columnDefs: any[] = [];
-  title: string = '';
-  constructor(private dataProvider: DataStorage, private router: Router,
+  title = '';
+  constructor(private sharedDataService: SharedDataService, private router: Router,
               private utilities: UtilitiesService) {
-    this.sheets = this.dataProvider.getSheets();
-    this.dataProvider.rowData.subscribe(rowData => {
+    this.sheets = this.sharedDataService.getSheets();
+    this.sharedDataService.rowData.subscribe(rowData => {
       this.utilities.log('new rowData arrived', rowData);
       if (rowData) {
         this.rowData = rowData;
@@ -25,7 +25,7 @@ export class DataPreviewComponent implements OnInit {
       this.utilities.error('Error obtaining row data', error);
       this.utilities.showSnackBar('Error obtaining row data', 'OK');
     });
-    this.dataProvider.columnDefs.subscribe(columnDefs => {
+    this.sharedDataService.columnDefs.subscribe(columnDefs => {
       this.utilities.log('new columnDefs arrived', columnDefs);
       if (columnDefs) {
         this.columnDefs = columnDefs.map(col => {
@@ -44,8 +44,8 @@ export class DataPreviewComponent implements OnInit {
     if (this.sheets.length > 0) {
       this.setData();
     }
-    this.dataProvider.sheets.subscribe(sheets => {
-      this.utilities.log('dataProvider data received', sheets);
+    this.sharedDataService.sheets.subscribe(sheets => {
+      this.utilities.log('sharedDataService data received', sheets);
       if (sheets) {
         this.sheets = sheets;
         this.setData();
@@ -55,7 +55,7 @@ export class DataPreviewComponent implements OnInit {
       this.utilities.error('Error obtaining file sheets');
       this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
     });
-    const dataTypeToImport = this.dataProvider.getDataType();
+    const dataTypeToImport = this.sharedDataService.getDataType();
     if (dataTypeToImport === IMPORTING_TYPES.ITEMS) {
       this.title = 'Importing Items';
     }
@@ -81,17 +81,17 @@ export class DataPreviewComponent implements OnInit {
       });
       this.utilities.log('columnDefs sortable', this.columnDefs);
     }
-    this.dataProvider.data = this.rowData;
+    this.sharedDataService.data = this.rowData;
   }
 
   goBack() {
     this.rowData = [];
     this.columnDefs = [];
     this.sheets = [];
-    this.dataProvider.setFileName('');
-    this.dataProvider.setRowData([]);
-    this.dataProvider.setSheets([]);
-    this.dataProvider.setColumnDefs([]);
+    this.sharedDataService.setFileName('');
+    this.sharedDataService.setRowData([]);
+    this.sharedDataService.setSheets([]);
+    this.sharedDataService.setColumnDefs([]);
     this.router.navigate([{outlets: {importing: 'importing/file-import'}}]);
   }
 

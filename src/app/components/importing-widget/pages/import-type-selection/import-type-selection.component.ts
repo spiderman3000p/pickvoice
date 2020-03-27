@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { UtilitiesService } from '../../../../services/utilities.service';
-import { DataStorage } from '../../../../services/data-provider';
+import { SharedDataService } from '../../../../services/shared-data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ImportDialogComponent } from '../../../import-dialog/import-dialog.component';
 import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
@@ -25,14 +25,14 @@ export class ImportTypeSelectionComponent implements OnInit {
   parsedData: any;
   types = IMPORTING_TYPES;
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
-              private dataProvider: DataStorage) {
+              private sharedDataService: SharedDataService) {
   }
 
   ngOnInit(): void {
   }
 
   import(dataType: string) {
-    this.dataProvider.setDataType(dataType);
+    this.sharedDataService.setDataType(dataType);
     this.router.navigate ([{ outlets: { importing: 'importing/file-import'}}]);
   }
 }

@@ -1,5 +1,5 @@
 import {Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, OrderDto, Transport,
-        Section, Order, LoadPick } from '@pickvoice/pickvoice-api';
+        Section, Order, LoadPick, OrderLines } from '@pickvoice/pickvoice-api';
 
 export class ModelFactory {
 
@@ -75,9 +75,9 @@ export class ModelFactory {
         object.orderType = this.newEmptyOrderType();
         object.priority = 0;
         object.note = '';
-        object.transport = this.newEmptyTransport();
+        object.idTransport = null;
         object.customer = this.newEmptyCustomer();
-        object.orderLineList = [] as OrderLine[];
+        object.orderLines = [] as OrderLines;
         return object;
     }
 
@@ -124,7 +124,7 @@ export class ModelFactory {
 
     public static newEmptyOrderLine(): OrderLine {
         const object = new Object() as OrderLine;
-        object.order = {} as Order;
+        object.idOrder = null;
         object.item = {} as Item;
         object.qtyRequired = 0;
         object.batchNumber = '';
@@ -137,7 +137,7 @@ export class ModelFactory {
 
     public static newEmptyCustomer(): Customer {
         const object = new Object() as Customer;
-        object.customerNumber = '';
+        object.code = '';
         object.name = '';
         object.contact = '';
         object.phone = '';

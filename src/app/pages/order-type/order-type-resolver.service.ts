@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, Resolve, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { OrderType } from '@pickvoice/pickvoice-api/model/orderType';
-import { OrderTypeService } from '@pickvoice/pickvoice-api';
+import { DataProviderService} from '../../services/data-provider.service';
 import { Observable } from 'rxjs';
 
 
@@ -10,10 +10,10 @@ import { Observable } from 'rxjs';
 })
 export class OrderTypeResolverService implements Resolve<OrderType> {
 
-  constructor(private orderTypeService: OrderTypeService, private router: Router) { }
+  constructor(private dataProviderService: DataProviderService, private router: Router) { }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<OrderType> {
     const id = Number(route.paramMap.get('id'));
-    return this.orderTypeService.retrieveorderTypeById(id);
+    return this.dataProviderService.getOrderType(id);
   }
 }

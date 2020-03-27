@@ -6,7 +6,7 @@ import { from, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { UtilitiesService } from '../../services/utilities.service';
-import { DataStorage } from '../../services/data-provider';
+import { SharedDataService } from '../../services/shared-data.service';
 
 @Component({
   selector: 'app-importing-widget',
@@ -20,7 +20,7 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
   constructor(
     public dialogRef: MatDialogRef<ImportingWidgetComponent>, private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService,
-    private httpClient: HttpClient, private dataProvider: DataStorage,
+    private httpClient: HttpClient, private sharedDataService: SharedDataService,
     changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
       this.init();
       // responsive del panel lateral izquierdo
@@ -28,7 +28,7 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
       this._mobileQueryListener = () => changeDetectorRef.detectChanges();
       this.mobileQuery.addListener(this._mobileQueryListener);
 
-      this.dataProvider.sheets.subscribe(sheets => {
+      this.sharedDataService.sheets.subscribe(sheets => {
         this.utilities.log('Sheets on importing-widget', sheets);
         if (sheets) {
           this.sheets = sheets;
@@ -37,7 +37,7 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
         this.utilities.error('Error obtaining file sheets');
         this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
       });
-      this.dataProvider.fileName.subscribe(fileName => {
+      this.sharedDataService.fileName.subscribe(fileName => {
         this.utilities.log('fileName on importing-widget', fileName);
         this.fileName = fileName;
       }, error => {
@@ -56,12 +56,12 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
     // cerramos el dialogo enviando los datos en formato json al componente llamante.
     this.init();
     /*
-      El valor de dataProvider.data es asignado desde el componente data-preview.
+      El valor de sharedDataService.data es asignado desde el componente data-preview.
       El envio de datos a traves del metodo close puede suprimirse y usar el provider en el componente
       llamante una vez que se cierre este dialogo.
     */
-    this.utilities.log('dataProvider.data a retornar', this.dataProvider.data);
-    this.dialogRef.close(this.dataProvider.data);
+    this.utilities.log('sharedDataService.data a retornar', this.sharedDataService.data);
+    this.dialogRef.close(this.sharedDataService.data);
   }
 
   close() {
@@ -77,9 +77,9 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
 
   changeSheet(sheet: any) {
     this.utilities.log('change sheet requested');
-    this.dataProvider.data = sheet.rowData;
-    this.dataProvider.setRowData(sheet.rowData);
-    this.dataProvider.setColumnDefs(sheet.columnDefs);
+    this.sharedDataService.data = sheet.rowData;
+    this.sharedDataService.setRowData(sheet.rowData);
+    this.sharedDataService.setColumnDefs(sheet.columnDefs);
   }
 
   private _mobileQueryListener: () => void;

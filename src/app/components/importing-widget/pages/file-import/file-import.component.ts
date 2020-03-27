@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { UtilitiesService } from '../../../../services/utilities.service';
-import { DataStorage } from '../../../../services/data-provider';
+import { SharedDataService } from '../../../../services/shared-data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ImportDialogComponent } from '../../../import-dialog/import-dialog.component';
 import * as XLSX from 'xlsx';
@@ -21,9 +21,9 @@ export class FileImportComponent implements OnInit {
   parsedData: any;
   title: string = '';
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
-              private dataProvider: DataStorage) {
+              private sharedDataService: SharedDataService) {
     // TODO: obtener de la ruta el tipo de datos a importar: items, locations u orders_dto
-    this.dataTypeToImport = this.dataProvider.getDataType();
+    this.dataTypeToImport = this.sharedDataService.getDataType();
     this.utilities.log('data type to import', this.dataTypeToImport);
     // Obtener las columnas a mostrar segun el tipo de datos recibidos
     this.displayedColumns = Object.keys(this.utilities.dataTypesModelMaps[this.dataTypeToImport]);
@@ -110,10 +110,10 @@ export class FileImportComponent implements OnInit {
       this.utilities.log('sheets', sheets);
 
       // guardando los datos en el provider
-      this.dataProvider.setSheets(sheets);
-      this.dataProvider.setFileName(this.file.name);
-      this.dataProvider.filePath = 'unknown'; /*this.file.webkitRelativePath;*/
-      this.utilities.log('dataProvider data seted', sheets);
+      this.sharedDataService.setSheets(sheets);
+      this.sharedDataService.setFileName(this.file.name);
+      this.sharedDataService.filePath = 'unknown'; /*this.file.webkitRelativePath;*/
+      this.utilities.log('sharedDataService data seted', sheets);
 
       // this.utilities.log('parsed xlsx data', this.parsedData);
       this.router.navigate ([{ outlets: { importing: 'importing/data-preview'}}]);

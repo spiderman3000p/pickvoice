@@ -56,6 +56,7 @@ import { NgxPrintModule } from 'ngx-print';
 
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { RouterModule } from '@angular/router';
 
 // See the Moment.js docs for the meaning of these formats:
 // https://momentjs.com/docs/#/displaying/format/
@@ -89,7 +90,7 @@ export const MY_FORMATS = {
   imports: [
     ApiModule,
     HttpClientModule,
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     BrowserAnimationsModule,
     LayoutModule,
@@ -123,7 +124,8 @@ export const MY_FORMATS = {
     ReactiveFormsModule,
     NgxPrintModule,
     AgGridModule.withComponents([]),
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    RouterModule
   ],
   entryComponents: [
     ImportDialogComponent

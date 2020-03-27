@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { RecentOriginsService } from '../../services/recent-origins.service';
-import { DataStorage } from '../../services/data-provider';
+import { SharedDataService } from '../../services/shared-data.service';
 import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
 import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
@@ -13,9 +13,9 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
 import { map, retry, tap, last } from 'rxjs/operators';
-import { LocationsService, ItemsService, Item, ItemType, OrderService, Customer,
-         OrderLine, OrderDto, Order, Transport, Location, UnityOfMeasure, Section,
-         LoadPickService, LoadPick } from '@pickvoice/pickvoice-api';
+import { Item, ItemType, Customer, OrderLine, OrderDto, Order, Transport, Location, UnityOfMeasure,
+         Section, LoadPick } from '@pickvoice/pickvoice-api';
+import { DataProviderService} from '../../services/data-provider.service';
 import { HttpResponse, HttpEventType } from '@angular/common/http';
 import { Observable, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -66,10 +66,8 @@ export class ImportComponent implements OnInit {
   }
 
   constructor(
-    private dialog: MatDialog, private itemsService: ItemsService, private ordersService: OrderService,
-    private locationsService: LocationsService, private utilities: UtilitiesService,
-    private dataProvider: DataStorage, private recentOriginsService: RecentOriginsService,
-    private loadPicksService: LoadPickService) {
+    private dialog: MatDialog, private utilities: UtilitiesService, private dataProviderService: DataProviderService,
+    private sharedDataService: SharedDataService, private recentOriginsService: RecentOriginsService) {
     this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
     this.processingProgress = 0;
@@ -87,7 +85,7 @@ export class ImportComponent implements OnInit {
       });
     dialogRef.afterClosed().subscribe(jsonResult => {
       this.utilities.log('dialog result:', jsonResult);
-      this.selectedType = this.dataProvider.getDataType();
+      this.selectedType = this.sharedDataService.getDataType();
 
       if (jsonResult && jsonResult.length > 0) {
         const receivedKeys: any[] = Object.keys(jsonResult[0]);
@@ -202,9 +200,8 @@ export class ImportComponent implements OnInit {
     } else {
       // Web Workers are not supported in this environment.
       // You should add a fallback so that your program still executes correctly.
-      this.utilities.error(`Web Workers no es soportado por este navegador, el proceso tardará
-      y la interfaz se congelará hasta que termine`);
-      this.utilities.showSnackBar('This web browser cant use web workers, the process will be slower', 'OK');
+      this.utilities.error(`Web Workers no es soportado por este navegador, por favor actualice su navegador`);
+      this.utilities.showSnackBar('This web browser cant use web workers, please update your web browser', 'OK');
     }
   }
 
@@ -363,22 +360,22 @@ export class ImportComponent implements OnInit {
 
   sendItemsData(dataToSend: any[]) {
     this.utilities.log('sending items');
-    return this.itemsService.createItemsList(dataToSend, 'events', true);
+    return this.dataProviderService.createItems(dataToSend, 'events', true);
   }
 
   sendLocationsData(dataToSend: any[]) {
     this.utilities.log('sending locations');
-    return this.locationsService.createLocationsList(dataToSend, 'events', true);
+    return this.dataProviderService.createLocations(dataToSend, 'events', true);
   }
 
   sendOrdersData(dataToSend: any[]) {
     this.utilities.log('sending orders');
-    return this.ordersService.createOrderList(dataToSend, 'events', true);
+    return this.dataProviderService.createOrders(dataToSend, 'events', true);
   }
 
   sendLoadPicksData(dataToSend: any[]) {
     this.utilities.log('sending load picks');
-    return this.loadPicksService.createLoadPick(dataToSend, 'events', true);
+    return this.dataProviderService.createLoadPicks(dataToSend, 'events', true);
   }
 
   handleApiCallResult(result: any, dataToSend: any[]) {
@@ -392,8 +389,8 @@ export class ImportComponent implements OnInit {
       this.importedRows = dataToSend.length - this.rejectedRows;
       if (this.importedRows > 0) {
         const newOrigin = new RecentOrigin();
-        newOrigin.filename = this.dataProvider.getFileName();
-        newOrigin.filepath = this.dataProvider.filePath;
+        newOrigin.filename = this.sharedDataService.getFileName();
+        newOrigin.filepath = this.sharedDataService.filePath;
         newOrigin.totalRows = dataToSend.length; // numero de registros
         newOrigin.importedRows = this.importedRows; // numero de registros aceptados en la bd api
         newOrigin.rejectedRows = this.rejectedRows; // numero de registros no aceptados en la bd api

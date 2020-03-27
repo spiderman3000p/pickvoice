@@ -2,13 +2,13 @@ import { Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/co
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
-import { Item, ItemType, UnityOfMeasure, Location, Order, ItemsService, LocationsService,
-         ItemTypeService, OrderService, Customer, OrderLine, UomService, Section, OrderType,
-         SectionService, Transport, CustomerService, OrderTypeService } from '@pickvoice/pickvoice-api';
+import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, OrderLine, Section, OrderType,
+         Transport } from '@pickvoice/pickvoice-api';
+import { DataProviderService} from '../../services/data-provider.service';
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { DataStorage } from '../../services/data-provider';
+import { SharedDataService } from '../../services/shared-data.service';
 import { from, Observable, Observer } from 'rxjs';
 import { retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
@@ -21,27 +21,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-interface ItemsData {
-  itemTypeList: ItemType[];
-  unityOfMeasureList: UnityOfMeasure[];
-  itemStateList: string[];
-}
-
-interface LocationsData {
-  sectionList: Section[];
-  typeList: string[];
-}
-
-interface OrderLinesData {
-  ordersList: Order[];
-  itemsList: Item[];
-}
-
-interface OrdersData {
-  orderTypeList: OrderType[];
-  transportList: Transport[];
-  customerList: Customer[];
-}
 @Component({
   selector: 'app-edit-row',
   templateUrl: './edit-row.component.html',
@@ -49,7 +28,7 @@ interface OrdersData {
 })
 
 export class EditRowComponent implements OnInit {
-  definitions: any = ModelMap.OrderLineMap;
+  definitions: any; // para mostrar datos de tablas
   form: FormGroup;
   pageTitle = '';
   cardTitle = '';
@@ -61,10 +40,6 @@ export class EditRowComponent implements OnInit {
   isLoadingResults = false;
   printElement = {};
   viewMode: string;
-  itemsData: ItemsData; // para los datos compuestos de Item
-  locationsData: LocationsData; // para los datos compuestos de Location
-  ordersData: OrdersData;
-  orderLinesData: OrderLinesData;
   columnDefs: any[]; // para el agGrid
   rowData: any[];
   dataSource: MatTableDataSource<any>;
@@ -78,29 +53,15 @@ export class EditRowComponent implements OnInit {
   filters: any[] = [];
   actionForSelected: FormControl;
   selection = new SelectionModel<any>(true, []);
+  selectsData: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
-    private dataProvider: DataStorage, private utilities: UtilitiesService, private location: WebLocation,
-    private itemService: ItemsService, private locationService: LocationsService,
-    private activatedRoute: ActivatedRoute, private orderService: OrderService,
-    private sectionService: SectionService, private itemTypeService: ItemTypeService,
-    private router: Router, private uomsService: UomService, private dialog: MatDialog,
-    private orderTypeService: OrderTypeService, private customerService: CustomerService
+    private sharedDataService: SharedDataService, private utilities: UtilitiesService,
+    private location: WebLocation, private activatedRoute: ActivatedRoute, private router: Router,
+    private dialog: MatDialog, private dataProviderService: DataProviderService
   ) {
-    // const data = this.dataProvider.sharedData;
-    // this.row = data.row; // object
-    // this.utilities.log('row recibida', this.row);
-    // this.dataMap = data.map; // map of object
-    // this.utilities.log('fields', this.dataMap);
-    // this.type = data.type; // map of object
-    // this.init();
     this.dataSource = new MatTableDataSource([]);
-    this.itemsData = new Object() as ItemsData;
-    this.locationsData = new Object() as LocationsData;
-    this.ordersData = new Object() as OrdersData;
-    this.orderLinesData = new Object() as OrderLinesData;
-    this.pageTitle = this.viewMode === 'edit' ? 'Edit Row' : 'View Row';
   }
 
   init() {
@@ -111,104 +72,41 @@ export class EditRowComponent implements OnInit {
     this.utilities.log('dataMap', this.dataMap);
     const formControls = {};
     this.keys = Object.keys(this.dataMap);
-    // this.utilities.log('keys', this.keys);
-    let value = '';
-    // init data for selects
-    if (this.type === IMPORTING_TYPES.ITEMS) {
-      // this.row = ModelFactory.newEmptyItem();
-      this.utilities.log('item', this.row);
-      this.getItemTypeList();
-      this.getUnityOfMeasureList();
-      this.getItemStateList();
-    }
-    if (this.type === IMPORTING_TYPES.LOCATIONS) {
-      // this.row = ModelFactory.newEmptyLocation();
-      this.utilities.log('location', this.row);
-      this.getSectionList();
-      this.getTypeList();
-    }
+    
     if (this.type === IMPORTING_TYPES.ORDERS) {
-      // this.row = ModelFactory.newEmptyOrder();
       this.utilities.log('order', this.row);
-      this.getTransportList();
-      this.getCustomerList();
-      this.getOrderTypeList();
+      this.definitions = ModelMap.OrderLineMap;
+    }
+    if (this.row && this.definitions && this.definitions.length > 0) { // si alguna tabla se va a mostrar
       // inicializamos todo lo necesario para la tabla
-      if (this.row && this.row.orderLines && this.row.orderLines.length > 0) {
-        this.dataSource.data = this.row.orderLines;
-        // inicializar definicion de columnas para la tabla agGrid
-        /*this.columnDefs = Object.keys(this.row.orderLines[0]).map((col: any) => {
-          return {
-                    field: col,
-                    filter: true,
-                    editable: true,
-                    sortable: true
-                 };
-        });
-        let orderLineRow;
-        // inicializar definicion de filas para la tabla agGrid
-        this.rowData = this.row.orderLines.map(row => {
-          orderLineRow = new Object();
-          for (let column in row) {
-            if (1) {
-              orderLineRow[column] = this.utilities.renderColumnData(ModelMap.OrderLineMap[column].type, row[column]);
-              console.log(`orderLineRow[${column}]`, orderLineRow[column]);
-              // console.log(`orderLineRow[${column}]`);
-            }
-          }
-          return orderLineRow;
-        });
-        console.log('rowData', this.rowData);
-        */
-        // inicializar tabla mat-table
-        this.displayedDataColumns = Object.keys(ModelMap.OrderLineMap);
-        this.displayedHeadersColumns = ['select'].concat(Object.keys(ModelMap.OrderLineMap));
-        this.displayedHeadersColumns.push('options');
-        this.initColumnsDefs(); // columnas a mostrarse en la tabla
-        // this.utilities.log('filters', this.filters);
-        // this.utilities.log('displayed data columns', this.displayedDataColumns);
-        // this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
-      }
+      this.displayedDataColumns = Object.keys(this.definitions);
+      this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
+      this.displayedHeadersColumns.push('options');
+      this.initColumnsDefs(); // columnas a mostrarse en la tabla
     }
-    if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
-      // this.row = ModelFactory.newEmptyItemType();
-      this.utilities.log('item type', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.UOMS) {
-      // this.row = ModelFactory.newEmptyUnityOfMeasure();
-      this.utilities.log('uom', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.CUSTOMERS) {
-      // this.row = ModelFactory.newEmptyUnityOfMeasure();
-      this.utilities.log('customer', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
-      // this.row = ModelFactory.newEmptyUnityOfMeasure();
-      this.utilities.log('order type', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.SECTIONS) {
-      // this.row = ModelFactory.newEmptyUnityOfMeasure();
-      this.utilities.log('section', this.row);
-    }
-    // console.log('columnDefs', this.columnDefs);
-    // console.log('rowData', this.rowData);
+    this.selectsData = {};
     this.keys.forEach((key, index) => {
       if (this.row === undefined) {
         return;
       }
       // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
-
-      if (this.dataMap[key].required) {
-        formControls[key] = new FormControl(this.row[key], Validators.required);
-      } else {
-        formControls[key] = new FormControl(this.row[key]);
+      if (this.dataMap[key].type !== 'table') {
+        if (this.dataMap[key].required) {
+          formControls[key] = new FormControl(this.row[key], Validators.required);
+        } else {
+          formControls[key] = new FormControl(this.row[key]);
+        }
+        if (this.dataMap[key].formControl.control === 'select') {
+          this.selectsData[key] =
+          this.dataProviderService.getDataFromApi(this.definitions[key].type);
+          formControls[key].patchValue(-1);
+        }
+      }
+      if (this.dataMap[key].type === 'table') {
+        this.dataSource.data = this.row[key];
       }
     });
     this.form = new FormGroup(formControls);
-    /*if (this.viewMode === 'view') {
-      this.form.disable();
-    }*/
-    // this.utilities.log('formControls', formControls);
   }
 
   initColumnsDefs() {
@@ -229,19 +127,20 @@ export class EditRowComponent implements OnInit {
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
-
+    this.selectsData.orderLines = {};
     this.columnDefs.forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
-        filter.name = ModelMap.OrderLineMap[column.name].name;
+        filter.name = this.definitions[column.name].name;
         filter.key = column.name;
         formControls[column.name] = new FormControl('');
-        this.utilities.log(`new formControl formControls[${column.name}]`, formControls[column.name]);
-        this.utilities.log('formControls', formControls);
-        filter.control = formControls[column.name];
-        filter.formControl = ModelMap.OrderLineMap[column.name].formControl;
+        if (this.definitions[column.name].formControl.control === 'select') {
+          this.selectsData.orderLines[column.name] =
+          this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
+          formControls[column.name].patchValue(-1);
+        }
         this.filters.push(filter);
       }
     });
@@ -311,23 +210,21 @@ export class EditRowComponent implements OnInit {
     }
   }
 
-  deleteRow(row: any) {
+  deleteRow(row: any, key) {
     if (this.selection.isSelected(row)) {
       this.selection.deselect(row);
     }
-    const index = this.dataSource.data.findIndex(_row => _row === row);
-    this.utilities.log('index to delete', index);
-    this.dataSource.data.splice(index, 1);
+    this.deleteRowFromTable(row, key);
     this.refreshTable();
     return true;
   }
 
-  deleteRows(rows: any) {
+  deleteRows(rows: any, key: string) {
     let deletedCounter = 0;
     const observer = {
       next: (result) => {
         if (result) {
-          this.deleteRow(rows);
+          this.deleteRow(rows, key);
           this.utilities.log('Row deleted');
           if (deletedCounter === 0) {
             this.utilities.showSnackBar('Row deleted', 'OK');
@@ -345,19 +242,32 @@ export class EditRowComponent implements OnInit {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        // TODO: tener servicio para eliminar registros de orderLines
-        // this.orderService.deleteOrderLine(row.id, 'response', false).subscribe(observer);
+        if (this.dataMap[key].type === IMPORTING_TYPES.ORDER_LINE) {
+          this.deleteRowFromTable(rows, key);
+          // this.orderLineService.delete(row).subscribe(observer);
+        }
+        // TODO: faltan los demas tipos de datos
       });
     } else {
-      // this.apiService.deleteUom(rows.id, 'response', false).subscribe(observer);
+      if (this.dataMap[key].type === IMPORTING_TYPES.ORDER_LINE) {
+        this.deleteRowFromTable(rows, key);
+        // this.orderLineService.delete(row).subscribe(observer);
+      }
+      // TODO: faltan los demas tipos de datos
     }
   }
 
-  deletePrompt(rows?: any) {
+  deleteRowFromTable(row: any, key: string) {
+    const optionIndex = this.dataMap[key].formControl.valueIndex;
+    const index = this.dataSource.data.findIndex(_row => _row[optionIndex] === row[optionIndex]);
+    this.dataSource.data.splice(index, 1);
+  }
+
+  deletePrompt(rows?: any, key?: string) {
     const observer = {
       next: (result) => {
         if (result) {
-          this.deleteRows(rows);
+          this.deleteRows(rows, key);
         }
       },
       error: (error) => {
@@ -393,13 +303,13 @@ export class EditRowComponent implements OnInit {
     this.router.navigate([`${element.id}`]);
   }
 
-  editRowOnDialog(element: any, mode: string) {
+  editRowOnDialog(element: any, key: string,  mode: string) {
     this.utilities.log('row to send to edit dialog', element);
     const dialogRef = this.dialog.open(EditRowDialogComponent, {
       data: {
         row: element,
-        map: ModelMap.OrderLineMap,
-        type: IMPORTING_TYPES.ORDER_LINE,
+        map: this.definitions,
+        type: this.dataMap[key].type,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -416,12 +326,12 @@ export class EditRowComponent implements OnInit {
     });
   }
 
-  addOrderLine() {
-    this.utilities.log('map to send to add dialog', ModelMap.OrderLineMap);
+  addRow(key: string) {
+    this.utilities.log('map to send to add dialog', this.definitions);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: ModelMap.OrderLineMap,
-        type: IMPORTING_TYPES.ORDER_LINE,
+        map: this.definitions,
+        type: this.dataMap[key].type,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -438,11 +348,7 @@ export class EditRowComponent implements OnInit {
     });
   }
 
-  export(){
-    
-  }
-
-  exportOrderLines() {
+  export() {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
@@ -479,7 +385,7 @@ export class EditRowComponent implements OnInit {
   applyFilters() {
   }
 
-  addNewObject(objectType: string, myTitle: string) {
+  addNewObject(key: string, objectType: string, myTitle: string) {
     this.utilities.log('map to send to add dialog', this.utilities.dataTypesModelMaps[objectType]);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
@@ -492,162 +398,13 @@ export class EditRowComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
-        if (objectType === IMPORTING_TYPES.ITEM_TYPE) {
-          this.itemsData.itemTypeList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.UOMS) {
-          this.itemsData.unityOfMeasureList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.SECTIONS) {
-          this.locationsData.sectionList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.TRANSPORTS) {
-          this.ordersData.transportList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.ORDER_TYPE) {
-          this.ordersData.orderTypeList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.CUSTOMERS) {
-          this.ordersData.customerList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.ITEMS) {
-          this.orderLinesData.itemsList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.ORDERS) {
-          this.orderLinesData.ordersList.push(result);
-        }
+        this.selectsData[key] = this.dataProviderService.getDataFromApi(key);
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
     });
-  }
-
-  getItemsList() {
-    this.itemService.retrieveAllItems().subscribe(results => {
-      this.orderLinesData.itemsList = results;
-    });
-  }
-
-  getOrdersList() {
-    this.orderService.retrieveAllOrders().subscribe(results => {
-      this.orderLinesData.ordersList = results;
-    });
-  }
-
-  getSectionList() {
-    this.sectionService.retrieveAllSections().subscribe(results => {
-      this.locationsData.sectionList = results;
-    });
-  }
-
-  getTypeList() {
-      this.locationsData.typeList = Object.keys(Location.TypeEnum);
-  }
-
-  getItemStateList() {
-    this.itemsData.itemStateList = Object.keys(Item.ItemStateEnum);
-}
-
-  getItemTypeList() {
-    this.itemTypeService.retrieveAllItemTypes().subscribe(results => {
-      this.itemsData.itemTypeList = results;
-    });
-  }
-
-  getUnityOfMeasureList() {
-    this.uomsService.retrieveAllUom().subscribe(results => {
-      this.itemsData.unityOfMeasureList = results;
-    });
-  }
-
-  getOrderTypeList() {
-    this.orderTypeService.retrieveAllOrderType().subscribe(results => {
-      this.ordersData.orderTypeList = results;
-    });
-    /*this.ordersData.orderTypeList = new Observable(suscriber => {
-      suscriber.next([
-        { code: 'Factura', description: 'Factura'}
-      ]);
-      suscriber.complete();
-    });*/
-  }
-
-  getCustomerList() {
-    this.customerService.retrieveAllCustomers().subscribe(results => {
-      this.ordersData.customerList = results;
-    });
-    /*this.ordersData.customerList = new Observable(suscriber => {
-      suscriber.next([
-        { customerNumber: 'CU01', name: 'CUSTOMER 1', contact: '', phone: '', address: ''},
-        { customerNumber: 'CU02', name: 'CUSTOMER 2', contact: '', phone: '', address: ''},
-      ]);
-      suscriber.complete();
-    });*/
-  }
-
-  getTransportList() {
-    // this.ordersData.orderTypeList = this.orderTypeService.retrieveAll();
-    const obs = new Observable<Transport[]>(suscriber => {
-      suscriber.next([
-        { transportNumber: 'T01', route: 'ROUTE 1', nameRoute: 'ROUTE 02', dispatchPlatforms: '',
-          carrierCode: 'T01', transportState: Transport.TransportStateEnum.Pending
-        },
-        { transportNumber: 'T01', route: 'ROUTE 2', nameRoute: 'ROUTE 02', dispatchPlatforms: '',
-          carrierCode: 'T02', transportState: Transport.TransportStateEnum.Pending
-        }
-      ]);
-      suscriber.complete();
-    }).subscribe(results => {
-      this.ordersData.transportList = results;
-    });
-  }
-
-  getSelectIndexValue(data: any, key: string) {
-    // console.log(`${key} on data select display`, data);
-    return (typeof data === 'object' ?
-    (data[this.dataMap[key].formControl.valueIndex] ? data[this.dataMap[key].formControl.valueIndex] : '-') :
-    (typeof data === 'string' ?
-    (data ? data : '-') : '-'));
-  }
-
-  getSelectDisplayData(data: any, key: string) {
-    // console.log(`${key} on data select display`, data);
-    return (typeof data === 'object' ?
-    (data[this.dataMap[key].formControl.displayIndex] ? data[this.dataMap[key].formControl.displayIndex] : '-') :
-    (typeof data === 'string' ?
-    (data ? data : '-') : '-'));
-  }
-
-  getSelectInputData(key: string): any[] {
-    let data: any[];
-    if (this.type === IMPORTING_TYPES.ITEMS) {
-      switch (key) {
-        case 'itemType': data = this.itemsData.itemTypeList; break;
-        case 'uom': data = this.itemsData.unityOfMeasureList; break;
-        case 'itemState': data = this.itemsData.itemStateList; break;
-        default: break;
-      }
-    }
-    if (this.type === IMPORTING_TYPES.LOCATIONS) {
-      switch (key) {
-        case 'section': data = this.locationsData.sectionList; break;
-        case 'type': data = this.locationsData.typeList; break;
-        default: break;
-      }
-    }
-    if (this.type === IMPORTING_TYPES.ORDERS) {
-      switch (key) {
-        case 'orderType': data = this.ordersData.orderTypeList; break;
-        case 'transport': data = this.ordersData.transportList; break;
-        case 'customer': data = this.ordersData.customerList; break;
-        default: break;
-      }
-    }
-    // data.subscribe(result => console.log('data on select', result));
-    // console.log(`getSelectInputData: key = '${key}', data:`, data);
-    return data;
   }
 
   print() {
@@ -691,46 +448,51 @@ export class EditRowComponent implements OnInit {
       };
       this.utilities.log('data to upload', toUpload);
       if (this.type === IMPORTING_TYPES.ITEMS) {
-        this.itemService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
+        this.dataProviderService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
         .subscribe(observer);
       }
 
       if (this.type === IMPORTING_TYPES.LOCATIONS) {
-        this.locationService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
+        this.dataProviderService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
 
       if (this.type === IMPORTING_TYPES.ORDERS) {
-        this.orderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
+        this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
 
       if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
-        this.itemTypeService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
+        this.dataProviderService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
 
       if (this.type === IMPORTING_TYPES.UOMS) {
-        this.uomsService.updateUom(toUpload, this.row.id, 'response').pipe(retry(3))
+        this.dataProviderService.updateUom(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
 
       if (this.type === IMPORTING_TYPES.CUSTOMERS) {
-        this.customerService.updateCustomer(toUpload, this.row.id, 'response').pipe(retry(3))
+        this.dataProviderService.updateCustomer(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
 
       if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
-        this.orderTypeService.updateorderType(toUpload, this.row.id, 'response').pipe(retry(3))
+        this.dataProviderService.updateOrderType(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
 
       if (this.type === IMPORTING_TYPES.SECTIONS) {
-        this.sectionService.updateSection(toUpload, this.row.id, 'response').pipe(retry(3))
+        this.dataProviderService.updateSection(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === IMPORTING_TYPES.TRANSPORTS) {
+        this.dataProviderService.updateTransport(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
     } else {
-      this.dataProvider.returnData = toUpload;
+      this.sharedDataService.returnData = toUpload;
       this.location.back();
     }
   }
@@ -765,33 +527,46 @@ export class EditRowComponent implements OnInit {
         console.log('object is an item');
         this.row = data.row as Item;
         this.cardTitle = 'Item sku # ' + this.row.sku;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Item' : 'View Item';
       } else if (this.type === IMPORTING_TYPES.LOCATIONS) {
         console.log('object is a location');
         this.row = data.row as Location;
         this.cardTitle = 'Location code # ' + this.row.code;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Location' : 'View Location';
       } else if (this.type === IMPORTING_TYPES.ORDERS) {
         this.row = data.row as Order;
         this.cardTitle = 'Order # ' + this.row.orderNumber;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
       } else if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
         console.log('object is an item type');
         this.row = data.row as ItemType;
         this.cardTitle = 'Item Type ' + this.row.description;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Item Type' : 'View Item Type';
       } else if (this.type === IMPORTING_TYPES.UOMS) {
         console.log('object is an uom');
         this.row = data.row as UnityOfMeasure;
         this.cardTitle = 'Unity of measure ' + this.row.description;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Unity Of Measure' : 'View Unity Of Measure';
       } else if (this.type === IMPORTING_TYPES.CUSTOMERS) {
         console.log('object is a customer');
         this.row = data.row as Customer;
         this.cardTitle = 'Customer ' + this.row.name;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Customer' : 'View Customer';
       } else if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
         console.log('object is an order type');
         this.row = data.row as OrderType;
         this.cardTitle = 'Order Type ' + this.row.description;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Order Type' : 'View Order Type';
       } else if (this.type === IMPORTING_TYPES.SECTIONS) {
         console.log('object is a section');
         this.row = data.row as OrderType;
         this.cardTitle = 'Section ' + this.row.code;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Section' : 'View Section';
+      } else if (this.type === IMPORTING_TYPES.TRANSPORTS) {
+        console.log('object is a transport');
+        this.row = data.row as Transport;
+        this.cardTitle = 'Transport #' + this.row.transportNumber;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Unknown' : 'View Unknown';
       } else {
         this.cardTitle = 'Unknown object type';
         console.error('object is unknown');

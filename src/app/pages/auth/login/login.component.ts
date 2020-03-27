@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
 
   doLogin() {
     let message: string;
-    this.utilities.log('Doing login ...', `${this.username}, ${this.password}`);
+    // this.utilities.log('Doing login ...', `${this.username}, ${this.password}`);
     this.isLoadingResults = true;
     this.autService.login(this.username.value, this.password.value).pipe(retry(3))
     .subscribe(response => {
@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
       this.isLoadingResults = false;
       this.utilities.error('Error on login', error);
       if (error) {
-        if (error.error.message) {
+        if (error.error && error.error.message) {
           message = error.error.message;
         } else {
           message = 'Error on login';

@@ -2,10 +2,10 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
+import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { ItemsService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+import { TransportService, Transport } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -15,49 +15,47 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
 import { retry } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Observable, Observer } from 'rxjs';
+import { Observer } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-items',
-  templateUrl: './items.component.html',
-  styleUrls: ['./items.component.css']
+  selector: 'app-transport',
+  templateUrl: './transport.component.html',
+  styleUrls: ['./transport.component.css']
 })
-export class ItemsComponent implements OnInit, AfterViewInit {
-  definitions: any = ModelMap.ItemMap;
-  dataSource: MatTableDataSource<Item>;
-  dataToSend: Item[];
+export class TransportComponent implements OnInit, AfterViewInit {
+  definitions: any = ModelMap.TransportMap;
+  dataSource: MatTableDataSource<Transport>;
+  dataToSend: Transport[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
   defaultColumnDefs: any[];
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
-  itemTypeList = [];
-  unityOfMeasureList = [];
-  itemStateList = [];
+  filter: FormControl;
   filtersForm: FormGroup;
   showFilters: boolean;
   filters: any[] = [];
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.ITEMS;
-  printableData: any;
-  selectsData: any[];
+  type = IMPORTING_TYPES.TRANSPORTS;
+  selectsData: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
     private utilities: UtilitiesService) {
       this.dataSource = new MatTableDataSource([]);
-      // this.filter = new FormControl('');
+      this.filter = new FormControl('');
       this.dataToSend = [];
       this.actionForSelected = new FormControl('');
       this.displayedDataColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
       this.displayedHeadersColumns.push('options');
+
       this.initColumnsDefs(); // columnas a mostrarse
-      // this.utilities.log('filters', this.filters);
+      this.utilities.log('filters', this.filters);
       this.actionForSelected.valueChanges.subscribe(value => {
         this.actionForSelectedRows(value);
       });
@@ -83,8 +81,8 @@ export class ItemsComponent implements OnInit, AfterViewInit {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInItemsPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInItemsPage'));
+    if (localStorage.getItem('displayedColumnsInTransportsPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInTransportsPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -96,8 +94,8 @@ export class ItemsComponent implements OnInit, AfterViewInit {
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
-    this.selectsData = [];
-    this.columnDefs.slice().forEach((column, index) => {
+    this.selectsData = {};
+    this.columnDefs.forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
@@ -114,32 +112,11 @@ export class ItemsComponent implements OnInit, AfterViewInit {
       }
     });
     this.filtersForm = new FormGroup(formControls);
-    // this.utilities.log('formControls', formControls);
-  }
-
-  getSelectIndexValue(data: any, key: string) {
-    // this.utilities.log(`${key} on data select display`, data);
-    return this.utilities.getSelectIndexValue(this.definitions, data, key);
-  }
-
-  getSelectDisplayData(data: any, key: string) {
-    // console.log(`${key} on data select display`, data);
-    return this.utilities.getSelectDisplayData(this.definitions, data, key);
-  }
-
-  getSelectInputData(type: string): Observable<any> {
-    return this.dataProviderService.getDataFromApi(type);
+    this.utilities.log('formControls', formControls);
   }
 
   getDisplayedHeadersColumns() {
     return this.columnDefs.filter(col => col.show).map(col => col.name);
-  }
-
-  getPrintableColumns() {
-    const headersColumns = this.getDisplayedHeadersColumns();
-    headersColumns.shift();
-    headersColumns.pop();
-    return headersColumns;
   }
 
   getDefaultHeadersColumns() {
@@ -160,7 +137,7 @@ export class ItemsComponent implements OnInit, AfterViewInit {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInItemsPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInTransportsPage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -234,10 +211,10 @@ export class ItemsComponent implements OnInit, AfterViewInit {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.dataProviderService.deleteItem(row.id, 'response', false).subscribe(observer);
+        this.dataProviderService.deleteTransport(row.id, 'response', false).subscribe(observer);
       });
     } else {
-      this.dataProviderService.deleteItem(rows.id, 'response', false).subscribe(observer);
+      this.dataProviderService.deleteTransport(rows.id, 'response', false).subscribe(observer);
     }
   }
 
@@ -268,57 +245,17 @@ export class ItemsComponent implements OnInit, AfterViewInit {
     return typeof text === 'string' ? text.slice(0, 30) : text;
   }
 
-  resetFilters() {
-    this.dataSource.filter = '';
-  }
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toLowerCase();
 
-  applyFilters() {
-    const formValues = this.filtersForm.value;
-    let value;
-    let value2;
-    // this.utilities.log('filter form values: ', formValues);
-    const filters = this.filters.filter(filter => filter.show &&
-                    formValues[filter.key] && formValues[filter.key].length > 0);
-    // this.utilities.log('filters: ', filters);
-    this.dataSource.filterPredicate = (data: Item, filter: string) => {
-      // this.utilities.log('data', data);
-      return filters.every(shownFilter => {
-        value = this.getSelectIndexValue(data[shownFilter.key], shownFilter.key);
-        value2 = formValues[shownFilter.key].toString();
-        /*
-        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
-        this.utilities.log('shownFilter.key', shownFilter.key);
-        this.utilities.log('value', value);
-        this.utilities.log('value2', value2);
-        this.utilities.log('--------------------------------------------');*/
-        return value !== undefined && value !== null && value.toString().toLowerCase().includes(value2.toLowerCase());
-      });
-    };
-    this.dataSource.filter = 'filtred';
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   editRowOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
-    /*const dialogRef = this.dialog.open(EditRowComponent, {
-      data: {
-        row: element,
-        map: this.utilities.dataTypesModelMaps.items,
-        type: IMPORTING_TYPES.ITEMS,
-        remoteSync: true // para mandar los datos a la BD por la API
-      }
-    });*/
-    /*dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-            this.dataSource.data[element.index] = result;
-            this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });*/
   }
 
   editRowOnDialog(element: any) {
@@ -327,7 +264,7 @@ export class ItemsComponent implements OnInit, AfterViewInit {
       data: {
         row: element,
         map: this.definitions,
-        type: IMPORTING_TYPES.ITEMS,
+        type: IMPORTING_TYPES.TRANSPORTS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -345,11 +282,11 @@ export class ItemsComponent implements OnInit, AfterViewInit {
   }
 
   loadData(useCache = true) {
-    this.utilities.log('requesting items');
+    this.utilities.log('requesting transports');
     this.isLoadingResults = true;
-    this.dataProviderService.getAllItems().subscribe(results => {
+    this.dataProviderService.getAllTransports().subscribe(results => {
       this.isLoadingResults = false;
-      this.utilities.log('items received', results);
+      this.utilities.log('transports received', results);
       if (results && results.length > 0) {
         this.dataSource.data = results.map((element, i) => {
           return { index: i, ... element};
@@ -370,11 +307,11 @@ export class ItemsComponent implements OnInit, AfterViewInit {
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.items);
+    this.utilities.dataTypesModelMaps.transports);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.utilities.dataTypesModelMaps.items,
-        type: IMPORTING_TYPES.ITEMS,
+        map: this.definitions,
+        type: IMPORTING_TYPES.TRANSPORTS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -396,25 +333,7 @@ export class ItemsComponent implements OnInit, AfterViewInit {
       delete row.id;
       delete row.index;
     });
-    this.utilities.exportToXlsx(dataToExport, 'Items List');
-  }
-
-  printRow(data: any) {
-    this.printableData = data;
-    setTimeout(() => {
-      if (this.utilities.print('printSection')) {
-        this.printableData = null;
-      }
-    }, 1000);
-  }
-
-  printRows() {
-    this.printableData = this.selection.selected;
-    setTimeout(() => {
-      if (this.utilities.print('printSection')) {
-        this.printableData = null;
-      }
-    }, 1000);
+    this.utilities.exportToXlsx(dataToExport, 'Transports List');
   }
 
   /*
@@ -441,5 +360,8 @@ export class ItemsComponent implements OnInit, AfterViewInit {
     this.showFilters = !this.showFilters;
 
 
+  }
+
+  applyFilters() {
   }
 }

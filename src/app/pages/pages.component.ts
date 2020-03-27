@@ -118,6 +118,12 @@ export class PagesComponent implements OnInit, OnDestroy  {
               children: []
             },
             {
+              text: 'Transports',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.TRANSPORTS,
+              children: []
+            },
+            {
               text: 'Picking',
               icon: '',
               route: '/pages/picking',

@@ -7,7 +7,7 @@ import { from, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import * as XLSX from 'xlsx';
-import { DataStorage } from '../../services/data-provider';
+import { SharedDataService } from '../../services/shared-data.service';
 
 @Component({
   selector: 'app-import-dialog',
@@ -24,7 +24,7 @@ export class ImportDialogComponent {
   isLoadingResults = false;
   dialogTitle = '';
 
-  constructor(public dialogRef: MatDialogRef<ImportDialogComponent>, private dataProvider: DataStorage,
+  constructor(public dialogRef: MatDialogRef<ImportDialogComponent>, private sharedDataService: SharedDataService,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService,
               private httpClient: HttpClient, private router: Router) {
     this.file = {} as File;
@@ -111,10 +111,10 @@ export class ImportDialogComponent {
         this.utilities.log('sheets', sheets);
   
         // guardando los datos en el provider
-        this.dataProvider.data = {
+        this.sharedDataService.data = {
           sheets: sheets
         };
-        this.utilities.log('dataProvider data seted', this.dataProvider.data);
+        this.utilities.log('sharedDataService data seted', this.sharedDataService.data);
         // this.utilities.log('parsed xlsx data', this.parsedData);
         this.router.navigate ([{ outlets: { importing: 'importing/data-preview'}}]);
         this.utilities.showSnackBar(`Data parsed successfully`, 'OK');
@@ -162,10 +162,10 @@ export class ImportDialogComponent {
           this.utilities.log('sheets', sheets);
     
           // guardando los datos en el provider
-          this.dataProvider.data = {
+          this.sharedDataService.data = {
             sheets: sheets
           };
-          this.utilities.log('dataProvider data seted', this.dataProvider.data);
+          this.utilities.log('sharedDataService data seted', this.sharedDataService.data);
           // this.utilities.log('parsed xlsx data', this.parsedData);
           this.router.navigate ([{ outlets: { importing: 'importing/data-preview'}}]);
           this.utilities.showSnackBar(`Data parsed successfully`, 'OK');

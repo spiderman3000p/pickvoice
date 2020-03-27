@@ -51,6 +51,10 @@ const routes: Routes = [
     loadChildren: () => import('./sections/sections.module').then(m => m.SectionsModule)
   },
   {
+    path: IMPORTING_TYPES.TRANSPORTS,
+    loadChildren: () => import('./transports/transport.module').then(m => m.TransportModule)
+  },
+  {
     path: 'administration',
     loadChildren: () => import('./administration/administration.module').then(m => m.AdministrationModule),
     pathMatch: 'full'

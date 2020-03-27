@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observer, Observable, of } from 'rxjs';
-import { ModelMap } from '../models/model-maps.model';
+import { IMPORTING_TYPES, ModelMap } from '../models/model-maps.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CommonDialogComponent } from '../components/common-dialog/common-dialog.component';
 import { environment } from '../../environments/environment';
@@ -58,21 +58,34 @@ export class UtilitiesService {
         } else {
           dataValue = data;
         }
-        // console.log('date value', dataValue);
         // dataValue = date;
         break;
-      case 'item': dataValue = data && data.description ? data.description : ''; break;
-      case 'order': dataValue = data && data.orderNumber ? data.orderNumber : ''; break;
-      case 'itemType': dataValue = data && data.code ? data.code : ''; break;
-      case 'itemUom': dataValue = data && data.code ? data.code : ''; break;
-      case 'section': dataValue = data && data.code ? data.code : ''; break;
-      case 'transport': dataValue = data && data.nameRoute ? data.nameRoute : ''; break;
-      case 'customer': dataValue = data && data.name ? data.name : ''; break;
-      case 'orderType': dataValue = data && data.code ? data.code : ''; break;
-      case 'orderLineList': dataValue = data && data.length ? `${data.length} orders` : 'none'; break;
+      case IMPORTING_TYPES.ITEMS: dataValue = data && data.description ? data.description : ''; break;
+      case IMPORTING_TYPES.ORDERS: dataValue = data && data.orderNumber ? data.orderNumber : ''; break;
+      case IMPORTING_TYPES.ITEM_TYPE: dataValue = data && data.name ? data.name : ''; break;
+      case IMPORTING_TYPES.UOMS: dataValue = data && data.name ? data.name : ''; break;
+      case IMPORTING_TYPES.SECTIONS: dataValue = data && data.name ? data.name : ''; break;
+      case IMPORTING_TYPES.TRANSPORTS: dataValue = data && data.nameRoute ? data.nameRoute : ''; break;
+      case IMPORTING_TYPES.CUSTOMERS: dataValue = data && data.name ? data.name : ''; break;
+      case IMPORTING_TYPES.ORDER_TYPE: dataValue = data && data.description ? data.description : ''; break;
+      case IMPORTING_TYPES.ORDER_LINE: dataValue = data && data.length ? `${data.length} orders` : 'none'; break;
       default: dataValue = data;
     }
     return dataValue;
+  }
+
+  getSelectIndexValue(definitions: any, data: any, key: string) {
+    // this.utilities.log(`${key} on data select display`, data);
+    return (definitions[key].formControl.control === 'select' ?
+    (definitions[key].formControl.valueIndex !== null && data[definitions[key].formControl.valueIndex] !== undefined ?
+    data[definitions[key].formControl.valueIndex] : data) : data);
+  }
+
+  getSelectDisplayData(definitions: any, data: any, key: string) {
+    // console.log(`${key} on data select display`, data);
+    return (definitions[key].formControl.control === 'select' ?
+    (definitions[key].formControl.displayIndex !== null && data[definitions[key].formControl.displayIndex] !== undefined ?
+    data[definitions[key].formControl.displayIndex] : data) : data);
   }
 
   equalArrays(array1: any[], array2: any[]) {
@@ -126,7 +139,7 @@ export class UtilitiesService {
   }
 
   exportToXlsx(data: any | any[], title: string) {
-    console.log('exporting data to xlsx file', data);
+    this.log('exporting data to xlsx file', data);
     if (data !== undefined) {
       /* generate worksheet */
       let rows = [];
@@ -150,7 +163,7 @@ export class UtilitiesService {
     let printContents;
     let popupWin;
     printContents = document.getElementById(htmlElementId).innerHTML;
-    console.log('printContent', printContents);
+    this.log('printContent', printContents);
     popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
     popupWin.document.open();
     popupWin.document.write(`

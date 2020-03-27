@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
-import { DataCacheService } from '../../services/data-cache.service';
+import { DataProviderService} from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
@@ -40,18 +40,18 @@ export class SectionsComponent implements OnInit, AfterViewInit {
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
   type = IMPORTING_TYPES.SECTIONS;
-
+  selectsData: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
-    private dialog: MatDialog, private apiService: SectionService, private router: Router,
-    private utilities: UtilitiesService, private cacheService: DataCacheService) {
+    private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
+    private utilities: UtilitiesService) {
       this.dataSource = new MatTableDataSource([]);
       this.filter = new FormControl('');
       this.dataToSend = [];
       this.actionForSelected = new FormControl('');
-      this.displayedDataColumns = Object.keys(ModelMap.SectionMap);
-      this.displayedHeadersColumns = ['select'].concat(Object.keys(ModelMap.SectionMap));
+      this.displayedDataColumns = Object.keys(this.definitions);
+      this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
       this.displayedHeadersColumns.push('options');
 
       this.initColumnsDefs(); // columnas a mostrarse
@@ -94,19 +94,20 @@ export class SectionsComponent implements OnInit, AfterViewInit {
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
-
+    this.selectsData = {};
     this.columnDefs.forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
-        filter.name = ModelMap.SectionMap[column.name].name;
+        filter.name = this.definitions[column.name].name;
         filter.key = column.name;
         formControls[column.name] = new FormControl('');
-        this.utilities.log(`new formControl formControls[${column.name}]`, formControls[column.name]);
-        this.utilities.log('formControls', formControls);
-        filter.control = formControls[column.name];
-        filter.formControl = ModelMap.SectionMap[column.name].formControl;
+        if (this.definitions[column.name].formControl.control === 'select') {
+          this.selectsData[column.name] =
+          this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
+          formControls[column.name].patchValue(-1);
+        }
         this.filters.push(filter);
       }
     });
@@ -210,10 +211,10 @@ export class SectionsComponent implements OnInit, AfterViewInit {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.apiService.deleteSection(row.id, 'response', false).subscribe(observer);
+        this.dataProviderService.deleteSection(row.id, 'response', false).subscribe(observer);
       });
     } else {
-      this.apiService.deleteSection(rows.id, 'response', false).subscribe(observer);
+      this.dataProviderService.deleteSection(rows.id, 'response', false).subscribe(observer);
     }
   }
 
@@ -283,7 +284,7 @@ export class SectionsComponent implements OnInit, AfterViewInit {
   loadData(useCache = true) {
     this.utilities.log('requesting sections');
     this.isLoadingResults = true;
-    this.cacheService.getCachedData(this.type, 'sectionsList', useCache).subscribe(results => {
+    this.dataProviderService.getAllSections().subscribe(results => {
       this.isLoadingResults = false;
       this.utilities.log('sections received', results);
       if (results && results.length > 0) {

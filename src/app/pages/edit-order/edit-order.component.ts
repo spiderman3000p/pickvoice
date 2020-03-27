@@ -3,11 +3,11 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Order, OrderService, Customer, OrderLine, OrderType, Transport, CustomerService,
-         OrderTypeService } from '@pickvoice/pickvoice-api';
+         OrderTypeService, TransportService } from '@pickvoice/pickvoice-api';
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { DataStorage } from '../../services/data-provider';
+import { SharedDataService } from '../../services/shared-data.service';
 import { from, Observable, Observer } from 'rxjs';
 import { retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
@@ -62,10 +62,10 @@ export class EditOrderComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
-    private dataProvider: DataStorage, private utilities: UtilitiesService, private location: WebLocation,
+    private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
     private activatedRoute: ActivatedRoute, private orderService: OrderService,
     private router: Router, private dialog: MatDialog, private orderTypeService: OrderTypeService,
-    private customerService: CustomerService
+    private customerService: CustomerService, private transportService: TransportService
   ) {
     this.dataSource = new MatTableDataSource([]);
     this.ordersData = new Object() as OrdersData;
@@ -78,11 +78,8 @@ export class EditOrderComponent implements OnInit {
     this.getCustomerList();
     this.getOrderTypeList();
     // inicializamos todo lo necesario para la tabla
-    // TODO: cambiar orderLines por orderLineList
     if (this.row && this.row.orderLines && this.row.orderLines.length > 0) {
-      this.dataSource.data = this.row.orderLines.slice();
-      delete this.row.orderLines;
-      // this.dataSource.data = this.row.orderLineList.slice();
+      this.dataSource.data = this.row.orderLines;
       // inicializar tabla mat-table
       this.displayedDataColumns = Object.keys(ModelMap.OrderLineMap);
       this.displayedHeadersColumns = ['select'].concat(Object.keys(ModelMap.OrderLineMap));
@@ -98,9 +95,9 @@ export class EditOrderComponent implements OnInit {
       orderType: new FormControl(this.row.orderType),
       priority: new FormControl(this.row.priority),
       note: new FormControl(this.row.note),
-      transport: new FormControl(this.row.transport),
+      idTransport: new FormControl(this.row.idTransport),
       customer: new FormControl(this.row.customer),
-      orderLineList: new FormControl('')
+      orderLines: new FormControl('')
     });
     /*if (this.viewMode === 'view') {
       this.form.disable();
@@ -244,10 +241,16 @@ export class EditOrderComponent implements OnInit {
       rows.forEach(row => {
         // TODO: tener servicio para eliminar registros de orderLines
         // this.orderService.deleteOrderLine(row.id, 'response', false).subscribe(observer);
+        this.deleteOrderLine(row);
       });
     } else {
-      // this.apiService.deleteUom(rows.id, 'response', false).subscribe(observer);
+      this.deleteOrderLine(rows);
     }
+  }
+
+  deleteOrderLine(row: any) {
+    const index = this.row.orderLines.findIndex(_row => _row.id === row.id);
+    this.row.orderLines.splice(index, 1);
   }
 
   deleteOrderLinePrompt(rows?: any) {
@@ -338,6 +341,8 @@ export class EditOrderComponent implements OnInit {
 
   export() {
     // TODO: hacer la exportacion de la orden completa
+    const dataToExport = this.row;
+    this.utilities.exportToXlsx(dataToExport, 'Order ' + this.row.orderNumber);
   }
 
   exportOrderLines() {
@@ -391,49 +396,9 @@ export class EditOrderComponent implements OnInit {
   }
 
   getTransportList() {
-    // this.ordersData.orderTypeList = this.orderTypeService.retrieveAll();
-    const obs = new Observable<Transport[]>(suscriber => {
-      suscriber.next([
-        { transportNumber: 'T01', route: 'ROUTE 1', nameRoute: 'ROUTE 02', dispatchPlatforms: '',
-          carrierCode: 'T01', transportState: Transport.TransportStateEnum.Pending
-        },
-        { transportNumber: 'T01', route: 'ROUTE 2', nameRoute: 'ROUTE 02', dispatchPlatforms: '',
-          carrierCode: 'T02', transportState: Transport.TransportStateEnum.Pending
-        }
-      ]);
-      suscriber.complete();
-    }).subscribe(results => {
+    this.transportService.retrieveAllTransport().subscribe(results => {
       this.ordersData.transportList = results;
     });
-  }
-
-  getSelectIndexValue(data: any, key: string) {
-    // console.log(`${key} on data select display`, data);
-    return (typeof data === 'object' ?
-    (data[this.dataMap[key].formControl.valueIndex] ? data[this.dataMap[key].formControl.valueIndex] : '-') :
-    (typeof data === 'string' ?
-    (data ? data : '-') : '-'));
-  }
-
-  getSelectDisplayData(data: any, key: string) {
-    // console.log(`${key} on data select display`, data);
-    return (typeof data === 'object' ?
-    (data[this.dataMap[key].formControl.displayIndex] ? data[this.dataMap[key].formControl.displayIndex] : '-') :
-    (typeof data === 'string' ?
-    (data ? data : '-') : '-'));
-  }
-
-  getSelectInputData(key: string): any[] {
-    let data: any[];
-    switch (key) {
-      case 'orderType': data = this.ordersData.orderTypeList; break;
-      case 'transport': data = this.ordersData.transportList; break;
-      case 'customer': data = this.ordersData.customerList; break;
-      default: break;
-    }
-    // data.subscribe(result => console.log('data on select', result));
-    // console.log(`getSelectInputData: key = '${key}', data:`, data);
-    return data;
   }
 
   print() {
@@ -450,7 +415,7 @@ export class EditOrderComponent implements OnInit {
     }
     this.utilities.log('onSubmit');
     const formData = this.form.value;
-    formData.orderLineList = this.dataSource.data;
+    formData.orderLines = this.dataSource.data;
 
     const toUpload = this.row;
     this.utilities.log('form data', formData);
@@ -482,7 +447,7 @@ export class EditOrderComponent implements OnInit {
       this.orderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
     } else {
-      this.dataProvider.returnData = toUpload;
+      this.sharedDataService.returnData = toUpload;
       this.location.back();
     }
   }
@@ -539,10 +504,10 @@ export class EditOrderComponent implements OnInit {
     }) => {
       this.viewMode = data.viewMode;
       this.type = data.type;
-      console.log('viewMode', this.viewMode);
+      this.utilities.log('viewMode', this.viewMode);
       const keys = Object.keys(data.row).filter(key => key !== 'id');
       const keysForItem = keys.filter(key => key !== 'state');
-      console.log('ngOnInit => row received', data.row);
+      this.utilities.log('ngOnInit => row received', data.row);
       this.row = data.row as Order;
       this.cardTitle = 'Order # ' + this.row.orderNumber;
       this.remoteSync = true;
