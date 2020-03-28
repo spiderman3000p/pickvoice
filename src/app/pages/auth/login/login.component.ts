@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { OnDestroy, Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { retry } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
@@ -17,6 +18,7 @@ export class LoginComponent implements OnInit {
   showPassword = false;
   remember = false;
   isLoadingResults = false;
+  subscriptions: Subscription[] = [];
   constructor(
     private autService: AuthService, private utilities: UtilitiesService, private router: Router) {
       this.utilities.log('last url', this.autService.redirectUrl);
@@ -26,7 +28,7 @@ export class LoginComponent implements OnInit {
     let message: string;
     // this.utilities.log('Doing login ...', `${this.username}, ${this.password}`);
     this.isLoadingResults = true;
-    this.autService.login(this.username.value, this.password.value).pipe(retry(3))
+    this.subscriptions.push(this.autService.login(this.username.value, this.password.value).pipe(retry(3))
     .subscribe(response => {
       this.isLoadingResults = false;
       this.utilities.log('resultado del login', response);
@@ -52,7 +54,7 @@ export class LoginComponent implements OnInit {
         }
         this.utilities.showSnackBar(message, 'OK');
       }
-    });
+    }));
   }
 
   enter() {

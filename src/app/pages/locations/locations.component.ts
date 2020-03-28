@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
@@ -15,7 +15,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
 import { retry } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Observer } from 'rxjs';
+import { Observer, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -23,7 +23,7 @@ import { Router } from '@angular/router';
   templateUrl: './locations.component.html',
   styleUrls: ['./locations.component.css']
 })
-export class LocationsComponent implements OnInit, AfterViewInit {
+export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
   definitions: any = ModelMap.LocationMap;
   dataSource: MatTableDataSource<Location>;
   dataToSend: Location[];
@@ -42,6 +42,7 @@ export class LocationsComponent implements OnInit, AfterViewInit {
   type = IMPORTING_TYPES.LOCATIONS;
   printableData: any;
   selectsData: any;
+  subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
@@ -56,12 +57,12 @@ export class LocationsComponent implements OnInit, AfterViewInit {
       this.displayedHeadersColumns.push('options');
       this.initColumnsDefs(); // columnas a mostrarse
       this.utilities.log('filters', this.filters);
-      this.actionForSelected.valueChanges.subscribe(value => {
+      this.subscriptions.push(this.actionForSelected.valueChanges.subscribe(value => {
         this.actionForSelectedRows(value);
-      });
-      this.selection.changed.subscribe(selected => {
+      }));
+      this.subscriptions.push(this.selection.changed.subscribe(selected => {
         this.utilities.log('new selection', selected);
-      });
+      }));
       this.utilities.log('displayed data columns', this.displayedDataColumns);
       this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
       this.loadData();
@@ -217,10 +218,12 @@ export class LocationsComponent implements OnInit, AfterViewInit {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.dataProviderService.deleteLocation(row.id, 'response', false).subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.deleteLocation(row.id, 'response', false)
+        .subscribe(observer));
       });
     } else {
-      this.dataProviderService.deleteLocation(rows.id, 'response', false).subscribe(observer);
+      this.subscriptions.push(this.dataProviderService.deleteLocation(rows.id, 'response', false)
+      .subscribe(observer));
     }
   }
 
@@ -249,14 +252,6 @@ export class LocationsComponent implements OnInit, AfterViewInit {
   renderColumnData(type: string, data: any) {
     const text = this.utilities.renderColumnData(type, data);
     return typeof text === 'string' ? text.slice(0, 30) : text;
-  }
-
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
   }
 
   editRowOnPage(element: any) {
@@ -293,7 +288,7 @@ export class LocationsComponent implements OnInit, AfterViewInit {
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
             this.dataSource.data[element.index] = result;
@@ -303,13 +298,13 @@ export class LocationsComponent implements OnInit, AfterViewInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    }));
   }
 
   loadData(useCache = true) {
     this.utilities.log('requesting locations');
     this.isLoadingResults = true;
-    this.dataProviderService.getAllLocations().subscribe(results => {
+    this.subscriptions.push(this.dataProviderService.getAllLocations().subscribe(results => {
       this.isLoadingResults = false;
       this.utilities.log('locations received', results);
       if (results && results.length > 0) {
@@ -322,7 +317,7 @@ export class LocationsComponent implements OnInit, AfterViewInit {
       this.isLoadingResults = false;
       this.utilities.error('error on requesting data');
       this.utilities.showSnackBar('Error requesting data', 'OK');
-    });
+    }));
   }
 
   reloadData() {
@@ -340,7 +335,7 @@ export class LocationsComponent implements OnInit, AfterViewInit {
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
         this.dataSource.data.push(result);
@@ -350,16 +345,14 @@ export class LocationsComponent implements OnInit, AfterViewInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    }));
   }
 
   export() {
-    const dataToExport = this.dataSource.data.slice().map((row: any) => {
-      delete row.id;
-      delete row.index;
+    const dataToExport = this.dataSource.data.map((row: any) => {
+      return this.utilities.getJsonFromObject(row, this.type);
     });
-
-    this.utilities.exportToXlsx(dataToExport, 'Locations List');
+    this.utilities.exportToXlsx(dataToExport, 'Uoms List');
   }
 
   printRow(data: any) {
@@ -402,10 +395,38 @@ export class LocationsComponent implements OnInit, AfterViewInit {
 
   toggleFilters() {
     this.showFilters = !this.showFilters;
+  }
 
-
+  resetFilters() {
+    this.dataSource.filter = '';
   }
 
   applyFilters() {
+    const formValues = this.filtersForm.value;
+    let value;
+    let value2;
+    // this.utilities.log('filter form values: ', formValues);
+    const filters = this.filters.filter(filter => filter.show &&
+                    formValues[filter.key] && formValues[filter.key].length > 0);
+    // this.utilities.log('filters: ', filters);
+    this.dataSource.filterPredicate = (data: Location, filter: string) => {
+      // this.utilities.log('data', data);
+      return filters.every(shownFilter => {
+        value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
+        value2 = formValues[shownFilter.key].toString();
+        /*
+        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
+        this.utilities.log('shownFilter.key', shownFilter.key);
+        this.utilities.log('value', value);
+        this.utilities.log('value2', value2);
+        this.utilities.log('--------------------------------------------');*/
+        return value !== undefined && value !== null && value.toString().toLowerCase().includes(value2.toLowerCase());
+      });
+    };
+    this.dataSource.filter = 'filtred';
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

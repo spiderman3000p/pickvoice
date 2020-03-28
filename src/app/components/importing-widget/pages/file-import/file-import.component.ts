@@ -1,25 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { OnDestroy, Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { UtilitiesService } from '../../../../services/utilities.service';
 import { SharedDataService } from '../../../../services/shared-data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ImportDialogComponent } from '../../../import-dialog/import-dialog.component';
 import * as XLSX from 'xlsx';
-import { of, from } from 'rxjs';
+import { of, from, Subscription } from 'rxjs';
 import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
 @Component({
   selector: 'app-file-import',
   templateUrl: './file-import.component.html',
   styleUrls: ['./file-import.component.css']
 })
-export class FileImportComponent implements OnInit {
+export class FileImportComponent implements OnInit, OnDestroy {
   isLoadingResults = false;
   isDataSaved = false;
   dataTypeToImport = '';
   file: File;
   displayedColumns: string[];
   parsedData: any;
-  title: string = '';
+  title = '';
+  subscriptions: Subscription[] = [];
   constructor(private dialog: MatDialog, private utilities: UtilitiesService, private router: Router,
               private sharedDataService: SharedDataService) {
     // TODO: obtener de la ruta el tipo de datos a importar: items, locations u orders_dto
@@ -131,7 +132,7 @@ export class FileImportComponent implements OnInit {
         },
         width: '450px'
       });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.isLoadingResults = false;
       this.utilities.log('dialog result:', result);
       if (result && result.length > 0) {
@@ -147,12 +148,16 @@ export class FileImportComponent implements OnInit {
     }, error => {
       this.utilities.error('Error after importing dialog close event');
       this.utilities.showSnackBar('Error after importing dialog close event', 'OK');
-    });
+    }));
   }
 
   goBack() {
     this.isLoadingResults = false;
     this.isDataSaved = false;
     this.router.navigate([{outlets: {importing: 'importing/import-type-selection'}}]);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

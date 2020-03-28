@@ -1,22 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { OnDestroy, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SharedDataService } from '../../../../services/shared-data.service';
 import { UtilitiesService } from '../../../../services/utilities.service';
 import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-data-preview',
   templateUrl: './data-preview.component.html',
   styleUrls: ['./data-preview.component.css']
 })
-export class DataPreviewComponent implements OnInit {
+export class DataPreviewComponent implements OnInit, OnDestroy {
   sheets: any[] = []; // hojas del libro excel
   rowData: any[] = [];
   columnDefs: any[] = [];
   title = '';
+  subscriptions: Subscription[] = [];
   constructor(private sharedDataService: SharedDataService, private router: Router,
               private utilities: UtilitiesService) {
     this.sheets = this.sharedDataService.getSheets();
-    this.sharedDataService.rowData.subscribe(rowData => {
+    this.subscriptions.push(this.sharedDataService.rowData.subscribe(rowData => {
       this.utilities.log('new rowData arrived', rowData);
       if (rowData) {
         this.rowData = rowData;
@@ -24,8 +26,8 @@ export class DataPreviewComponent implements OnInit {
     }, error => {
       this.utilities.error('Error obtaining row data', error);
       this.utilities.showSnackBar('Error obtaining row data', 'OK');
-    });
-    this.sharedDataService.columnDefs.subscribe(columnDefs => {
+    }));
+    this.subscriptions.push(this.sharedDataService.columnDefs.subscribe(columnDefs => {
       this.utilities.log('new columnDefs arrived', columnDefs);
       if (columnDefs) {
         this.columnDefs = columnDefs.map(col => {
@@ -39,12 +41,12 @@ export class DataPreviewComponent implements OnInit {
     }, error => {
       this.utilities.error('Error obtaining file columns definitions');
       this.utilities.showSnackBar('Error obtaining columns definitions', 'OK');
-    });
+    }));
     this.utilities.log('in data-preview initial sheets', this.sheets);
     if (this.sheets.length > 0) {
       this.setData();
     }
-    this.sharedDataService.sheets.subscribe(sheets => {
+    this.subscriptions.push(this.sharedDataService.sheets.subscribe(sheets => {
       this.utilities.log('sharedDataService data received', sheets);
       if (sheets) {
         this.sheets = sheets;
@@ -54,7 +56,7 @@ export class DataPreviewComponent implements OnInit {
     }, error => {
       this.utilities.error('Error obtaining file sheets');
       this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
-    });
+    }));
     const dataTypeToImport = this.sharedDataService.getDataType();
     if (dataTypeToImport === IMPORTING_TYPES.ITEMS) {
       this.title = 'Importing Items';
@@ -98,4 +100,7 @@ export class DataPreviewComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 }

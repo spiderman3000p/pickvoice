@@ -1,9 +1,9 @@
-import { Inject, Component, OnInit, AfterViewInit } from '@angular/core';
+import { OnDestroy, Inject, Component, OnInit, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { from, Observable } from 'rxjs';
+import { Subscription, from, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import * as XLSX from 'xlsx';
@@ -14,7 +14,7 @@ import { SharedDataService } from '../../services/shared-data.service';
   templateUrl: './import-dialog.component.html',
   styleUrls: ['./import-dialog.component.scss']
 })
-export class ImportDialogComponent {
+export class ImportDialogComponent implements OnDestroy {
   importType: string;
   fileInput: FormControl;
   urlInput: FormControl;
@@ -23,7 +23,7 @@ export class ImportDialogComponent {
   parsedData: any;
   isLoadingResults = false;
   dialogTitle = '';
-
+  subscriptions: Subscription[] = [];
   constructor(public dialogRef: MatDialogRef<ImportDialogComponent>, private sharedDataService: SharedDataService,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService,
               private httpClient: HttpClient, private router: Router) {
@@ -69,7 +69,7 @@ export class ImportDialogComponent {
       return;
     }
     this.isLoadingResults = true;
-    this.httpClient.get(this.urlInput.value, { responseType: 'blob'}).pipe(
+    this.subscriptions.push(this.httpClient.get(this.urlInput.value, { responseType: 'blob'}).pipe(
       tap(
         data => {
           this.utilities.log('data', data);
@@ -124,11 +124,11 @@ export class ImportDialogComponent {
     }, error => {
       this.utilities.error('Error on url request');
       this.utilities.showSnackBar('Error on url request', 'OK');
-    });
+    }));
   }
 
   loadApi() {
-      this.httpClient.get(this.urlInput.value, { responseType: 'blob'})
+    this.subscriptions.push(this.httpClient.get(this.urlInput.value, { responseType: 'blob'})
       .subscribe(response => {
         this.utilities.log('resultado obtenido', response);
         this.utilities.log('tipo', typeof response);
@@ -144,7 +144,6 @@ export class ImportDialogComponent {
           const sheets = [];
           /*this.utilities.log('wb.Sheets', wb.Sheets);
           this.utilities.log('wb.SheetNames', wb.SheetNames);*/
-    
           /* grab first sheet */
           wb.SheetNames.forEach((key, index) => {
             wsname = key;
@@ -158,9 +157,7 @@ export class ImportDialogComponent {
             });
             sheets.push(sheet);
           });
-    
           this.utilities.log('sheets', sheets);
-    
           // guardando los datos en el provider
           this.sharedDataService.data = {
             sheets: sheets
@@ -175,7 +172,7 @@ export class ImportDialogComponent {
       }, error => {
         this.utilities.error('Error on api request');
         this.utilities.showSnackBar(`Error on api request`, 'OK');
-      });
+      }));
   }
 
   onSubmit() {
@@ -190,5 +187,9 @@ export class ImportDialogComponent {
 
   close() {
     this.dialogRef.close();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

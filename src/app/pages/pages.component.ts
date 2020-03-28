@@ -5,7 +5,7 @@ import { UtilitiesService } from '../services/utilities.service';
 import { Observer } from 'rxjs';
 import { Router } from '@angular/router';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
-
+import { timer, Subscription } from 'rxjs';
 @Component({
   selector: 'app-pages',
   templateUrl: './pages.component.html',
@@ -153,7 +153,10 @@ export class PagesComponent implements OnInit, OnDestroy  {
       ]
     }
   ];
-
+  subscriptions: Subscription[] = [];
+  internetStatus = 'online';
+  internetStatusMessage = '';
+  showInternetStatus = false;
   private _mobileQueryListener: () => void;
   
   constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
@@ -162,8 +165,32 @@ export class PagesComponent implements OnInit, OnDestroy  {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
-
     this.username = this.authService.getUsername();
+    this.subscriptions.push(this.utilities.internetStatus().subscribe((event: Event) => {
+      this.utilities.log('Internet status event', event);
+      if (event && event.type) {
+        switch (event.type) {
+          case 'offline': {
+            this.internetStatusMessage = 'It seems you are offline right now. Please verify your Internet connection';
+            this.utilities.showSnackBar('Internet connection has gone', 'OK');
+            this.internetStatus = event.type;
+            this.showInternetStatus = true;
+            break;
+          }
+          case 'online': {
+            let message = 'You are online';
+            if (this.internetStatus === 'offline') {
+              message = 'You are online again';
+              this.utilities.showSnackBar(message, 'OK');
+            }
+            this.internetStatusMessage = message;
+            this.internetStatus = event.type;
+            this.showInternetStatus = true;
+            this.subscriptions.push(timer(5000).subscribe(() => this.showInternetStatus = false));
+          }
+        }
+      }
+    }));
   }
 
   logout() {
@@ -171,7 +198,7 @@ export class PagesComponent implements OnInit, OnDestroy  {
       next: (response) => {
         if (response === true) {
           this.utilities.log('loggin out...');
-          this.authService.logout().subscribe(result => {
+          this.subscriptions.push(this.authService.logout().subscribe(result => {
             this.utilities.log('logout response', result);
             if (result) {
               this.utilities.log('redirecting to /');
@@ -180,7 +207,7 @@ export class PagesComponent implements OnInit, OnDestroy  {
           }, error => {
             this.utilities.log('error on logout');
             this.utilities.showSnackBar('Error requesting logout', 'OK');
-          });
+          }));
         }
       },
       error: (error) => {
@@ -199,5 +226,6 @@ export class PagesComponent implements OnInit, OnDestroy  {
 
   ngOnDestroy(): void {
     this.mobileQuery.removeListener(this._mobileQueryListener);
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 }

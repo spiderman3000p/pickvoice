@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observer, Observable, of } from 'rxjs';
+import { concat, merge, Subscription, fromEvent, Observer, Observable, of } from 'rxjs';
+import { takeLast } from 'rxjs/operators';
 import { IMPORTING_TYPES, ModelMap } from '../models/model-maps.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CommonDialogComponent } from '../components/common-dialog/common-dialog.component';
@@ -17,7 +18,7 @@ export interface ValidationError {
 @Injectable({
   providedIn: 'root'
 })
-export class UtilitiesService {
+export class UtilitiesService implements OnDestroy {
   public dataTypesModelMaps = {
     items: ModelMap.ItemMap,
     itemTypes: ModelMap.ItemTypeMap,
@@ -31,7 +32,10 @@ export class UtilitiesService {
     transports: ModelMap.TransportMap,
     loadPicksDto: ModelMap.LoadPickDtoMap
   };
-  constructor(private snackBar: MatSnackBar, private dialog: MatDialog) { }
+  subscriptions: Subscription[];
+  constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {
+    this.subscriptions = [];
+  }
 
   showSnackBar(message: string, action: string) {
     this.snackBar.open(message, action, {
@@ -123,7 +127,24 @@ export class UtilitiesService {
         showNegativeBtn: options.showNegativeBtn
       }
     });
-    dialogRef.afterClosed().subscribe(observer);
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(observer));
+  }
+
+  getJsonFromObject(object: any, type: string): any {
+    const dataMap = this.dataTypesModelMaps[type];
+    const toExport = {};
+    if (dataMap) {
+      for (const key in dataMap) {
+        if (dataMap[key].formControl.control !== 'select' && dataMap[key].formControl.control !== 'table') {
+          toExport[key] = object[key];
+        } else if (dataMap[key].formControl.control === 'select') {
+          toExport[key] = dataMap[key].formControl.valueIndex === null ? object[key] :
+          object[key][dataMap[key].formControl.valueIndex];
+        }
+      }
+      return toExport;
+    }
+    return null;
   }
 
   public log(param1: any, param2?: any) {
@@ -179,5 +200,15 @@ export class UtilitiesService {
     );
     popupWin.document.close();
     return true;
+  }
+
+  internetStatus(): Observable<Event> {
+    const offlineEvent = fromEvent(window, 'offline');
+    const onlineEvent = fromEvent(window, 'online');
+    return merge(onlineEvent, offlineEvent);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe);
   }
 }

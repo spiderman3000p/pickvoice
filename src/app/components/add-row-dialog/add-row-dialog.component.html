@@ -13,12 +13,11 @@
                         Select a value
                     </mat-option>
                     <mat-option *ngFor="let data of selectsData[key] | async"
-                    [value]="dataMap[key].formControl.valueIndex !== null ?
-                    data[dataMap[key].formControl.valueIndex] : data">
+                    [value]="data">
                         {{ dataMap[key].formControl.displayIndex !== null ?
                             data[dataMap[key].formControl.displayIndex] : data }}
                     </mat-option>
-                    <div class="select-footer">
+                    <div class="select-footer" *ngIf="dataMap[key].addNew">
                         <span class="select-footer-content">
                             <a href="javascript: void(0)"
                             (click)="addNewObject(key, dataMap[key].addNew.modelType, 'Add new ' + dataMap[key].name)">

@@ -14,6 +14,9 @@ export class UomsResolverService implements Resolve<UnityOfMeasure> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<UnityOfMeasure> {
     const id = Number(route.paramMap.get('id'));
-    return this.dataProviderService.getUom(id);
+    return Observable.create((observer) => {
+      observer.next(this.dataProviderService.getUom(id));
+      observer.complete();
+    });
   }
 }

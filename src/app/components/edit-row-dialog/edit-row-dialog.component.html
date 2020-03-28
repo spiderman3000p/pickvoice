@@ -19,7 +19,7 @@
                         {{ dataMap[key].formControl.displayIndex !== null ?
                             data[dataMap[key].formControl.displayIndex] : data }}
                     </mat-option>
-                    <div class="select-footer" *ngIf="dataMap[key].addNew !== undefined && viewMode === 'edit'">
+                    <div class="select-footer" *ngIf="dataMap[key].addNew && viewMode === 'edit'">
                         <span class="select-footer-content">
                             <a href="javascript: void(0)"
                             (click)="addNewObject(key, dataMap[key].addNew.modelType)">

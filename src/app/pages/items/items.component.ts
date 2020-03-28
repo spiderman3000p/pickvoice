@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
@@ -8,6 +8,12 @@ import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-d
 import { ItemsService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 
+import { MatCheckboxComponent } from './components/mat-checkbox.component';
+/*import { MatInputComponent } from "./mat-input.component";
+import { MatRadioComponent } from "./mat-radio.component";
+import { MatSelectComponent } from "./mat-select.component";*/
+
+import { AllCommunityModules, GridOptions } from '@ag-grid-community/all-modules';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -15,7 +21,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
 import { retry } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Observable, Observer } from 'rxjs';
+import { Subscription, Observable, Observer } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -23,7 +29,7 @@ import { Router } from '@angular/router';
   templateUrl: './items.component.html',
   styleUrls: ['./items.component.css']
 })
-export class ItemsComponent implements OnInit, AfterViewInit {
+export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
   definitions: any = ModelMap.ItemMap;
   dataSource: MatTableDataSource<Item>;
   dataToSend: Item[];
@@ -44,35 +50,45 @@ export class ItemsComponent implements OnInit, AfterViewInit {
   type = IMPORTING_TYPES.ITEMS;
   printableData: any;
   selectsData: any[];
+  subscriptions: Subscription[] = [];
+  agGridOptions: GridOptions;
+  agGridModules = AllCommunityModules;
+  agGridRowData = [];
+  agGridColumnDefs = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
     private utilities: UtilitiesService) {
-      this.dataSource = new MatTableDataSource([]);
+      // this.dataSource = new MatTableDataSource([]);
       // this.filter = new FormControl('');
       this.dataToSend = [];
       this.actionForSelected = new FormControl('');
       this.displayedDataColumns = Object.keys(this.definitions);
-      this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
-      this.displayedHeadersColumns.push('options');
-      this.initColumnsDefs(); // columnas a mostrarse
+      // +this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
+      // this.displayedHeadersColumns.push('options');
+      // this.initColumnsDefs(); // columnas a mostrarse
       // this.utilities.log('filters', this.filters);
-      this.actionForSelected.valueChanges.subscribe(value => {
+      this.subscriptions.push(this.actionForSelected.valueChanges.subscribe(value => {
         this.actionForSelectedRows(value);
+      }));
+      this.agGridColumnDefs = this.displayedDataColumns.map(column => {
+        return {
+          field: column,
+          filter: true,
+          editable: true,
+          sortable: true
+        };
       });
-      this.selection.changed.subscribe(selected => {
-        this.utilities.log('new selection', selected);
-      });
-
+      this.utilities.log('agGridColumnDefs', this.agGridColumnDefs);
       this.utilities.log('displayed data columns', this.displayedDataColumns);
-      this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
+      // this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
       this.loadData();
   }
 
   ngOnInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    /*this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;*/
   }
 
   ngAfterViewInit() {
@@ -115,20 +131,6 @@ export class ItemsComponent implements OnInit, AfterViewInit {
     });
     this.filtersForm = new FormGroup(formControls);
     // this.utilities.log('formControls', formControls);
-  }
-
-  getSelectIndexValue(data: any, key: string) {
-    // this.utilities.log(`${key} on data select display`, data);
-    return this.utilities.getSelectIndexValue(this.definitions, data, key);
-  }
-
-  getSelectDisplayData(data: any, key: string) {
-    // console.log(`${key} on data select display`, data);
-    return this.utilities.getSelectDisplayData(this.definitions, data, key);
-  }
-
-  getSelectInputData(type: string): Observable<any> {
-    return this.dataProviderService.getDataFromApi(type);
   }
 
   getDisplayedHeadersColumns() {
@@ -234,10 +236,12 @@ export class ItemsComponent implements OnInit, AfterViewInit {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.dataProviderService.deleteItem(row.id, 'response', false).subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.deleteItem(row.id, 'response', false)
+        .subscribe(observer));
       });
     } else {
-      this.dataProviderService.deleteItem(rows.id, 'response', false).subscribe(observer);
+      this.subscriptions.push(this.dataProviderService.deleteItem(rows.id, 'response', false)
+      .subscribe(observer));
     }
   }
 
@@ -283,7 +287,7 @@ export class ItemsComponent implements OnInit, AfterViewInit {
     this.dataSource.filterPredicate = (data: Item, filter: string) => {
       // this.utilities.log('data', data);
       return filters.every(shownFilter => {
-        value = this.getSelectIndexValue(data[shownFilter.key], shownFilter.key);
+        value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
         value2 = formValues[shownFilter.key].toString();
         /*
         this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
@@ -331,7 +335,7 @@ export class ItemsComponent implements OnInit, AfterViewInit {
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
             this.dataSource.data[element.index] = result;
@@ -341,26 +345,43 @@ export class ItemsComponent implements OnInit, AfterViewInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    }));
+  }
+
+  initAgGrid() {
+    this.agGridOptions = {
+      rowData: this.agGridRowData,
+      columnDefs: this.columnDefs,
+      onGridReady: () => {
+        this.agGridOptions.api.sizeColumnsToFit();
+      },
+      rowHeight: 48,
+      headerHeight: 48,
+      frameworkComponents: {
+        checkboxRenderer: MatCheckboxComponent
+      }
+    } as GridOptions;
   }
 
   loadData(useCache = true) {
     this.utilities.log('requesting items');
     this.isLoadingResults = true;
-    this.dataProviderService.getAllItems().subscribe(results => {
+    this.subscriptions.push(this.dataProviderService.getAllItems().subscribe(results => {
       this.isLoadingResults = false;
       this.utilities.log('items received', results);
-      if (results && results.length > 0) {
+      this.agGridRowData = results;
+      this.initAgGrid();
+      /*if (results && results.length > 0) {
         this.dataSource.data = results.map((element, i) => {
           return { index: i, ... element};
         });
         this.refreshTable();
-      }
+      }*/
     }, error => {
       this.isLoadingResults = false;
       this.utilities.error('error on requesting data');
       this.utilities.showSnackBar('Error requesting data', 'OK');
-    });
+    }));
   }
 
   reloadData() {
@@ -378,7 +399,7 @@ export class ItemsComponent implements OnInit, AfterViewInit {
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
         this.dataSource.data.push(result);
@@ -388,13 +409,12 @@ export class ItemsComponent implements OnInit, AfterViewInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    }));
   }
 
   export() {
-    const dataToExport = this.dataSource.data.slice().map((row: any) => {
-      delete row.id;
-      delete row.index;
+    const dataToExport = this.dataSource.data.map((row: any) => {
+      return this.utilities.getJsonFromObject(row, this.type);
     });
     this.utilities.exportToXlsx(dataToExport, 'Items List');
   }
@@ -439,7 +459,9 @@ export class ItemsComponent implements OnInit, AfterViewInit {
 
   toggleFilters() {
     this.showFilters = !this.showFilters;
+  }
 
-
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe);
   }
 }

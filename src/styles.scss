@@ -167,7 +167,7 @@ tr.mat-header-row{
   font-weight: 400;
   letter-spacing: .1rem;
 }
-mat-table {
+/*mat-table {
   min-height: 300px;
 }
 table{
@@ -189,7 +189,7 @@ table.mat-table-hoverflow{
   background-color: white;
   border-width: 1px;
   color: #00525E !important;
-  /*position: absolute!important;*/
+  // position: absolute!important;
   z-index: 1;
   display: flex;
   right: auto;
@@ -236,6 +236,7 @@ td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
   padding-left: 10px !important;
   padding-right: 10px !important;
 }
+*/
 .mat-slide-toggle + span > label {
   display: none !important;
 }

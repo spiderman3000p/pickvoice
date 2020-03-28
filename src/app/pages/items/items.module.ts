@@ -25,6 +25,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 
+import { AgGridModule } from 'ag-grid-angular';
+
 @NgModule({
   declarations: [
     ItemsComponent
@@ -52,7 +54,8 @@ import { MatListModule } from '@angular/material/list';
     MatSelectModule,
     MatSlideToggleModule,
     MatExpansionModule,
-    MatListModule
+    MatListModule,
+    AgGridModule.withComponents([]),
   ]
 })
 export class ItemsModule { }

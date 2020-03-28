@@ -33,7 +33,7 @@ export class EditRowComponent implements OnInit {
   pageTitle = '';
   cardTitle = '';
   type: string;
-  dataMap: any;
+  dataMap: any; // paramapear datos de la entidad recibida a editar
   remoteSync: boolean;
   keys: string[];
   row: any;
@@ -62,6 +62,7 @@ export class EditRowComponent implements OnInit {
     private dialog: MatDialog, private dataProviderService: DataProviderService
   ) {
     this.dataSource = new MatTableDataSource([]);
+    this.isLoadingResults = true;
   }
 
   init() {
@@ -72,12 +73,13 @@ export class EditRowComponent implements OnInit {
     this.utilities.log('dataMap', this.dataMap);
     const formControls = {};
     this.keys = Object.keys(this.dataMap);
-    
+
     if (this.type === IMPORTING_TYPES.ORDERS) {
       this.utilities.log('order', this.row);
       this.definitions = ModelMap.OrderLineMap;
     }
-    if (this.row && this.definitions && this.definitions.length > 0) { // si alguna tabla se va a mostrar
+    // si alguna tabla se va a mostrar
+    if (this.row && this.definitions && this.definitions.length > 0) {
       // inicializamos todo lo necesario para la tabla
       this.displayedDataColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
@@ -90,7 +92,7 @@ export class EditRowComponent implements OnInit {
         return;
       }
       // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
-      if (this.dataMap[key].type !== 'table') {
+      if (this.dataMap[key].formControl.control !== 'table') {
         if (this.dataMap[key].required) {
           formControls[key] = new FormControl(this.row[key], Validators.required);
         } else {
@@ -98,15 +100,19 @@ export class EditRowComponent implements OnInit {
         }
         if (this.dataMap[key].formControl.control === 'select') {
           this.selectsData[key] =
-          this.dataProviderService.getDataFromApi(this.definitions[key].type);
-          formControls[key].patchValue(-1);
+          this.dataProviderService.getDataFromApi(this.dataMap[key].type);
+          if (this.row[key] === undefined || this.row[key] === null) {
+            formControls[key].patchValue(-1);
+          }
         }
       }
       if (this.dataMap[key].type === 'table') {
         this.dataSource.data = this.row[key];
       }
     });
+    this.utilities.log('formControls', formControls);
     this.form = new FormGroup(formControls);
+    this.utilities.log('form', this.form.value);
   }
 
   initColumnsDefs() {
@@ -348,12 +354,23 @@ export class EditRowComponent implements OnInit {
     });
   }
 
-  export() {
+  export(title: string) {
+    const dataToExport = this.utilities.getJsonFromObject(this.row, this.type);
+    if (dataToExport !== null) {
+      this.utilities.exportToXlsx(dataToExport, title);
+      this.utilities.showSnackBar('Data exported succesfully', 'OK');
+    } else {
+      this.utilities.showSnackBar('Error mapping the data', 'OK');
+    }
+  }
+
+  exportTableData(title: string) {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
     });
-    this.utilities.exportToXlsx(dataToExport, 'Order Lines List');
+    this.utilities.exportToXlsx(dataToExport, title);
+    this.utilities.showSnackBar('Data exported succesfully', 'OK');
   }
 
   /*
@@ -510,6 +527,7 @@ export class EditRowComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isLoadingResults = true;
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.activatedRoute.data.subscribe((data: {
@@ -517,62 +535,70 @@ export class EditRowComponent implements OnInit {
       viewMode: string,
       type: string
     }) => {
-      this.viewMode = data.viewMode;
-      this.type = data.type;
-      console.log('viewMode', this.viewMode);
-      const keys = Object.keys(data.row).filter(key => key !== 'id');
-      const keysForItem = keys.filter(key => key !== 'state');
-      console.log('ngOnInit => row received', data.row);
-      if (this.type === IMPORTING_TYPES.ITEMS) {
-        console.log('object is an item');
-        this.row = data.row as Item;
-        this.cardTitle = 'Item sku # ' + this.row.sku;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Item' : 'View Item';
-      } else if (this.type === IMPORTING_TYPES.LOCATIONS) {
-        console.log('object is a location');
-        this.row = data.row as Location;
-        this.cardTitle = 'Location code # ' + this.row.code;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Location' : 'View Location';
-      } else if (this.type === IMPORTING_TYPES.ORDERS) {
-        this.row = data.row as Order;
-        this.cardTitle = 'Order # ' + this.row.orderNumber;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
-      } else if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
-        console.log('object is an item type');
-        this.row = data.row as ItemType;
-        this.cardTitle = 'Item Type ' + this.row.description;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Item Type' : 'View Item Type';
-      } else if (this.type === IMPORTING_TYPES.UOMS) {
-        console.log('object is an uom');
-        this.row = data.row as UnityOfMeasure;
-        this.cardTitle = 'Unity of measure ' + this.row.description;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Unity Of Measure' : 'View Unity Of Measure';
-      } else if (this.type === IMPORTING_TYPES.CUSTOMERS) {
-        console.log('object is a customer');
-        this.row = data.row as Customer;
-        this.cardTitle = 'Customer ' + this.row.name;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Customer' : 'View Customer';
-      } else if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
-        console.log('object is an order type');
-        this.row = data.row as OrderType;
-        this.cardTitle = 'Order Type ' + this.row.description;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Order Type' : 'View Order Type';
-      } else if (this.type === IMPORTING_TYPES.SECTIONS) {
-        console.log('object is a section');
-        this.row = data.row as OrderType;
-        this.cardTitle = 'Section ' + this.row.code;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Section' : 'View Section';
-      } else if (this.type === IMPORTING_TYPES.TRANSPORTS) {
-        console.log('object is a transport');
-        this.row = data.row as Transport;
-        this.cardTitle = 'Transport #' + this.row.transportNumber;
-        this.pageTitle = this.viewMode === 'edit' ? 'Edit Unknown' : 'View Unknown';
-      } else {
-        this.cardTitle = 'Unknown object type';
-        console.error('object is unknown');
+      if (data) {
+        this.viewMode = data.viewMode;
+        this.type = data.type;
+        this.utilities.log('viewMode', this.viewMode);
+        data.row.subscribe(row => {
+          this.utilities.log('row', row);
+          if (row) {
+            this.isLoadingResults = false;
+            const keys = Object.keys(row).filter(key => key !== 'id');
+            const keysForItem = keys.filter(key => key !== 'state');
+            this.utilities.log('ngOnInit => row received', row);
+            if (this.type === IMPORTING_TYPES.ITEMS) {
+              this.utilities.log('object is an item');
+              this.row = row as Item;
+              this.cardTitle = 'Item sku # ' + this.row.sku;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Item' : 'View Item';
+            } else if (this.type === IMPORTING_TYPES.LOCATIONS) {
+              this.utilities.log('object is a location');
+              this.row = row as Location;
+              this.cardTitle = 'Location code # ' + this.row.code;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Location' : 'View Location';
+            } else if (this.type === IMPORTING_TYPES.ORDERS) {
+              this.row = row as Order;
+              this.cardTitle = 'Order # ' + this.row.orderNumber;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
+            } else if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
+              this.utilities.log('object is an item type');
+              this.row = row as ItemType;
+              this.cardTitle = 'Item Type ' + this.row.description;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Item Type' : 'View Item Type';
+            } else if (this.type === IMPORTING_TYPES.UOMS) {
+              this.utilities.log('object is an uom');
+              this.row = row as UnityOfMeasure;
+              this.cardTitle = 'Unity of measure ' + this.row.name;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Unity Of Measure' : 'View Unity Of Measure';
+            } else if (this.type === IMPORTING_TYPES.CUSTOMERS) {
+              this.utilities.log('object is a customer');
+              this.row = row as Customer;
+              this.cardTitle = 'Customer ' + this.row.name;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Customer' : 'View Customer';
+            } else if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
+              this.utilities.log('object is an order type');
+              this.row = row as OrderType;
+              this.cardTitle = 'Order Type ' + this.row.description;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Order Type' : 'View Order Type';
+            } else if (this.type === IMPORTING_TYPES.SECTIONS) {
+              this.utilities.log('object is a section');
+              this.row = row as OrderType;
+              this.cardTitle = 'Section ' + this.row.code;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Section' : 'View Section';
+            } else if (this.type === IMPORTING_TYPES.TRANSPORTS) {
+              this.utilities.log('object is a transport');
+              this.row = row as Transport;
+              this.cardTitle = 'Transport #' + this.row.transportNumber;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Unknown' : 'View Unknown';
+            } else {
+              this.cardTitle = 'Unknown object type';
+              console.error('object is unknown');
+            }
+            this.remoteSync = true;
+            this.init();
+          }
+        });
       }
-      this.remoteSync = true;
-      this.init();
     });
   }
 }

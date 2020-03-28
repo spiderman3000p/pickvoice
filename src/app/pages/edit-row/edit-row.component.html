@@ -1,6 +1,9 @@
 <div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
     <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
-    <div class="content">
+    <div class="content" *ngIf="form">
       <div class="section-wrapper">
           <div class="header actionbar align-content-top">
               <div class="title actionbar-section align-content-top">
@@ -10,7 +13,7 @@
                 <button mat-raised-button color="accent" (click)="print()">
                     <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
                 </button>
-                <button mat-raised-button color="warn" (click)="export()">
+                <button mat-raised-button color="warn" (click)="export(cardTitle)">
                     <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
                 </button>
               </div>
@@ -18,9 +21,6 @@
       </div>
       <mat-card>
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <div class="example-loading-shade" *ngIf="isLoadingResults">
-                <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
-            </div>
             <mat-card-header>
                 <mat-card-title>{{cardTitle}}</mat-card-title>
             </mat-card-header>
@@ -31,14 +31,14 @@
                         <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
                         *ngIf="dataMap[key].formControl.control === 'select'">
                             <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                            <mat-select [compareWith]="dataMap[key].formControl.compareFn" [formControlName]="key" [class.readonly]="viewMode === 'view'">
+                            <mat-select [compareWith]="dataMap[key].formControl.compareFn" [formControlName]="key"
+                            [class.readonly]="viewMode === 'view'">
                                 <mat-option [value]="-1">
                                     Select a value
                                 </mat-option>
                                 <mat-option *ngFor="let data of selectsData[key] | async"
-                                [value]="dataMap[key].formControl.valueIndex !== null ?
-                                data[dataMap[key].formControl.valueIndex] : data">
-                                    {{ dataMap[key].formControl.displayIndex !== null ?
+                                [value]="data">
+                                    {{ dataMap[key].formControl.displayIndex !== null && dataMap[key].formControl.displayIndex !== null ?
                                         data[dataMap[key].formControl.displayIndex] : data }}
                                 </mat-option>
                                 <div class="select-footer" *ngIf="dataMap[key].addNew && viewMode === 'edit'">
@@ -93,7 +93,7 @@
                                     <h3>{{dataMap[key].name}}</h3>
                                 </div>
                                 <div class="col-sm-6 text-right">
-                                    <button mat-raised-button color="warn" (click)="export()">
+                                    <button mat-raised-button color="warn" (click)="exportTableData(cardTitle + ' ' + dataMap[key].name)">
                                         <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
                                     </button>
                                     <button mat-raised-button color="accent" (click)="addRow(key)" class="ml-2">

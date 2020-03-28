@@ -13,6 +13,9 @@ export class LocationsResolverService implements Resolve<Location> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Location> {
     const id = Number(route.paramMap.get('id'));
-    return this.dataProviderService.getLocation(id);
+    return Observable.create((observer) => {
+      observer.next(this.dataProviderService.getLocation(id));
+      observer.complete();
+    });
   }
 }

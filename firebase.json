@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/PickVoiceWarehouseAdmin",
+    "public": "dist/PickVoiceWarehouseAdmin/browser",
     "ignore": [
       "firebase.json",
       "**/.*",

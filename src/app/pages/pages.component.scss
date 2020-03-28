@@ -89,3 +89,20 @@ a.mat-list-item.active .mat-list-item-content:before {
     left: 0px;
     background: rgba(0,0,0,0.03);
 }
+.internet-status{
+    padding: 10px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.8);
+    transition: background-color 2s;
+    color: white;
+    z-index: 1;
+}
+.internet-status.offline {
+    background-color: rgba(198, 12, 12, 0.8);
+}
+.internet-status.online {
+    background-color: rgba(8, 198, 12, 0.8);
+}

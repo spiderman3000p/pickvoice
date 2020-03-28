@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, Inject } from '@angula
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { from, Observable } from 'rxjs';
+import { from, Observable, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { UtilitiesService } from '../../services/utilities.service';
@@ -17,6 +17,7 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
   fileName: string;
   sheets: any[];
   mobileQuery: MediaQueryList;
+  subscriptions: Subscription[] = [];
   constructor(
     public dialogRef: MatDialogRef<ImportingWidgetComponent>, private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService,
@@ -28,7 +29,7 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
       this._mobileQueryListener = () => changeDetectorRef.detectChanges();
       this.mobileQuery.addListener(this._mobileQueryListener);
 
-      this.sharedDataService.sheets.subscribe(sheets => {
+      this.subscriptions.push(this.sharedDataService.sheets.subscribe(sheets => {
         this.utilities.log('Sheets on importing-widget', sheets);
         if (sheets) {
           this.sheets = sheets;
@@ -36,14 +37,14 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
       }, error => {
         this.utilities.error('Error obtaining file sheets');
         this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
-      });
-      this.sharedDataService.fileName.subscribe(fileName => {
+      }));
+      this.subscriptions.push(this.sharedDataService.fileName.subscribe(fileName => {
         this.utilities.log('fileName on importing-widget', fileName);
         this.fileName = fileName;
       }, error => {
         this.utilities.error('Error obtaining file name');
         this.utilities.showSnackBar('Error obtaining file name', 'OK');
-      });
+      }));
       this.router.navigate([{outlets: {importing: 'importing'}}]);
   }
 
@@ -89,5 +90,6 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
   
   ngOnDestroy(): void {
     this.mobileQuery.removeListener(this._mobileQueryListener);
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

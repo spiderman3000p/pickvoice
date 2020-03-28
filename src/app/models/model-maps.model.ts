@@ -132,6 +132,8 @@ export class ModelMap {
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
+                    console.log('c1', c1);
+                    console.log('c2', c2);
                     return c1.code === c2.code;
                 }
             },

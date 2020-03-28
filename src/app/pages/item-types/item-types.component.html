@@ -156,16 +156,16 @@
                             <!--button mat-icon-button (click)="editRowOnPage(element)">
                                 <img src="assets/icons/zoom.png">
                             </button-->
-                            <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
+                            <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
                                 <img src="assets/icons/zoom.png">
                             </button>
-                            <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
+                            <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
                                 <img src="assets/icons/page_edit.png">
                             </button>
                             <!--button mat-icon-button (click)="printRow(element)">
                                 <img src="assets/icons/printer.png">
                             </button-->
-                            <a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
+                            <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
                                 <img src="assets/icons/printer.png">
                             </a>
                             <button mat-icon-button (click)="deletePrompt(element)">
@@ -177,8 +177,8 @@
                     <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
                     <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                     [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
-                    <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
-                        [routerLink]="['/pages/' + type + '/view', row.code]"></tr>
+                    <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                    [ngClass]="{'alert alert-danger': row.invalid}"></tr>
                 </table>
                 <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
             </div>

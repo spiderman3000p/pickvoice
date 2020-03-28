@@ -1,4 +1,7 @@
 <div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+    </div>
     <div id="printSection" style="display:none">
         <app-print *ngIf="printableData !== null && printableData !== undefined" [format]="'table'"
         [title]="'Items List'" [headers]="getPrintableColumns()" [element]="printableData" [type]="type"></app-print>
@@ -20,7 +23,7 @@
               </div>
           </div>
       </div>
-      <div>
+      <!--div>
         <div class="example-loading-shade" *ngIf="isLoadingResults">
           <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
         </div>
@@ -108,12 +111,12 @@
                 </div>
                 <div class="col-sm-6 text-right toolbar-buttons">
                     <!--button class="print-button" (click)="printRows(selection.selected)">Print</button-->
-                    <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button-->
+                    <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button->
                     <button class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
                 </div>
             </div>
             <table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8">
-                <!-- Checkbox Column -->
+                <!-- Checkbox Column ->
                 <ng-container matColumnDef="select">
                     <th mat-header-cell *matHeaderCellDef>
                         <mat-checkbox (change)="$event ? masterToggle() : null"
@@ -130,12 +133,12 @@
                         </mat-checkbox>
                     </td>
                 </ng-container>
-                <!-- Data Columns -->
+                <!-- Data Columns ->
                 <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
                     <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
                 </ng-container>
-                <!-- Options Sticky Column -->
+                <!-- Options Sticky Column ->
                 <ng-container matColumnDef="options" stickyEnd>
                     <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
                         {{'Options' | uppercase}}
@@ -160,7 +163,7 @@
                         </button-->
                         <!--button mat-icon-button (click)="editRowOnPage(element)">
                             <img src="assets/icons/zoom.png">
-                        </button-->
+                        </button->
                         <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
                             <img src="assets/icons/zoom.png">
                         </button>
@@ -169,7 +172,7 @@
                         </button>
                         <!--button mat-icon-button (click)="printRow(element)">
                             <img src="assets/icons/printer.png">
-                        </button-->
+                        </button->
                         <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
                             <img src="assets/icons/printer.png">
                         </a>
@@ -181,12 +184,22 @@
 
                 <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
                 <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
+                [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr->
                 <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                 [ngClass]="{'alert alert-danger': row.invalid}"></tr>
             </table>
             <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
         </div>
+      </div-->
+      <div style="height:500px; width:100%;">
+        <ag-grid-angular
+        style="height: 100%; width: 100%"
+        class="ag-theme-balham"
+        [modules]="agGridModules"
+        [gridOptions]="agGridOptions"
+        [rowData]="agGridRowData"
+        [columnDefs]="agGridColumnDefs">
+        </ag-grid-angular>
       </div>
     </div>
   </div>

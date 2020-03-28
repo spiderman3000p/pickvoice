@@ -1,4 +1,4 @@
-import { Inject, Component, OnInit, AfterViewInit } from '@angular/core';
+import { OnDestroy, Inject, Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
@@ -9,7 +9,7 @@ import { AddRowDialogComponent } from '../add-row-dialog/add-row-dialog.componen
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { SharedDataService } from '../../services/shared-data.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { from, Observable } from 'rxjs';
+import { Subscription, from, Observable } from 'rxjs';
 import { retry } from 'rxjs/operators';
 
 @Component({
@@ -18,7 +18,7 @@ import { retry } from 'rxjs/operators';
   styleUrls: ['./edit-row-dialog.component.scss']
 })
 
-export class EditRowDialogComponent implements OnInit {
+export class EditRowDialogComponent implements OnInit, OnDestroy {
   form: FormGroup;
   dialogTitle = '';
   type: string;
@@ -29,6 +29,7 @@ export class EditRowDialogComponent implements OnInit {
   isLoadingResults = false;
   viewMode: string;
   selectsData: any;
+  subscriptions: Subscription[] = [];
   constructor(public dialogRef: MatDialogRef<EditRowDialogComponent>, private sharedDataService: SharedDataService,
               private dialog: MatDialog, private dataProviderService: DataProviderService,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
@@ -79,7 +80,7 @@ export class EditRowDialogComponent implements OnInit {
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
         this.selectsData[key] = this.dataProviderService.getDataFromApi(objectType);
@@ -88,7 +89,7 @@ export class EditRowDialogComponent implements OnInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    }));
   }
 
   onSubmit() {
@@ -127,48 +128,48 @@ export class EditRowDialogComponent implements OnInit {
       };
       this.utilities.log('data to upload', toUpload);
       if (this.type === IMPORTING_TYPES.ITEMS) {
-        this.dataProviderService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
+        .subscribe(observer));
       }
 
       if (this.type === IMPORTING_TYPES.LOCATIONS) {
-        this.dataProviderService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
 
       if (this.type === IMPORTING_TYPES.ORDERS_DTO) {
-        this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
 
       if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
-        this.dataProviderService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
 
       if (this.type === IMPORTING_TYPES.ORDERS) {
-        this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
 
       if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
-        this.dataProviderService.updateOrderType(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateOrderType(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
 
       if (this.type === IMPORTING_TYPES.UOMS) {
-        this.dataProviderService.updateUom(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateUom(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
 
       if (this.type === IMPORTING_TYPES.TRANSPORTS) {
-        this.dataProviderService.updateTransport(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateTransport(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
 
       if (this.type === IMPORTING_TYPES.SECTIONS) {
-        this.dataProviderService.updateSection(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.updateSection(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
     } else {
       this.dialogRef.close(toUpload);
@@ -191,5 +192,7 @@ export class EditRowDialogComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
 }
