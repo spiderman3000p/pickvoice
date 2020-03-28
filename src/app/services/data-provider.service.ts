@@ -5,6 +5,7 @@ import { Transport, Location, Item, UomService, SectionService, OrderService, Or
 import { UtilitiesService } from './utilities.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { retry } from 'rxjs/operators';
 
 @Injectable({
@@ -17,10 +18,10 @@ export class DataProviderService {
     private loadPickService: LoadPickService, private itemTypeService: ItemTypeService,
     private itemService: ItemsService, private customerService: CustomerService,
     private sectionService: SectionService, private orderService: OrderService,
-    private transportService: TransportService) {
+    private transportService: TransportService, private httpClient: HttpClient) {
   }
 
-  getDataFromApi(type: any): Observable<any> {
+  getDataFromApi(type: any, params: string = null): Observable<any> {
     let toReturn: Observable<any>;
     switch (type) {
       case IMPORTING_TYPES.CUSTOMERS: {
@@ -40,7 +41,11 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.ITEMS: {
         this.utilities.log(`obteniendo items...`);
-        toReturn = this.itemService.retrieveAllItems().pipe(retry(3));
+        if (params) {
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/items/' + params).pipe(retry(3));
+        } else {
+          toReturn = this.itemService.retrieveAllItems().pipe(retry(3));
+        }
         break;
       }
       case IMPORTING_TYPES.LOCATIONS: {

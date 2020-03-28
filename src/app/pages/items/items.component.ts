@@ -83,10 +83,11 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.utilities.log('agGridColumnDefs', this.agGridColumnDefs);
       this.utilities.log('displayed data columns', this.displayedDataColumns);
       // this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
-      this.loadData();
+      // this.loadData();
   }
 
   ngOnInit() {
+    this.initAgGrid();
     /*this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;*/
   }
@@ -350,15 +351,61 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   initAgGrid() {
     this.agGridOptions = {
-      rowData: this.agGridRowData,
       columnDefs: this.columnDefs,
+      enableColResize : true,
+      enableSorting : true,
+      enableFilter : true,
+      rowSelection: 'single',
+      enableServerSideSorting : true,
+      enableServerSideFilter : true,
+      rowModelType : 'infinite',
+      pagination: true,
+      paginationPageSize : 100,
+      cacheOverflowSize : 2,
+      maxConcurrentDatasourceRequests : 2,
+      infiniteInitialRowCount : 1,
+      maxBlocksInCache : 2,
       onGridReady: () => {
-        this.agGridOptions.api.sizeColumnsToFit();
+        // this.agGridOptions.api.sizeColumnsToFit();
+        this.agGridOptions.api.showLoadingOverlay();
       },
-      rowHeight: 48,
-      headerHeight: 48,
       frameworkComponents: {
-        checkboxRenderer: MatCheckboxComponent
+        // checkboxRenderer: MatCheckboxComponent
+      },
+      datasource : {
+        getRows : (params) => {
+          const filterModel = params.filterModel;
+          let param = '';
+          this.utilities.log('filterModel', filterModel);
+          for (const p in filterModel) {
+            if (1) {
+              for (const q in filterModel[p]) {
+                if (1) {
+                  const x = p + '-' + q + '=' + filterModel[p][q];
+                  param += x + ';';
+                }
+              }
+            }
+          }
+          const sortModel = params.sortModel;
+          if (sortModel && sortModel.length > 0) {
+            sortModel.forEach(sortElem => {
+              param += 'sort-' + sortElem.colId + '=' + sortElem.sort + ';';
+            });
+          }
+          param += 'startRow=' + params.startRow + ';' + 'endRow=' + params.endRow + ';';
+          let rowData;
+          this.dataProviderService.getDataFromApi(this.type, param).subscribe(results => {
+            rowData = results.map(result => this.utilities.objectToRow(result, this.type));
+            let lastRow = -1;
+            if (rowData.length < (params.endRow - params.startRow)) {
+              lastRow = params.startRow + rowData.length;
+            }
+            this.agGridOptions.api.sizeColumnsToFit();
+            this.agGridOptions.api.hideOverlay();
+            params.successCallback(rowData, lastRow);
+          });
+        }
       }
     } as GridOptions;
   }
@@ -386,7 +433,7 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   reloadData() {
     this.selection.clear();
-    this.loadData(false);
+    // this.loadData(false);
   }
 
   addRow() {
