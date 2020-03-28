@@ -5,11 +5,12 @@
     {
       "name": "api-performance",
       "urls": [
+        "https://tau-tech.co:8443/api/*"
       ],
       "cacheConfig": {
         "strategy": "performance",
         "maxSize": 100,
-        "maxAge": "3d"
+        "maxAge": "600s"
       }
     },
     {

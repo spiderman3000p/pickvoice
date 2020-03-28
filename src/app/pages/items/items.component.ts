@@ -369,7 +369,7 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.push(this.dataProviderService.getAllItems().subscribe(results => {
       this.isLoadingResults = false;
       this.utilities.log('items received', results);
-      this.agGridRowData = results;
+      this.agGridRowData = results.map(item => this.utilities.objectToRow(item, this.type));
       this.initAgGrid();
       /*if (results && results.length > 0) {
         this.dataSource.data = results.map((element, i) => {

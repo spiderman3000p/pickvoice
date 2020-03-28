@@ -147,6 +147,23 @@ export class UtilitiesService implements OnDestroy {
     return null;
   }
 
+  objectToRow(object: any, type: string): any {
+    const dataMap = this.dataTypesModelMaps[type];
+    const toExport = {};
+    if (dataMap) {
+      for (const key in dataMap) {
+        if (dataMap[key].formControl.control !== 'select' && dataMap[key].formControl.control !== 'table') {
+          toExport[key] = object[key];
+        } else if (dataMap[key].formControl.control === 'select') {
+          toExport[key] = dataMap[key].formControl.displayIndex === null ? object[key] :
+          object[key][dataMap[key].formControl.displayIndex];
+        }
+      }
+      return toExport;
+    }
+    return null;
+  }
+
   public log(param1: any, param2?: any) {
     if (environment.debug === true) {
       console.log(param1, param2 ? param2 : '');
