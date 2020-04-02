@@ -1,0 +1,31 @@
+
+equals -> Todo
+notEqual -> todo
+contains -> texto,
+notContains -> texto
+startsWith -> texto
+endsWith -> texto
+lessThan -> numero, date
+lessThanOrEqual -> numero, date
+greaterThan -> numero, date
+greaterThanOrEqual -> numero, date
+inRange -> numeros, fecha
+
+https://tau-tech.co:8443/api/settings/itemList/weight-filterType=text;weight-type=contains;weight-filter=hj;expiryDate-filterType=text;expiryDate-type=notContains;expiryDate-filter=k;sort-weight=asc;startRow=0;endRow=100;
+https://tau-tech.co:8443/api/settings/itemList/weight-filterType=text;weight-type=contains;weight-filter=hj;sort-weight=asc;startRow=0;endRow=100;
+https://tau-tech.co:8443/api/settings/itemList/weight-filterType=text;weight-type=contains;weight-filter=hj;sort-weight=asc;startRow=0;endRow=100;
+https://tau-tech.co:8443/api/settings/itemList/sort-weight=asc;startRow=0;endRow=100;
+https://tau-tech.co:8443/api/settings/itemList/startRow=100;endRow=200;
+https://tau-tech.co:8443/api/settings/itemList/startRow=0;endRow=100;
+
+filter-itemType=25
+
+cadena generada por mi:
+
+https://tau-tech.co:8443/api/settings/itemList/
+startRow=0;endRow=10;
+sku-filterType=number;sku-type=greaterThan;sku-filter=21212;upc-filterType=text;upc-type=contains;
+upc-filter=122;description-filterType=text;description-type=contains;description-filter=ghhg;
+phonetic-filterType=text;phonetic-type=contains;phonetic-filter=hjgjk;itemType-filterType=itemTypes;
+itemType-type=number;itemType-filter=4;
+sort-sku=asc

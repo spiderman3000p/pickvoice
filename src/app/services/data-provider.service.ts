@@ -21,7 +21,7 @@ export class DataProviderService {
     private transportService: TransportService, private httpClient: HttpClient) {
   }
 
-  getDataFromApi(type: any, params: string = null): Observable<any> {
+  getDataFromApi(type: any, params?: string, errorHandler?: any): Observable<any> {
     let toReturn: Observable<any>;
     switch (type) {
       case IMPORTING_TYPES.CUSTOMERS: {
@@ -42,7 +42,7 @@ export class DataProviderService {
       case IMPORTING_TYPES.ITEMS: {
         this.utilities.log(`obteniendo items...`);
         if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/items/' + params).pipe(retry(3));
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/itemList/' + params).pipe(retry(3));
         } else {
           toReturn = this.itemService.retrieveAllItems().pipe(retry(3));
         }
@@ -50,7 +50,11 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.LOCATIONS: {
         this.utilities.log(`obteniendo locations...`);
-        toReturn = this.locationService.retrieveAllLocation().pipe(retry(3));
+        if (params) {
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/locationsList/' + params).pipe(retry(3));
+        } else {
+          toReturn = this.locationService.retrieveAllLocation().pipe(retry(3));
+        }
         break;
       }
       case IMPORTING_TYPES.LOCATION_TYPE: {
@@ -60,7 +64,11 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.ORDERS: {
         this.utilities.log(`obteniendo orders...`);
-        toReturn = this.orderService.retrieveAllOrders().pipe(retry(3));
+        if (params) {
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/outbound/orderList/all;' + params).pipe(retry(3));
+        } else {
+          toReturn = this.orderService.retrieveAllOrders().pipe(retry(3));
+        }
         break;
       }
       case IMPORTING_TYPES.ORDER_LINE: {

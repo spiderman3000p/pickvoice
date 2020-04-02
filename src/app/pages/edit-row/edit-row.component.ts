@@ -94,14 +94,15 @@ export class EditRowComponent implements OnInit {
       // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
       if (this.dataMap[key].formControl.control !== 'table') {
         if (this.dataMap[key].required) {
-          formControls[key] = new FormControl(this.row[key], Validators.required);
+          formControls[key] = new FormControl(this.row[key] ? this.row[key] : '', Validators.required);
         } else {
-          formControls[key] = new FormControl(this.row[key]);
+          formControls[key] = new FormControl(this.row[key] ? this.row[key] : '');
         }
         if (this.dataMap[key].formControl.control === 'select') {
           this.selectsData[key] =
           this.dataProviderService.getDataFromApi(this.dataMap[key].type);
           if (this.row[key] === undefined || this.row[key] === null) {
+            this.utilities.error(`this.row[${key}] es null o undefined`, this.row[key]);
             formControls[key].patchValue(-1);
           }
         }
@@ -145,7 +146,9 @@ export class EditRowComponent implements OnInit {
         if (this.definitions[column.name].formControl.control === 'select') {
           this.selectsData.orderLines[column.name] =
           this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
-          formControls[column.name].patchValue(-1);
+          if (this.row[column.name] === undefined || this.row[column.name] === null) {
+            formControls[column.name].patchValue(this.row[column.name]);
+          }
         }
         this.filters.push(filter);
       }

@@ -133,15 +133,22 @@ export class UtilitiesService implements OnDestroy {
   getJsonFromObject(object: any, type: string): any {
     const dataMap = this.dataTypesModelMaps[type];
     const toExport = {};
-    if (dataMap) {
+    // this.log('parseando objeto', object);
+    if (dataMap && object) {
       for (const key in dataMap) {
-        if (dataMap[key].formControl.control !== 'select' && dataMap[key].formControl.control !== 'table') {
-          toExport[key] = object[key];
-        } else if (dataMap[key].formControl.control === 'select') {
-          toExport[key] = dataMap[key].formControl.valueIndex === null ? object[key] :
-          object[key][dataMap[key].formControl.valueIndex];
+        if (object[key]) {
+          if (dataMap[key].formControl.control !== 'select' && dataMap[key].formControl.control !== 'table') {
+            toExport[key] = object[key];
+          } else if (dataMap[key].formControl.control === 'select') {
+            // this.log('parseando objeto', object[key]);
+            // this.log('formControl de mapa de objeto', dataMap[key].formControl);
+            // this.log('objeto con indice', object[key][dataMap[key].formControl.valueIndex]);
+            toExport[key] = dataMap[key].formControl.valueIndex === null ? object[key] :
+            object[key][dataMap[key].formControl.valueIndex];
+          }
         }
       }
+      // this.log('objeto parseado', toExport);
       return toExport;
     }
     return null;

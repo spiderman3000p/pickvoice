@@ -13,6 +13,9 @@ export class OrdersResolverService implements Resolve<Order> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Order> {
     const id = Number(route.paramMap.get('id'));
-    return this.dataProviderService.getOrder(id);
+    return Observable.create((observer) => {
+      observer.next(this.dataProviderService.getOrder(id));
+      observer.complete();
+    });
   }
 }

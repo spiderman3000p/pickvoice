@@ -15,6 +15,58 @@ export const IMPORTING_TYPES = {
     TRANSPORT_STATE: 'transportState',
     ITEM_STATE: 'itemState'
 };
+export const FILTER_TYPES = [
+    {
+        value: 'equal',
+        name: 'Equal',
+        availableForTypes: ['all']
+    },
+    {
+        value: 'notEqual',
+        name: 'Not equal',
+        availableForTypes: ['text']
+    },
+    {
+        value: 'contains',
+        name: 'Contains',
+        availableForTypes: ['text']
+    },
+    {
+        value: 'notContains',
+        name: 'Not contains',
+        availableForTypes: ['text']
+    },
+    {
+        value: 'startsWith',
+        name: 'Starts with',
+        availableForTypes: ['text']
+    },
+    {
+        value: 'endsWith',
+        name: 'Ends with',
+        availableForTypes: ['text']
+    },
+    {
+        value: 'lessThan',
+        name: 'Less than',
+        availableForTypes: ['number', 'date']
+    },
+    {
+        value: 'lessThanOrEqual',
+        name: 'Less than or equal',
+        availableForTypes: ['number', 'date']
+    },
+    {
+        value: 'greaterThan',
+        name: 'Greater than',
+        availableForTypes: ['number', 'date']
+    },
+    {
+        value: 'inRange',
+        name: 'In range',
+        availableForTypes: ['number', 'date']
+    }
+];
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
     Cada propiedad aqui especificada, corresponde a las columnas de los archivos de importacion
@@ -132,8 +184,6 @@ export class ModelMap {
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
-                    console.log('c1', c1);
-                    console.log('c2', c2);
                     return c1.code === c2.code;
                 }
             },
@@ -426,6 +476,8 @@ export class ModelMap {
                 displayIndex: null,
                 valueIndex: null,
                 compareFn: (c1, c2) => {
+                    console.log('c1', c1);
+                    console.log('c2', c2);
                     return c1 === c2;
                 }
             }
@@ -527,7 +579,7 @@ export class ModelMap {
                 control: 'textarea'
             }
         },
-        idTransport: {
+        transport: {
             name: 'transport',
             required: false,
             type: IMPORTING_TYPES.TRANSPORTS,
@@ -553,10 +605,10 @@ export class ModelMap {
             formControl: {
                 control: 'select',
                 type: IMPORTING_TYPES.CUSTOMERS,
-                valueIndex: 'customerNumber',
+                valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
-                    return c1.customerNumber === c2.customerNumber;
+                    return c1.code === c2.code;
                 }
             },
             addNew: {

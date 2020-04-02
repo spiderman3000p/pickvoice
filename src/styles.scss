@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 $primary: #00b19d;
+$accent: #00535e;
+$secondary: #00535e;
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
@@ -13,6 +15,9 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   overflow-y: hidden;
+}
+button:focus {
+  outline: none !important;
 }
 .mat-sidenav>.mat-drawer-inner-container::-webkit-scrollbar {
   width: 8px;
@@ -49,6 +54,89 @@ body {
     border-bottom-color: rgb(255,255,255);
     border-width: 9px;
     margin-left: -9px;
+}
+.column-filter-menu {
+  padding: 8px !important;
+  max-width: 150px !important;
+}
+.column-filter-menu .mat-menu-content{
+  padding: 0 !important;
+}
+.mat-menu-content:not(:empty) {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.column-filter-icon {
+  position: absolute;
+  right: 0px;
+  opacity: 0;
+  transition: all 0.5s;
+  font-size: 14px;
+  color: rgb(0, 0, 0)
+}
+.btn-filter2-wrapper{
+  float: right;
+}
+.btn-filter2{
+  padding: 0 !important;
+  line-height: unset !important;
+}
+.btn-filter2 .mat-icon{
+  font-size: 14px !important;
+  line-height: unset !important;
+  height: auto !important;
+}
+.mat-sort-header-container{
+  width: 100% !important;
+}
+.mat-sort-header-button:hover .column-filter-icon {
+  opacity: 0.3;
+}
+.column-filter-icon:hover {
+  opacity: 0.6;
+  font-weight: bold;
+}
+.column-filter-icon.active {
+  opacity: 1;
+  color: $secondary;
+}
+.column-filter-menu .form-control{
+  font-size: 12px;
+}
+th.mat-header-cell {
+  min-width: max-content !important;
+  padding-left: 20px !important;
+}
+.mat-sort-header-arrow, [dir=rtl] .mat-sort-header-position-before .mat-sort-header-arrow {
+  margin: 0 0 0 0px !important;
+}
+.mat-sort-header-button{
+  min-width: 100% !important;
+  max-width: 250px !important;
+  width: max-content !important;
+  position: relative !important;
+  align-items: end !important;
+  padding-right: 20px !important;
+}
+.mat-sort-header-button::-webkit-textfield-decoration-container{
+  width: max-content;
+}
+.mat-menu-panel .btn-filter-menu{
+  position: absolute !important;
+  top: -18px !important;
+  height: 25px !important;
+  left: 130px !important;
+  width: 25px !important;
+}
+.mat-menu-panel .btn-filter-menu .mat-button-wrapper{
+  padding: 0;
+  display: block;
+  line-height: 0px;
+}
+.mat-menu-panel .btn-filter-menu .mat-icon{
+  font-size: 17px !important;
+  height: 17px;
+  width: 17px;
 }
 .fab-button {
   position: fixed !important;
@@ -167,7 +255,7 @@ tr.mat-header-row{
   font-weight: 400;
   letter-spacing: .1rem;
 }
-/*mat-table {
+mat-table {
   min-height: 300px;
 }
 table{
@@ -230,18 +318,20 @@ table.mat-table-hoverflow{
   background: url('assets/icons/delete.png') no-repeat 4px center;
 }
 table tbody tr.mat-row:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgb(245, 245, 245);
 }
 td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
   padding-left: 10px !important;
   padding-right: 10px !important;
 }
-*/
 .mat-slide-toggle + span > label {
   display: none !important;
 }
 .cdk-global-scrollblock{
   overflow: hidden;
+}
+.filters-controls{
+  width: 100%;
 }
 .form-signin {
   width: 100%;
@@ -376,7 +466,7 @@ td.mat-cell.mat-column-options.mat-table-sticky{
   min-width: 100px !important;
 }
 tr:hover td.mat-cell.mat-column-options.mat-table-sticky{
-  background: none !important;
+  /*background: none !important;*/
 }
 td.mat-cell.mat-column-options.mat-table-sticky .mat-icon-button{
   width: 30px !important;

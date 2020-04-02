@@ -1,0 +1,61 @@
+datasource : {
+        getRows : function(params) {
+          
+          var filterModel = params.filterModel;
+          
+          var s = '';
+          for(var p in filterModel) {
+            for(var q in filterModel[p]) {
+              var x = p + '-' + q + '=' + filterModel[p][q];
+            s = s + x + ';';
+            }
+          }
+          
+          var sortModel = params.sortModel;
+          
+          if(sortModel && sortModel.length > 0) {
+            sortModel.forEach(function(sortElem) {
+              s = s + 'sort-' + sortElem.colId + '=' + sortElem.sort + ';';
+            });
+          }
+          
+          s = s + 'startRow=' + params.startRow + ';';
+          s = s + 'endRow=' + params.endRow + ';';
+          
+          $.ajax({
+            url : 'items/lista/2;' + s
+          }).done(function(result) {
+  
+            var rows = result.map(function(item) {
+              return {
+                id : item.id,
+                sku : item.sku,
+                sku2 : item.sku2,
+                sku3 : item.sku3,
+                description : item.description,
+                packaging : item.packaging,
+                lot : item.lot,
+                createdDate : item.createdDate,
+                expiryDate : item.expiryDate,
+                serial : item.serial,
+                weight : item.weight,
+                enable : item.enable,
+                classification : item.classification,
+                cost : item.cost
+              }
+            });
+            
+             var lastRow = -1;
+                     if (rows.length < (params.endRow - params.startRow)) {
+                       lastRow = params.startRow + rows.length;
+                     }
+  
+            params.successCallback(rows, lastRow);
+          }).fail(function(error) {
+  
+          }).always(function() {
+  
+          });
+  
+        }
+      }

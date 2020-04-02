@@ -55,8 +55,9 @@ export class PrintComponent implements OnInit {
           }
         }
       }
+      console.log('print properties', this.properties);
     }
-    console.log('print init properties', this.element);
+    console.log('print init element', this.element);
   }
 
   renderColumn(type: string, data: any) {
@@ -72,14 +73,17 @@ export class PrintComponent implements OnInit {
       title: string
     }) => {
       this.type = data.type;
-      this.element = data.row;
+      data.row.subscribe(element => {
+        console.log('element suscribed', element);
+        this.element = element;
+        this.init();
+        setTimeout(() => {
+          window.print();
+          window.close();
+        }, 1000);
+      });
       this.format = data.format;
       this.title = data.title;
-      this.init();
-      setTimeout(() => {
-        window.print();
-        window.close();
-      }, 1000);
     });
   }
 

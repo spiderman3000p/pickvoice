@@ -5,7 +5,7 @@
     {
       "name": "api-performance",
       "urls": [
-        "https://tau-tech.co:8443/api/*"
+        
       ],
       "cacheConfig": {
         "strategy": "performance",

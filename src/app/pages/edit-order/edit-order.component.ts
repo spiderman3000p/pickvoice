@@ -70,6 +70,7 @@ export class EditOrderComponent implements OnInit {
     this.dataSource = new MatTableDataSource([]);
     this.ordersData = new Object() as OrdersData;
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
+    this.isLoadingResults = true;
   }
 
   init() {
@@ -95,7 +96,8 @@ export class EditOrderComponent implements OnInit {
       orderType: new FormControl(this.row.orderType),
       priority: new FormControl(this.row.priority),
       note: new FormControl(this.row.note),
-      idTransport: new FormControl(this.row.idTransport),
+      // idTransport: new FormControl(this.row.idTransport),
+      transport: new FormControl(this.row.transport),
       customer: new FormControl(this.row.customer),
       orderLines: new FormControl('')
     });
@@ -386,18 +388,21 @@ export class EditOrderComponent implements OnInit {
   getOrderTypeList() {
     this.orderTypeService.retrieveAllOrderType().subscribe(results => {
       this.ordersData.orderTypeList = results;
+      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
     });
   }
 
   getCustomerList() {
     this.customerService.retrieveAllCustomers().subscribe(results => {
       this.ordersData.customerList = results;
+      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
     });
   }
 
   getTransportList() {
     this.transportService.retrieveAllTransport().subscribe(results => {
       this.ordersData.transportList = results;
+      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
     });
   }
 
@@ -505,13 +510,16 @@ export class EditOrderComponent implements OnInit {
       this.viewMode = data.viewMode;
       this.type = data.type;
       this.utilities.log('viewMode', this.viewMode);
-      const keys = Object.keys(data.row).filter(key => key !== 'id');
-      const keysForItem = keys.filter(key => key !== 'state');
-      this.utilities.log('ngOnInit => row received', data.row);
-      this.row = data.row as Order;
-      this.cardTitle = 'Order # ' + this.row.orderNumber;
+      data.row.subscribe(element => {
+        this.isLoadingResults = false;
+        this.utilities.log('ngOnInit => row received', element);
+        this.row = element;
+        const keys = Object.keys(element).filter(key => key !== 'id');
+        const keysForItem = keys.filter(key => key !== 'state');
+        this.cardTitle = 'Order # ' + this.row.orderNumber;
+        this.init();
+      });
       this.remoteSync = true;
-      this.init();
     });
   }
 }

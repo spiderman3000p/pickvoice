@@ -206,10 +206,14 @@ export class ItemTypesComponent implements OnInit, AfterViewInit, OnDestroy {
           deletedCounter++;
         }
       },
-      error: (error) => {
-        this.utilities.error('Error on delete rows', error);
+      error: (response) => {
+        this.utilities.error('Error on delete rows', response);
         if (deletedCounter === 0) {
-          this.utilities.showSnackBar('Error on delete rows', 'OK');
+          if (response.error && response.error.errors && response.error.errors[0].includes('foreign')) {
+            this.utilities.showSnackBar('This record cant be deleted because it is in use', 'OK');
+          } else {
+            this.utilities.showSnackBar('Error on delete row', 'OK');
+          }
         }
         deletedCounter++;
       }

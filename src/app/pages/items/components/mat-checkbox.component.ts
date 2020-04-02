@@ -3,9 +3,7 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 
 @Component({
     selector: 'app-checkbox-cell',
-    template: `
-        <mat-checkbox [ngModel]="checked" (ngModelChange)="onChange($event)"></mat-checkbox>
-    `,
+    template: ``,
     styles: [
         `
             ::ng-deep

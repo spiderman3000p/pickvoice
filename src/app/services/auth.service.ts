@@ -13,11 +13,11 @@ const SESSION_INACTIVITY_TIME = environment.sessionInactivityTime;
   providedIn: 'root'
 })
 export class AuthService {
-  isLogged: Boolean;
+  isLogged: boolean;
   redirectUrl: string;
   username: string;
   rememberUsername: string;
-  remember: Boolean;
+  remember: boolean;
   sessionStart: number;
   inactivityInterval: any;
   constructor(private userService: UserService, private utilities: UtilitiesService,
@@ -73,7 +73,7 @@ export class AuthService {
   }
 
   public getRemember() {
-    let remember = false as Boolean;
+    let remember = false as boolean;
     if (this.remember === undefined) {
       if (localStorage.getItem('remember') && localStorage.getItem('rememberUsername')) {
         remember = JSON.parse(localStorage.getItem('remember'));
@@ -99,9 +99,9 @@ export class AuthService {
   }
 
   public isLoggedIn() {
-    let isLogged = false as Boolean;
+    let isLogged = false as boolean;
     let sessionStart = null;
-    let remember = false as Boolean;
+    let remember = false as boolean;
     let sessionDuration = 0; // in minutes
     let lastActivity;
     let diffDates;
@@ -150,7 +150,7 @@ export class AuthService {
     return isLogged;
   }
 
-  public setLoggedIn(value: Boolean) {
+  public setLoggedIn(value: boolean) {
     this.isLogged = value;
     localStorage.setItem('isLoggedIn', value.toString());
   }
@@ -165,7 +165,7 @@ export class AuthService {
     localStorage.setItem('sessionStart', value.toString());
   }
 
-  public setRemember(value: Boolean) {
+  public setRemember(value: boolean) {
     this.remember = value;
     localStorage.setItem('remember', value.toString());
     localStorage.setItem('rememberUsername', this.username);
