@@ -1,77 +1,167 @@
 import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-
-import { UtilitiesService } from '../../services/utilities.service';
-import { DataProviderService } from '../../services/data-provider.service';
-import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { UnityOfMeasure } from '@pickvoice/pickvoice-api';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { Router } from '@angular/router';
+import { SelectionModel } from '@angular/cdk/collections';
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { retry } from 'rxjs/operators';
-import { SelectionModel } from '@angular/cdk/collections';
-import { Observer, Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+
+import { UtilitiesService } from '../../services/utilities.service';
+import { DataProviderService} from '../../services/data-provider.service';
+import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
+import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
+import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
+import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
+import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
+
+import { debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { merge, Observer, Subscription } from 'rxjs';
+
+
+import { MyDataSource } from '../../models/my-data-source';
 
 @Component({
-  selector: 'app-uoms',
-  templateUrl: './uoms.component.html',
-  styleUrls: ['./uoms.component.css']
+  selector: 'app-picking-planning',
+  templateUrl: './picking-planning.component.html',
+  styleUrls: ['./picking-planning.component.css']
 })
-export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.UomMap;
-  dataSource: MatTableDataSource<UnityOfMeasure>;
-  dataToSend: UnityOfMeasure[];
+export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewInit {
+  definitions: any = ModelMap.LocationMap;
+  dataSource: MyDataSource<Location>;
+  dataToSend: Location[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
   defaultColumnDefs: any[];
+
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
+
   filter: FormControl;
   filtersForm: FormGroup;
   showFilters: boolean;
   filters: any[] = [];
+  filterParams = '';
+  paginatorParams = '';
+  sortParams = '';
+  filteredDone = false;
+
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.UOMS;
+  type = IMPORTING_TYPES.LOCATIONS;
   selectsData: any;
   subscriptions: Subscription[] = [];
+  parserFn: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
     private utilities: UtilitiesService) {
-      this.dataSource = new MatTableDataSource([]);
       this.filter = new FormControl('');
       this.dataToSend = [];
       this.actionForSelected = new FormControl('');
       this.displayedDataColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
       this.displayedHeadersColumns.push('options');
-
       this.initColumnsDefs(); // columnas a mostrarse
       this.utilities.log('filters', this.filters);
       this.subscriptions.push(this.actionForSelected.valueChanges.subscribe(value => {
         this.actionForSelectedRows(value);
       }));
-
+      this.subscriptions.push(this.selection.changed.subscribe(selected => {
+        this.utilities.log('new selection', selected);
+      }));
+      this.parserFn = (element: any, index) => {
+        element.section = element.section ? element.section.name : '';
+        return element;
+      };
       this.utilities.log('displayed data columns', this.displayedDataColumns);
       this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
-      this.loadData();
   }
 
   ngOnInit() {
+    this.dataSource = new MyDataSource(this.dataProviderService);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.paginator.pageIndex = 0;
+    this.paginator.pageSize = 10;
+    this.loadDataPage();
   }
 
   ngAfterViewInit() {
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+    merge(this.sort.sortChange, this.paginator.page)
+    .pipe(tap(() => this.loadDataPage()))
+    .subscribe();
+  }
+
+  getFilterParams(): string {
+    const formValues = this.filtersForm.value;
+    this.utilities.log('filter form values: ', formValues);
+    const filtersToUse = [];
+    for (const filterKey in this.filters) {
+      if (this.filters[filterKey].controls.value.value !== undefined &&
+          this.filters[filterKey].controls.value.value !== null &&
+          this.filters[filterKey].controls.value.value !== '') {
+        filtersToUse.push(this.filters[filterKey]);
+      }
+    }
+    const stringParams = filtersToUse.length > 0 ? filtersToUse.map(filter =>
+      `${filter.key}-filterType=${filter.type};${filter.key}-type=` +
+      `${this.definitions[filter.key].formControl.control === 'select' ? 'number'
+      : formValues[filter.key].type};${filter.key}-filter=${formValues[filter.key].value.toLowerCase()}`)
+      .join(';') : '';
+    this.utilities.log('filters to use: ', filtersToUse);
+    this.utilities.log('filters string params: ', stringParams);
+    return stringParams;
+  }
+
+  getPaginatorParams(): string {
+    const startRow = this.paginator.pageIndex * this.paginator.pageSize;
+    return `startRow=${startRow};endRow=${startRow + this.paginator.pageSize}`;
+  }
+
+  getSortParams(): string {
+    return `sort-${this.sort.active}=${this.sort.direction}`;
+  }
+
+  loadDataPage() {
+    this.paginatorParams = this.getPaginatorParams();
+    this.sortParams = this.getSortParams();
+    const paramsArray = Array.of(this.paginatorParams, this.filterParams, this.sortParams)
+    .filter(paramArray => paramArray.length > 0);
+    // this.utilities.log('paramsArray', paramsArray);
+    const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
+    // this.utilities.log('loading data with params', params);
+    this.dataSource.loadData(this.type, `${params}`)
+    .subscribe((response: any) => {
+        /*this.data = dataResults;
+        this.dataCount = 100;
+        this.dataSubject.next(dataResults);*/
+        if (response.content) {
+            this.dataSource.lastRow = response.pageSize;
+            this.dataSource.data = response.content.map(this.parserFn);
+            this.dataSource.dataCount = response.totalElements;
+            this.dataSource.dataSubject.next(this.dataSource.data);
+        }
+    }, error => {
+      this.utilities.error('Error fetching data from server');
+      this.utilities.showSnackBar('Error fetching data from server', 'OK');
+    });
+  }
+
+  reloadData() {
+    this.selection.clear();
+    this.loadDataPage();
+  }
+
+  applyFilters(): void {
+    this.filterParams = this.getFilterParams();
+    this.filteredDone = this.filterParams.length > 0;
+    this.paginator.pageIndex = 0;
+    this.loadDataPage();
   }
 
   initColumnsDefs() {
@@ -79,8 +169,8 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInUomsPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInUomsPage'));
+    if (localStorage.getItem('displayedColumnsInLocationsPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInLocationsPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -92,25 +182,64 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
-    this.selectsData = {};
-    this.columnDefs.forEach((column, index) => {
+    this.selectsData = [];
+    this.columnDefs.slice().forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
+        filter.type = this.definitions[column.name].formControl.type;
         filter.key = column.name;
-        formControls[column.name] = new FormControl('');
-        if (this.definitions[column.name].formControl.control === 'select') {
-          this.selectsData[column.name] =
-          this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
-          formControls[column.name].patchValue(-1);
+        if (this.definitions[column.name].formControl.control !== 'select' &&
+            this.definitions[column.name].formControl.control !== 'toggle') {
+          filter.availableTypes = FILTER_TYPES.filter(_filterType => _filterType.availableForTypes
+            .findIndex(availableType => filter.type === availableType
+            || availableType === 'all') > -1);
         }
-        this.filters.push(filter);
+        formControls[column.name] = new FormGroup({
+          type: new FormControl(FILTER_TYPES[0].value),
+          value: new FormControl('')
+        });
+        filter.controls = formControls[column.name].controls;
+        filter.controls.value.valueChanges.pipe(debounceTime(500), tap((value) => {
+          this.utilities.log(`valor del campo ${column.name} cambiando a: `, value);
+          this.applyFilters();
+        }))
+        .subscribe();
+        filter.controls.type.valueChanges.pipe(debounceTime(500), tap((type) => {
+          this.utilities.log(`tipo de filtro del campo ${column.name} cambiando a: `, type);
+          // TODO: acomodar esto de modo que al cambiar tipo y haber un valor, hacer la busqueda
+          if (false) {
+            this.applyFilters();
+          }
+        }))
+        .subscribe();
+        // formControls[column.name].get('type').patchValue(FILTER_TYPES[0].value);
+        if (this.definitions[column.name].formControl.control === 'select') {
+          this.dataProviderService.getDataFromApi(this.definitions[column.name].type).subscribe(results => {
+            this.selectsData[column.name] = results;
+            this.utilities.log('selectsData', this.selectsData);
+          });
+          // formControls[column.name].get('value').patchValue(-1);
+         // this.utilities.log('selectsData: ', this.selectsData);
+        }
+        this.filters[column.name] = filter;
       }
     });
     this.filtersForm = new FormGroup(formControls);
     this.utilities.log('formControls', formControls);
+    this.utilities.log('form values', this.filtersForm.value);
+  }
+
+  isFilteredBy(column: string): boolean {
+    return this.filterParams.includes(column);
+  }
+
+  clearFilterInColumn(column: string) {
+    this.filters[column].controls.value.reset();
+    this.filters[column].controls.type.patchValue(FILTER_TYPES[0].value);
+    this.filteredDone = this.filterParams.length > 0;
   }
 
   getDisplayedHeadersColumns() {
@@ -135,7 +264,7 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInUomsPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInLocationsPage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -213,11 +342,11 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.subscriptions.push(this.dataProviderService.deleteUom(row.id, 'response', false)
+        this.subscriptions.push(this.dataProviderService.deleteLocation(row.id, 'response', false)
         .subscribe(observer));
       });
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteUom(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deleteLocation(rows.id, 'response', false)
       .subscribe(observer));
     }
   }
@@ -239,49 +368,33 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  handleError(error: any) {
-    this.utilities.error('error sending data to api', error);
-    this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
-  }
-
   renderColumnData(type: string, data: any) {
     const text = this.utilities.renderColumnData(type, data);
     return typeof text === 'string' ? text.slice(0, 30) : text;
   }
 
-  resetFilters() {
-    this.filtersForm.reset();
-    this.dataSource.filter = '';
-  }
-
-  applyFilters() {
-    const formValues = this.filtersForm.value;
-    let value;
-    let value2;
-    // this.utilities.log('filter form values: ', formValues);
-    const filters = this.filters.filter(filter => filter.show &&
-                    formValues[filter.key] && formValues[filter.key].length > 0);
-    // this.utilities.log('filters: ', filters);
-    this.dataSource.filterPredicate = (data: UnityOfMeasure, filter: string) => {
-      // this.utilities.log('data', data);
-      return filters.every(shownFilter => {
-        value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
-        value2 = formValues[shownFilter.key].toString();
-        /*
-        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
-        this.utilities.log('shownFilter.key', shownFilter.key);
-        this.utilities.log('value', value);
-        this.utilities.log('value2', value2);
-        this.utilities.log('--------------------------------------------');*/
-        return value !== undefined && value !== null && value.toString().toLowerCase().includes(value2.toLowerCase());
-      });
-    };
-    this.dataSource.filter = 'filtred';
-  }
-
   editRowOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
+    /*const dialogRef = this.dialog.open(EditRowComponent, {
+      data: {
+        row: element,
+        map: this.utilities.dataTypesModelMaps.locations,
+        type: IMPORTING_TYPES.LOCATIONS,
+        remoteSync: true // para mandar los datos a la BD por la API
+      }
+    });*/
+    /*dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+            this.dataSource.data[element.index] = result;
+            this.refreshTable();
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
+    });*/
   }
 
   editRowOnDialog(element: any) {
@@ -289,8 +402,8 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(EditRowDialogComponent, {
       data: {
         row: element,
-        map: this.definitions,
-        type: IMPORTING_TYPES.UOMS,
+        map: this.utilities.dataTypesModelMaps.locations,
+        type: IMPORTING_TYPES.LOCATIONS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -307,37 +420,13 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
   }
 
-  loadData(useCache = true) {
-    this.utilities.log('requesting uoms');
-    this.isLoadingResults = true;
-    this.subscriptions.push(this.dataProviderService.getAllUoms().subscribe(results => {
-      this.isLoadingResults = false;
-      this.utilities.log('uoms received', results);
-      if (results && results.length > 0) {
-        this.dataSource.data = results.map((element, i) => {
-          return { index: i, ... element};
-        });
-        this.refreshTable();
-      }
-    }, error => {
-      this.isLoadingResults = false;
-      this.utilities.error('error on requesting data');
-      this.utilities.showSnackBar('Error requesting data', 'OK');
-    }));
-  }
-
-  reloadData() {
-    this.selection.clear();
-    this.loadData(false);
-  }
-
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.uoms);
+    this.utilities.dataTypesModelMaps.locations);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.definitions,
-        type: IMPORTING_TYPES.UOMS,
+        map: this.utilities.dataTypesModelMaps.locations,
+        type: IMPORTING_TYPES.LOCATIONS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -366,6 +455,8 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     TODO: mejorar esta funcion usando this.dataSource y no el filtro
   */
   private refreshTable() {
+    this.loadDataPage();
+    /*
     // If there's no data in filter we do update using pagination, next page or previous page
     if (this.dataSource.filter === '') {
       const aux = this.dataSource.filter;
@@ -378,7 +469,7 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.dataSource.filter = aux;
     }
     this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.dataSource.sort = this.sort;*/
   }
 
   toggleFilters() {
@@ -386,6 +477,6 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(subscription => subscription.unsubscribe);
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

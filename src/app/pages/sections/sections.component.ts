@@ -249,12 +249,34 @@ export class SectionsComponent implements OnInit, AfterViewInit {
     return typeof text === 'string' ? text.slice(0, 30) : text;
   }
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  resetFilters() {
+    this.filtersForm.reset();
+    this.dataSource.filter = '';
+  }
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  applyFilters() {
+    const formValues = this.filtersForm.value;
+    let value;
+    let value2;
+    // this.utilities.log('filter form values: ', formValues);
+    const filters = this.filters.filter(filter => filter.show &&
+                    formValues[filter.key] && formValues[filter.key].length > 0);
+    // this.utilities.log('filters: ', filters);
+    this.dataSource.filterPredicate = (data: Section, filter: string) => {
+      // this.utilities.log('data', data);
+      return filters.every(shownFilter => {
+        value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
+        value2 = formValues[shownFilter.key].toString();
+        /*
+        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
+        this.utilities.log('shownFilter.key', shownFilter.key);
+        this.utilities.log('value', value);
+        this.utilities.log('value2', value2);
+        this.utilities.log('--------------------------------------------');*/
+        return value !== undefined && value !== null && value.toString().toLowerCase().includes(value2.toLowerCase());
+      });
+    };
+    this.dataSource.filter = 'filtred';
   }
 
   editRowOnPage(element: any) {
@@ -362,10 +384,5 @@ export class SectionsComponent implements OnInit, AfterViewInit {
 
   toggleFilters() {
     this.showFilters = !this.showFilters;
-
-
-  }
-
-  applyFilters() {
   }
 }

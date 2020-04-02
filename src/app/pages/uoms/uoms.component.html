@@ -37,18 +37,19 @@
                                 <div *ngFor="let filter of filters">
                                     <span *ngIf="filter.show" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
                                             <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'select'">
-                                                    <mat-select [compareWith]="definitions[filter.key].formControl.compareFn"
-                                                    [formControlName]="filter.key">
-                                                        <mat-option [value]="-1">
-                                                            Select a value
-                                                        </mat-option>
-                                                        <mat-option *ngFor="let data of selectsData[filter.key] | async"
-                                                        [value]="definitions[filter.key].formControl.valueIndex !== null ?
-                                                        data[definitions[filter.key].formControl.valueIndex] : data">
-                                                            {{ definitions[filter.key].formControl.displayIndex !== null ?
-                                                                data[definitions[filter.key].formControl.displayIndex] : data }}
-                                                        </mat-option>
-                                                    </mat-select>
+                                                <mat-label>{{filter.name}}</mat-label>
+                                                <mat-select [compareWith]="definitions[filter.key].formControl.compareFn"
+                                                [formControlName]="filter.key">
+                                                    <mat-option [value]="">
+                                                        Select a value
+                                                    </mat-option>
+                                                    <mat-option *ngFor="let data of selectsData[filter.key] | async"
+                                                    [value]="definitions[filter.key].formControl.valueIndex !== null ?
+                                                    data[definitions[filter.key].formControl.valueIndex] : data">
+                                                        {{ definitions[filter.key].formControl.displayIndex !== null ?
+                                                            data[definitions[filter.key].formControl.displayIndex] : data }}
+                                                    </mat-option>
+                                                </mat-select>
                                             </mat-form-field>
                                             <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'input'">
                                                 <mat-label>{{filter.name}}</mat-label>

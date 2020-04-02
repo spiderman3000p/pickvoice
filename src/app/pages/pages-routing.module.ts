@@ -5,7 +5,7 @@ import { IMPORTING_TYPES } from '../models/model-maps.model';
 const routes: Routes = [
   {
     path: 'picking',
-    loadChildren: () => import('./picking/picking.module').then(m => m.PickingModule),
+    loadChildren: () => import('./picking-planning/picking-planning.module').then(m => m.PickingPlanningModule),
     pathMatch: 'full'
   },
   {

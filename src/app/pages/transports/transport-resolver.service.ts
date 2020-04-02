@@ -14,6 +14,9 @@ export class TransportResolverService implements Resolve<Transport> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Transport> {
     const id = Number(route.paramMap.get('id'));
-    return this.dataProviderService.getTransport(id);
+    return Observable.create((observer) => {
+      observer.next(this.dataProviderService.getTransport(id));
+      observer.complete();
+    });
   }
 }

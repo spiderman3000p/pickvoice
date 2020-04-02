@@ -50,30 +50,33 @@ export class UtilitiesService implements OnDestroy {
   }
 
   renderColumnData(type: string, data: any) {
-    let dataValue;
-    switch (type) {
-      case 'date':
-        let date;
-        if (typeof data === 'number') {
-          // esta conversion sale de aqui: https://github.com/SheetJS/sheetjs/issues/1623
-          date = 1000 * 60 * 60 * 24 * (data - 25569);
-        } else if (data !== '') {
-          dataValue = this.parseDate(data);
-        } else {
-          dataValue = data;
-        }
-        // dataValue = date;
-        break;
-      case IMPORTING_TYPES.ITEMS: dataValue = data && data.description ? data.description : ''; break;
-      case IMPORTING_TYPES.ORDERS: dataValue = data && data.orderNumber ? data.orderNumber : ''; break;
-      case IMPORTING_TYPES.ITEM_TYPE: dataValue = data && data.name ? data.name : ''; break;
-      case IMPORTING_TYPES.UOMS: dataValue = data && data.name ? data.name : ''; break;
-      case IMPORTING_TYPES.SECTIONS: dataValue = data && data.name ? data.name : ''; break;
-      case IMPORTING_TYPES.TRANSPORTS: dataValue = data && data.nameRoute ? data.nameRoute : ''; break;
-      case IMPORTING_TYPES.CUSTOMERS: dataValue = data && data.name ? data.name : ''; break;
-      case IMPORTING_TYPES.ORDER_TYPE: dataValue = data && data.description ? data.description : ''; break;
-      case IMPORTING_TYPES.ORDER_LINE: dataValue = data && data.length ? `${data.length} orders` : 'none'; break;
-      default: dataValue = data;
+    let dataValue = '';
+    if (data !== undefined && data !== null) {
+      switch (type) {
+        case 'date':
+          let date;
+          if (typeof data === 'number') {
+            // esta conversion sale de aqui: https://github.com/SheetJS/sheetjs/issues/1623
+            date = 1000 * 60 * 60 * 24 * (data - 25569);
+            dataValue = moment(date).format('YYYY-MM-DD');
+          } else if (typeof data === 'object') {
+            dataValue = moment(data).format('YYYY-MM-DD');
+          } else {
+            dataValue = data;
+          }
+          // dataValue = date;
+          break;
+        case IMPORTING_TYPES.ITEMS: dataValue = data && data.description ? data.description : ''; break;
+        case IMPORTING_TYPES.ORDERS: dataValue = data && data.orderNumber ? data.orderNumber : ''; break;
+        case IMPORTING_TYPES.ITEM_TYPE: dataValue = data && data.name ? data.name : ''; break;
+        case IMPORTING_TYPES.UOMS: dataValue = data && data.name ? data.name : ''; break;
+        case IMPORTING_TYPES.SECTIONS: dataValue = data && data.name ? data.name : ''; break;
+        case IMPORTING_TYPES.TRANSPORTS: dataValue = data && data.nameRoute ? data.nameRoute : ''; break;
+        case IMPORTING_TYPES.CUSTOMERS: dataValue = data && data.name ? data.name : ''; break;
+        case IMPORTING_TYPES.ORDER_TYPE: dataValue = data && data.description ? data.description : ''; break;
+        case IMPORTING_TYPES.ORDER_LINE: dataValue = data && data.length ? `${data.length} orders` : 'none'; break;
+        default: dataValue = data;
+      }
     }
     return dataValue;
   }
@@ -110,7 +113,7 @@ export class UtilitiesService implements OnDestroy {
   }
 
   parseDate(date: any): string {
-    return moment(date, 'DD/MM/YYYY').format('DD/MM/YYYY');
+    return moment(date, 'YYYY/MM/DD').format('DD/MM/YYYY');
   }
 
   public showCommonDialog(observer: Observer<any>, options?: any) {

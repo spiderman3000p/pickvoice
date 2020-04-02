@@ -16,6 +16,7 @@ import { OrdersResolverService } from './pages/orders/orders-resolver.service';
 import { ItemTypesResolverService } from './pages/item-types/item-types-resolver.service';
 import { OrderTypeResolverService } from './pages/order-type/order-type-resolver.service';
 import { UomsResolverService } from './pages/uoms/uoms-resolver.service';
+import { TransportResolverService } from './pages/transports/transport-resolver.service';
 import { IMPORTING_TYPES } from './models/model-maps.model';
 
 const routes: Routes = [
@@ -176,6 +177,18 @@ const routes: Routes = [
             type: IMPORTING_TYPES.ORDER_LINE,
             format: 'single',
             title: 'Print Order Line'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.TRANSPORTS + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: TransportResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.TRANSPORTS,
+            format: 'single',
+            title: 'Print Transport'
           }
         }
     ]

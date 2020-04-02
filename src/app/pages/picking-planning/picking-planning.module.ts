@@ -1,24 +1,27 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PagesRoutingModule } from './pages-routing.module';
-import { AdministrationModule } from './administration/administration.module';
-import { PendingOrdersModule } from './pending-orders/pending-orders.module';
-import { CurrentActionsModule } from './current-actions/current-actions.module';
-import { ItemsModule } from './items/items.module';
-import { ItemTypesModule } from './item-types/item-types.module';
-import { LocationsModule } from './locations/locations.module';
-import { RecentOriginsModule } from './recent-origins/recent-origins.module';
-import { ImportModule } from './import/import.module';
 
+import { PickingPlanningRoutingModule } from './picking-planning-routing.module';
+import { PickingPlanningComponent } from './picking-planning.component';
+
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { PagesComponent } from './pages.component';
+import { AgGridModule } from 'ag-grid-angular';
 
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
@@ -43,35 +46,34 @@ export const MY_FORMATS = {
     monthYearA11yLabel: 'MMMM YYYY',
   },
 };
-
 @NgModule({
-  declarations: [
-    PagesComponent
-  ],
+  declarations: [PickingPlanningComponent],
   imports: [
     CommonModule,
+    PickingPlanningRoutingModule,
 
-    PagesRoutingModule,
-    AdministrationModule,
-    PendingOrdersModule,
-    CurrentActionsModule,
-    ItemsModule,
-    ItemTypesModule,
-    LocationsModule,
-    RecentOriginsModule,
-    ImportModule,
-
+    FormsModule,
+    ReactiveFormsModule,
+    
+    MatGridListModule,
+    MatNativeDateModule,
+    MatProgressSpinnerModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
     MatButtonModule,
-    MatToolbarModule,
-    MatSidenavModule,
     MatIconModule,
-    MatListModule,
+    MatCardModule,
+    MatDatepickerModule,
     MatMenuModule,
-    MatExpansionModule
+    MatSelectModule,
+    AgGridModule.withComponents([])
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]},
     {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
   ]
 })
-export class PagesModule { }
+export class PickingPlanningModule { }

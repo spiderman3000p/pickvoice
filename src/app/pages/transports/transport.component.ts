@@ -106,7 +106,7 @@ export class TransportComponent implements OnInit, AfterViewInit {
         if (this.definitions[column.name].formControl.control === 'select') {
           this.selectsData[column.name] =
           this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
-          formControls[column.name].patchValue(-1);
+          formControls[column.name].patchValue('');
         }
         this.filters.push(filter);
       }
@@ -249,12 +249,43 @@ export class TransportComponent implements OnInit, AfterViewInit {
     return typeof text === 'string' ? text.slice(0, 30) : text;
   }
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  resetFilters() {
+    this.filtersForm.reset();
+    this.dataSource.filter = '';
+  }
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  applyFilters() {
+    const formValues = this.filtersForm.value;
+    let value;
+    let value2;
+    this.utilities.log('filter form values: ', formValues);
+    const filters = this.filters.filter(filter => {
+      this.utilities.log('iterating filter', filter);
+      this.utilities.log('fom value filter', formValues[filter.key]);
+      if (filter.show && formValues[filter.key] && formValues[filter.key] !== '') {
+        return filter;
+      }
+    });
+    this.utilities.log('filters: ', filters);
+    this.dataSource.filterPredicate = (data: Transport, filter: string) => {
+      // this.utilities.log('data', data);
+      return filters.every(shownFilter => {
+        value = '';
+        if (this.definitions[shownFilter.key].formControl.control === 'select') {
+          value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
+        } else {
+          value = this.utilities.renderColumnData(this.definitions[shownFilter.key].type, data[shownFilter.key]);
+        }
+        value2 = this.utilities.renderColumnData(this.definitions[shownFilter.key].type, formValues[shownFilter.key]);
+        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
+        this.utilities.log('shownFilter.key', shownFilter.key);
+        this.utilities.log('value', value);
+        this.utilities.log('value2', value2);
+        this.utilities.log('--------------------------------------------');
+        return value !== undefined && value !== null && String(value).toString().toLowerCase().includes(String(value2).toLowerCase());
+      });
+    };
+    this.dataSource.filter = 'filtred';
   }
 
   editRowOnPage(element: any) {
@@ -362,10 +393,5 @@ export class TransportComponent implements OnInit, AfterViewInit {
 
   toggleFilters() {
     this.showFilters = !this.showFilters;
-
-
-  }
-
-  applyFilters() {
   }
 }

@@ -62,13 +62,10 @@ import { RouterModule } from '@angular/router';
 // https://momentjs.com/docs/#/displaying/format/
 export const MY_FORMATS = {
   parse: {
-    dateInput: 'l',
+    dateInput: 'YYYY-MM-DD',
   },
   display: {
-    dateInput: 'l',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
+    dateInput: 'YYYY-MM-DD'
   },
 };
 @NgModule({
@@ -133,7 +130,13 @@ export const MY_FORMATS = {
   providers: [
     { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }},
     { provide: BASE_PATH, useValue: environment.apiBaseUrl },
-    { provide: MAT_DATE_LOCALE, useValue: 'es'}
+    // { provide: MAT_DATE_LOCALE, useValue: 'es'},
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+    },
+    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
   ],
   bootstrap: [AppComponent]
 })

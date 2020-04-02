@@ -20,9 +20,11 @@ export class RecentOriginsService {
     itemsRecentOrigins: RecentOrigin[];
     locationsRecentOrigins: RecentOrigin[];
     ordersDtoRecentOrigins: RecentOrigin[];
+    loadPicksDtoRecentOrigins: RecentOrigin[];
     itemsFilters: RecentOriginsFilters;
     locationsFilters: RecentOriginsFilters;
     ordersFilters: RecentOriginsFilters;
+    loadPicksDtoFilters: RecentOriginsFilters;
 
     constructor(private utilities: UtilitiesService) {
         if (typeof(Storage) === 'undefined') {
@@ -31,6 +33,7 @@ export class RecentOriginsService {
         this.itemsRecentOrigins = [];
         this.locationsRecentOrigins = [];
         this.ordersDtoRecentOrigins = [];
+        this.loadPicksDtoRecentOrigins = [];
     }
 
     getRecentOrigins(type: string, filters?: RecentOriginsFilters): Observable<RecentOrigin[]> {

@@ -14,6 +14,9 @@ export class SectionsResolverService implements Resolve<Section> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Section> {
     const id = Number(route.paramMap.get('id'));
-    return this.dataProviderService.getSection(id);
+    return Observable.create((observer) => {
+      observer.next(this.dataProviderService.getSection(id));
+      observer.complete();
+    });
   }
 }

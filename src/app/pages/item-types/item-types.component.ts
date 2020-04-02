@@ -257,6 +257,7 @@ export class ItemTypesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetFilters() {
+    this.filtersForm.reset();
     this.dataSource.filter = '';
   }
 

@@ -682,15 +682,6 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        dispatchPlatforms: {
-            name: 'dispatch `platforms',
-            required: false,
-            type: 'string',
-            formControl: {
-                control: 'input',
-                type: 'text'
-            }
-        },
         carrierCode: {
             name: 'carrier code',
             required: false,
@@ -700,7 +691,16 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        transportState: {
+        deliverDate: {
+            name: 'delivery date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        state: {
             name: 'state',
             required: false,
             type: IMPORTING_TYPES.TRANSPORT_STATE,
@@ -713,7 +713,35 @@ export class ModelMap {
                     return c1 === c2;
                 }
             }
-        }
+        },
+        cubicMeters: {
+            name: 'meters',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number',
+                min: 0
+            }
+        },
+        containerNumber: {
+            name: 'container number',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        weight: {
+            name: 'weight',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
     };
     /* order line object map for CRUD */
     public static OrderLineMap = {

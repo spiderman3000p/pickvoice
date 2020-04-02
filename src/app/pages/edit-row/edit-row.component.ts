@@ -94,9 +94,13 @@ export class EditRowComponent implements OnInit {
       // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
       if (this.dataMap[key].formControl.control !== 'table') {
         if (this.dataMap[key].required) {
-          formControls[key] = new FormControl(this.row[key] ? this.row[key] : '', Validators.required);
+          formControls[key] = new FormControl(this.row[key] !== undefined &&
+            this.row[key] !== null ? this.utilities.renderColumnData(this.dataMap[key].type,
+              this.row[key])  : '', Validators.required);
         } else {
-          formControls[key] = new FormControl(this.row[key] ? this.row[key] : '');
+          formControls[key] = new FormControl(this.row[key] !== undefined &&
+          this.row[key] !== null ? this.utilities.renderColumnData(this.dataMap[key].type,
+            this.row[key]) : '');
         }
         if (this.dataMap[key].formControl.control === 'select') {
           this.selectsData[key] =
@@ -444,7 +448,7 @@ export class EditRowComponent implements OnInit {
     const toUpload = this.row;
     this.utilities.log('form data', formData);
     for (const key in toUpload) {
-      if (formData[key]) {
+      if (formData[key] !== undefined) {
         toUpload[key] = formData[key];
       }
     }
@@ -592,7 +596,7 @@ export class EditRowComponent implements OnInit {
               this.utilities.log('object is a transport');
               this.row = row as Transport;
               this.cardTitle = 'Transport #' + this.row.transportNumber;
-              this.pageTitle = this.viewMode === 'edit' ? 'Edit Unknown' : 'View Unknown';
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Transport' : 'View Transport';
             } else {
               this.cardTitle = 'Unknown object type';
               console.error('object is unknown');

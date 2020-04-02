@@ -14,6 +14,9 @@ export class OrderTypeResolverService implements Resolve<OrderType> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<OrderType> {
     const id = Number(route.paramMap.get('id'));
-    return this.dataProviderService.getOrderType(id);
+    return Observable.create((observer) => {
+      observer.next(this.dataProviderService.getOrderType(id));
+      observer.complete();
+    });
   }
 }

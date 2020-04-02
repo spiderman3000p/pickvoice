@@ -30,6 +30,7 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
   locationsSubscriber: Subscription;
   ordersSubscriber: Subscription;
   loadPicksSubscriber: Subscription;
+  importingTypes = IMPORTING_TYPES;
   @ViewChild(MatPaginator, {static: true}) itemsPaginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) locationsPaginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) ordersPaginator: MatPaginator;
