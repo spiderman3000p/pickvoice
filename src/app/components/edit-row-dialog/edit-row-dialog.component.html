@@ -9,8 +9,9 @@
             <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'select'"
             [class.readonly]="viewMode === 'view'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                <mat-select [compareWith]="dataMap[key].formControl.compareFn" [formControlName]="key">
-                    <mat-option [value]="-1">
+                <mat-select [compareWith]="dataMap[key].formControl.compareFn" [formControlName]="key"
+                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                    <mat-option [value]="">
                         Select a value
                     </mat-option>
                     <mat-option *ngFor="let data of selectsData[key] | async"
@@ -45,13 +46,14 @@
             <mat-form-field [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
             *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'number'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                <input class="w-100" matInput type="number" [formControlName]="key">
+                <input class="w-100" matInput type="number" [formControlName]="key" [class.readonly]="viewMode === 'view'"
+                [readonly]="viewMode === 'view'">
             </mat-form-field>
             <!-- campos date -->
             <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'date'"
             [class.readonly]="viewMode === 'view'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                <input matInput [formControlName]="key" [matDatepicker]="pickerDate"  readonly>
+                <input matInput [formControlName]="key" [matDatepicker]="pickerDate" [class.readonly]="viewMode === 'view'"  readonly>
                 <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].formControl.control === 'date'">
                 </mat-datepicker-toggle>
                 <mat-datepicker #pickerDate ></mat-datepicker>
@@ -60,8 +62,8 @@
             <mat-form-field [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
             *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'text'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                <input class="w-100" matInput type="text" [formControlName]="key"
-                >
+                <input class="w-100" matInput type="text" [formControlName]="key" [class.readonly]="viewMode === 'view'"
+                [readonly]="viewMode === 'view'">
             </mat-form-field>
             <!-- campos boolean -->
             <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'toggle'"
@@ -78,6 +80,6 @@
     <div mat-dialog-actions align="end">
         <small class="footer-label">Required fields are marked with *</small>
         <button mat-button type="submit" [disabled]="isLoadingResults" *ngIf="viewMode === 'edit'">SAVE</button>
-        <button mat-button mat-dialog-close [disabled]="isLoadingResults">CANCEL</button>
+        <button mat-button mat-dialog-close [disabled]="isLoadingResults" autofocus>CANCEL</button>
     </div>
 </form>

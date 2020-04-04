@@ -8,7 +8,7 @@ import { SharedDataService } from '../../services/shared-data.service';
 import { DataProviderService} from '../../services/data-provider.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subscription, from, Observable } from 'rxjs';
-import { retry } from 'rxjs/operators';
+import { retry, tap } from 'rxjs/operators';
 import { ModelFactory } from '../../models/model-factory.class';
 import { IMPORTING_TYPES } from '../../models/model-maps.model';
 
@@ -84,6 +84,18 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
       this.row = ModelFactory.newEmptyTransport();
       this.utilities.log('new empty transport', this.row);
     }
+    if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
+      this.row = ModelFactory.newEmptyPickPlanning();
+      this.utilities.log('new empty pick planning', this.row);
+    }
+    if (this.type === IMPORTING_TYPES.PICK_TASKS) {
+      this.row = ModelFactory.newEmptyTask();
+      this.utilities.log('new empty pick task', this.row);
+    }
+    if (this.type === IMPORTING_TYPES.PICK_TASKLINES) {
+      this.row = ModelFactory.newEmptyTaskLine();
+      this.utilities.log('new empty pick task line', this.row);
+    }
     // init variables end
     this.utilities.log('row recibida', this.row);
     // build form group
@@ -100,8 +112,9 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
       }
       if (this.dataMap[key].formControl.control === 'select') {
         this.selectsData[key] =
-        this.dataProviderService.getDataFromApi(this.dataMap[key].type);
-        formControls[key].patchValue(-1);
+        this.dataProviderService.getDataFromApi(this.dataMap[key].type)
+        .pipe(tap(result => this.utilities.log(`${key} results`, result)));
+        formControls[key].patchValue('');
       }
     });
     // console.log('form controls', formControls);
@@ -207,6 +220,21 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
 
       if (this.type === IMPORTING_TYPES.TRANSPORTS) {
         this.subscriptions.push(this.dataProviderService.createTransport(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer));
+      }
+
+      if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
+        this.subscriptions.push(this.dataProviderService.createPickPlanning(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer));
+      }
+
+      if (this.type === IMPORTING_TYPES.PICK_TASKS) {
+        this.subscriptions.push(this.dataProviderService.createPickTask(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer));
+      }
+
+      if (this.type === IMPORTING_TYPES.PICK_TASKLINES) {
+        this.subscriptions.push(this.dataProviderService.createPickTaskLine(toUpload, 'response').pipe(retry(3))
         .subscribe(observer));
       }
     } else {

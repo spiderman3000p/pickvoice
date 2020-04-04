@@ -20,6 +20,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -36,6 +37,8 @@ import { ApiModule } from '@pickvoice/pickvoice-api';
 import { BASE_PATH } from '@pickvoice/pickvoice-api';
 
 import { EditOrderComponent } from './pages/edit-order/edit-order.component';
+import { EditPickTaskComponent } from './pages/edit-pick-task/edit-pick-task.component';
+import { EditPickPlanningComponent } from './pages/edit-pick-planning/edit-pick-planning.component';
 import { EditRowComponent } from './pages/edit-row/edit-row.component';
 import { AddRowDialogComponent } from './components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
@@ -78,7 +81,9 @@ export const MY_FORMATS = {
     FileImportComponent,
     CommonDialogComponent,
     EditRowComponent,
+    EditPickPlanningComponent,
     EditOrderComponent,
+    EditPickTaskComponent,
     AddRowDialogComponent,
     EditRowDialogComponent,
     PrintComponent,
@@ -114,6 +119,7 @@ export const MY_FORMATS = {
     MatSelectModule,
     MatPaginatorModule,
     MatCheckboxModule,
+    MatProgressBarModule,
 
     PagesModule,
     AuthModule,

@@ -14,7 +14,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
 import { merge, Observer, Subscription } from 'rxjs';
 import { Router } from '@angular/router';

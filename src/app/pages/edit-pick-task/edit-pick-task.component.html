@@ -1,0 +1,239 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <div class="content">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>{{ pageTitle }}</h1>
+              </div>
+              <div class="actions actionbar-section right">
+                <button mat-raised-button color="accent" (click)="print()">
+                    <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
+                </button>
+                <button mat-raised-button color="warn" (click)="export()">
+                    <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                </button>
+              </div>
+          </div>
+      </div>
+      <mat-card>
+          <mat-card-content *ngIf="form">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Description</mat-label>
+                        <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Enable Date</mat-label>
+                        <input matInput formControlName="enableDate" [matDatepicker]="enableDate"
+                        [class.readonly]="viewMode === 'view'" readonly>
+                        <mat-datepicker-toggle matSuffix [for]="enableDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
+                        <mat-datepicker #enableDate ></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Date Assignment</mat-label>
+                        <input matInput formControlName="dateAssignment" [matDatepicker]="dateAssignment"
+                        [class.readonly]="viewMode === 'view'" readonly>
+                        <mat-datepicker-toggle matSuffix [for]="dateAssignment" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
+                        <mat-datepicker #dateAssignment ></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Date</mat-label>
+                        <input matInput formControlName="date" [matDatepicker]="date"
+                        [class.readonly]="viewMode === 'view'" readonly>
+                        <mat-datepicker-toggle matSuffix [for]="date" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
+                        <mat-datepicker #date></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Priority</mat-label>
+                        <input class="w-100" matInput type="number" formControlName="priority" [class.readonly]="viewMode === 'view'">
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Lines</mat-label>
+                        <input class="w-100" matInput type="number" formControlName="lines" [class.readonly]="viewMode === 'view'">
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Quantity</mat-label>
+                        <input class="w-100" matInput type="number" formControlName="qty" [class.readonly]="viewMode === 'view'">
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Document</mat-label>
+                        <input class="w-100" matInput type="text" formControlName="document" [class.readonly]="viewMode === 'view'">
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Current Line</mat-label>
+                        <input class="w-100" matInput type="text" formControlName="currentLine" [class.readonly]="viewMode === 'view'">
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Children Work</mat-label>
+                        <input class="w-100" matInput type="text" formControlName="childrenWork" [class.readonly]="viewMode === 'view'">
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>State</mat-label>
+                        <mat-select [compareWith]="dataMap.taskState.formControl.compareFn" formControlName="taskState"
+                        [class.readonly]="viewMode === 'view'">
+                            <mat-option *ngFor="let state of pickTaskData.taskStateList" [value]="state">
+                                {{ state }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Type</mat-label>
+                        <mat-select [compareWith]="dataMap.taskType.formControl.compareFn" formControlName="taskType"
+                        [class.readonly]="viewMode === 'view'">
+                            <mat-option *ngFor="let type of pickTaskData.taskTypesList" [value]="type">
+                                {{ type.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <hr>
+                    <mat-tab-group class="tab-orders">
+                        <mat-tab label="Task Lines">
+                            <ng-template matTabContent>
+                                <div class="col-sm-12">
+                                    <div class="col-sm-12 text-right mb-3">
+                                        <a mat-raised-button color="warn" (click)="exportTaskLines()">
+                                            <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                                        </a>
+                                        <a mat-raised-button color="accent" (click)="addTaskLine()" class="ml-2"
+                                            *ngIf="viewMode === 'edit'">
+                                            <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                                        </a>
+                                    </div>
+                                    <table mat-table [dataSource]="dataSource" matSort 
+                                    [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 12">
+                                        <!-- Checkbox Column -->
+                                        <ng-container matColumnDef="select">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                <mat-checkbox (change)="$event ? masterToggle() : null"
+                                                    [checked]="selection.hasValue() && isAllSelected()"
+                                                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                                    [aria-label]="checkboxLabel()">
+                                                </mat-checkbox>
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                <mat-checkbox (click)="$event.stopPropagation()"
+                                                    (change)="$event ? selection.toggle(row) : null"
+                                                    [checked]="selection.isSelected(row)"
+                                                    [aria-label]="checkboxLabel(row)">
+                                                </mat-checkbox>
+                                            </td>
+                                        </ng-container>
+                                        <!-- Data Columns -->
+                                        <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
+                                            <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
+                                        </ng-container>
+                                        <!-- Options Sticky Column -->
+                                        <ng-container matColumnDef="options" stickyEnd>
+                                            <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+                                                {{'Options' | uppercase}}
+                                                <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </a>
+                                                
+                                                <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                                                    <span>
+                                                        <a mat-menu-item (click)="toggleColumn()">Show all</a>
+                                                        <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                                                        (click)="toggleColumn(column)">
+                                                            <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                                                            {{column.name}}
+                                                        </a>
+                                                    </span>
+                                                </mat-menu>
+                                            </th>
+                                            <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                                                <a mat-icon-button (click)="editTaskLineOnDialog(element, 'view')" *ngIf="viewMode === 'view'">
+                                                    <img src="assets/icons/zoom.png">
+                                                </a>
+                                                <a mat-icon-button (click)="editTaskLineOnDialog(element, 'edit')" *ngIf="viewMode === 'edit'">
+                                                    <img src="assets/icons/page_edit.png">
+                                                </a>
+                                                <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
+                                                    <img src="assets/icons/zoom.png">
+                                                </a>
+                                                <a mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
+                                                    <img src="assets/icons/page_edit.png">
+                                                </a-->
+                                                <!--button mat-icon-button (click)="printRow(element)">
+                                                    <img src="assets/icons/printer.png">
+                                                </button-->
+                                                <!--a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
+                                                    <img src="assets/icons/printer.png">
+                                                </a-->
+                                                <a mat-icon-button (click)="deletePickTaskPrompt(element)" *ngIf="viewMode === 'edit'">
+                                                    <img src="assets/icons/delete.png">
+                                                </a>
+                                            </td>
+                                        </ng-container>
+                        
+                                        <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+                                        <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                                        [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
+                                        <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                                        [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + type + '/view', row.code]"></tr>
+                                    </table>
+                                    <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                        <mat-tab label="User">
+                            <ng-template matTabContent>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                        <mat-label>User</mat-label>
+                                        <mat-select [compareWith]="dataMap.user.formControl.compareFn" formControlName="user"
+                                        [class.readonly]="viewMode === 'view'">
+                                            <mat-option *ngFor="let user of pickTaskData.userList" [value]="user">
+                                                {{ user.firstName }} {{ user.lastName }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                <br><br>
+                                <h6>User Details</h6>
+                                <hr>
+                                <span *ngIf="form.get('user').value">
+                                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                        <mat-label>Username</mat-label>
+                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.userName" [class.readonly]="true">
+                                    </mat-form-field>
+                                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                        <mat-label>First Name</mat-label>
+                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.firstName" [class.readonly]="true">
+                                    </mat-form-field>
+                                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                        <mat-label>Last Name</mat-label>
+                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.lastName" [class.readonly]="true">
+                                    </mat-form-field>
+                                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                        <mat-label>Email</mat-label>
+                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.email" [class.readonly]="viewMode === 'view'">
+                                    </mat-form-field>
+                                    <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                        <mat-label>Phone</mat-label>
+                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.phone" [class.readonly]="viewMode === 'view'">
+                                    </mat-form-field>
+                                    <!--mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                        <mat-label>Rol</mat-label>
+                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.rol.name" [class.readonly]="viewMode === 'view'">
+                                    </mat-form-field-->
+                                    <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                        <mat-label>Status</mat-label>
+                                        <input matInput  hidden>
+                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.status" [class.readonly]="viewMode === 'view'">
+                                    </mat-form-field>
+                                </span>
+                            </ng-template>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="col-sm-12 text-right">
+                        <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
+                        <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                    </div>
+                </form>
+            </mat-card-content>
+      </mat-card>
+    </div>
+</div>

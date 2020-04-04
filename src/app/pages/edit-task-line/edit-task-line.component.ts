@@ -1,9 +1,9 @@
 import { Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
+import { DataProviderService } from '../../services/data-provider.service';
 import { environment } from '../../../environments/environment';
-import { Order, OrderService, Customer, OrderLine, OrderType, Transport, CustomerService,
-         OrderTypeService, TransportService } from '@pickvoice/pickvoice-api';
+import { PickTask, PickTaskLine, Dock, Transport } from '@pickvoice/pickvoice-api';
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
@@ -20,25 +20,25 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-interface OrdersData {
-  orderTypeList: OrderType[];
+interface PickTaskData {
+  pickTaskList: PickTask[];
+  dockList: Dock[];
   transportList: Transport[];
-  customerList: Customer[];
-  orderLineList: OrderLine[];
+  pickTaskLines: PickTaskLine[];
 }
 @Component({
-  selector: 'app-edit-order',
-  templateUrl: './edit-order.component.html',
-  styleUrls: ['./edit-order.component.scss']
+  selector: 'app-edit-task-line',
+  templateUrl: './edit-task-line.component.html',
+  styleUrls: ['./edit-task-line.component.scss']
 })
 
-export class EditOrderComponent implements OnInit {
+export class EditTaskLineComponent implements OnInit {
   form: FormGroup;
   pageTitle = '';
   cardTitle = '';
-  type = IMPORTING_TYPES.ORDERS;
-  dataMap = ModelMap.OrderMap;
-  definitions = ModelMap.OrderLineMap;
+  type = IMPORTING_TYPES.PICK_TASKS;
+  dataMap = ModelMap.PickTaskMap;
+  definitions = ModelMap.PickTaskLineMap;
   remoteSync: boolean;
   keys: string[];
   row: any;
@@ -46,10 +46,10 @@ export class EditOrderComponent implements OnInit {
   isLoadingResults = false;
   printElement = {};
   viewMode: string;
-  ordersData: OrdersData;
+  PickTaskData: PickTaskData;
 
   columnDefs: any[];
-  dataSource: MatTableDataSource<OrderLine>;
+  dataSource: MatTableDataSource<PickTaskLine>;
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   defaultColumnDefs: any[];
@@ -59,30 +59,32 @@ export class EditOrderComponent implements OnInit {
   showFilters: boolean;
   filters: any[] = [];
   actionForSelected: FormControl;
-  selection = new SelectionModel<OrderLine>(true, []);
+  selection = new SelectionModel<PickTaskLine>(true, []);
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
-    private activatedRoute: ActivatedRoute, private orderService: OrderService,
-    private router: Router, private dialog: MatDialog, private orderTypeService: OrderTypeService,
-    private customerService: CustomerService, private transportService: TransportService
+    private activatedRoute: ActivatedRoute, private dataProviderService: DataProviderService,
+    private router: Router, private dialog: MatDialog
   ) {
     this.dataSource = new MatTableDataSource([]);
-    this.ordersData = new Object() as OrdersData;
-    this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
+    this.PickTaskData = new Object() as PickTaskData;
+    this.PickTaskData.pickTaskList = [];
+    this.PickTaskData.dockList = [];
+    this.PickTaskData.transportList = [];
+    this.PickTaskData.pickTaskLines = [];
+    this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Task' : 'View Pick Task';
     this.isLoadingResults = true;
   }
 
   init() {
-    this.utilities.log('order', this.row);
+    this.utilities.log('pick task', this.row);
+    this.getDockList();
     this.getTransportList();
-    this.getCustomerList();
-    this.getOrderTypeList();
-    this.getOrderLineList();
+    this.getPickTaskLinesList();
     // inicializamos todo lo necesario para la tabla
-    if (this.row && this.row.orderLines && this.row.orderLines.length > 0) {
-      this.dataSource.data = this.ordersData.orderLineList;
+    if (this.row) {
+      this.dataSource.data = this.PickTaskData.pickTaskLines;
       // inicializar tabla mat-table
       this.displayedDataColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
@@ -90,22 +92,21 @@ export class EditOrderComponent implements OnInit {
       this.initColumnsDefs(); // columnas a mostrarse en la tabla
     }
     this.form = new FormGroup({
-      orderNumber: new FormControl(this.row.orderNumber, Validators.required),
-      purchaseNumber: new FormControl(this.row.purchaseNumber),
-      invoiceNumber: new FormControl(this.row.invoiceNumber),
-      orderDate: new FormControl(this.row.orderDate),
-      deliveryDate: new FormControl(this.row.deliveryDate),
-      orderType: new FormControl(this.row.orderType),
+      description: new FormControl(this.row.description),
+      enableDate: new FormControl(this.row.enableDate),
+      dateAssignment: new FormControl(this.row.dateAssignment),
+      progress: new FormControl(this.row.progress),
+      date: new FormControl(this.row.date),
       priority: new FormControl(this.row.priority),
-      note: new FormControl(this.row.note),
-      // idTransport: new FormControl(this.row.idTransport),
-      transport: new FormControl(this.row.transport),
-      customer: new FormControl(this.row.customer)
+      // lines : no tiene control de formulario
+      qty: new FormControl(this.row.qty),
+      document: new FormControl(this.row.document),
+      taskState: new FormControl(this.row.taskState),
+      user: new FormControl(this.row.user),
+      taskType: new FormControl(this.row.taskType),
+      currentLine: new FormControl(this.row.currentLine),
+      childrenWork: new FormControl(this.row.childrenWork)
     });
-    /*if (this.viewMode === 'view') {
-      this.form.disable();
-    }*/
-    // this.utilities.log('form', this.form);
   }
 
   initColumnsDefs() {
@@ -113,8 +114,8 @@ export class EditOrderComponent implements OnInit {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInOrderLinesPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInOrderLinesPage'));
+    if (localStorage.getItem('displayedColumnsInPickTaskPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInPickTaskPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -168,7 +169,7 @@ export class EditOrderComponent implements OnInit {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInOrderLinesPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInPickTaskPage', JSON.stringify(this.columnDefs));
     // this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -199,7 +200,7 @@ export class EditOrderComponent implements OnInit {
     switch (action) {
       case 'delete':
         if (this.selection.selected.length > 0) {
-          this.deleteOrderLinePrompt(this.selection.selected);
+          this.deletePickTaskLinePrompt(this.selection.selected);
         } else {
           this.utilities.showSnackBar('You have no selected records', 'OK');
         }
@@ -242,21 +243,22 @@ export class EditOrderComponent implements OnInit {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        // TODO: tener servicio para eliminar registros de orderLines
-        // this.orderService.deleteOrderLine(row.id, 'response', false).subscribe(observer);
-        this.deleteOrderLine(row);
+        // TODO: tener servicio para eliminar registros de pick tasks
+        this.deletePickTaskLine(row);
       });
     } else {
-      this.deleteOrderLine(rows);
+      this.deletePickTaskLine(rows);
     }
   }
 
-  deleteOrderLine(row: any) {
-    const index = this.row.orderLines.findIndex(_row => _row.id === row.id);
-    this.row.orderLines.splice(index, 1);
+  deletePickTaskLine(row: any) {
+    const index = this.PickTaskData.pickTaskLines.findIndex(_row => _row.batchNumber === row.batchNumber);
+    if (index > 1) {
+      this.PickTaskData.pickTaskLines.splice(index, 1);
+    }
   }
 
-  deleteOrderLinePrompt(rows?: any) {
+  deletePickTaskLinePrompt(rows?: any) {
     const observer = {
       next: (result) => {
         if (result) {
@@ -291,19 +293,19 @@ export class EditOrderComponent implements OnInit {
     }
   }
 
-  editOrderLineOnPage(element: any) {
+  ediPickTaskLineOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
   }
 
-  editOrderLineOnDialog(element: any, mode: string) {
+  editPickTaskLineOnDialog(element: any, mode: string) {
     this.utilities.log('row to send to edit dialog', element);
     const dialogRef = this.dialog.open(EditRowDialogComponent, {
       data: {
         row: element,
         map: this.definitions,
         viewMode: mode,
-        type: IMPORTING_TYPES.ORDER_LINE,
+        type: IMPORTING_TYPES.PICK_TASKLINES,
         remoteSync: false // para mandar los datos a la BD por la API
       }
     });
@@ -320,12 +322,12 @@ export class EditOrderComponent implements OnInit {
     });
   }
 
-  addOrderLine() {
+  addPickTaskLine() {
     this.utilities.log('map to send to add dialog', this.definitions);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.definitions,
-        type: IMPORTING_TYPES.ORDER_LINE,
+        type: IMPORTING_TYPES.PICK_TASKLINES,
         remoteSync: false // para mandar los datos a la BD por la API
       }
     });
@@ -345,16 +347,16 @@ export class EditOrderComponent implements OnInit {
   export() {
     // TODO: hacer la exportacion de la orden completa
     const dataToExport = this.row;
-    this.utilities.exportToXlsx(dataToExport, 'Order ' + this.row.orderNumber);
+    this.utilities.exportToXlsx(dataToExport, 'Pick Task ' + this.row.id);
   }
 
-  exportOrderLines() {
+  exportPickTaskLines() {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
       return row;
     });
-    this.utilities.exportToXlsx(dataToExport, 'Order Lines List');
+    this.utilities.exportToXlsx(dataToExport, 'Pick Task Lines List');
   }
 
   /*
@@ -384,33 +386,26 @@ export class EditOrderComponent implements OnInit {
   applyFilters() {
   }
 
-  getOrderTypeList() {
-    this.orderTypeService.retrieveAllOrderType().subscribe(results => {
-      this.ordersData.orderTypeList = results;
-      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
-    });
-  }
-
-  getOrderLineList() {
-    this.orderService.orderLineByOrderId(this.row.id).subscribe(results => {
-      this.ordersData.orderLineList = results;
-      this.dataSource.data = results;
+  getPickTaskLinesList() {
+    this.dataProviderService.getAllPickTaskLinesByTask(this.row.id).subscribe(results => {
+      this.PickTaskData.pickTaskLines = results;
+      this.dataSource.data = this.PickTaskData.pickTaskLines;
       this.refreshTable();
-      this.utilities.log('this.ordersData.orderTypeList', results);
-    });
-  }
-
-  getCustomerList() {
-    this.customerService.retrieveAllCustomers().subscribe(results => {
-      this.ordersData.customerList = results;
-      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
+      this.utilities.log('pick task list', this.PickTaskData.pickTaskLines);
     });
   }
 
   getTransportList() {
-    this.transportService.retrieveAllTransport().subscribe(results => {
-      this.ordersData.transportList = results;
-      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
+    this.dataProviderService.getAllTransports().subscribe(results => {
+      this.PickTaskData.transportList = results;
+      this.utilities.log('transport list', this.PickTaskData.transportList);
+    });
+  }
+
+  getDockList() {
+    this.dataProviderService.getAllDocks().subscribe(results => {
+      this.PickTaskData.dockList = results;
+      this.utilities.log('docks list', this.PickTaskData.dockList);
     });
   }
 
@@ -428,7 +423,6 @@ export class EditOrderComponent implements OnInit {
     }
     this.utilities.log('onSubmit');
     const formData = this.form.value;
-    formData.orderLines = this.dataSource.data;
 
     const toUpload = this.row;
     this.utilities.log('form data', formData);
@@ -457,7 +451,7 @@ export class EditOrderComponent implements OnInit {
           this.utilities.error('error on update', error);
         }
       };
-      this.orderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
+      this.dataProviderService.updatePickTask(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
     } else {
       this.sharedDataService.returnData = toUpload;
@@ -474,7 +468,6 @@ export class EditOrderComponent implements OnInit {
   }
 
   addNewObject(objectType: string, myTitle: string) {
-    this.utilities.log('map to send to add dialog', this.definitions);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.utilities.dataTypesModelMaps[objectType],
@@ -486,15 +479,16 @@ export class EditOrderComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
+        if (objectType === IMPORTING_TYPES.PICK_TASKS) {
+          this.PickTaskData.pickTaskList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.DOCKS) {
+          this.PickTaskData.dockList.push(result);
+        }
         if (objectType === IMPORTING_TYPES.TRANSPORTS) {
-          this.ordersData.transportList.push(result);
+          this.PickTaskData.transportList.push(result);
         }
-        if (objectType === IMPORTING_TYPES.ORDER_TYPE) {
-          this.ordersData.orderTypeList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.CUSTOMERS) {
-          this.ordersData.customerList.push(result);
-        }
+        // TODO: agregar los tipos de datos que se pueden agregar desde selects
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');
@@ -522,9 +516,7 @@ export class EditOrderComponent implements OnInit {
         this.isLoadingResults = false;
         this.utilities.log('ngOnInit => row received', element);
         this.row = element;
-        const keys = Object.keys(element).filter(key => key !== 'id');
-        const keysForItem = keys.filter(key => key !== 'state');
-        this.cardTitle = 'Order # ' + this.row.orderNumber;
+        this.cardTitle = 'Pick Task # ' + this.row.id;
         this.init();
       });
       this.remoteSync = true;

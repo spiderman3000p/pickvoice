@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { OnDestroy, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
@@ -10,6 +10,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
 import { retry } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { ItemsService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { ModuleRegistry, AllModules } from '@ag-grid-enterprise/all-modules';
 import { LicenseManager } from '@ag-grid-enterprise/core';
@@ -45,18 +46,15 @@ interface GridWindow {
   templateUrl: './picking.component.html',
   styleUrls: ['./picking.component.css']
 })
-export class PickingComponent implements OnInit {
+export class PickingComponent implements OnDestroy {
   periods: TimePeriod[];
   windows: GridWindow[];
   agGridModules: Module[] = AllModules;
+  subscriptions: Subscription[] = [];
   constructor(private apiService: ItemsService, private utilities: UtilitiesService) {
       this.initWindows();
       this.initPeriods();
       console.log('periods', this.periods);
-  }
-
-  ngOnInit() {
-    
   }
 
   onGridReady(params, window: GridWindow) {
@@ -69,7 +67,8 @@ export class PickingComponent implements OnInit {
     this.utilities.log('requesting data');
     if (!window) {
       this.windows.forEach(loader => loader.isLoading = true);
-      this.apiService.retrieveAllItems('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
+      this.subscriptions.push(this.apiService.retrieveAllItems('response', false)
+      .pipe(retry(3)/*, catchError(this.handleError)*/)
       .subscribe(response => {
         this.windows.forEach(loader => loader.isLoading = false);
         this.utilities.log('items received', response.body);
@@ -136,21 +135,23 @@ export class PickingComponent implements OnInit {
         this.windows.forEach(loader => loader.isLoading = false);
         this.utilities.error('error on requesting data');
         this.utilities.showSnackBar('Error requesting data', 'OK');
-      });
+      }));
     } else {
       window.isLoading = true;
-      this.apiService.retrieveAllItems('response', false).pipe(retry(3)/*, catchError(this.handleError)*/)
-      .subscribe(response => {
-        window.isLoading = true;
-        this.utilities.log('items received', response.body);
-        if (response.body.length > 0) {
-          window.data.rowData = response.body;
-        }
-      }, error => {
-        window.isLoading = false;
-        this.utilities.error('error on requesting data');
-        this.utilities.showSnackBar('Error requesting data', 'OK');
-      });
+      this.subscriptions.push(this.apiService.retrieveAllItems('response', false)
+      .pipe(retry(3)/*, catchError(this.handleError)*/)
+        .subscribe(response => {
+          window.isLoading = true;
+          this.utilities.log('items received', response.body);
+          if (response.body.length > 0) {
+            window.data.rowData = response.body;
+          }
+        }, error => {
+          window.isLoading = false;
+          this.utilities.error('error on requesting data');
+          this.utilities.showSnackBar('Error requesting data', 'OK');
+        })
+      );
     }
   }
 
@@ -269,5 +270,9 @@ export class PickingComponent implements OnInit {
     }
     console.log('displayed column after', window.data.colDefs);
     window.gridApi.setColumnDefs(window.data.colDefs);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

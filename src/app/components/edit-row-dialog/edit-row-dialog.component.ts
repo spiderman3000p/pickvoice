@@ -63,7 +63,7 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
       if (this.dataMap[key].formControl.control === 'select') {
         this.selectsData[key] =
         this.dataProviderService.getDataFromApi(this.dataMap[key].type);
-        formControls[key].patchValue(-1);
+        formControls[key].patchValue('');
       }
     });
     this.form = new FormGroup(formControls);

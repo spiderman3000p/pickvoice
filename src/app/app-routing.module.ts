@@ -17,6 +17,9 @@ import { ItemTypesResolverService } from './pages/item-types/item-types-resolver
 import { OrderTypeResolverService } from './pages/order-type/order-type-resolver.service';
 import { UomsResolverService } from './pages/uoms/uoms-resolver.service';
 import { TransportResolverService } from './pages/transports/transport-resolver.service';
+import { PickingPlanningResolverService } from './pages/picking-planning/picking-planning-resolver.service';
+import { PickTaskResolverService } from './pages/picking-planning/pick-task-resolver.service';
+import { PickTaskLineResolverService } from './pages/picking-planning/pick-task-line-resolver.service';
 import { IMPORTING_TYPES } from './models/model-maps.model';
 
 const routes: Routes = [
@@ -189,6 +192,42 @@ const routes: Routes = [
             type: IMPORTING_TYPES.TRANSPORTS,
             format: 'single',
             title: 'Print Transport'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.PICK_PLANNINGS + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: PickingPlanningResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.PICK_PLANNINGS,
+            format: 'single',
+            title: 'Print Pick Planning'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.PICK_TASKS + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: PickTaskResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.PICK_TASKS,
+            format: 'single',
+            title: 'Print Task'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.PICK_TASKLINES + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: PickTaskLineResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.PICK_TASKLINES,
+            format: 'single',
+            title: 'Print Pick Task Line'
           }
         }
     ]

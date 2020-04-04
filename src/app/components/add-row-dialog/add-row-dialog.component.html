@@ -9,7 +9,7 @@
             <mat-form-field [ngClass]="getColumnsClasses()" *ngIf="dataMap[key].formControl.control === 'select'">
                 <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                 <mat-select [formControlName]="key">
-                    <mat-option [value]="-1">
+                    <mat-option [value]="">
                         Select a value
                     </mat-option>
                     <mat-option *ngFor="let data of selectsData[key] | async"

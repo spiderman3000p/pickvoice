@@ -1,4 +1,5 @@
 export const IMPORTING_TYPES = {
+    USERS: 'users',
     ITEMS: 'items',
     LOCATIONS: 'locations',
     ORDERS: 'orders',
@@ -10,10 +11,17 @@ export const IMPORTING_TYPES = {
     ORDER_TYPE: 'orderTypes',
     SECTIONS: 'sections',
     TRANSPORTS: 'transports',
+    PICK_PLANNINGS: 'pickPlannings',
+    PICK_TASKS: 'pickTasks',
+    PICK_TASKLINES: 'pickTaskLines',
+    TASK_TYPES: 'taskTypes',
+    DOCKS: 'docks',
     LOADPICKS_DTO: 'loadPicksDto',
     LOCATION_TYPE: 'locationTypes',
     TRANSPORT_STATE: 'transportState',
-    ITEM_STATE: 'itemState'
+    ITEM_STATE: 'itemState',
+    TASK_STATE: 'taskState',
+    PICK_STATE: 'pickPlanningState'
 };
 export const FILTER_TYPES = [
     {
@@ -180,7 +188,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.ITEM_TYPE,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.ITEM_TYPE,
+                type: 'text',
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
@@ -199,7 +207,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.UOMS,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.UOMS,
+                type: 'text',
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
@@ -287,7 +295,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.ITEM_STATE,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.ITEM_STATE,
+                type: 'text',
                 displayIndex: null,
                 valueIndex: null,
                 compareFn: (c1, c2) => {
@@ -403,7 +411,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.SECTIONS,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.SECTIONS,
+                type: 'text',
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
@@ -472,7 +480,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.LOCATION_TYPE,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.LOCATION_TYPE,
+                type: 'text',
                 displayIndex: null,
                 valueIndex: null,
                 compareFn: (c1, c2) => {
@@ -547,7 +555,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.ORDER_TYPE,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.ORDER_TYPE,
+                type: 'text',
                 valueIndex: 'code',
                 displayIndex: 'description',
                 compareFn: (c1, c2) => {
@@ -585,7 +593,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.TRANSPORTS,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.TRANSPORTS,
+                type: 'number',
                 valueIndex: 'id',
                 displayIndex: 'transportNumber',
                 compareFn: (c1, c2) => {
@@ -604,7 +612,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.CUSTOMERS,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.CUSTOMERS,
+                type: 'text',
                 valueIndex: 'code',
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
@@ -706,7 +714,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.TRANSPORT_STATE,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.TRANSPORT_STATE,
+                type: 'text',
                 valueIndex: null,
                 displayIndex: null,
                 compareFn: (c1, c2) => {
@@ -752,7 +760,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.ITEMS,
             formControl: {
                 control: 'select',
-                type: IMPORTING_TYPES.ITEMS,
+                type: 'text',
                 valueIndex: 'sku',
                 displayIndex: 'description',
                 compareFn: (c1, c2) => {
@@ -849,7 +857,388 @@ export class ModelMap {
             type: 'number'
         }
     };
-
+    /* picking planning object map for CRUD */
+    public static PickPlanningMap = {
+        targetDock: {
+            name: 'dock',
+            required: true,
+            type: IMPORTING_TYPES.DOCKS,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'description',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new dock',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.DOCKS
+            }
+        },
+        description: {
+            name: 'description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        state: {
+            name: 'state',
+            required: false,
+            type: IMPORTING_TYPES.PICK_STATE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1: any, c2: any) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        progress: {
+            name: 'progress',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        processDate: {
+            name: 'process date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        rootWork: {
+            name: 'root work',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
+    /* picking task object map for CRUD */
+    public static PickTaskMap = {
+        description: {
+            name: 'description',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        enableDate: {
+            name: 'enable date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        dateAssignment: {
+            name: 'date assignment',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        date: {
+            name: 'date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        priority: {
+            name: 'priority',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        lines: {
+            name: 'lines',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        qty: {
+            name: 'qty',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number',
+            }
+        },
+        document: {
+            name: 'document',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        currentLine: {
+            name: 'current line',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number',
+            }
+        },
+        childrenWork: {
+            name: 'chidren work',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number',
+            }
+        },
+        taskState: {
+            name: 'state',
+            required: false,
+            type: IMPORTING_TYPES.TASK_STATE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        user: {
+            name: 'user',
+            required: true,
+            type: IMPORTING_TYPES.USERS,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'username',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            /*addNew: {
+                text: 'Add new user',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.USERS
+            }*/
+        },
+        taskType: {
+            name: 'type',
+            required: false,
+            type: IMPORTING_TYPES.TASK_TYPES,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new type',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.TASK_TYPES
+            }
+        },
+    };
+    /* picking task object map for CRUD */
+    public static PickTaskLineMap = {
+        lpnItemId: {
+            name: 'lpn',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        sku: {
+            name: 'sku',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        skuDescription: {
+            name: 'sku description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        expiryDate: {
+            name: 'expiry Date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        serial: {
+            name: 'serial',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        batchNumber: {
+            name: 'batch Number',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        sectionCode: {
+            name: 'section code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text',
+            }
+        },
+        locationId: {
+            name: 'location id',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationCode: {
+            name: 'location code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text',
+            }
+        },
+        locationCheckDigit: {
+            name: 'location check digitl',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number',
+            }
+        },
+        qtyToPicked: {
+            name: 'qty to pick',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number',
+            }
+        },
+        uomId: {
+            name: 'uom id',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        lpnId: {
+            name: 'lpn id',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        uomCode: {
+            name: 'uom code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnCode: {
+            name: 'lpn code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        pickSequenceNumber: {
+            name: 'pick sequence number',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        scannedVerification: {
+            name: 'scanned verification',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        spokenVerification: {
+            name: 'spoken verification',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
     /*********************************************
     *                   DTO's
     **********************************************/

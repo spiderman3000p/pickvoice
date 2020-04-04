@@ -6,9 +6,7 @@ import { PickingPlanningComponent } from './picking-planning.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { MatSelectModule } from '@angular/material/select';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatGridListModule } from '@angular/material/grid-list';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,8 +18,14 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
-import { AgGridModule } from 'ag-grid-angular';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatListModule } from '@angular/material/list';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
@@ -55,7 +59,6 @@ export const MY_FORMATS = {
     FormsModule,
     ReactiveFormsModule,
     
-    MatGridListModule,
     MatNativeDateModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
@@ -67,9 +70,14 @@ export const MY_FORMATS = {
     MatIconModule,
     MatCardModule,
     MatDatepickerModule,
+    MatCheckboxModule,
     MatMenuModule,
     MatSelectModule,
-    AgGridModule.withComponents([])
+    MatSlideToggleModule,
+    MatExpansionModule,
+    MatListModule,
+    MatTabsModule,
+    MatProgressBarModule
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]},

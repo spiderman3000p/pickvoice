@@ -1,0 +1,284 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <div class="content">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>{{ pageTitle }}</h1>
+              </div>
+              <div class="actions actionbar-section right">
+                <button mat-raised-button color="accent" (click)="print()">
+                    <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
+                </button>
+                <button mat-raised-button color="warn" (click)="export()">
+                    <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                </button>
+              </div>
+          </div>
+      </div>
+      <mat-card>
+          <mat-card-content *ngIf="form">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <mat-tab-group class="tab-orders">
+                    <mat-tab label="General">
+                        <ng-template matTabContent>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Target Dock</mat-label>
+                                <mat-select [compareWith]="dataMap.targetDock.formControl.compareFn" formControlName="targetDock"
+                                [class.readonly]="viewMode === 'view'">
+                                    <mat-option *ngFor="let dock of pickPlanningData.dockList" [value]="dock.code">
+                                        {{ dock.description }}
+                                    </mat-option>
+                                    <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
+                                        <span class="select-footer-content">
+                                            <a href="javascript: void(0)"
+                                            (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')">
+                                                <mat-icon *ngIf="dataMap.orderType.addNew.icon">{{ dataMap.orderType.addNew.icon }}</mat-icon>
+                                                <span>{{ dataMap.orderType.addNew.text }}</span>
+                                            </a>
+                                        </span>
+                                    </div-->
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Description</mat-label>
+                                <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Progress</mat-label>
+                                <input class="w-100" matInput type="number" formControlName="progress" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Process Date</mat-label>
+                                <input matInput formControlName="processDate" [matDatepicker]="processDate"
+                                [class.readonly]="viewMode === 'view'" readonly>
+                                <mat-datepicker-toggle matSuffix [for]="processDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
+                                <mat-datepicker #processDate ></mat-datepicker>
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>State</mat-label>
+                                <mat-select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
+                                [class.readonly]="viewMode === 'view'">
+                                    <mat-option *ngFor="let state of pickPlanningData.pickPlanningStates" [value]="state">
+                                        {{ state }}
+                                    </mat-option>
+                                    <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
+                                        <span class="select-footer-content">
+                                            <a href="javascript: void(0)"
+                                            (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')">
+                                                <mat-icon *ngIf="dataMap.orderType.addNew.icon">{{ dataMap.orderType.addNew.icon }}</mat-icon>
+                                                <span>{{ dataMap.orderType.addNew.text }}</span>
+                                            </a>
+                                        </span>
+                                    </div-->
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Root Work</mat-label>
+                                <input class="w-100" matInput type="text" formControlName="rootWork" [class.readonly]="viewMode === 'view'">
+                            </mat-form-field>
+                            <!-- TODO: tabla de tasks -->
+                        </ng-template>
+                    </mat-tab>
+                    <mat-tab label="Dock">
+                        <ng-template matTabContent>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Target Dock</mat-label>
+                                    <mat-select [compareWith]="dataMap.targetDock.formControl.compareFn" formControlName="targetDock"
+                                    [class.readonly]="viewMode === 'view'">
+                                        <mat-option *ngFor="let dock of pickPlanningData.dockList" [value]="dock.code">
+                                            {{ dock.description }}
+                                        </mat-option>
+                                        <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
+                                            <span class="select-footer-content">
+                                                <a href="javascript: void(0)"
+                                                (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')">
+                                                    <mat-icon *ngIf="dataMap.orderType.addNew.icon">{{ dataMap.orderType.addNew.icon }}</mat-icon>
+                                                    <span>{{ dataMap.orderType.addNew.text }}</span>
+                                                </a>
+                                            </span>
+                                        </div-->
+                                    </mat-select>
+                                </mat-form-field>
+                            <br><br>
+                            <h6>Dock Details</h6>
+                            <hr>
+                            <span *ngIf="form.get('targetDock').value">
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                    <mat-label>Dock Code</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('targetDock').value.code" [class.readonly]="true">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                    <mat-label>Description</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('targetDock').value.name" [class.readonly]="true">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                    <mat-label>Dock Type</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('targetDock').value.dockType" [class.readonly]="true">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Section</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('targetDock').value.section" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'"
+                                appearance="none">
+                                    <mat-label>Status</mat-label>
+                                    <input matInput [formControlName]="key"  hidden>
+                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                    [checked]="form.get('targetDock').value.status">
+                                        Status
+                                    </mat-slide-toggle>
+                                </mat-form-field>
+                            </span>
+                        </ng-template>
+                    </mat-tab>
+                    <mat-tab label="Transport">
+                        <ng-template matTabContent>
+                            <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                <mat-label>Transport</mat-label>
+                                <mat-select formControlName="transport">
+                                    <mat-option *ngFor="let transport of pickPlanningData.transportList" [value]="transport">
+                                        {{ transport.nameRoute }}
+                                    </mat-option>
+                                    <div class="select-footer">
+                                        <span class="select-footer-content">
+                                            <a href="javascript: void(0)"
+                                            (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')">
+                                                <mat-icon>add</mat-icon>
+                                                Add new transport
+                                            </a>
+                                        </span>
+                                    </div>
+                                </mat-select>
+                            </mat-form-field>
+                            <br><br>
+                            <h5>Transport Details</h5>
+                            <hr>
+                            <span *ngIf="form.get('transport').value">
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Transport Number</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.transportNumber" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Route</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.route" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Name Route</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.nameRoute" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Dispatch Platforms</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.dispatchPlatforms" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Carrier Code</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.carrierCode" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Transport State</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.transportState" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                            </span>
+                        </ng-template>
+                    </mat-tab>
+                </mat-tab-group>
+                <hr>
+                <div class="col-sm-12">
+                    <h4>Pick Planning Tasks</h4>
+                    <div class="col-sm-12 text-right mb-3">
+                        <a mat-raised-button color="warn" (click)="exportOrderLines()">
+                            <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                        </a>
+                        <a mat-raised-button color="accent" (click)="addOrderLine()" class="ml-2"
+                            *ngIf="viewMode === 'edit'">
+                            <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                        </a>
+                    </div>
+                    <table mat-table [dataSource]="dataSource" matSort 
+                    [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 12">
+                        <!-- Checkbox Column -->
+                        <ng-container matColumnDef="select">
+                            <th mat-header-cell *matHeaderCellDef>
+                                <mat-checkbox (change)="$event ? masterToggle() : null"
+                                    [checked]="selection.hasValue() && isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                    [aria-label]="checkboxLabel()">
+                                </mat-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(row) : null"
+                                    [checked]="selection.isSelected(row)"
+                                    [aria-label]="checkboxLabel(row)">
+                                </mat-checkbox>
+                            </td>
+                        </ng-container>
+                        <!-- Data Columns -->
+                        <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
+                            <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
+                        </ng-container>
+                        <!-- Options Sticky Column -->
+                        <ng-container matColumnDef="options" stickyEnd>
+                            <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+                                {{'Options' | uppercase}}
+                                <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                                    <mat-icon>more_vert</mat-icon>
+                                </a>
+                                
+                                <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                                    <span>
+                                        <a mat-menu-item (click)="toggleColumn()">Show all</a>
+                                        <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                                        (click)="toggleColumn(column)">
+                                            <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                                            {{column.name}}
+                                        </a>
+                                    </span>
+                                </mat-menu>
+                            </th>
+                            <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                                <a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
+                                    <img src="assets/icons/zoom.png">
+                                </a>
+                                <a mat-icon-button (click)="['/pages/' + type + '/edit', element.id]" *ngIf="viewMode === 'edit'">
+                                    <img src="assets/icons/page_edit.png">
+                                </a>
+                                <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
+                                    <img src="assets/icons/zoom.png">
+                                </a>
+                                <a mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
+                                    <img src="assets/icons/page_edit.png">
+                                </a-->
+                                <!--button mat-icon-button (click)="printRow(element)">
+                                    <img src="assets/icons/printer.png">
+                                </button-->
+                                <!--a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
+                                    <img src="assets/icons/printer.png">
+                                </a-->
+                                <a mat-icon-button (click)="deletePickTaskPrompt(element)" *ngIf="viewMode === 'edit'">
+                                    <img src="assets/icons/delete.png">
+                                </a>
+                            </td>
+                        </ng-container>
+        
+                        <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+                        <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                        [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
+                        <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                        [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.code]"></tr>
+                    </table>
+                    <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                </div>
+                <div class="col-sm-12 text-right">
+                    <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </div>
+            </form>
+          </mat-card-content>
+      </mat-card>
+    </div>
+</div>

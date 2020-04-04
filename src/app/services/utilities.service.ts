@@ -30,7 +30,10 @@ export class UtilitiesService implements OnDestroy {
     orderTypes: ModelMap.OrderTypeMap,
     sections: ModelMap.SectionMap,
     transports: ModelMap.TransportMap,
-    loadPicksDto: ModelMap.LoadPickDtoMap
+    loadPicksDto: ModelMap.LoadPickDtoMap,
+    pickPlannings: ModelMap.PickPlanningMap,
+    pickTasks: ModelMap.PickTaskMap,
+    pickTaskLines: ModelMap.PickTaskLineMap
   };
   subscriptions: Subscription[];
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {
@@ -66,7 +69,9 @@ export class UtilitiesService implements OnDestroy {
           }
           // dataValue = date;
           break;
+        case IMPORTING_TYPES.TASK_TYPES: dataValue = data && data.name ? data.name : ''; break;
         case IMPORTING_TYPES.ITEMS: dataValue = data && data.description ? data.description : ''; break;
+        case IMPORTING_TYPES.USERS: dataValue = data ? `${data.firstName} ${data.lastName}` : ''; break;
         case IMPORTING_TYPES.ORDERS: dataValue = data && data.orderNumber ? data.orderNumber : ''; break;
         case IMPORTING_TYPES.ITEM_TYPE: dataValue = data && data.name ? data.name : ''; break;
         case IMPORTING_TYPES.UOMS: dataValue = data && data.name ? data.name : ''; break;

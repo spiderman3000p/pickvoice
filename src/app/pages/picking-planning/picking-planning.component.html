@@ -20,219 +20,154 @@
       <div class="example-loading-shade" *ngIf="dataSource.loading$ | async">
         <mat-spinner class="spinner"></mat-spinner>
       </div>
-      <mat-accordion>
-        <mat-expansion-panel (opened)="showFilters = true" (closed)="showFilters = false">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <mat-icon>search</mat-icon>
-              Filters Section
-            </mat-panel-title>
-            <mat-panel-description>
-              Click to {{ !showFilters ? 'show' : 'hide' }} all filter controls
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <div class="filters-panel">
-            <div class="col-sm-9 filters-controls">
-              <form [formGroup]="filtersForm" *ngIf="showFilters" class="row" (ngSubmit)="applyFilters()">
-                <div *ngFor="let filter of filters">
-                  <span *ngIf="filter.show" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-                        <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'select'">
-                          <mat-select [compareWith]="definitions[filter.key].formControl.compareFn"
-                          [formControlName]="filter.key">
-                              <mat-option [value]="-1">
-                                  Select a value
-                              </mat-option>
-                              <mat-option *ngFor="let data of selectsData[filter.key] | async"
-                              [value]="definitions[filter.key].formControl.valueIndex !== null ?
-                              data[definitions[filter.key].formControl.valueIndex] : data">
-                                  {{ definitions[filter.key].formControl.displayIndex !== null ?
-                                      data[definitions[filter.key].formControl.displayIndex] : data }}
-                              </mat-option>
-                          </mat-select>
-                        </mat-form-field>
-                        <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'input'">
-                            <mat-label>{{filter.name}}</mat-label>
-                            <input matInput [formControlName]="filter.key"
-                                type="definitions[filter.key].formControl.type">
-                        </mat-form-field>
-                        <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'date'">
-                            <mat-label>{{filter.name}}</mat-label>
-                            <input matInput [formControlName]="filter.key" [matDatepicker]="pickerDate" readonly>
-                            <mat-datepicker-toggle matSuffix [for]="pickerDate">    
-                            </mat-datepicker-toggle>
-                            <mat-datepicker #pickerDate ></mat-datepicker>
-                        </mat-form-field>
-                        <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'toggle'" [appearance]="'none'">
-                            <mat-label>{{filter.name}}</mat-label>
-                            <input matInput [formControlName]="filter.key" hidden>
-                            <mat-slide-toggle color="primary"
-                            (change)="filtersForm.get(filter.key).setValue(!filterForm.get(filter.key).value)"
-                            [checked]="filtersForm.get(filter.key).value">
-                                {{definitions[filter.key].name}}
-                            </mat-slide-toggle>
-                        </mat-form-field>
-                    </span>
-                </div>
-                <div class="col-sm-12">
-                  <button mat-raised-button color="accent" class="btn btn-lg" type="submit">
-                    <mat-icon>search</mat-icon>
-                    Filter
-                  </button>
-                  <button mat-raised-button color="primary" class="btn btn-lg ml-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
-                    <mat-icon>not_interested</mat-icon>
-                    Reset Filters
-                  </button>
-                </div>
-              </form>
-            </div>
-            <div class="col-sm-3 filters-list">
-              <mat-selection-list>
-                <mat-list-option *ngFor="let filter of filters" [selected]="filter.show" (click)="filter.show = !filter.show">
-                  {{filter.name}}
-                </mat-list-option>
-              </mat-selection-list>
-            </div>
+      <div>
+        <!--strong *ngIf="filteredDone">Filtred results: {{dataSource.dataCount}}</strong-->
+        <div class="table-toolbar" *ngIf="selection.selected.length > 0">
+          <div class="col-sm-3 text-left toolbar-label">
+            <label>Selected rows: {{selection.selected.length}}</label>
           </div>
-        </mat-expansion-panel>
-        </mat-accordion>
-        <div>
-          <!--strong *ngIf="filteredDone">Filtred results: {{dataSource.dataCount}}</strong-->
-          <div class="table-toolbar" *ngIf="selection.selected.length > 0">
-            <div class="col-sm-6 text-left toolbar-label">
-              <label>Selected rows: {{selection.selected.length}}</label>
-            </div>
-            <div class="col-sm-6 text-right toolbar-buttons">
-              <!--button class="print-button" (click)="printRows(selection.selected)">Print</button-->
-              <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button-->
-              <button class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
-            </div>
-          </div>
-          <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 10"-->
-          <table mat-table [dataSource]="dataSource" matSort matSortActive="code" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 10">
-            <!-- Checkbox Column -->
-            <ng-container matColumnDef="select">
-              <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
-                  [aria-label]="checkboxLabel()">
-                </mat-checkbox>
-              </th>
-              <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
-                  [aria-label]="checkboxLabel(row)">
-                </mat-checkbox>
-              </td>
-            </ng-container>
-            <!-- Data Columns -->
-            <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}}
-                <span (keyup)="$event.stopPropagation()" (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
-              <mat-icon class="column-filter-icon" [ngClass]="{'active': isFilteredBy(column)}" [matMenuTriggerFor]="filterColumnMenu">
-                  filter_list
-              </mat-icon>
-              <mat-menu #filterColumnMenu="matMenu" (keyup)="$event.stopPropagation()" class="column-filter-menu"
-              (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
-                  <span (click)="$event.stopPropagation()" class="btn-filter2-wrapper">
-                      <!--button mat-mini-fab aria-label="Clear filter" class="btn-filter-menu"
-                      (click)="clearFilterInColumn(column)">
-                          <mat-icon>block</mat-icon>
-                      </button-->
-                      <button mat-button aria-label="Clear filter" (click)="clearFilterInColumn(column)"
-                      class="btn-filter2">
-                          <!--mat-icon style="font-size: 14px">block</mat-icon--> clear filter
-                      </button>
-                  </span>
-                  <span (keyup)="$event.stopPropagation()" class="form-group" (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()"
-                    *ngIf="definitions[column].formControl.control !== 'select' &&
-                                        definitions[column].formControl.control !== 'toggle'">
-                      <select class="form-control" [formControl]="filters[column].controls.type"
-                      [name]="column+'-type'">
-                          <option *ngFor="let type of filters[column].availableTypes"
-                          [value]="type.value">
-                              {{ type.name }}
-                          </option>
-                      </select>
-                  </span>
-                  <span class="form-group" *ngIf="definitions[column].formControl.control === 'select'" (keyup)="$event.stopPropagation()"
-                    (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
-                      <select class="form-control" [formControl]="filters[column].controls.value"
-                      [name]="column">
-                          <option value="">Select a value</option>
-                          <option *ngFor="let data of selectsData[column]"
-                          [value]="data.id !== undefined && data.id !== null ? data.id : 
-                          (definitions[column].formControl.valueIndex !== null ?
-                          data[definitions[column].formControl.valueIndex] : data)">
-                              {{ definitions[column].formControl.displayIndex !== null ?
-                                  data[definitions[column].formControl.displayIndex] : data }}
-                          </option>
-                      </select>
-                  </span>
-                  <span class="form-group" *ngIf="definitions[column].formControl.control === 'input' ||
-                                      definitions[column].formControl.control === 'date'" (keyup)="$event.stopPropagation()"
-                        (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
-                    <input [type]="filters[column].type" class="form-control" [name]="column"
-                                          [formControl]="filters[column].controls.value">
-                  </span>
-                  <span class="form-group" *ngIf="definitions[column].formControl.control === 'toggle'" (keyup)="$event.stopPropagation()"
-                  (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
-                    <mat-slide-toggle color="primary" [formControl]="filters[column].controls.value"></mat-slide-toggle>
-                  </span>
-                </mat-menu>
-                </span>
-              </th>
-              <td mat-cell *matCellDef="let element"> {{ element[column] }} </td>
-            </ng-container>
-            <!-- Options Sticky Column -->
-            <ng-container matColumnDef="options" stickyEnd>
-              <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
-                {{'Options' | uppercase}}
-                <button mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
-                                  <mat-icon>more_vert</mat-icon>
-                              </button>
-
-                <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
-                  <span>
-                                      <button mat-menu-item (click)="toggleColumn()">Show all</button>
-                                      <button mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
-                                      (click)="toggleColumn(column)">
-                                          <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                          {{column.name}}
-                                      </button>
-                                  </span>
-                </mat-menu>
-              </th>
-              <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                <!--button mat-icon-button (click)="editRowOnDialog(element)">
-                                  <img src="assets/icons/zoom.png">
-                              </button-->
-                <!--button mat-icon-button (click)="editRowOnPage(element)">
-                                  <img src="assets/icons/zoom.png">
-                              </button-->
-                <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
-                                  <img src="assets/icons/zoom.png">
-                              </button>
-                <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
-                                  <img src="assets/icons/page_edit.png">
-                              </button>
-                <!--button mat-icon-button (click)="printRow(element)">
-                                  <img src="assets/icons/printer.png">
-                              </button-->
-                <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
-                                  <img src="assets/icons/printer.png">
-                              </a>
-                <button mat-icon-button (click)="deletePrompt(element)">
-                                  <img src="assets/icons/delete.png">
-                              </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
-            <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                      [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
-            <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
-              [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
-          </table>
-          <mat-paginator [length]="dataSource.dataCount" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+          <!--div class="col-sm-9 text-right toolbar-buttons">
+            <button class="" (click)="advancedOptions()">Advanced options</button>
+            <button class="" (click)="chechTasks(selection.selected)">Check tasks</button>
+            <button class="" (click)="cancelTasks(selection.selected)">Cancel tasks</button>
+            <button class="" (click)="orderingProcess(selection.selected)">Ordering process</button>
+            <button class="" (click)="export(selection.selected)">Export</button>
+            <button class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
+          </div-->
         </div>
+        <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 10"-->
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="targetDock" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8">
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
+                [aria-label]="checkboxLabel()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
+                [aria-label]="checkboxLabel(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+          <!-- Data Columns -->
+          <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}}
+              <span (keyup)="$event.stopPropagation()" (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+            <mat-icon class="column-filter-icon" [ngClass]="{'active': isFilteredBy(column)}" [matMenuTriggerFor]="filterColumnMenu">
+                filter_list
+            </mat-icon>
+            <mat-menu #filterColumnMenu="matMenu" (keyup)="$event.stopPropagation()" class="column-filter-menu"
+            (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                <span (click)="$event.stopPropagation()" class="btn-filter2-wrapper">
+                    <!--button mat-mini-fab aria-label="Clear filter" class="btn-filter-menu"
+                    (click)="clearFilterInColumn(column)">
+                        <mat-icon>block</mat-icon>
+                    </button-->
+                    <button mat-button aria-label="Clear filter" (click)="clearFilterInColumn(column)"
+                    class="btn-filter2">
+                        <!--mat-icon style="font-size: 14px">block</mat-icon--> clear filter
+                    </button>
+                </span>
+                <span (keyup)="$event.stopPropagation()" class="form-group" (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()"
+                  *ngIf="definitions[column].formControl.control !== 'select' &&
+                                      definitions[column].formControl.control !== 'toggle'">
+                    <select class="form-control" [formControl]="filters[column].controls.type"
+                    [name]="column+'-type'">
+                        <option *ngFor="let type of filters[column].availableTypes"
+                        [value]="type.value">
+                            {{ type.name }}
+                        </option>
+                    </select>
+                </span>
+                <span class="form-group" *ngIf="definitions[column].formControl.control === 'select'" (keyup)="$event.stopPropagation()"
+                  (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                    <select class="form-control" [formControl]="filters[column].controls.value"
+                    [name]="column">
+                        <option value="">Select a value</option>
+                        <option *ngFor="let data of selectsData[column]"
+                        [value]="data.id !== undefined && data.id !== null ? data.id : 
+                        (definitions[column].formControl.valueIndex !== null ?
+                        data[definitions[column].formControl.valueIndex] : data)">
+                            {{ definitions[column].formControl.displayIndex !== null ?
+                                data[definitions[column].formControl.displayIndex] : data }}
+                        </option>
+                    </select>
+                </span>
+                <span class="form-group" *ngIf="definitions[column].formControl.control === 'input' ||
+                                    definitions[column].formControl.control === 'date'" (keyup)="$event.stopPropagation()"
+                      (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                  <input [type]="filters[column].type" class="form-control" [name]="column"
+                                        [formControl]="filters[column].controls.value">
+                </span>
+                <span class="form-group" *ngIf="definitions[column].formControl.control === 'toggle'" (keyup)="$event.stopPropagation()"
+                (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                  <mat-slide-toggle color="primary" [formControl]="filters[column].controls.value"></mat-slide-toggle>
+                </span>
+              </mat-menu>
+              </span>
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <span *ngIf="column !== 'progress'">
+                {{ element[column] }}
+              </span>
+              <span *ngIf="column === 'progress'">
+                <mat-progress-bar class="progress-bar-td" type="determinate" [value]="element[column]"></mat-progress-bar>
+              </span>
+            </td>
+          </ng-container>
+          <!-- Options Sticky Column -->
+          <ng-container matColumnDef="options" stickyEnd>
+            <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+              {{'Options' | uppercase}}
+              <button mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                  <mat-icon>more_vert</mat-icon>
+              </button>
+
+              <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                <span>
+                  <button mat-menu-item (click)="toggleColumn()">Show all</button>
+                  <button mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                  (click)="toggleColumn(column)">
+                      <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                      {{column.name}}
+                  </button>
+                </span>
+              </mat-menu>
+            </th>
+            <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+              <!--button mat-icon-button (click)="editRowOnDialog(element)">
+                  <img src="assets/icons/zoom.png">
+              </button-->
+              <!--button mat-icon-button (click)="editRowOnPage(element)">
+                  <img src="assets/icons/zoom.png">
+              </button-->
+              <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
+                  <img src="assets/icons/zoom.png">
+              </button>
+              <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
+                  <img src="assets/icons/page_edit.png">
+              </button>
+              <!--button mat-icon-button (click)="printRow(element)">
+                  <img src="assets/icons/printer.png">
+              </button-->
+              <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
+                  <img src="assets/icons/printer.png">
+              </a>
+              <button mat-icon-button (click)="deletePrompt(element)">
+                  <img src="assets/icons/delete.png">
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+          <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                    [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
+          <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
+            [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
+        </table>
+        <mat-paginator [length]="dataSource.dataCount" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+      </div>
     </div>
   </div>
 </div>

@@ -86,6 +86,19 @@ button:focus {
   line-height: unset !important;
   height: auto !important;
 }
+.progress-bar-fromcontrol{
+  height: 20px;
+}
+.mat-progress-bar.progress-bar-td{
+  height: 14px !important;
+}
+.mat-form-field.progress-bar .mat-form-field-wrapper {
+  padding-bottom: 10px;
+}
+.mat-form-field.progress-bar .mat-form-field-wrapper .mat-progress-bar{
+  height: 20px;
+  position: absolute;
+}
 .mat-sort-header-container{
   width: 100% !important;
 }

@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, OrderLine, Section, OrderType,
-         Transport } from '@pickvoice/pickvoice-api';
+         Transport, PickPlanning, PickTask } from '@pickvoice/pickvoice-api';
 import { DataProviderService} from '../../services/data-provider.service';
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
@@ -78,6 +78,11 @@ export class EditRowComponent implements OnInit {
       this.utilities.log('order', this.row);
       this.definitions = ModelMap.OrderLineMap;
     }
+
+    if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
+      this.utilities.log('pick planning', this.row);
+      this.definitions = ModelMap.PickTaskMap;
+    }
     // si alguna tabla se va a mostrar
     if (this.row && this.definitions && this.definitions.length > 0) {
       // inicializamos todo lo necesario para la tabla
@@ -107,7 +112,7 @@ export class EditRowComponent implements OnInit {
           this.dataProviderService.getDataFromApi(this.dataMap[key].type);
           if (this.row[key] === undefined || this.row[key] === null) {
             this.utilities.error(`this.row[${key}] es null o undefined`, this.row[key]);
-            formControls[key].patchValue(-1);
+            formControls[key].patchValue('');
           }
         }
       }
@@ -125,8 +130,8 @@ export class EditRowComponent implements OnInit {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInOrderLinesPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInOrderLinesPage'));
+    if (localStorage.getItem(`displayedColumnsIn${this.type}Page`)) {
+      this.columnDefs = JSON.parse(localStorage.getItem(`displayedColumnsIn${this.type}Page`));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -183,7 +188,7 @@ export class EditRowComponent implements OnInit {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInOrderLinesPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem(`displayedColumnsIn${this.type}Page`, JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -515,6 +520,16 @@ export class EditRowComponent implements OnInit {
         this.dataProviderService.updateTransport(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
+
+      if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
+        this.dataProviderService.updatePickPlanning(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
+
+      if (this.type === IMPORTING_TYPES.PICK_TASKS) {
+        this.dataProviderService.updatePickTask(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
     } else {
       this.sharedDataService.returnData = toUpload;
       this.location.back();
@@ -597,6 +612,16 @@ export class EditRowComponent implements OnInit {
               this.row = row as Transport;
               this.cardTitle = 'Transport #' + this.row.transportNumber;
               this.pageTitle = this.viewMode === 'edit' ? 'Edit Transport' : 'View Transport';
+            } else if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
+              this.utilities.log('object is a pick planning');
+              this.row = row as PickPlanning;
+              this.cardTitle = 'Pick Planning #' + this.row.id;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Planning' : 'View Pick Planning';
+            } else if (this.type === IMPORTING_TYPES.PICK_TASKS) {
+              this.utilities.log('object is a pick task');
+              this.row = row as PickTask;
+              this.cardTitle = 'Pick Task #' + this.row.id;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Task' : 'View Pick Task';
             } else {
               this.cardTitle = 'Unknown object type';
               console.error('object is unknown');

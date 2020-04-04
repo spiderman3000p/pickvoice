@@ -4,11 +4,6 @@ import { IMPORTING_TYPES } from '../models/model-maps.model';
 
 const routes: Routes = [
   {
-    path: 'picking',
-    loadChildren: () => import('./picking-planning/picking-planning.module').then(m => m.PickingPlanningModule),
-    pathMatch: 'full'
-  },
-  {
     path: 'import',
     loadChildren: () => import('./import/import.module').then(m => m.ImportModule),
     pathMatch: 'full'
@@ -53,6 +48,10 @@ const routes: Routes = [
   {
     path: IMPORTING_TYPES.TRANSPORTS,
     loadChildren: () => import('./transports/transport.module').then(m => m.TransportModule)
+  },
+  {
+    path: IMPORTING_TYPES.PICK_PLANNINGS,
+    loadChildren: () => import('./picking-planning/picking-planning.module').then(m => m.PickingPlanningModule)
   },
   {
     path: 'administration',

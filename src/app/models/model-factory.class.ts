@@ -1,5 +1,7 @@
 import {Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, OrderDto, Transport,
-        Section, Order, LoadPick, OrderLines } from '@pickvoice/pickvoice-api';
+        Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine,
+        PickTaskLines, Dock, User, Role, TaskType
+     } from '@pickvoice/pickvoice-api';
 
 export class ModelFactory {
 
@@ -86,9 +88,8 @@ export class ModelFactory {
         object.transportNumber = '';
         object.route = '';
         object.nameRoute = '';
-        object.dispatchPlatforms = '';
         object.carrierCode = '';
-        object.transportState = Transport.TransportStateEnum.Pending;
+        object.state = Transport.StateEnum.Pending;
         return object;
     }
 
@@ -177,6 +178,106 @@ export class ModelFactory {
         object.locationCode = '';
         object.childrenWork = '';
         object.rootWork = '';
+        return object;
+    }
+
+    public static newEmptyTask(): PickTask {
+        const object = new Object() as PickTask;
+        object.description = '';
+        object.childrenWork = '';
+        object.currentLine = 0;
+        object.date = '';
+        object.dateAssignment = '';
+        object.document = '';
+        object.enableDate = '';
+        object.id = 0;
+        object.lines = 0;
+        object.palletComple = false;
+        object.priority = 0;
+        object.qyt = 0;
+        object.ruleExecuted = '';
+        object.taskState = PickTask.TaskStateEnum.AC;
+        object.taskType = this.newEmptyTaskType();
+        object.user = this.newEmptyUser();
+        object.validateLocation = false;
+        object.validateLpn = false;
+        object.validateSku = false;
+        return object;
+    }
+
+    public static newEmptyTaskLine(): PickTaskLine {
+        const object = new Object() as PickTaskLine;
+        object.batchNumber = '';
+        object.expiryDate = '';
+        object.locationCheckDigit = 0;
+        object.locationCode = '';
+        object.locationId = '';
+        object.lpnCode = '';
+        object.lpnId = 0;
+        object.lpnItemId = 0;
+        object.lpnItemId = 0;
+        object.pickSequenceNumber = 0;
+        object.pickTaskLineId = 0;
+        object.qtyToPicked = 0;
+        object.scannedVerification = '';
+        object.sectionCode = '';
+        object.serial = '';
+        object.sku = '';
+        object.skuDescription = '';
+        object.spokenVerification = '';
+        object.uomCode = '';
+        object.uomId = 0;
+        return object;
+    }
+
+    public static newEmptyTaskType(): TaskType {
+        const object = new Object() as TaskType;
+        object.code = '';
+        object.description = '';
+        object.id = 0;
+        object.name = '';
+        return object;
+    }
+
+    public static newEmptyUser(): User {
+        const object = new Object() as User;
+        object.email = '';
+        object.firstName = '';
+        object.lastName = '';
+        object.password = '';
+        object.passwordConfirm = '';
+        object.phone = '';
+        object.rol = this.newEmptyRole();
+        object.userName = '';
+        object.userState = User.UserStateEnum.Active;
+        return object;
+    }
+
+    public static newEmptyRole(): Role {
+        const object = new Object() as Role;
+        object.code = '';
+        object.name = '';
+        return object;
+    }
+
+    public static newEmptyDock(): Dock {
+        const object = new Object() as Dock;
+        object.code = '';
+        object.description = '';
+        object.dockType = Dock.DockTypeEnum.Bivalent;
+        object.section = this.newEmptySection();
+        object.status = false;
+        return object;
+    }
+
+    public static newEmptyPickPlanning(): PickPlanning {
+        const object = new Object() as PickPlanning;
+        object.description = '';
+        object.processDate = '';
+        object.progress = 0;
+        object.rootWork = '';
+        object.state = PickPlanning.StateEnum.CA;
+        object.targetDock = this.newEmptyDock();
         return object;
     }
 }

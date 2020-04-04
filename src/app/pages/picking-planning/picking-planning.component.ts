@@ -15,10 +15,10 @@ import { ImportDialogComponent } from '../../components/import-dialog/import-dia
 import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
+import { PickTask, PickTaskLine, PickTaskLines, LoadPick, PickPlanning } from '@pickvoice/pickvoice-api';
 
-import { debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
 import { merge, Observer, Subscription } from 'rxjs';
-
 
 import { MyDataSource } from '../../models/my-data-source';
 
@@ -28,9 +28,9 @@ import { MyDataSource } from '../../models/my-data-source';
   styleUrls: ['./picking-planning.component.css']
 })
 export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewInit {
-  definitions: any = ModelMap.LocationMap;
-  dataSource: MyDataSource<Location>;
-  dataToSend: Location[];
+  definitions: any = ModelMap.PickPlanningMap;
+  dataSource: MyDataSource<PickPlanning>;
+  dataToSend: PickPlanning[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
@@ -38,7 +38,7 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
 
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
 
-  filter: FormControl;
+  searchForm: FormGroup;
   filtersForm: FormGroup;
   showFilters: boolean;
   filters: any[] = [];
@@ -50,7 +50,7 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.LOCATIONS;
+  type = IMPORTING_TYPES.PICK_PLANNINGS;
   selectsData: any;
   subscriptions: Subscription[] = [];
   parserFn: any;
@@ -59,8 +59,9 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
   constructor(
     private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
     private utilities: UtilitiesService) {
-      this.filter = new FormControl('');
+
       this.dataToSend = [];
+      this.showFilters = true;
       this.actionForSelected = new FormControl('');
       this.displayedDataColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
@@ -74,9 +75,19 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
         this.utilities.log('new selection', selected);
       }));
       this.parserFn = (element: any, index) => {
-        element.section = element.section ? element.section.name : '';
+        element.targetDock = element.targetDock.description ? element.targetDock.description : '';
         return element;
       };
+      // inicializar formulario de busqueda
+      this.searchForm = new FormGroup({
+        process: new FormControl(''),
+        order: new FormControl(''),
+        transport: new FormControl(''),
+        description: new FormControl(''),
+        state: new FormControl(''),
+        startOrder: new FormControl(''),
+        purchaseOrder: new FormControl('')
+      });
       this.utilities.log('displayed data columns', this.displayedDataColumns);
       this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
   }
@@ -91,10 +102,10 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngAfterViewInit() {
-    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-    merge(this.sort.sortChange, this.paginator.page)
+    this.subscriptions.push(this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0));
+    this.subscriptions.push(merge(this.sort.sortChange, this.paginator.page)
     .pipe(tap(() => this.loadDataPage()))
-    .subscribe();
+    .subscribe());
   }
 
   getFilterParams(): string {
@@ -132,15 +143,16 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
     this.sortParams = this.getSortParams();
     const paramsArray = Array.of(this.paginatorParams, this.filterParams, this.sortParams)
     .filter(paramArray => paramArray.length > 0);
-    // this.utilities.log('paramsArray', paramsArray);
+    this.utilities.log('paramsArray', paramsArray);
     const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
     // this.utilities.log('loading data with params', params);
-    this.dataSource.loadData(this.type, `${params}`)
+    this.subscriptions.push(this.dataSource.loadData(this.type, `${params}`)
     .subscribe((response: any) => {
         /*this.data = dataResults;
         this.dataCount = 100;
         this.dataSubject.next(dataResults);*/
-        if (response.content) {
+        this.utilities.log('response', response);
+        if (response.content.length > 0) {
             this.dataSource.lastRow = response.pageSize;
             this.dataSource.data = response.content.map(this.parserFn);
             this.dataSource.dataCount = response.totalElements;
@@ -149,7 +161,7 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
     }, error => {
       this.utilities.error('Error fetching data from server');
       this.utilities.showSnackBar('Error fetching data from server', 'OK');
-    });
+    }));
   }
 
   reloadData() {
@@ -164,13 +176,17 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
     this.loadDataPage();
   }
 
+  search() {
+    
+  }
+
   initColumnsDefs() {
     let shouldShow: boolean;
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInLocationsPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInLocationsPage'));
+    if (localStorage.getItem('displayedColumnsInPickPlanningsPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInPickPlanningsPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -192,35 +208,43 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
         filter.type = this.definitions[column.name].formControl.type;
         filter.key = column.name;
         if (this.definitions[column.name].formControl.control !== 'select' &&
-            this.definitions[column.name].formControl.control !== 'toggle') {
+            this.definitions[column.name].formControl.control !== 'toggle' &&
+            this.definitions[column.name].formControl.control !== 'table') {
           filter.availableTypes = FILTER_TYPES.filter(_filterType => _filterType.availableForTypes
             .findIndex(availableType => filter.type === availableType
             || availableType === 'all') > -1);
+        } else {
+          // aqui en caso de querer hacer algo con los campos select y toggle
         }
         formControls[column.name] = new FormGroup({
           type: new FormControl(FILTER_TYPES[0].value),
           value: new FormControl('')
         });
         filter.controls = formControls[column.name].controls;
-        filter.controls.value.valueChanges.pipe(debounceTime(500), tap((value) => {
+        this.subscriptions.push(filter.controls.value.valueChanges
+          .pipe(debounceTime(500), tap((value) => {
           this.utilities.log(`valor del campo ${column.name} cambiando a: `, value);
           this.applyFilters();
-        }))
-        .subscribe();
-        filter.controls.type.valueChanges.pipe(debounceTime(500), tap((type) => {
+        })).subscribe());
+        this.subscriptions.push(filter.controls.type.valueChanges
+          .pipe(debounceTime(500), tap((type) => {
           this.utilities.log(`tipo de filtro del campo ${column.name} cambiando a: `, type);
           // TODO: acomodar esto de modo que al cambiar tipo y haber un valor, hacer la busqueda
           if (false) {
             this.applyFilters();
           }
-        }))
-        .subscribe();
+        })).subscribe());
         // formControls[column.name].get('type').patchValue(FILTER_TYPES[0].value);
         if (this.definitions[column.name].formControl.control === 'select') {
-          this.dataProviderService.getDataFromApi(this.definitions[column.name].type).subscribe(results => {
-            this.selectsData[column.name] = results;
-            this.utilities.log('selectsData', this.selectsData);
-          });
+          this.subscriptions.push(
+            this.dataProviderService.getDataFromApi(this.definitions[column.name].type)
+            .subscribe(results => {
+              this.selectsData[column.name] = results;
+              this.utilities.log('selectsData', this.selectsData);
+            }, error => {
+              this.utilities.error('Error: no hay datos de seleccion para el campo', this.definitions[column.name]);
+            })
+          );
           // formControls[column.name].get('value').patchValue(-1);
          // this.utilities.log('selectsData: ', this.selectsData);
         }
@@ -228,6 +252,7 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
       }
     });
     this.filtersForm = new FormGroup(formControls);
+    this.utilities.log('filters', this.filters);
     this.utilities.log('formControls', formControls);
     this.utilities.log('form values', this.filtersForm.value);
   }
@@ -264,7 +289,7 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInLocationsPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInPickPlanningsPage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -341,12 +366,13 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
+      const requests = [];
       rows.forEach(row => {
-        this.subscriptions.push(this.dataProviderService.deleteLocation(row.id, 'response', false)
-        .subscribe(observer));
+        requests.push(this.dataProviderService.deletePickPlanning(row.id, 'response', false));
       });
+      this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteLocation(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deletePickPlanning(rows.id, 'response', false)
       .subscribe(observer));
     }
   }
@@ -402,8 +428,8 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
     const dialogRef = this.dialog.open(EditRowDialogComponent, {
       data: {
         row: element,
-        map: this.utilities.dataTypesModelMaps.locations,
-        type: IMPORTING_TYPES.LOCATIONS,
+        map: this.utilities.dataTypesModelMaps.pickPlannings,
+        type: IMPORTING_TYPES.PICK_PLANNINGS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -422,11 +448,11 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.locations);
+    this.utilities.dataTypesModelMaps.pickTasks);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.utilities.dataTypesModelMaps.locations,
-        type: IMPORTING_TYPES.LOCATIONS,
+        map: this.utilities.dataTypesModelMaps.pickTasks,
+        type: IMPORTING_TYPES.PICK_TASKS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });

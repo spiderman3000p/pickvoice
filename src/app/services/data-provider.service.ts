@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Transport, Location, Item, UomService, SectionService, OrderService, OrderTypeService, LocationsService, TransportService,
-         LoadPickService, ItemTypeService, ItemsService, CustomerService } from '@pickvoice/pickvoice-api';
+import { Transport, Location, Item, UomService, SectionService, OrderService, OrderTypeService,
+         LocationsService, TransportService, LoadPickService, ItemTypeService, ItemsService,
+         CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
+         PickTaskLine, PickTaskLines, LoadPick, Section, DockerService, UserService } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
-import { Observable } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { retry } from 'rxjs/operators';
 
@@ -18,10 +20,12 @@ export class DataProviderService {
     private loadPickService: LoadPickService, private itemTypeService: ItemTypeService,
     private itemService: ItemsService, private customerService: CustomerService,
     private sectionService: SectionService, private orderService: OrderService,
-    private transportService: TransportService, private httpClient: HttpClient) {
+    private transportService: TransportService, private httpClient: HttpClient,
+    private pickTaskService: PickTaskService, private pickPlanningService: PickPlanningService,
+    private docksService: DockerService, private userService: UserService) {
   }
 
-  getDataFromApi(type: any, params?: string, errorHandler?: any): Observable<any> {
+  getDataFromApi(type: any, params?: string, errorHandler?: any, id?: number): Observable<any> {
     let toReturn: Observable<any>;
     switch (type) {
       case IMPORTING_TYPES.CUSTOMERS: {
@@ -42,7 +46,8 @@ export class DataProviderService {
       case IMPORTING_TYPES.ITEMS: {
         this.utilities.log(`obteniendo items...`);
         if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/itemList/' + params).pipe(retry(3));
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/itemList/' + params)
+          .pipe(retry(3));
         } else {
           toReturn = this.itemService.retrieveAllItems().pipe(retry(3));
         }
@@ -51,7 +56,8 @@ export class DataProviderService {
       case IMPORTING_TYPES.LOCATIONS: {
         this.utilities.log(`obteniendo locations...`);
         if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/locationsList/' + params).pipe(retry(3));
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/locationsList/' + params)
+          .pipe(retry(3));
         } else {
           toReturn = this.locationService.retrieveAllLocation().pipe(retry(3));
         }
@@ -65,7 +71,8 @@ export class DataProviderService {
       case IMPORTING_TYPES.ORDERS: {
         this.utilities.log(`obteniendo orders...`);
         if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/outbound/orderList/all;' + params).pipe(retry(3));
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/outbound/orderList/all;' +
+          params).pipe(retry(3));
         } else {
           toReturn = this.orderService.retrieveAllOrders().pipe(retry(3));
         }
@@ -91,7 +98,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.TRANSPORT_STATE: {
         this.utilities.log(`obteniendo transport states...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Transport.TransportStateEnum)));
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Transport.StateEnum)));
         break;
       }
       case IMPORTING_TYPES.UOMS: {
@@ -99,8 +106,73 @@ export class DataProviderService {
         toReturn = this.uomService.retrieveAllUom().pipe(retry(3));
         break;
       }
+      case IMPORTING_TYPES.PICK_PLANNINGS: {
+        this.utilities.log(`obteniendo pick plannings...`);
+        if (params) {
+          toReturn = this.httpClient.get(environment.apiBaseUrl +
+             '/console/outbound/pick/planningList/all;' + params).pipe(retry(3));
+        } else {
+          toReturn = this.pickPlanningService.retrieveAllPickPlanning().pipe(retry(3));
+        }
+        break;
+      }
+      case IMPORTING_TYPES.PICK_TASKS: {
+        if (id) {
+          this.utilities.log(`obteniendo pick tasks de ${id}...`);
+          toReturn = this.pickTaskService.taskByPickPlanning(id).pipe(retry(3));
+        } else {
+          this.utilities.error('received id is invalid');
+        }
+        break;
+      }
+      case IMPORTING_TYPES.PICK_TASKLINES: {
+        if (id) {
+          this.utilities.log(`obteniendo pick tasks lines de ${id}...`);
+          toReturn = this.pickTaskService.retrievePickTaskLineById(id).pipe(retry(3));
+        } else {
+          this.utilities.error('received id is invalid');
+        }
+        break;
+      }
+      case IMPORTING_TYPES.DOCKS: {
+        this.utilities.log(`obteniendo dock...`);
+        toReturn = this.getAllDocks().pipe(retry(3));
+        break;
+      }
+      case IMPORTING_TYPES.TASK_STATE: {
+        this.utilities.log(`obteniendo pick task states...`);
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(PickTask.TaskStateEnum)));
+        break;
+      }
+      case IMPORTING_TYPES.PICK_STATE: {
+        this.utilities.log(`obteniendo pick planning states...`);
+        toReturn = this.getAllPickPlanningStates().pipe(retry(3));
+        break;
+      }
+      case IMPORTING_TYPES.USERS: {
+        this.utilities.log(`obteniendo users...`);
+        toReturn = this.getAllUsers().pipe(retry(3));
+        break;
+      }
+      case IMPORTING_TYPES.TASK_TYPES: {
+        this.utilities.log(`obteniendo pick task types...`);
+        toReturn = this.getAllPickTaskTypes().pipe(retry(3));
+        break;
+      }
+      default: toReturn = new Observable(suscriber => {
+        suscriber.error(`El tipo de dato '${type}' no tiene un metodo api asociado`);
+        suscriber.next([]);
+        suscriber.complete();
+      });
     }
     return toReturn;
+  }
+  /**********************************************************************************
+    Grupo de metodos para items
+  ***********************************************************************************/
+  public getAllUsers(observe: any = 'body', reportProgress = false) {
+    // return this.userService.retrieveAllUSers(observe, reportProgress);
+    return of([]);
   }
   /**********************************************************************************
     Grupo de metodos para items
@@ -317,5 +389,126 @@ export class DataProviderService {
   ***********************************************************************************/
   public createLoadPicks(data: any[], observe: any = 'body', reportProgress = false) {
     return this.loadPickService.createLoadPick(data, observe, reportProgress);
+  }
+  /**********************************************************************************
+    Grupo de metodos para pick planning
+  ***********************************************************************************/
+  public getAllPickPlannings(observe: any = 'body', reportProgress = false) {
+    return this.pickPlanningService.retrieveAllPickPlanning(observe, reportProgress);
+  }
+
+  public getAllPickPlanningTasks(pickPlanningId: number, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.taskByPickPlanning(pickPlanningId, observe, reportProgress);
+  }
+
+  public getAllPickPlanningStates(observe: any = 'body', reportProgress = false): Observable<string[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(PickPlanning.StateEnum)));
+  }
+
+  public getPickPlanningTransport(id: number, observe: any = 'body', reportProgress = false) {
+    return this.transportService.findByPickPlanning(String(id), observe, reportProgress);
+  }
+
+  public deletePickPlanning(id: number, observe: any = 'body', reportProgress = false) {
+    return this.pickPlanningService.deletePickPlanning(id, observe, reportProgress);
+  }
+
+  public updatePickPlanning(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.pickPlanningService.updatePickPlanning(data, id, observe, reportProgress);
+  }
+
+  public createPickPlanning(data: any, observe: any = 'body', reportProgress = false) {
+    return this.pickPlanningService.createPickPlanning(data, observe, reportProgress);
+  }
+
+  public getPickPlanning(id: number, observe: any = 'body', reportProgress = false) {
+    return this.pickPlanningService.retrievePickPlanning(id, observe, reportProgress);
+  }
+  /**********************************************************************************
+    Grupo de metodos para pick task
+  ***********************************************************************************/
+  public getAllPickTasks(observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.retrieveAllPickTask(observe, reportProgress);
+  }
+
+  public getAllPickTasksByPickPlanning(pickPlanningId: number, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.taskByPickPlanning(pickPlanningId, observe, reportProgress);
+  }
+
+  public getAllPickTasksByUser(user: string, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.retrievePickTaskByUser(user, observe, reportProgress);
+  }
+
+  public getAllPickTaskLinesByTask(pickTaskId: number, observe: any = 'body', reportProgress = false) {
+    console.log('obteniendo task lines de task: ', pickTaskId);
+    return this.pickTaskService.retrievePickTaskLineById(pickTaskId, observe, reportProgress);
+  }
+
+  public getAllPickTaskTypes(observe: any = 'body', reportProgress = false): Observable<any[]> {
+    console.log('obteniendo task types');
+    // TODO: agregar servcicio real
+    return new Observable(suscriber  => suscriber.next(Object.keys(PickTask.TaskStateEnum)));
+  }
+
+  public getAllPickTaskStates(observe: any = 'body', reportProgress = false): Observable<string[]> {
+    console.log('obteniendo task states');
+    return new Observable(suscriber  => suscriber.next(Object.keys(PickTask.TaskStateEnum)));
+  }
+
+  public getPickTask(id: number, observe: any = 'body', reportProgress = false) {
+    console.log('obteniendo task');
+    return this.pickTaskService.retrievePickTask(id, observe, reportProgress);
+  }
+
+  public getPickTaskLine(id: number, observe: any = 'body', reportProgress = false) {
+    console.log('obteniendo task line ', id);
+    return this.pickTaskService.retrievePickTaskLineById(id, observe, reportProgress);
+  }
+
+  public createPickTaskLine(data: any, observe: any = 'body', reportProgress = false) {
+    // TODO: cambiar por createPickTaskLine
+    return this.pickTaskService.createPickTask(data, observe, reportProgress);
+  }
+
+  public createPickTask(data: any, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.createPickTask(data, observe, reportProgress);
+  }
+
+  public deletePickTask(id: number, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.deletePickTask(id, observe, reportProgress);
+  }
+
+  public updatePickTask(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.updatePickTask(data, id, observe, reportProgress);
+  }
+
+  public activatePickTask(id: string, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.activatePickTask(id, observe, reportProgress);
+  }
+
+  public getTasksByPickPlanning(id: number, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.taskByPickPlanning(id, observe, reportProgress);
+  }
+  /**********************************************************************************
+    Grupo de metodos para docks
+  ***********************************************************************************/
+  public getAllDocks(observe: any = 'body', reportProgress = false): Observable<any[]> {
+    return this.docksService.retrieveAllDocks(observe, reportProgress);
+  }
+
+  public deleteDock(id: number, observe: any = 'body', reportProgress = false) {
+    return this.docksService.deleteDock(id, observe, reportProgress);
+  }
+
+  public updateDock(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.docksService.updateDock(data, id, observe, reportProgress);
+  }
+
+  public createDock(data: any, observe: any = 'body', reportProgress = false) {
+    return this.docksService.createDocker(data, observe, reportProgress);
+  }
+
+  public getDock(id: number, observe: any = 'body', reportProgress = false) {
+    return this.docksService.retrieveDockById(id, observe, reportProgress);
   }
 }

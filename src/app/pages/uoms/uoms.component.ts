@@ -13,9 +13,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { retry } from 'rxjs/operators';
+import { retry, takeLast } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Observer, Subscription } from 'rxjs';
+import { merge, Observer, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -212,10 +212,11 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
+      const requests = [];
       rows.forEach(row => {
-        this.subscriptions.push(this.dataProviderService.deleteUom(row.id, 'response', false)
-        .subscribe(observer));
+        requests.push(this.dataProviderService.deleteUom(row.id, 'response', false));
       });
+      this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
       this.subscriptions.push(this.dataProviderService.deleteUom(rows.id, 'response', false)
       .subscribe(observer));

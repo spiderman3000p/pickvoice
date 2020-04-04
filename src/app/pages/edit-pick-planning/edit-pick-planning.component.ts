@@ -1,9 +1,9 @@
 import { Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
+import { DataProviderService } from '../../services/data-provider.service';
 import { environment } from '../../../environments/environment';
-import { Order, OrderService, Customer, OrderLine, OrderType, Transport, CustomerService,
-         OrderTypeService, TransportService } from '@pickvoice/pickvoice-api';
+import { PickPlanning, PickTask, PickTaskLine, Dock, Transport } from '@pickvoice/pickvoice-api';
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
@@ -20,25 +20,25 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-interface OrdersData {
-  orderTypeList: OrderType[];
+interface PickPlanningData {
+  pickTaskList: PickTask[];
+  dockList: Dock[];
   transportList: Transport[];
-  customerList: Customer[];
-  orderLineList: OrderLine[];
 }
 @Component({
-  selector: 'app-edit-order',
-  templateUrl: './edit-order.component.html',
-  styleUrls: ['./edit-order.component.scss']
+  selector: 'app-edit-pick-planning',
+  templateUrl: './edit-pick-planning.component.html',
+  styleUrls: ['./edit-pick-planning.component.scss']
 })
 
-export class EditOrderComponent implements OnInit {
+export class EditPickPlanningComponent implements OnInit {
   form: FormGroup;
   pageTitle = '';
   cardTitle = '';
-  type = IMPORTING_TYPES.ORDERS;
-  dataMap = ModelMap.OrderMap;
-  definitions = ModelMap.OrderLineMap;
+  type = IMPORTING_TYPES.PICK_PLANNINGS;
+  dataMap = ModelMap.PickPlanningMap;
+  definitions = ModelMap.PickTaskMap;
+  definitionsTransports = ModelMap.TransportMap;
   remoteSync: boolean;
   keys: string[];
   row: any;
@@ -46,112 +46,128 @@ export class EditOrderComponent implements OnInit {
   isLoadingResults = false;
   printElement = {};
   viewMode: string;
-  ordersData: OrdersData;
+  pickPlanningData: PickPlanningData;
 
   columnDefs: any[];
-  dataSource: MatTableDataSource<OrderLine>;
+  columnDefsTransports: any[];
+  dataSource: MatTableDataSource<PickTask>;
+  dataSourceTransports: MatTableDataSource<Transport>;
   displayedDataColumns: string[];
+  displayedDataColumnsTransports: string[];
   displayedHeadersColumns: any[];
+  displayedHeadersColumnsTransports: any[];
   defaultColumnDefs: any[];
+  defaultColumnDefsTransports: any[];
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
-  filter: FormControl;
-  filtersForm: FormGroup;
-  showFilters: boolean;
-  filters: any[] = [];
+  pageSizeOptionsTransports = [5, 10, 15, 30, 50, 100];
   actionForSelected: FormControl;
-  selection = new SelectionModel<OrderLine>(true, []);
+  actionForSelectedTransports: FormControl;
+  selection = new SelectionModel<PickTask>(true, []);
+  selectionTransports = new SelectionModel<Transport>(true, []);
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatPaginator, {static: true}) paginatorTransports: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sortTransports: MatSort;
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
-    private activatedRoute: ActivatedRoute, private orderService: OrderService,
-    private router: Router, private dialog: MatDialog, private orderTypeService: OrderTypeService,
-    private customerService: CustomerService, private transportService: TransportService
+    private activatedRoute: ActivatedRoute, private dataProviderService: DataProviderService,
+    private router: Router, private dialog: MatDialog
   ) {
     this.dataSource = new MatTableDataSource([]);
-    this.ordersData = new Object() as OrdersData;
-    this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
+    this.dataSourceTransports = new MatTableDataSource([]);
+    this.pickPlanningData = new Object() as PickPlanningData;
+    this.pickPlanningData.pickTaskList = [];
+    this.pickPlanningData.dockList = [];
+    this.pickPlanningData.transportList = [];
+    this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Planning' : 'View Pick Planning';
     this.isLoadingResults = true;
   }
 
   init() {
-    this.utilities.log('order', this.row);
+    this.utilities.log('pick planning', this.row);
+    this.getPickTaskList();
+    this.getDockList();
     this.getTransportList();
-    this.getCustomerList();
-    this.getOrderTypeList();
-    this.getOrderLineList();
     // inicializamos todo lo necesario para la tabla
-    if (this.row && this.row.orderLines && this.row.orderLines.length > 0) {
-      this.dataSource.data = this.ordersData.orderLineList;
+    if (this.row) {
+      this.dataSource.data = this.pickPlanningData.pickTaskList;
       // inicializar tabla mat-table
       this.displayedDataColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
       this.displayedHeadersColumns.push('options');
-      this.initColumnsDefs(); // columnas a mostrarse en la tabla
+      this.initColumnsDefs(); // columnas a mostrarse en la tabla de pick task
+    }
+    if (this.row) {
+      this.dataSourceTransports.data = this.pickPlanningData.transportList;
+      // inicializar tabla mat-table
+      this.utilities.log('dataSourceTransports.data', this.dataSourceTransports.data);
+      this.displayedDataColumnsTransports = Object.keys(this.definitionsTransports);
+      this.utilities.log('displayedDataColumnsTransports', this.displayedDataColumnsTransports);
+      this.displayedHeadersColumnsTransports = ['select'].concat(Object.keys(this.definitionsTransports));
+      this.displayedHeadersColumnsTransports.push('options');
+      this.utilities.log('displayedHeadersColumnsTransports', this.displayedHeadersColumnsTransports);
+      this.initColumnsDefsTransports(); // columnas a mostrarse en la tabla de transports
     }
     this.form = new FormGroup({
-      orderNumber: new FormControl(this.row.orderNumber, Validators.required),
-      purchaseNumber: new FormControl(this.row.purchaseNumber),
-      invoiceNumber: new FormControl(this.row.invoiceNumber),
-      orderDate: new FormControl(this.row.orderDate),
-      deliveryDate: new FormControl(this.row.deliveryDate),
-      orderType: new FormControl(this.row.orderType),
-      priority: new FormControl(this.row.priority),
-      note: new FormControl(this.row.note),
-      // idTransport: new FormControl(this.row.idTransport),
-      transport: new FormControl(this.row.transport),
-      customer: new FormControl(this.row.customer)
+      targetDock: new FormControl(this.row.targetDock),
+      description: new FormControl(this.row.description),
+      state: new FormControl(this.row.state),
+      progress: new FormControl(this.row.progress),
+      processDate: new FormControl(this.row.processDate),
+      rootWork: new FormControl(this.row.rootWork)
     });
-    /*if (this.viewMode === 'view') {
-      this.form.disable();
-    }*/
-    // this.utilities.log('form', this.form);
   }
 
   initColumnsDefs() {
     let shouldShow: boolean;
-    let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInOrderLinesPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInOrderLinesPage'));
+    if (localStorage.getItem('displayedColumnsInPickPlanningPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInPickPlanningPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
         return {show: shouldShow, name: columnName};
       });
     }
-
     aux = this.columnDefs.slice();
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
+  }
 
-    this.columnDefs.forEach((column, index) => {
-      // ignoramos la columna 0 y la ultima (select y opciones)
-      if (index > 0 && index < this.columnDefs.length - 1) {
-        filter = new Object();
-        filter.show = column.show;
-        filter.name = this.definitions[column.name].name;
-        filter.key = column.name;
-        formControls[column.name] = new FormControl('');
-        // this.utilities.log(`new formControl formControls[${column.name}]`, formControls[column.name]);
-        // this.utilities.log('formControls', formControls);
-        filter.control = formControls[column.name];
-        filter.formControl = this.definitions[column.name].formControl;
-        this.filters.push(filter);
-      }
-    });
-    this.filtersForm = new FormGroup(formControls);
-    this.utilities.log('formControls', formControls);
+  initColumnsDefsTransports() {
+    let shouldShow: boolean;
+    const formControls = {} as any;
+    let aux;
+    if (localStorage.getItem('displayedColumnsInPickPlanningPageT')) {
+      this.columnDefsTransports = JSON.parse(localStorage.getItem('displayedColumnsInPickPlanningPageT'));
+    } else {
+      this.columnDefsTransports = this.displayedHeadersColumnsTransports.map((columnName, index) => {
+        shouldShow = index === 0 || index === this.displayedHeadersColumnsTransports.length - 1 || index < 7;
+        return {show: shouldShow, name: columnName};
+      });
+    }
+    aux = this.columnDefsTransports.slice();
+    aux.pop();
+    aux.shift();
+    this.defaultColumnDefsTransports = aux;
   }
 
   getDisplayedHeadersColumns() {
     return this.columnDefs.filter(col => col.show).map(col => col.name);
   }
 
+  getDisplayedHeadersColumnsTransports() {
+    return this.columnDefsTransports.filter(col => col.show).map(col => col.name);
+  }
+
   getDefaultHeadersColumns() {
     return this.defaultColumnDefs;
+  }
+
+  getDefaultHeadersColumnsTransports() {
+    return this.defaultColumnDefsTransports;
   }
 
   toggleColumn(column?) {
@@ -168,7 +184,25 @@ export class EditOrderComponent implements OnInit {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInOrderLinesPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInPickPlanningPage', JSON.stringify(this.columnDefs));
+    // this.utilities.log('displayed column after', this.columnDefs);
+  }
+
+  toggleColumnTransports(column?) {
+    this.utilities.log('displayed column until now', this.displayedDataColumnsTransports);
+
+    const selectedCol = column ? this.columnDefsTransports.find(col => col.name === column.name) : null;
+    const selectedDefaultCol = column ? this.defaultColumnDefsTransports.find(col => col.name === column.name) : null;
+    if (selectedCol) {
+      column.show = !column.show;
+      selectedCol.show = !selectedCol.show;
+      selectedDefaultCol.show = !selectedDefaultCol.show;
+    } else {
+      this.defaultColumnDefsTransports.forEach(col => col.show = true);
+      this.columnDefsTransports.forEach(col => col.show = true);
+    }
+    // guardamos la eleccion en el local storage
+    localStorage.setItem('displayedColumnsInPickPlanningPageT', JSON.stringify(this.columnDefsTransports));
     // this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -179,11 +213,23 @@ export class EditOrderComponent implements OnInit {
     return numSelected === numRows;
   }
 
+  isAllSelectedTransports() {
+    const numSelected = this.selectionTransports.selected.length;
+    const numRows = this.dataSourceTransports.data.length;
+    return numSelected === numRows;
+  }
+
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
         this.dataSource.data.forEach(row => this.selection.select(row));
+  }
+
+  masterToggleTransports() {
+    this.isAllSelectedTransports() ?
+        this.selectionTransports.clear() :
+        this.dataSourceTransports.data.forEach(row => this.selectionTransports.select(row));
   }
 
   /** The label for the checkbox on the passed row */
@@ -194,12 +240,33 @@ export class EditOrderComponent implements OnInit {
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.index + 1}`;
   }
 
+  checkboxLabelTransports(row?: any): string {
+    if (!row) {
+      return `${this.isAllSelectedTransports() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionTransports.isSelected(row) ? 'deselect' : 'select'} row ${row.index + 1}`;
+  }
+
   actionForSelectedRows(action) {
     // this.utilities.log('action selected', action);
     switch (action) {
       case 'delete':
         if (this.selection.selected.length > 0) {
-          this.deleteOrderLinePrompt(this.selection.selected);
+          this.deletePickTaskPrompt(this.selection.selected);
+        } else {
+          this.utilities.showSnackBar('You have no selected records', 'OK');
+        }
+        break;
+      default: break;
+    }
+  }
+
+  actionForSelectedRowsTransports(action) {
+    // this.utilities.log('action selected', action);
+    switch (action) {
+      case 'delete':
+        if (this.selectionTransports.selected.length > 0) {
+          this.deleteTransportPrompt(this.selectionTransports.selected);
         } else {
           this.utilities.showSnackBar('You have no selected records', 'OK');
         }
@@ -216,6 +283,17 @@ export class EditOrderComponent implements OnInit {
     // this.utilities.log('index to delete', index);
     this.dataSource.data.splice(index, 1);
     this.refreshTable();
+    return true;
+  }
+
+  deleteRowTransports(row: any) {
+    if (this.selectionTransports.isSelected(row)) {
+      this.selectionTransports.deselect(row);
+    }
+    const index = this.dataSourceTransports.data.findIndex(_row => _row === row);
+    // this.utilities.log('index to delete', index);
+    this.dataSourceTransports.data.splice(index, 1);
+    this.refreshTableTransports();
     return true;
   }
 
@@ -242,25 +320,81 @@ export class EditOrderComponent implements OnInit {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        // TODO: tener servicio para eliminar registros de orderLines
-        // this.orderService.deleteOrderLine(row.id, 'response', false).subscribe(observer);
-        this.deleteOrderLine(row);
+        // TODO: tener servicio para eliminar registros de pick tasks
+        this.deletePickTask(row);
       });
     } else {
-      this.deleteOrderLine(rows);
+      this.deletePickTask(rows);
     }
   }
 
-  deleteOrderLine(row: any) {
-    const index = this.row.orderLines.findIndex(_row => _row.id === row.id);
-    this.row.orderLines.splice(index, 1);
+  deleteRowsTransports(rows: any) {
+    let deletedCounter = 0;
+    const observer = {
+      next: (result) => {
+        if (result) {
+          this.deleteRowTransports(rows);
+          this.utilities.log('Row deleted');
+          if (deletedCounter === 0) {
+            this.utilities.showSnackBar('Row deleted', 'OK');
+          }
+          deletedCounter++;
+        }
+      },
+      error: (error) => {
+        this.utilities.error('Error on delete rows', error);
+        if (deletedCounter === 0) {
+          this.utilities.showSnackBar('Error on delete rows', 'OK');
+        }
+        deletedCounter++;
+      }
+    } as Observer<any>;
+    if (Array.isArray(rows)) {
+      rows.forEach(row => {
+        // TODO: tener servicio para eliminar registros de pick tasks
+        this.deleteTransport(row);
+      });
+    } else {
+      this.deleteTransport(rows);
+    }
   }
 
-  deleteOrderLinePrompt(rows?: any) {
+  deletePickTask(row: any) {
+    const index = this.pickPlanningData.pickTaskList.findIndex(_row => _row.id === row.id);
+    if (index > 1) {
+      this.pickPlanningData.pickTaskList.splice(index, 1);
+    }
+  }
+
+  deleteTransport(row: any) {
+    const index = this.pickPlanningData.transportList.findIndex(_row => _row.id === row.id);
+    if (index > 1) {
+      this.pickPlanningData.transportList.splice(index, 1);
+    }
+  }
+
+  deletePickTaskPrompt(rows?: any) {
     const observer = {
       next: (result) => {
         if (result) {
           this.deleteRows(rows);
+        }
+      },
+      error: (error) => {
+
+      }
+    } as Observer<boolean>;
+    this.utilities.showCommonDialog(observer, {
+      title: 'Delete Row',
+      message: 'You are about to delete this record(s). Are you sure to continue?'
+    });
+  }
+
+  deleteTransportPrompt(rows?: any) {
+    const observer = {
+      next: (result) => {
+        if (result) {
+          this.deleteRowsTransports(rows);
         }
       },
       error: (error) => {
@@ -283,27 +417,14 @@ export class EditOrderComponent implements OnInit {
     return typeof text === 'string' ? text.slice(0, 30) : text;
   }
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
-
-  editOrderLineOnPage(element: any) {
-    this.utilities.log('row to send to edit page', element);
-    this.router.navigate([`${element.id}`]);
-  }
-
-  editOrderLineOnDialog(element: any, mode: string) {
+  editPickPlanningOnDialog(element: any, mode: string) {
     this.utilities.log('row to send to edit dialog', element);
     const dialogRef = this.dialog.open(EditRowDialogComponent, {
       data: {
         row: element,
         map: this.definitions,
         viewMode: mode,
-        type: IMPORTING_TYPES.ORDER_LINE,
+        type: IMPORTING_TYPES.PICK_TASKS,
         remoteSync: false // para mandar los datos a la BD por la API
       }
     });
@@ -320,12 +441,26 @@ export class EditOrderComponent implements OnInit {
     });
   }
 
-  addOrderLine() {
+  viewTransport(element: any) {
+    this.utilities.log('row to send to view dialog', element);
+    const dialogRef = this.dialog.open(EditRowDialogComponent, {
+      data: {
+        row: element,
+        map: this.definitionsTransports,
+        viewMode: 'view',
+        type: IMPORTING_TYPES.TRANSPORTS,
+        remoteSync: false // para mandar los datos a la BD por la API
+      }
+    });
+  }
+
+  addPickTask() {
     this.utilities.log('map to send to add dialog', this.definitions);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.definitions,
-        type: IMPORTING_TYPES.ORDER_LINE,
+        type: IMPORTING_TYPES.PICK_TASKS,
+        title: 'Add New Pick task',
         remoteSync: false // para mandar los datos a la BD por la API
       }
     });
@@ -345,16 +480,16 @@ export class EditOrderComponent implements OnInit {
   export() {
     // TODO: hacer la exportacion de la orden completa
     const dataToExport = this.row;
-    this.utilities.exportToXlsx(dataToExport, 'Order ' + this.row.orderNumber);
+    this.utilities.exportToXlsx(dataToExport, 'Pick Planning ' + this.row.id);
   }
 
-  exportOrderLines() {
+  exportPickTasks() {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
       return row;
     });
-    this.utilities.exportToXlsx(dataToExport, 'Order Lines List');
+    this.utilities.exportToXlsx(dataToExport, 'Pick Task List');
   }
 
   /*
@@ -377,40 +512,43 @@ export class EditOrderComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
-  toggleFilters() {
-    this.showFilters = !this.showFilters;
+  private refreshTableTransports() {
+    // If there's no data in filter we do update using pagination, next page or previous page
+    if (this.dataSourceTransports.filter === '') {
+      const aux = this.dataSourceTransports.filter;
+      this.dataSourceTransports.filter = 'XXX';
+      this.dataSourceTransports.filter = aux;
+      // If there's something in filter, we reset it to 0 and then put back old value
+    } else {
+      const aux = this.dataSourceTransports.filter;
+      this.dataSourceTransports.filter = '';
+      this.dataSourceTransports.filter = aux;
+    }
+    this.dataSourceTransports.paginator = this.paginatorTransports;
+    this.dataSourceTransports.sort = this.sortTransports;
   }
 
-  applyFilters() {
-  }
-
-  getOrderTypeList() {
-    this.orderTypeService.retrieveAllOrderType().subscribe(results => {
-      this.ordersData.orderTypeList = results;
-      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
-    });
-  }
-
-  getOrderLineList() {
-    this.orderService.orderLineByOrderId(this.row.id).subscribe(results => {
-      this.ordersData.orderLineList = results;
-      this.dataSource.data = results;
+  getPickTaskList() {
+    this.dataProviderService.getAllPickPlanningTasks(this.row.id).subscribe(results => {
+      this.pickPlanningData.pickTaskList = results;
+      this.dataSource.data = this.pickPlanningData.pickTaskList;
       this.refreshTable();
-      this.utilities.log('this.ordersData.orderTypeList', results);
-    });
-  }
-
-  getCustomerList() {
-    this.customerService.retrieveAllCustomers().subscribe(results => {
-      this.ordersData.customerList = results;
-      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
+      this.utilities.log('pick task list', this.pickPlanningData.pickTaskList);
     });
   }
 
   getTransportList() {
-    this.transportService.retrieveAllTransport().subscribe(results => {
-      this.ordersData.transportList = results;
-      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
+    this.dataProviderService.getPickPlanningTransport(this.row.id).subscribe(result => {
+      this.pickPlanningData.transportList = result;
+      this.dataSourceTransports.data = result;
+      this.utilities.log('pick planning transports', result);
+    });
+  }
+
+  getDockList() {
+    this.dataProviderService.getAllDocks().subscribe(results => {
+      this.pickPlanningData.dockList = results;
+      this.utilities.log('docks list', this.pickPlanningData.dockList);
     });
   }
 
@@ -428,7 +566,6 @@ export class EditOrderComponent implements OnInit {
     }
     this.utilities.log('onSubmit');
     const formData = this.form.value;
-    formData.orderLines = this.dataSource.data;
 
     const toUpload = this.row;
     this.utilities.log('form data', formData);
@@ -457,7 +594,7 @@ export class EditOrderComponent implements OnInit {
           this.utilities.error('error on update', error);
         }
       };
-      this.orderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
+      this.dataProviderService.updatePickPlanning(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
     } else {
       this.sharedDataService.returnData = toUpload;
@@ -486,14 +623,14 @@ export class EditOrderComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
+        if (objectType === IMPORTING_TYPES.PICK_TASKS) {
+          this.pickPlanningData.pickTaskList.push(result);
+        }
+        if (objectType === IMPORTING_TYPES.DOCKS) {
+          this.pickPlanningData.dockList.push(result);
+        }
         if (objectType === IMPORTING_TYPES.TRANSPORTS) {
-          this.ordersData.transportList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.ORDER_TYPE) {
-          this.ordersData.orderTypeList.push(result);
-        }
-        if (objectType === IMPORTING_TYPES.CUSTOMERS) {
-          this.ordersData.customerList.push(result);
+          this.pickPlanningData.transportList.push(result);
         }
       }
     }, error => {
@@ -522,9 +659,7 @@ export class EditOrderComponent implements OnInit {
         this.isLoadingResults = false;
         this.utilities.log('ngOnInit => row received', element);
         this.row = element;
-        const keys = Object.keys(element).filter(key => key !== 'id');
-        const keysForItem = keys.filter(key => key !== 'state');
-        this.cardTitle = 'Order # ' + this.row.orderNumber;
+        this.cardTitle = 'Pick Planning # ' + this.row.id;
         this.init();
       });
       this.remoteSync = true;
