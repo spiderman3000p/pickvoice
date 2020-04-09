@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Router, Resolve, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
-import { PickTaskLine } from '@pickvoice/pickvoice-api/model/picktaskline';
+import { PickPlanning } from '@pickvoice/pickvoice-api/model/pickplanning';
 import { DataProviderService} from '../../services/data-provider.service';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PickTaskLineResolverService implements Resolve<PickTaskLine> {
+export class PickingPlanningResolverService implements Resolve<PickPlanning> {
 
   constructor(private dataProviderService: DataProviderService, private router: Router) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<PickTaskLine> {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<PickPlanning> {
     const id = Number(route.paramMap.get('id'));
     return Observable.create((observer) => {
-      // observer.next(this.dataProviderService.getPickTaskLine(id));
+      observer.next(this.dataProviderService.getPickPlanning(id));
       observer.complete();
     });
   }

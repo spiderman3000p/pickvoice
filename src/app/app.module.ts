@@ -50,6 +50,8 @@ import { FileImportComponent } from './components/importing-widget/pages/file-im
 import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
 import { CommonDialogComponent } from './components/common-dialog/common-dialog.component';
+import { ContextMenuModule } from 'ngx-contextmenu';
+import { UserSelectorDialogComponent } from './components/user-selector-dialog/user-selector-dialog.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -87,7 +89,8 @@ export const MY_FORMATS = {
     AddRowDialogComponent,
     EditRowDialogComponent,
     PrintComponent,
-    PrintLayoutComponent
+    PrintLayoutComponent,
+    UserSelectorDialogComponent
   ],
   imports: [
     ApiModule,
@@ -128,7 +131,8 @@ export const MY_FORMATS = {
     NgxPrintModule,
     AgGridModule.withComponents([]),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
-    RouterModule
+    RouterModule,
+    ContextMenuModule.forRoot({useBootstrap4: true})
   ],
   entryComponents: [
     ImportDialogComponent

@@ -89,7 +89,7 @@ export class ModelFactory {
         object.route = '';
         object.nameRoute = '';
         object.carrierCode = '';
-        object.state = Transport.StateEnum.Pending;
+        object.transportState = Transport.TransportStateEnum.Pending;
         return object;
     }
 
@@ -192,16 +192,16 @@ export class ModelFactory {
         object.enableDate = '';
         object.id = 0;
         object.lines = 0;
-        object.palletComple = false;
+        // object.palletComple = false;
         object.priority = 0;
         object.qyt = 0;
-        object.ruleExecuted = '';
+        // object.ruleExecuted = '';
         object.taskState = PickTask.TaskStateEnum.AC;
         object.taskType = this.newEmptyTaskType();
         object.user = this.newEmptyUser();
-        object.validateLocation = false;
-        object.validateLpn = false;
-        object.validateSku = false;
+        // object.validateLocation = false;
+        // object.validateLpn = false;
+        // object.validateSku = false;
         return object;
     }
 

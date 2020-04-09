@@ -81,7 +81,7 @@ export class EditOrderComponent implements OnInit {
     this.getOrderTypeList();
     this.getOrderLineList();
     // inicializamos todo lo necesario para la tabla
-    if (this.row && this.row.orderLines && this.row.orderLines.length > 0) {
+    if (this.row && this.ordersData.orderLineList && this.ordersData.orderLineList.length > 0) {
       this.dataSource.data = this.ordersData.orderLineList;
       // inicializar tabla mat-table
       this.displayedDataColumns = Object.keys(this.definitions);
@@ -252,8 +252,8 @@ export class EditOrderComponent implements OnInit {
   }
 
   deleteOrderLine(row: any) {
-    const index = this.row.orderLines.findIndex(_row => _row.id === row.id);
-    this.row.orderLines.splice(index, 1);
+    /*const index = this.dataSource.data.findIndex(_row => _row.idOrder === row.id);
+    this.row.orderLines.splice(index, 1);*/
   }
 
   deleteOrderLinePrompt(rows?: any) {
@@ -392,7 +392,7 @@ export class EditOrderComponent implements OnInit {
   }
 
   getOrderLineList() {
-    this.orderService.orderLineByOrderId(this.row.id).subscribe(results => {
+    this.orderService.orderLineByOrderId(this.row.id).subscribe((results: any) => {
       this.ordersData.orderLineList = results;
       this.dataSource.data = results;
       this.refreshTable();

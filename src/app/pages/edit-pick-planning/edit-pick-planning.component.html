@@ -75,15 +75,6 @@
                         <mat-label>Root Work</mat-label>
                         <input class="w-100" matInput type="text" formControlName="rootWork" [class.readonly]="viewMode === 'view'">
                     </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Target Dock</mat-label>
-                        <mat-select [compareWith]="dataMap.targetDock.formControl.compareFn" formControlName="targetDock"
-                        [class.readonly]="viewMode === 'view'">
-                            <mat-option *ngFor="let dock of pickPlanningData.dockList" [value]="dock">
-                                {{ dock.description }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
                     <hr>
                     <mat-tab-group class="tab-orders">
                         <mat-tab label="Tasks">
@@ -142,10 +133,10 @@
                                                 </mat-menu>
                                             </th>
                                             <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                                                <a mat-icon-button [routerLink]="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + importingTypes.PICK_TASKS + '/view', element.id]">
+                                                <!--a mat-icon-button [routerLink]="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + importingTypes.PICK_TASKS + '/view', element.id]">
                                                     <img src="assets/icons/zoom.png">
                                                 </a>
-                                                <!--a mat-icon-button (click)="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + importingTypes.PICK_TASKS +'/edit', element.id]" *ngIf="viewMode === 'edit'">
+                                                <a mat-icon-button (click)="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + importingTypes.PICK_TASKS +'/edit', element.id]" *ngIf="viewMode === 'edit'">
                                                     <img src="assets/icons/page_edit.png">
                                                 </a-->
                                                 <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
@@ -170,11 +161,60 @@
                                         <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                                         [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
                                         <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                                        [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + importingTypes.PICK_TASKS + '/view', row.code]"></tr>
+                                        [ngClass]="{'alert alert-danger': row.invalid}" 
+                                        [contextMenu]="basicMenu" [contextMenuSubject]="row"></tr>
                                     </table>
                                     <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                                 </div>
                             </ng-template>
+                            <context-menu>
+                                <ng-template contextMenuItem [subMenu]="statusSubmenu">
+                                    Status
+                                </ng-template>
+                                <context-menu #statusSubmenu>
+                                    <ng-template contextMenuItem
+                                    (execute)="executeContext('activateTask', $event.item)">
+                                        Activate task
+                                    </ng-template>
+                                    <ng-template contextMenuItem divider="true"></ng-template>
+                                    <ng-template contextMenuItem 
+                                    (execute)="executeContext('cancelTask', $event.item)">
+                                        Cancel task
+                                    </ng-template>
+                                </context-menu>
+                                <ng-template contextMenuItem let-item [subMenu]="prioritySubmenu">
+                                    Priority ({{item?.priority}})
+                                </ng-template>
+                                <context-menu #prioritySubmenu>
+                                    <ng-template contextMenuItem
+                                    (execute)="executeContext('incrementPriority', $event.item)">
+                                        Increment
+                                    </ng-template>
+                                    <ng-template contextMenuItem divider="true"></ng-template>
+                                    <ng-template contextMenuItem 
+                                    (execute)="executeContext('decrementPriority', $event.item)">
+                                        Decrement
+                                    </ng-template>
+                                </context-menu>
+                                <ng-template contextMenuItem divider="true"></ng-template>
+                                <ng-template contextMenuItem (execute)="executeContext('assignToUser', $event.item)">
+                                    Assign to user
+                                </ng-template>
+                                <ng-template contextMenuItem [subMenu]="viewSubmenu">
+                                    View
+                                </ng-template>
+                                <context-menu #viewSubmenu>
+                                    <ng-template contextMenuItem
+                                    (execute)="executeContext('viewBySku', $event.item)">
+                                        By Sku
+                                    </ng-template>
+                                    <ng-template contextMenuItem divider="true"></ng-template>
+                                    <ng-template contextMenuItem
+                                    (execute)="executeContext('viewByCode', $event.item)">
+                                        By Code
+                                    </ng-template>
+                                </context-menu>
+                            </context-menu>
                         </mat-tab>
                         <mat-tab label="Transports">
                             <ng-template matTabContent>
@@ -188,7 +228,7 @@
                                             <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
                                         </a-->
                                     </div>
-                                    <table mat-table [dataSource]="dataSourceTransports" matSort 
+                                    <table mat-table [dataSource]="dataSourceTransports" matSort multiTemplateDataRows
                                     [class.mat-table-hoverflow]="getDisplayedHeadersColumnsTransports().length > 12">
                                         <!-- Checkbox Column -->
                                         <ng-container matColumnDef="select">
@@ -207,10 +247,50 @@
                                                 </mat-checkbox>
                                             </td>
                                         </ng-container>
+                                        
                                         <!-- Data Columns -->
                                         <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumnsTransports">
                                             <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitionsTransports[column].name | uppercase}} </th>
                                             <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitionsTransports[column].type, element[column]) }} </td>
+                                        </ng-container>
+                                        <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+                                        <ng-container matColumnDef="expandedDetail">
+                                            <td mat-cell *matCellDef="let element" [attr.colspan]="getDisplayedHeadersColumnsTransports().length">
+                                            <div class="example-element-detail"
+                                                [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                                                <div class="example-element-description w-100">
+                                                    <h6>Orders List</h6>
+                                                    <table class="table w-100">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Number</th>
+                                                                <th>Purchase</th>
+                                                                <th>Invoice</th>
+                                                                <th>Date</th>
+                                                                <th>Delivery Date</th>
+                                                                <th>Priority</th>
+                                                                <th>Type</th>
+                                                                <th>Customer</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let order of element.orders">
+                                                                <td>{{order.orderNumber}}</td>
+                                                                <td>{{order.purchaseNumber}}</td>
+                                                                <td>{{order.invoiceNumber}}</td>
+                                                                <td>{{order.orderDate}}</td>
+                                                                <td>{{order.deliveryDate}}</td>
+                                                                <td>{{order.priority}}</td>
+                                                                <td>{{order.orderType.name}}</td>
+                                                                <td>{{order.customer.name}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tfoot>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            </td>
                                         </ng-container>
                                         <!-- Options Sticky Column -->
                                         <ng-container matColumnDef="options" stickyEnd>
@@ -232,35 +312,38 @@
                                                 </mat-menu>
                                             </th>
                                             <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                                            <a mat-icon-button (click)="viewTransport(element)">
-                                                <img src="assets/icons/zoom.png">
-                                            </a>
-                                            <!--a mat-icon-button (click)="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + importingTypes.PICK_TASKS +'/edit', element.id]" *ngIf="viewMode === 'edit'">
-                                                <img src="assets/icons/page_edit.png">
-                                            </a-->
-                                            <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
-                                                <img src="assets/icons/zoom.png">
-                                            </a>
-                                            <a mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
-                                                <img src="assets/icons/page_edit.png">
-                                            </a-->
-                                            <!--button mat-icon-button (click)="printRow(element)">
-                                                <img src="assets/icons/printer.png">
-                                            </button-->
-                                            <!--a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
-                                                <img src="assets/icons/printer.png">
-                                            </a-->
-                                            <!--a mat-icon-button (click)="deletePickTaskPrompt(element)" *ngIf="viewMode === 'edit'">
-                                                <img src="assets/icons/delete.png">
-                                            </a-->
-                                        </td>
+                                                <a mat-icon-button (click)="expandedElement = expandedElement === element ? null : element">
+                                                    <img src="assets/icons/zoom.png">
+                                                </a>
+                                                <!--a mat-icon-button (click)="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + importingTypes.PICK_TASKS +'/edit', element.id]" *ngIf="viewMode === 'edit'">
+                                                    <img src="assets/icons/page_edit.png">
+                                                </a-->
+                                                <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
+                                                    <img src="assets/icons/zoom.png">
+                                                </a>
+                                                <a mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
+                                                    <img src="assets/icons/page_edit.png">
+                                                </a-->
+                                                <!--button mat-icon-button (click)="printRow(element)">
+                                                    <img src="assets/icons/printer.png">
+                                                </button-->
+                                                <!--a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
+                                                    <img src="assets/icons/printer.png">
+                                                </a-->
+                                                <!--a mat-icon-button (click)="deletePickTaskPrompt(element)" *ngIf="viewMode === 'edit'">
+                                                    <img src="assets/icons/delete.png">
+                                                </a-->
+                                            </td>
                                         </ng-container>
                         
                                         <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumnsTransports()"></tr>
                                         <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                                         [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
                                         <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumnsTransports();"
-                                        [ngClass]="{'alert alert-danger': row.invalid}"></tr>
+                                        class="example-element-row"
+                                        [ngClass]="{'alert alert-danger': row.invalid, 'example-expanded-row': expandedElement === row}"
+                                        ></tr>
+                                        <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
                                     </table>
                                     <mat-paginator [pageSizeOptions]="pageSizeOptionsTransports"></mat-paginator>
                                 </div>

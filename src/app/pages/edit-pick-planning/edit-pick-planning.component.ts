@@ -7,9 +7,11 @@ import { PickPlanning, PickTask, PickTaskLine, Dock, Transport } from '@pickvoic
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
+import { UserSelectorDialogComponent } from '../../components/user-selector-dialog/user-selector-dialog.component';
+import { ContextMenuComponent } from 'ngx-contextmenu';
 import { SharedDataService } from '../../services/shared-data.service';
 import { from, Observable, Observer } from 'rxjs';
-import { retry, switchMap } from 'rxjs/operators';
+import { map, retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
@@ -19,16 +21,31 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import {animate, state, style, transition, trigger} from '@angular/animations';
+
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+declare var JsBarcode: any;
 
 interface PickPlanningData {
   pickTaskList: PickTask[];
   dockList: Dock[];
   transportList: Transport[];
+  pickPlanningStates: string[];
 }
 @Component({
   selector: 'app-edit-pick-planning',
   templateUrl: './edit-pick-planning.component.html',
-  styleUrls: ['./edit-pick-planning.component.scss']
+  styleUrls: ['./edit-pick-planning.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 
 export class EditPickPlanningComponent implements OnInit {
@@ -64,10 +81,12 @@ export class EditPickPlanningComponent implements OnInit {
   actionForSelectedTransports: FormControl;
   selection = new SelectionModel<PickTask>(true, []);
   selectionTransports = new SelectionModel<Transport>(true, []);
+  expandedElement: any | null;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) paginatorTransports: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatSort, {static: true}) sortTransports: MatSort;
+  @ViewChild(ContextMenuComponent) public basicMenu: ContextMenuComponent;
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
     private activatedRoute: ActivatedRoute, private dataProviderService: DataProviderService,
@@ -83,11 +102,487 @@ export class EditPickPlanningComponent implements OnInit {
     this.isLoadingResults = true;
   }
 
+  showMessage(message: any) {
+    alert(message);
+    console.log(message);
+  }
+
+  executeContext(action: string, element: any) {
+    switch (action) {
+      case 'activateTask': {
+        /*
+          Estado de la tarea
+          PE - Pending,
+          WP - Work In Progress,
+          PS - Paused,
+          CP - Complete,
+          CA - Canceled)
+        */
+        if (element && element.taskState !== PickTask.TaskStateEnum.AC) {
+          this.utilities.log('activating task', element);
+          this.dataProviderService.activatePickTask(element.id).subscribe(result => {
+            this.utilities.log('activating result', result);
+            this.utilities.showSnackBar('Task activated successfully', 'OK');
+          }, error => {
+            this.utilities.error('activating error', error);
+            if (error.status === 500 && error.error && error.error.message) {
+              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+            } else {
+              this.utilities.showSnackBar('Task could not be activated', 'OK');
+            }
+          });
+        } else {
+          this.utilities.error('Task is allready active');
+          this.utilities.showSnackBar('Task is allready active', 'OK');
+        }
+        break;
+      }
+      case 'cancelTask': {
+        /*
+          Estado de la tarea
+          PE - Pending,
+          WP - Work In Progress,
+          PS - Paused,
+          CP - Complete,
+          CA - Canceled)
+        */
+        if (element && element.taskState !== PickTask.TaskStateEnum.CA) {
+          this.dataProviderService.updateStatePickTask(element.id, PickTask.TaskStateEnum.CA)
+          .subscribe(response => {
+            if (response) {
+              element.taskState = PickTask.TaskStateEnum.CA;
+              this.utilities.log('task cancel response', response);
+              this.utilities.showSnackBar('Task caceled successfully', 'OK');
+            }
+          }, error => {
+            this.utilities.error('task cancel error', error);
+            if (error.status === 500 && error.error && error.error.message) {
+              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+            } else {
+              this.utilities.showSnackBar('Task could not be canceled', 'OK');
+            }
+          });
+        } else {
+          this.utilities.error('task is canceled');
+          this.utilities.showSnackBar('Task is allready canceled', 'OK');
+        }
+        break;
+      }
+      case 'closeTask': {
+        /*
+          Estado de la tarea
+          PE - Pending,
+          WP - Work In Progress,
+          PS - Paused,
+          CP - Complete,
+          CA - Canceled)
+        */
+        if (element && element.taskState !== PickTask.TaskStateEnum.CP) {
+          this.dataProviderService.updateStatePickTask(element.id, PickTask.TaskStateEnum.CP).subscribe(response => {
+            if (response) {
+              element.taskState = PickTask.TaskStateEnum.CP;
+              this.utilities.log('task close response', response);
+              this.utilities.showSnackBar('Task closed successfully', 'OK');
+            }
+          }, error => {
+            this.utilities.error('task close error', error);
+            if (error.status === 500 && error.error && error.error.message) {
+              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+            } else {
+              this.utilities.showSnackBar('Task could not be closed', 'OK');
+            }
+          });
+        } else {
+          this.utilities.error('task is allready closed');
+          this.utilities.showSnackBar('Task is allready closed', 'OK');
+        }
+        break;
+      }
+      case 'assignToUser': {
+        const dialogRef = this.dialog.open(UserSelectorDialogComponent, {
+          data: {
+            collection: this.dataProviderService.getAllUsers(),
+            title: 'Select User',
+            message: 'Please select a user from the list'
+          }
+        });
+        dialogRef.afterClosed().subscribe(selectedUser => {
+          this.utilities.log('user selector dialog result:', selectedUser);
+          if (selectedUser && selectedUser.id !== element.user.id) {
+            this.dataProviderService.assignUserToPickTask(element, selectedUser).subscribe(response => {
+              if (response) {
+                element.user = selectedUser;
+                this.utilities.log('user assign response', response);
+                this.utilities.showSnackBar('User assigned successfully', 'OK');
+              }
+            }, error => {
+              this.utilities.error('user assign error', error);
+              if (error.status === 500 && error.error && error.error.message) {
+                this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+              } else {
+                this.utilities.showSnackBar('User could not be assigned', 'OK');
+              }
+            });
+          } else {
+            this.utilities.error('User is allready assigned');
+            this.utilities.showSnackBar('User is allready assigned', 'OK');
+          }
+        }, error => {
+          this.utilities.error('error after closing user selector dialog');
+          this.utilities.showSnackBar('Error after closing user selector dialog', 'OK');
+          this.isLoadingResults = false;
+        });
+        break;
+      }
+      case 'incrementPriority': {
+        /*
+          10 max
+        */
+        if (element && element.priority < 10) {
+          const elementCopy = Object.assign({}, element);
+          elementCopy.priority++;
+          this.dataProviderService.updatePickTask(elementCopy, element.id).subscribe(response => {
+            if (response) {
+              element.priority++;
+              this.utilities.log('task priority increment response', response);
+              this.utilities.showSnackBar('Priority incremented successfully', 'OK');
+            }
+          }, error => {
+            this.utilities.error('task priority increment error', error);
+            if (error.status === 500 && error.error && error.error.message) {
+              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+            } else {
+              this.utilities.showSnackBar('Priority could not be incremented', 'OK');
+            }
+          });
+        } else {
+          this.utilities.error('task already have priority 10');
+          this.utilities.showSnackBar('Task allready have maximum priority', 'OK');
+        }
+        break;
+      }
+      case 'decrementPriority': {
+        /*
+          0 min
+        */
+        if (element && element.priority > 0) {
+          const elementCopy = Object.assign({}, element);
+          elementCopy.priority--;
+          this.dataProviderService.updatePickTask(elementCopy, element.id).subscribe(response => {
+            if (response) {
+              element.priority--;
+              this.utilities.log('task priority decrement response', response);
+              this.utilities.showSnackBar('Priority decremented successfully', 'OK');
+            }
+          }, error => {
+            this.utilities.error('task priority decrement error', error);
+            if (error.status === 500 && error.error && error.error.message) {
+              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+            } else {
+              this.utilities.showSnackBar('Priority could not be decremented', 'OK');
+            }
+          });
+        } else {
+          this.utilities.error('task already have priority 0');
+          this.utilities.showSnackBar('Task allready have minimum priority', 'OK');
+        }
+        break;
+      }
+      case 'viewBySku': {
+        this.generateTaskPdf(element);
+        break;
+      }
+      case 'viewByCode': {
+        this.generateTaskPdf(element);
+        break;
+      }
+    }
+    this.refreshTable();
+  }
+
+  generateTaskPdf(object?: any) {
+    this.dataProviderService.getAllPickTaskLinesByTask(object.id).
+    subscribe(taskLines => {
+      taskLines = taskLines.map((taskLine: any) =>
+      [
+        { text: taskLine.pickTaskLineId, style: 'tableRow'},
+        { text: taskLine.sku, style: 'tableRow'},
+        { text: taskLine.skuDescription, style: 'tableRow'},
+        { text: taskLine.batchNumber, style: 'tableRow'},
+        { text: taskLine.serial, style: 'tableRow'},
+        { text: taskLine.locationCode, style: 'tableRow'},
+        { text: taskLine.expiryDate, style: 'tableRow'},
+        { text: taskLine.uomCode, style: 'tableRow'},
+        { text: taskLine.lpnCode, style: 'tableRow'},
+        /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
+        { text: taskLine.qtyToPicked, style: 'tableRow'}
+      ]);
+      this.generatePdfContent(object, taskLines)
+      .subscribe(documentDefinition => pdfMake.createPdf(documentDefinition).open());
+    }, error => {
+      this.utilities.error('Error al cargar task lines', error);
+      if (error && error.error.message) {
+        this.utilities.showSnackBar(error.error.message, 'OK');
+      } else {
+        this.utilities.showSnackBar('Error fetching task lines', 'OK');
+      }
+    });
+  }
+
+
+  generatePdfContent(object: any, tableContent: any[]): Observable<any> {
+    let base64Logo;
+    let canvas;
+    let content;
+    const image = new Image();
+    canvas = document.createElement('canvas');
+    canvas.style.height = 50 + 'px';
+    const response = new Observable(suscriber => {
+      image.onload = () => {
+        const context = canvas.getContext('2d');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        context.drawImage(image, 0, 0);
+        base64Logo = canvas.toDataURL('image/png');
+        content.images.logo = base64Logo;
+        suscriber.next(content);
+        suscriber.complete();
+      };
+    });
+    content = {
+      content: [
+        {
+          margin: [20, 0, 20, 10],
+          alignment: 'left',
+          columns: [
+            {
+              width: 80,
+              image: 'logo',
+              margin: [0, 0, 10, 0]
+            },
+            [
+              {
+                text: `TASK # ${object.id} (${object.taskState})`,
+                style: 'h1'
+              },
+              {
+                text: `Type: ${object.taskType.name} - Priority: ${object.priority}`,
+                style: 'h2'
+              },
+              {
+                text: `Description: ${object.description}`,
+                style: 'small'
+              }
+            ],
+            [
+              {
+                alignment: 'right',
+                text: `Enable Date: ${object.enableDate}`,
+                style: 'small'
+              },
+              {
+                alignment: 'right',
+                text: `Date: ${object.date}`,
+                style: 'small'
+              },
+              {
+                alignment: 'right',
+                text: `Assignment Date: ${object.dateAssignment}`,
+                style: 'small'
+              }
+            ]
+          ]
+        },
+        {canvas: [ { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1 } ], margin: [0, 0, 0, 25]},
+        {
+          style: 'normal',
+          alignment: 'left',
+          margin: [0, 0, 0, 20],
+          columns: [
+            [
+              {
+                text: [
+                  { text: `Document: `, bold: true},
+                  `${object.document}`
+                ]
+              },
+              {
+                text: [
+                  { text: `User: `, bold: true},
+                  ` ${object.user ? object.user.firstName : ''} ${object.user ? object.user.lastName : ''} ${object.user ? '(' + object.user.userName + ')' : ''}`
+                ]
+              },
+              {
+                columns: [
+                  {
+                    margin: [0, 20, 0, 20],
+                    width: 'auto',
+                    text: 'Task',
+                    bold: true
+                  },
+                  {
+                    image: this.generateBarCode(object.id)
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                text: [
+                  {
+                    text: 'Quantity: ', bold: true
+                  },
+                  ` ${object.qty}`
+                ]
+              },
+              {
+                text: [
+                  {
+                    text: 'Lines: ', bold: true
+                  },
+                  `${object.lines}`
+                ]
+              },
+              {
+                text: [
+                  {
+                    text: `Current Line: `, bold: true
+                  },
+                  `${object.currentLine}`
+                ]
+              },
+              {
+                text: [
+                  {
+                    text: `Children Work: `, bold: true
+                  },
+                  `${object.childrenWork}`
+                ]
+              },
+              {
+                text: [
+                  {
+                    text: `Rule executed: `, bold: true
+                  },
+                  `${object.ruleExecuted}`
+                ]
+              },
+              {
+                text: [
+                  {
+                    text: `Validate Location: `, bold: true
+                  },
+                  `${object.validateLocation ? 'Yes' : 'No' }`
+                ]
+              },
+              {
+                text: [
+                  {
+                    text: `Pallet Complete: `, bold: true
+                  },
+                  `${object.palletComplete ? 'Yes' : 'No' }`
+                ]
+              },
+              {
+                text: [
+                  {
+                    text: `Validate Lpn: `, bold: true
+                  },
+                  `${object.validateLpn ? 'Yes' : 'No' }`
+                ]
+              },
+              {
+                text: [
+                  {
+                    text: `Validate Sku: `, bold: true
+                  },
+                  `${object.validateSku ? 'Yes' : 'No' }`
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          table: {
+            widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            headerRows: 1,
+            body: [
+              [
+                {text: 'Line', style: 'tableHeader', alignment: 'center'},
+                {text: 'Sku', style: 'tableHeader', alignment: 'center'},
+                {text: 'Sku Description', style: 'tableHeader', alignment: 'center'},
+                {text: 'Batch', style: 'tableHeader', alignment: 'center'},
+                {text: 'Serial', style: 'tableHeader', alignment: 'center'},
+                {text: 'Location', style: 'tableHeader', alignment: 'center'},
+                {text: 'Expiry Date', style: 'tableHeader', alignment: 'center'},
+                {text: 'Uom Code', style: 'tableHeader', alignment: 'center'},
+                {text: 'Lpn Code', style: 'tableHeader', alignment: 'center'},
+                /* {text: 'Scanned Verification', style: 'tableHeader', alignment: 'center'},*/
+                {text: 'Qty To Picked', style: 'tableHeader', alignment: 'center'}
+              ]
+            ]
+          }
+        }
+      ],
+      styles: {
+        h1: {
+          fontSize: '18',
+          bold: true
+        },
+        h2: {
+          fontSize: '14',
+          bold: true
+        },
+        small: {
+          fontSize: '10'
+        },
+        normal: {
+          fontSize: '11'
+        },
+        medium: {
+          fontSize: '12'
+        },
+        tableHeader: {
+          color: 'white',
+          bold: true,
+          fillColor: 'darkblue',
+          fontSize: 8
+        },
+        tableRow: {
+          fontSize: 8
+        },
+        invisible: {
+          opacity: 0,
+        }
+      },
+      images: {
+        // logo: img.src
+        // logo: base64Logo
+        logo: base64Logo
+      }
+    };
+    tableContent.forEach(row => {
+      row.style = 'tableRow';
+      content.content[3].table.body.push(row);
+    });
+    image.src = '/assets/images/logo.png';
+    return response;
+  }
+
+  generateBarCode(input: string) {
+    const canvas = document.createElement('canvas');
+    JsBarcode(canvas, input, { height: 30, fontSize: 10});
+    const base64 = canvas.toDataURL('image/jpg');
+    this.utilities.log('base64 bar code', base64);
+    return base64;
+  }
+
   init() {
     this.utilities.log('pick planning', this.row);
     this.getPickTaskList();
     this.getDockList();
     this.getTransportList();
+    this.getPickPlanningStates();
     // inicializamos todo lo necesario para la tabla
     if (this.row) {
       this.dataSource.data = this.pickPlanningData.pickTaskList;
@@ -367,7 +862,7 @@ export class EditPickPlanningComponent implements OnInit {
   }
 
   deleteTransport(row: any) {
-    const index = this.pickPlanningData.transportList.findIndex(_row => _row.id === row.id);
+    const index = this.pickPlanningData.transportList.findIndex((_row: any) => _row.id === row.id);
     if (index > 1) {
       this.pickPlanningData.transportList.splice(index, 1);
     }
@@ -538,10 +1033,22 @@ export class EditPickPlanningComponent implements OnInit {
   }
 
   getTransportList() {
-    this.dataProviderService.getPickPlanningTransport(this.row.id).subscribe(result => {
-      this.pickPlanningData.transportList = result;
-      this.dataSourceTransports.data = result;
-      this.utilities.log('pick planning transports', result);
+    this.dataProviderService.getPickPlanningTransport(this.row.id).subscribe((transports: any) => {
+      this.pickPlanningData.transportList = transports;
+      this.dataSourceTransports.data = transports;
+      this.utilities.log('pick planning transports', transports);
+      transports.forEach(transport => {
+        this.dataProviderService.getTransportsOrders(transport.id).subscribe(orders => {
+          transport.orders = orders;
+        });
+      });
+    });
+  }
+
+  getPickPlanningStates() {
+    this.dataProviderService.getAllPickPlanningStates().subscribe(result => {
+      this.pickPlanningData.pickPlanningStates = result;
+      this.utilities.log('pick planning states', result);
     });
   }
 

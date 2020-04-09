@@ -1,0 +1,27 @@
+
+mat-card{
+  width: 98%;
+  height: 98%;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.mat-card-header .mat-card-title {
+  font-weight: 400;
+  color: #00535e;
+  font-size: 1rem;
+  margin-bottom: 0px;
+}
+.mat-card-header{
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+.more-button {
+  position: absolute !important;
+  top: 0.5rem;
+  right: 0.1rem;
+}
+.mat-card .date-selector{
+  position: absolute;
+  right: 50px;
+  top: 10px;
+}

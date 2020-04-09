@@ -19,6 +19,15 @@ body {
 button:focus {
   outline: none !important;
 }
+.ngx-contextmenu{
+
+}
+.ngx-contextmenu .dropdown-menu{
+  padding: 0;
+}
+.ngx-contextmenu .dropdown-menu .dropdown-divider{
+  margin: 0;
+}
 .mat-sidenav>.mat-drawer-inner-container::-webkit-scrollbar {
   width: 8px;
 }
@@ -330,7 +339,7 @@ table.mat-table-hoverflow{
 .table-toolbar button.delete-button{
   background: url('assets/icons/delete.png') no-repeat 4px center;
 }
-table tbody tr.mat-row:hover {
+table tbody tr.mat-row:not(.example-detail-row):hover{
   background: rgb(245, 245, 245);
 }
 td.mat-cell, td.mat-footer-cell, th.mat-header-cell {

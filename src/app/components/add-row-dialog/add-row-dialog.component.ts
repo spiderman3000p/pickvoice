@@ -229,13 +229,13 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
       }
 
       if (this.type === IMPORTING_TYPES.PICK_TASKS) {
-        this.subscriptions.push(this.dataProviderService.createPickTask(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
+        /* this.subscriptions.push(this.dataProviderService.createPickTask(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer));*/ 
       }
 
       if (this.type === IMPORTING_TYPES.PICK_TASKLINES) {
-        this.subscriptions.push(this.dataProviderService.createPickTaskLine(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
+        /*this.subscriptions.push(this.dataProviderService.createPickTaskLine(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer));*/
       }
     } else {
       this.dialogRef.close(toUpload);
