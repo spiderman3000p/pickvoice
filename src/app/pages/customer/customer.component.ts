@@ -1,22 +1,23 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-
+import { Router } from '@angular/router';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
 import { CustomerService, Customer } from '@pickvoice/pickvoice-api';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { retry } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Observer } from 'rxjs';
-import { Router } from '@angular/router';
+
+import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { merge, Observer, Subscription } from 'rxjs';
+
+import { MyDataSource } from '../../models/my-data-source';
 
 @Component({
   selector: 'app-customer',
@@ -25,30 +26,34 @@ import { Router } from '@angular/router';
 })
 export class CustomerComponent implements OnInit, AfterViewInit {
   definitions: any = ModelMap.CustomerMap;
-  dataSource: MatTableDataSource<Customer>;
+  dataSource: MyDataSource<Customer>;
   dataToSend: Customer[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
   defaultColumnDefs: any[];
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
-  filter: FormControl;
+
+  searchForm: FormGroup;
   filtersForm: FormGroup;
   showFilters: boolean;
   filters: any[] = [];
+  filterParams = '';
+  paginatorParams = '';
+  sortParams = '';
+  filteredDone = false;
+
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
   type = IMPORTING_TYPES.CUSTOMERS;
-  printableData: any;
   selectsData: any;
+  subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
     private utilities: UtilitiesService) {
-      this.dataSource = new MatTableDataSource([]);
-      this.filter = new FormControl('');
       this.dataToSend = [];
       this.actionForSelected = new FormControl('');
       this.displayedDataColumns = Object.keys(this.definitions);
@@ -63,18 +68,114 @@ export class CustomerComponent implements OnInit, AfterViewInit {
       this.selection.changed.subscribe(selected => {
         this.utilities.log('new selection', selected);
       });
-
+      this.searchForm = new FormGroup({
+        process: new FormControl(''),
+        order: new FormControl(''),
+        transport: new FormControl(''),
+        description: new FormControl(''),
+        state: new FormControl(''),
+        startOrder: new FormControl(''),
+        purchaseOrder: new FormControl('')
+      });
       this.utilities.log('displayed data columns', this.displayedDataColumns);
       this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
-      this.loadData();
   }
 
   ngOnInit() {
+    this.dataSource = new MyDataSource(this.dataProviderService);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.paginator.pageIndex = 0;
+    this.paginator.pageSize = 10;
+    this.loadDataPage();
   }
 
   ngAfterViewInit() {
+    this.subscriptions.push(this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0));
+    this.subscriptions.push(merge(this.sort.sortChange, this.paginator.page)
+    .pipe(tap(() => this.loadDataPage()))
+    .subscribe());
+  }
+
+  getFilterParams(): string {
+    const formValues = this.filtersForm.value;
+    this.utilities.log('filter form values: ', formValues);
+    const filtersToUse = [];
+    for (const filterKey in this.filters) {
+      if (this.filters[filterKey].controls.value.value !== undefined &&
+          this.filters[filterKey].controls.value.value !== null &&
+          this.filters[filterKey].controls.value.value !== '') {
+        filtersToUse.push(this.filters[filterKey]);
+      }
+    }
+    const stringParams = filtersToUse.length > 0 ? filtersToUse.map(filter =>
+      `${filter.key}-filterType=${filter.type};${filter.key}-type=` +
+      `${this.definitions[filter.key].formControl.control === 'select' ? 'number'
+      : formValues[filter.key].type};${filter.key}-filter=${formValues[filter.key].value.toLowerCase()}`)
+      .join(';') : '';
+    this.utilities.log('filters to use: ', filtersToUse);
+    this.utilities.log('filters string params: ', stringParams);
+    return stringParams;
+  }
+
+  getPaginatorParams(): string {
+    const startRow = this.paginator.pageIndex * this.paginator.pageSize;
+    return `startRow=${startRow};endRow=${startRow + this.paginator.pageSize}`;
+  }
+
+  getSortParams(): string {
+    return `sort-${this.sort.active}=${this.sort.direction}`;
+  }
+
+  loadDataPage() {
+    this.paginatorParams = this.getPaginatorParams();
+    this.sortParams = this.getSortParams();
+    const paramsArray = Array.of(this.paginatorParams, this.filterParams, this.sortParams)
+    .filter(paramArray => paramArray.length > 0);
+    this.utilities.log('paramsArray', paramsArray);
+    const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
+    this.utilities.log('loading data with params', params);
+    this.subscriptions.push(this.dataSource.loadData(this.type, `${params}`)
+    .subscribe((response: any) => {
+        /*this.data = dataResults;
+        this.dataCount = 100;
+        this.dataSubject.next(dataResults);*/
+        this.utilities.log('response', response);
+        if (response.content.length > 0) {
+            this.dataSource.lastRow = response.pageSize;
+            this.dataSource.data = response.content;
+            this.dataSource.dataCount = response.totalElements;
+            this.dataSource.dataSubject.next(this.dataSource.data);
+        }
+    }, error => {
+      this.utilities.error('Error fetching data from server');
+      this.utilities.showSnackBar('Error fetching data from server', 'OK');
+    }));
+  }
+
+  reloadData() {
+    this.selection.clear();
+    this.loadDataPage();
+  }
+
+  applyFilters(): void {
+    this.filterParams = this.getFilterParams();
+    this.filteredDone = this.filterParams.length > 0;
+    this.paginator.pageIndex = 0;
+    this.loadDataPage();
+  }
+
+  search() {
+  }
+
+  isFilteredBy(column: string): boolean {
+    return this.filterParams.includes(column);
+  }
+
+  clearFilterInColumn(column: string) {
+    this.filters[column].controls.value.reset();
+    this.filters[column].controls.type.patchValue(FILTER_TYPES[0].value);
+    this.filteredDone = this.filterParams.length > 0;
   }
 
   initColumnsDefs() {
@@ -95,21 +196,57 @@ export class CustomerComponent implements OnInit, AfterViewInit {
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
-    this.selectsData = {};
-    this.columnDefs.forEach((column, index) => {
+    this.selectsData = [];
+    this.columnDefs.slice().forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
+        filter.type = this.definitions[column.name].formControl.type;
         filter.key = column.name;
-        formControls[column.name] = new FormControl('');
-        if (this.definitions[column.name].formControl.control === 'select') {
-          this.selectsData[column.name] =
-          this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
-          formControls[column.name].patchValue(-1);
+        if (this.definitions[column.name].formControl.control !== 'select' &&
+            this.definitions[column.name].formControl.control !== 'toggle' &&
+            this.definitions[column.name].formControl.control !== 'table') {
+          filter.availableTypes = FILTER_TYPES.filter(_filterType => _filterType.availableForTypes
+            .findIndex(availableType => filter.type === availableType
+            || availableType === 'all') > -1);
+        } else {
+          // aqui en caso de querer hacer algo con los campos select y toggle
         }
-        this.filters.push(filter);
+        formControls[column.name] = new FormGroup({
+          type: new FormControl(FILTER_TYPES[0].value),
+          value: new FormControl('')
+        });
+        filter.controls = formControls[column.name].controls;
+        this.subscriptions.push(filter.controls.value.valueChanges
+          .pipe(debounceTime(500), tap((value) => {
+          this.utilities.log(`valor del campo ${column.name} cambiando a: `, value);
+          this.applyFilters();
+        })).subscribe());
+        this.subscriptions.push(filter.controls.type.valueChanges
+          .pipe(debounceTime(500), tap((type) => {
+          this.utilities.log(`tipo de filtro del campo ${column.name} cambiando a: `, type);
+          // TODO: acomodar esto de modo que al cambiar tipo y haber un valor, hacer la busqueda
+          if (false) {
+            this.applyFilters();
+          }
+        })).subscribe());
+        // formControls[column.name].get('type').patchValue(FILTER_TYPES[0].value);
+        if (this.definitions[column.name].formControl.control === 'select') {
+          this.subscriptions.push(
+            this.dataProviderService.getDataFromApi(this.definitions[column.name].type)
+            .subscribe(results => {
+              this.selectsData[column.name] = results;
+              this.utilities.log('selectsData', this.selectsData);
+            }, error => {
+              this.utilities.error('Error: no hay datos de seleccion para el campo', this.definitions[column.name]);
+            })
+          );
+          // formControls[column.name].get('value').patchValue(-1);
+         // this.utilities.log('selectsData: ', this.selectsData);
+        }
+        this.filters[column.name] = filter;
       }
     });
     this.filtersForm = new FormGroup(formControls);
@@ -252,13 +389,13 @@ export class CustomerComponent implements OnInit, AfterViewInit {
     const text = this.utilities.renderColumnData(type, data);
     return typeof text === 'string' ? text.slice(0, 30) : text;
   }
-
+/*
   resetFilters() {
     this.filtersForm.reset();
     this.dataSource.filter = '';
   }
 
-  applyFilters() {
+  applyFilters_old() {
     const formValues = this.filtersForm.value;
     let value;
     let value2;
@@ -276,13 +413,13 @@ export class CustomerComponent implements OnInit, AfterViewInit {
         this.utilities.log('shownFilter.key', shownFilter.key);
         this.utilities.log('value', value);
         this.utilities.log('value2', value2);
-        this.utilities.log('--------------------------------------------');*/
+        this.utilities.log('--------------------------------------------');
         return value !== undefined && value !== null && value.toString().toLowerCase().includes(value2.toLowerCase());
       });
     };
     this.dataSource.filter = 'filtred';
   }
-
+*/
   editRowOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
@@ -330,11 +467,6 @@ export class CustomerComponent implements OnInit, AfterViewInit {
     });
   }
 
-  reloadData() {
-    this.selection.clear();
-    this.loadData(false);
-  }
-
   addRow() {
     this.utilities.log('map to send to add dialog',
     this.utilities.dataTypesModelMaps.customers);
@@ -366,29 +498,13 @@ export class CustomerComponent implements OnInit, AfterViewInit {
     this.utilities.exportToXlsx(dataToExport, 'Customers List');
   }
 
-  printRow(data: any) {
-    this.printableData = data;
-    setTimeout(() => {
-      if (this.utilities.print('printSection')) {
-        this.printableData = null;
-      }
-    }, 1000);
-  }
-
-  printRows() {
-    this.printableData = this.selection.selected;
-    setTimeout(() => {
-      if (this.utilities.print('printSection')) {
-        this.printableData = null;
-      }
-    }, 1000);
-  }
-
   /*
     Esta funcion se encarga de refrescar la tabla cuando el contenido cambia.
     TODO: mejorar esta funcion usando this.dataSource y no el filtro
   */
   private refreshTable() {
+    this.loadDataPage();
+    /*
     // If there's no data in filter we do update using pagination, next page or previous page
     if (this.dataSource.filter === '') {
       const aux = this.dataSource.filter;
@@ -401,7 +517,7 @@ export class CustomerComponent implements OnInit, AfterViewInit {
       this.dataSource.filter = aux;
     }
     this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.dataSource.sort = this.sort;*/
   }
 
   toggleFilters() {

@@ -5,14 +5,11 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
-import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { PickTask, PickTaskLine, PickTaskLines, LoadPick } from '@pickvoice/pickvoice-api';
@@ -183,6 +180,16 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
     
   }
 
+  isFilteredBy(column: string): boolean {
+    return this.filterParams.includes(column);
+  }
+
+  clearFilterInColumn(column: string) {
+    this.filters[column].controls.value.reset();
+    this.filters[column].controls.type.patchValue(FILTER_TYPES[0].value);
+    this.filteredDone = this.filterParams.length > 0;
+  }
+
   initColumnsDefs() {
     let shouldShow: boolean;
     let filter: any;
@@ -258,16 +265,6 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
     this.utilities.log('filters', this.filters);
     this.utilities.log('formControls', formControls);
     this.utilities.log('form values', this.filtersForm.value);
-  }
-
-  isFilteredBy(column: string): boolean {
-    return this.filterParams.includes(column);
-  }
-
-  clearFilterInColumn(column: string) {
-    this.filters[column].controls.value.reset();
-    this.filters[column].controls.type.patchValue(FILTER_TYPES[0].value);
-    this.filteredDone = this.filterParams.length > 0;
   }
 
   getDisplayedHeadersColumns() {

@@ -174,7 +174,7 @@
                                         <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                                         [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
                                         <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                                        [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + type + '/view', row.code]"></tr>
+                                        [ngClass]="{'alert alert-danger': row.invalid}"></tr>
                                     </table>
                                     <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                                 </div>

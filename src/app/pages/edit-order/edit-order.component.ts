@@ -396,21 +396,21 @@ export class EditOrderComponent implements OnInit {
       this.ordersData.orderLineList = results;
       this.dataSource.data = results;
       this.refreshTable();
-      this.utilities.log('this.ordersData.orderTypeList', results);
+      this.utilities.log('this.ordersData.orderLineList', this.ordersData.orderLineList);
     });
   }
 
   getCustomerList() {
     this.customerService.retrieveAllCustomers().subscribe(results => {
       this.ordersData.customerList = results;
-      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
+      this.utilities.log('this.ordersData.customerList', this.ordersData.customerList);
     });
   }
 
   getTransportList() {
     this.transportService.retrieveAllTransport().subscribe(results => {
       this.ordersData.transportList = results;
-      this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
+      this.utilities.log('this.ordersData.transportList', this.ordersData.transportList);
     });
   }
 

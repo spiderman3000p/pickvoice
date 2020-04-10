@@ -17,10 +17,10 @@
             </div>
         </div>
         <div>
-            <div class="example-loading-shade" *ngIf="isLoadingResults">
-                <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+            <div class="example-loading-shade" *ngIf="dataSource.loading$ | async">
+                <mat-spinner class="spinner"></mat-spinner>
             </div>
-            <mat-accordion>
+            <!--mat-accordion>
                 <mat-expansion-panel (opened)="showFilters = true" (closed)="showFilters = false">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
@@ -95,9 +95,9 @@
                         </div>
                     </div>
                 </mat-expansion-panel>
-            </mat-accordion>
+            </mat-accordion-->
             <div>
-                <strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong>
+                <!--strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong-->
                 <div class="table-toolbar" *ngIf="selection.selected.length > 0">
                     <div class="col-sm-6 text-left toolbar-label">
                         <label>Selected rows: {{selection.selected.length}}</label>
@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8"-->
-                <table mat-table [dataSource]="dataSource" matSort>
+                <table mat-table [dataSource]="dataSource" matSort matSortActive="code" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8">
                     <!-- Checkbox Column -->
                     <ng-container matColumnDef="select">
                         <th mat-header-cell *matHeaderCellDef>
@@ -125,7 +125,61 @@
                     </ng-container>
                     <!-- Data Columns -->
                     <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} 
+                            <span (keyup)="$event.stopPropagation()" (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                                <mat-icon class="column-filter-icon" [ngClass]="{'active': isFilteredBy(column)}" [matMenuTriggerFor]="filterColumnMenu">
+                                    filter_list
+                                </mat-icon>
+                                <mat-menu #filterColumnMenu="matMenu" (keyup)="$event.stopPropagation()" class="column-filter-menu"
+                                (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                                  <span (click)="$event.stopPropagation()" class="btn-filter2-wrapper">
+                                      <!--button mat-mini-fab aria-label="Clear filter" class="btn-filter-menu"
+                                      (click)="clearFilterInColumn(column)">
+                                          <mat-icon>block</mat-icon>
+                                      </button-->
+                                      <button mat-button aria-label="Clear filter" (click)="clearFilterInColumn(column)"
+                                      class="btn-filter2">
+                                          <!--mat-icon style="font-size: 14px">block</mat-icon--> clear filter
+                                      </button>
+                                  </span>
+                                  <span (keyup)="$event.stopPropagation()" class="form-group" (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()"
+                                    *ngIf="definitions[column].formControl.control !== 'select' &&
+                                                        definitions[column].formControl.control !== 'toggle'">
+                                      <select class="form-control" [formControl]="filters[column].controls.type"
+                                      [name]="column+'-type'">
+                                          <option *ngFor="let type of filters[column].availableTypes"
+                                          [value]="type.value">
+                                              {{ type.name }}
+                                          </option>
+                                      </select>
+                                  </span>
+                                  <span class="form-group" *ngIf="definitions[column].formControl.control === 'select'" (keyup)="$event.stopPropagation()"
+                                    (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                                      <select class="form-control" [formControl]="filters[column].controls.value"
+                                      [name]="column">
+                                          <option value="">Select a value</option>
+                                          <option *ngFor="let data of selectsData[column]"
+                                          [value]="data.id !== undefined && data.id !== null ? data.id : 
+                                          (definitions[column].formControl.valueIndex !== null ?
+                                          data[definitions[column].formControl.valueIndex] : data)">
+                                              {{ definitions[column].formControl.displayIndex !== null ?
+                                                  data[definitions[column].formControl.displayIndex] : data }}
+                                          </option>
+                                      </select>
+                                  </span>
+                                  <span class="form-group" *ngIf="definitions[column].formControl.control === 'input' ||
+                                                      definitions[column].formControl.control === 'date'" (keyup)="$event.stopPropagation()"
+                                        (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                                    <input [type]="filters[column].type" class="form-control" [name]="column"
+                                                          [formControl]="filters[column].controls.value">
+                                  </span>
+                                  <span class="form-group" *ngIf="definitions[column].formControl.control === 'toggle'" (keyup)="$event.stopPropagation()"
+                                  (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                                    <mat-slide-toggle color="primary" [formControl]="filters[column].controls.value"></mat-slide-toggle>
+                                  </span>
+                                </mat-menu>
+                            </span>
+                        </th>
                         <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
                     </ng-container>
                     <!-- Options Sticky Column -->

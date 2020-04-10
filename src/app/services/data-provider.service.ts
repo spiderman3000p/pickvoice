@@ -30,7 +30,12 @@ export class DataProviderService {
     switch (type) {
       case IMPORTING_TYPES.CUSTOMERS: {
         this.utilities.log(`obteniendo customers...`);
-        toReturn = this.customerService.retrieveAllCustomers().pipe(retry(3));
+        if (params) {
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/customerList/' + params)
+          .pipe(retry(3));
+        } else {
+          toReturn = this.customerService.retrieveAllCustomers().pipe(retry(3));
+        }
         break;
       }
       case IMPORTING_TYPES.ITEM_TYPE: {
