@@ -33,7 +33,8 @@ export class UtilitiesService implements OnDestroy {
     loadPicksDto: ModelMap.LoadPickDtoMap,
     pickPlannings: ModelMap.PickPlanningMap,
     pickTasks: ModelMap.PickTaskMap,
-    pickTaskLines: ModelMap.PickTaskLineMap
+    pickTaskLines: ModelMap.PickTaskLineMap,
+    docks: ModelMap.DockMap
   };
   subscriptions: Subscription[];
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {
@@ -53,8 +54,10 @@ export class UtilitiesService implements OnDestroy {
   }
 
   renderColumnData(type: string, data: any) {
-    let dataValue = '';
-    if (data !== undefined && data !== null) {
+    let dataValue = data;
+
+    if (data !== undefined && data !== null && (typeof data === 'object' ||
+      (type === 'date' && typeof data === 'number'))) {
       switch (type) {
         case 'date':
           let date;

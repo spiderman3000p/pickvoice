@@ -30,6 +30,7 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
   viewMode: string;
   selectsData: any;
   subscriptions: Subscription[] = [];
+  defaultValues: any;
   constructor(public dialogRef: MatDialogRef<EditRowDialogComponent>, private sharedDataService: SharedDataService,
               private dialog: MatDialog, private dataProviderService: DataProviderService,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
@@ -45,6 +46,7 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
     this.viewMode = data.viewMode;
     this.utilities.log('viewMode', this.viewMode);
     this.dialogTitle = this.viewMode === 'edit' ? 'Edit Row' : 'View Row';
+    this.defaultValues = data.defaultValues;
     const formControls = {};
     this.keys = Object.keys(this.dataMap);
     this.utilities.log('keys', this.keys);
@@ -63,7 +65,9 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
       if (this.dataMap[key].formControl.control === 'select') {
         this.selectsData[key] =
         this.dataProviderService.getDataFromApi(this.dataMap[key].type);
-        formControls[key].patchValue('');
+        if (typeof this.row[key] === 'object') {
+          formControls[key].setValue(this.row[key]);
+        }
       }
     });
     this.form = new FormGroup(formControls);
@@ -103,7 +107,7 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
     const toUpload = this.row;
     this.utilities.log('form data', formData);
     for (const key in toUpload) {
-      if (formData[key]) {
+      if (formData[key] !== undefined && formData[key] !== null) {
         toUpload[key] = formData[key];
       }
     }

@@ -4,7 +4,7 @@
         <div class="section-wrapper">
             <div class="header actionbar align-content-top">
                 <div class="title actionbar-section align-content-top">
-                    <h1>Item Types List</h1>
+                    <h1>Dock List</h1>
                 </div>
                 <div class="actions actionbar-section right">
                     <button mat-raised-button color="warn" (click)="export()">
@@ -79,7 +79,7 @@
                                             <mat-icon>search</mat-icon>
                                             Filter
                                         </button>
-                                    <button mat-raised-button color="primary" class="btn btn-lg ml-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
+                                    <button mat-raised-button color="primary" class="btn btn-lg ml-md-3 ml-lg-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
                                             <mat-icon>not_interested</mat-icon>
                                             Reset Filters
                                         </button>

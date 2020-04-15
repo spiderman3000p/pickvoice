@@ -90,6 +90,7 @@ export class ModelFactory {
         object.nameRoute = '';
         object.carrierCode = '';
         object.transportState = Transport.TransportStateEnum.Pending;
+        object.orders = [];
         return object;
     }
 

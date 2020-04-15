@@ -1,29 +1,25 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-
+import { ViewChild, Inject, AfterViewInit, Component, OnInit } from '@angular/core';
+import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
-import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { OrderService, Order, OrderType, OrderLine } from '@pickvoice/pickvoice-api';
 import { MyDataSource } from '../../models/my-data-source';
-
-import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { FormGroup, FormControl } from '@angular/forms';
 import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { merge, Observer, Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+import { merge, Observable, Observer, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-orders',
-  templateUrl: './orders.component.html',
-  styleUrls: ['./orders.component.css']
+  selector: 'app-order-selector-dialog',
+  templateUrl: './order-selector-dialog.component.html',
+  styleUrls: ['./order-selector-dialog.component.css']
 })
-export class OrdersComponent implements OnInit, AfterViewInit {
+export class OrderSelectorDialogComponent implements OnInit, AfterViewInit {
+  title: string;
+  message: string;
   definitions: any = ModelMap.OrderMap;
   dataSource: MyDataSource<Order>;
   dataToSend: Order[];
@@ -34,6 +30,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
 
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
 
+  filter: FormControl;
   filtersForm: FormGroup;
   showFilters: boolean;
   filters: any[] = [];
@@ -51,39 +48,37 @@ export class OrdersComponent implements OnInit, AfterViewInit {
   parserFn: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
-  constructor(
-    private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
-    private utilities: UtilitiesService) {
-      this.dataToSend = [];
-      this.actionForSelected = new FormControl('');
-      this.displayedDataColumns = Object.keys(this.definitions);
-      this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
-      this.displayedHeadersColumns.push('options');
+  constructor(public dialogRef: MatDialogRef<OrderSelectorDialogComponent>,
+              private dataProviderService: DataProviderService, private utilities: UtilitiesService,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
+    this.filter = new FormControl('');
+    this.dataToSend = [];
+    this.actionForSelected = new FormControl('');
+    this.displayedDataColumns = Object.keys(this.definitions);
+    this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
 
-      this.initColumnsDefs(); // columnas a mostrarse
-      this.utilities.log('filters', this.filters);
-      this.actionForSelected.valueChanges.subscribe(value => {
-        this.actionForSelectedRows(value);
-      });
-      this.selection.changed.subscribe(selected => {
-        this.utilities.log('new selection', selected);
-      });
-      this.parserFn = (element: any, index) => {
-        element.transport = element.transport ? element.transport.name : '';
-        element.orderType = element.orderType ? element.orderType.name : '';
-        element.customer = element.customer ? element.customer.name : '';
-        return element;
-      };
-      this.utilities.log('displayed data columns', this.displayedDataColumns);
-      this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
+    this.initColumnsDefs(); // columnas a mostrarse
+    this.utilities.log('filters', this.filters);
+    this.parserFn = (element: any, index) => {
+      element.transport = element.transport ? element.transport.name : '';
+      element.orderType = element.orderType ? element.orderType.name : '';
+      element.customer = element.customer ? element.customer.name : '';
+      return element;
+    };
+    this.utilities.log('displayed data columns', this.displayedDataColumns);
+    this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
   }
 
-  ngOnInit() {
+  setSelectedElement() {
+    this.dialogRef.close(this.selection.selected);
+  }
+
+  ngOnInit(): void {
     this.dataSource = new MyDataSource(this.dataProviderService);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageSize = 5;
     this.loadDataPage();
   }
 
@@ -121,10 +116,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
   }
 
   getSortParams(): string {
-    if (this.sort !== undefined) {
-      return `sort-${this.sort.active}=${this.sort.direction}`;
-    }
-    return `sort-orderNumber=asc`;
+    return `sort-${this.sort.active}=${this.sort.direction}`;
   }
 
   loadDataPage() {
@@ -153,27 +145,23 @@ export class OrdersComponent implements OnInit, AfterViewInit {
   }
 
   initColumnsDefs() {
-    let shouldShow: boolean;
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInOrdersPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInOrdersPage'));
+    if (localStorage.getItem('displayedColumnsInOrderSelectorPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInOrderSelectorPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
-        shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
-        return {show: shouldShow, name: columnName};
+        return {show: true, name: columnName};
       });
     }
-
     aux = this.columnDefs.slice();
-    aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
     this.selectsData = [];
     this.columnDefs.slice().forEach((column, index) => {
-      // ignoramos la columna 0 y la ultima (select y opciones)
-      if (index > 0 && index < this.columnDefs.length - 1) {
+      // ignoramos la columna 0
+      if (index > 0) {
         filter = new Object();
         filter.show = column.show;
         this.utilities.log(`this.definitions[${column.name}]`, this.definitions[column.name]);
@@ -265,7 +253,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInOrdersPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInOrderSelectorPage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -291,186 +279,8 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.index + 1}`;
   }
 
-  actionForSelectedRows(action) {
-    this.utilities.log('action selected', action);
-    switch (action) {
-      case 'delete':
-        if (this.selection.selected.length > 0) {
-          this.deletePrompt(this.selection.selected);
-        } else {
-          this.utilities.showSnackBar('You have no selected records', 'OK');
-        }
-        break;
-      default: break;
-    }
-  }
-
-  deleteRow(row: any) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
-    }
-    const index = this.dataSource.data.findIndex(_row => _row === row);
-    this.utilities.log('index to delete', index);
-    this.dataSource.data.splice(index, 1);
-    this.refreshTable();
-    return true;
-  }
-
-  deleteRows(rows: any) {
-    let deletedCounter = 0;
-    const observer = {
-      next: (result) => {
-        if (result) {
-          this.deleteRow(rows);
-          this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
-        }
-      },
-      error: (response) => {
-        this.utilities.error('Error on delete rows', response);
-        if (deletedCounter === 0) {
-          if (response.error && response.error.errors && response.error.errors[0].includes('foreign')) {
-            this.utilities.showSnackBar('This record cant be deleted because it is in use', 'OK');
-          } else {
-            this.utilities.showSnackBar('Error on delete row', 'OK');
-          }
-        }
-        deletedCounter++;
-      }
-    } as Observer<any>;
-    if (Array.isArray(rows)) {
-      rows.forEach(row => {
-        this.dataProviderService.deleteOrder(row.id, 'response', false).subscribe(observer);
-      });
-    } else {
-      this.dataProviderService.deleteOrder(rows.id, 'response', false).subscribe(observer);
-    }
-  }
-
-  deletePrompt(rows?: any) {
-    const observer = {
-      next: (result) => {
-        if (result) {
-          this.deleteRows(rows);
-        }
-      },
-      error: (error) => {
-
-      }
-    } as Observer<boolean>;
-    this.utilities.showCommonDialog(observer, {
-      title: 'Delete Row',
-      message: 'You are about to delete this record(s). Are you sure to continue?'
-    });
-  }
-
   renderColumnData(type: string, data: any) {
     const text = this.utilities.renderColumnData(type, data);
     return typeof text === 'string' ? text.slice(0, 30) : text;
-  }
-
-  editRowOnPage(element: any) {
-    this.utilities.log('row to send to edit page', element);
-    this.router.navigate([`${element.id}`]);
-    /*const dialogRef = this.dialog.open(EditRowComponent, {
-      data: {
-        row: element,
-        map: this.utilities.dataTypesModelMaps.orders,
-        type: IMPORTING_TYPES.ORDERS,
-        remoteSync: true // para mandar los datos a la BD por la API
-      }
-    });*/
-    /*dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-            this.dataSource.data[element.index] = result;
-            this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });*/
-  }
-
-  editRowOnDialog(element: any) {
-    this.utilities.log('row to send to edit dialog', element);
-    const dialogRef = this.dialog.open(EditRowDialogComponent, {
-      data: {
-        row: element,
-        map: this.definitions,
-        type: IMPORTING_TYPES.ORDERS,
-        remoteSync: true // para mandar los datos a la BD por la API
-      }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-            this.dataSource.data[element.index] = result;
-            this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });
-  }
-
-  addRow() {
-    this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.orders);
-    const dialogRef = this.dialog.open(AddRowDialogComponent, {
-      data: {
-        map: this.utilities.dataTypesModelMaps.orders,
-        type: IMPORTING_TYPES.ORDERS,
-        remoteSync: true // para mandar los datos a la BD por la API
-      }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-        this.dataSource.data.push(result);
-        this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });
-  }
-
-  export() {
-    const dataToExport = this.dataSource.data.slice().map((row: any) => {
-      delete row.id;
-      delete row.index;
-      return row;
-    });
-
-    this.utilities.exportToXlsx(dataToExport, 'Orders List');
-  }
-
-  /*
-    Esta funcion se encarga de refrescar la tabla cuando el contenido cambia.
-    TODO: mejorar esta funcion usando this.dataSource y no el filtro
-  */
-  private refreshTable() {
-    this.loadDataPage();
-    /*
-    // If there's no data in filter we do update using pagination, next page or previous page
-    if (this.dataSource.filter === '') {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = 'XXX';
-      this.dataSource.filter = aux;
-      // If there's something in filter, we reset it to 0 and then put back old value
-    } else {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = '';
-      this.dataSource.filter = aux;
-    }
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
   }
 }

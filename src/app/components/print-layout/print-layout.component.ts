@@ -28,6 +28,11 @@ export class PrintLayoutComponent implements OnInit {
   init() {
   }
   ngOnInit(): void {
+    this.activatedRoute.data.subscribe((data: {
+      title: string
+    }) => {
+      this.title = data.title;
+    });
   }
 
 }

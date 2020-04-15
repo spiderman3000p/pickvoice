@@ -33,9 +33,6 @@
                             <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
                             <mat-select [compareWith]="dataMap[key].formControl.compareFn" [formControlName]="key"
                             [class.readonly]="viewMode === 'view'">
-                                <mat-option [value]="-1">
-                                    Select a value
-                                </mat-option>
                                 <mat-option *ngFor="let data of selectsData[key] | async"
                                 [value]="data">
                                     {{ dataMap[key].formControl.displayIndex !== null && dataMap[key].formControl.displayIndex !== null ?
@@ -87,18 +84,21 @@
                             </mat-slide-toggle>
                         </mat-form-field>
                         <!-- campos table -->
-                        <span *ngIf="dataMap[key].type === 'table'">
+                        <span *ngIf="dataMap[key].formControl.control === 'table'">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <h3>{{dataMap[key].name}}</h3>
+                                    <h5>{{dataMap[key].name | titlecase}}</h5>
                                 </div>
                                 <div class="col-sm-6 text-right">
-                                    <button mat-raised-button color="warn" (click)="exportTableData(cardTitle + ' ' + dataMap[key].name)">
+                                    <a mat-raised-button color="warn" href="javascript: void(0);"
+                                    (click)="exportTableData(cardTitle + ' ' + dataMap[key].name)">
                                         <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
-                                    </button>
-                                    <button mat-raised-button color="accent" (click)="addRow(key)" class="ml-2">
+                                    </a>
+                                    <a mat-raised-button color="accent" (click)="dataMap[key].type === importingTypes.ORDERS ?
+                                    addOrder() : addRow(dataMap[key].type)" *ngIf="viewMode === 'edit'"
+                                    class="ml-2" href="javascript: void(0);">
                                         <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                             <table mat-table [dataSource]="dataSource" matSort>
@@ -159,7 +159,7 @@
                                         <!--button mat-icon-button (click)="printRow(element)">
                                             <img src="assets/icons/printer.png">
                                         </button-->
-                                        <a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
+                                        <a mat-icon-button [href]="'/print/' + dataMap[key].type + '/' + element.id" target="_blank">
                                             <img src="assets/icons/printer.png">
                                         </a>
                                         <a mat-icon-button (click)="deletePrompt(element, key)">

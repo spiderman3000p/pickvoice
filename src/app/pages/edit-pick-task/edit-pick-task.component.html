@@ -75,7 +75,7 @@
                         <mat-select [compareWith]="dataMap.taskState.formControl.compareFn" formControlName="taskState"
                         [class.readonly]="viewMode === 'view'">
                             <mat-option *ngFor="let state of pickTaskData.taskStateList" [value]="state">
-                                {{ state }}
+                                {{ states[state] }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -97,10 +97,10 @@
                                         <a mat-raised-button color="warn" (click)="exportTaskLines()">
                                             <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
                                         </a>
-                                        <a mat-raised-button color="accent" (click)="addTaskLine()" class="ml-2"
+                                        <!--a mat-raised-button color="accent" (click)="addTaskLine()" class="ml-2"
                                             *ngIf="viewMode === 'edit'">
                                             <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
-                                        </a>
+                                        </a-->
                                     </div>
                                     <table mat-table [dataSource]="dataSource" matSort 
                                     [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 12">

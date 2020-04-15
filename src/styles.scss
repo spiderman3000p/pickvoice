@@ -483,7 +483,7 @@ td.mat-cell.mat-column-options.mat-table-sticky{
   text-align: center !important;
   padding-left: 0px !important;
   padding-right: 0px !important;
-  max-width: 100px !important;
+  /*max-width: 100px !important;*/
   width: 100px !important;
   min-width: 100px !important;
 }
@@ -578,13 +578,39 @@ a:hover {
 .select-footer .select-footer-content a > span{
   text-decoration: underline;
 }
+.toggle-filters-btn{
+  position: absolute;
+  bottom: 0;
+  right: 0
+}
 @media screen and (max-width:480px){
+  table.mat-table{
+    display: block;
+  }
+  .footer-label{
+    width: -webkit-fill-available;
+  }
+  .section-wrapper .header .actions, .resolution-header .actions {
+    float: left;
+    margin-left: unset;
+    text-align: right;
+    width: min-content;
+  }
+  .toggle-filters-btn{
+    position: absolute;
+    bottom: 0;
+    right: 0
+  }
+  .content .header h1{
+    font-size: 1.5rem;
+    width: -webkit-fill-available;
+  }
   .toolbar-username {
     right: 20%;
   }
   .cdk-overlay-pane{
     max-width: 100vw !important;
-    width: 97vw !important;
+    width: unset;
   }
   .btn-menu, .btn-menu mat-icon{
     width: unset;

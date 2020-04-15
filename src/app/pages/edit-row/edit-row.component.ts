@@ -1,15 +1,16 @@
-import { Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { OnDestroy, Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, OrderLine, Section, OrderType,
-         Transport, PickPlanning, PickTask } from '@pickvoice/pickvoice-api';
+         Transport, PickPlanning, PickTask, Dock } from '@pickvoice/pickvoice-api';
 import { DataProviderService} from '../../services/data-provider.service';
 import { PrintComponent } from '../../components/print/print.component';
+import { OrderSelectorDialogComponent } from '../../components/order-selector-dialog/order-selector-dialog.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { SharedDataService } from '../../services/shared-data.service';
-import { from, Observable, Observer } from 'rxjs';
+import { from, Observable, Observer, Subscription } from 'rxjs';
 import { retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
@@ -27,7 +28,7 @@ import { MatTableDataSource } from '@angular/material/table';
   styleUrls: ['./edit-row.component.scss']
 })
 
-export class EditRowComponent implements OnInit {
+export class EditRowComponent implements OnInit, OnDestroy {
   definitions: any; // para mostrar datos de tablas
   form: FormGroup;
   pageTitle = '';
@@ -40,12 +41,12 @@ export class EditRowComponent implements OnInit {
   isLoadingResults = false;
   printElement = {};
   viewMode: string;
-  columnDefs: any[]; // para el agGrid
-  rowData: any[];
+  columnDefs: any[] = []; // para el agGrid
+  rowData: any[] = [];
   dataSource: MatTableDataSource<any>;
-  displayedDataColumns: string[];
-  displayedHeadersColumns: any[];
-  defaultColumnDefs: any[];
+  displayedDataColumns: string[] = [];
+  displayedHeadersColumns: any[] = [];
+  defaultColumnDefs: any[] = [];
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
   filter: FormControl;
   filtersForm: FormGroup;
@@ -54,6 +55,9 @@ export class EditRowComponent implements OnInit {
   actionForSelected: FormControl;
   selection = new SelectionModel<any>(true, []);
   selectsData: any;
+  defaultValues: any;
+  subscriptions: Subscription[] = [];
+  importingTypes = IMPORTING_TYPES;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
@@ -83,8 +87,20 @@ export class EditRowComponent implements OnInit {
       this.utilities.log('pick planning', this.row);
       this.definitions = ModelMap.PickTaskMap;
     }
+
+    if (this.type === IMPORTING_TYPES.TRANSPORTS) {
+      this.definitions = ModelMap.OrderMap;
+      this.defaultValues = {
+        idTransport: this.row.id
+      };
+      this.subscriptions.push(this.dataProviderService.getTransportsOrders(this.row.id).subscribe(results => {
+        this.utilities.log('transport orders results', results);
+        this.dataSource.data = results;
+      }));
+    }
+    this.utilities.log('definitions', this.definitions);
     // si alguna tabla se va a mostrar
-    if (this.row && this.definitions && this.definitions.length > 0) {
+    if (this.definitions !== undefined) {
       // inicializamos todo lo necesario para la tabla
       this.displayedDataColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
@@ -99,26 +115,22 @@ export class EditRowComponent implements OnInit {
       // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
       if (this.dataMap[key].formControl.control !== 'table') {
         if (this.dataMap[key].required) {
-          formControls[key] = new FormControl(this.row[key] !== undefined &&
-            this.row[key] !== null ? this.utilities.renderColumnData(this.dataMap[key].type,
-              this.row[key])  : '', Validators.required);
+          formControls[key] = new FormControl(this.row[key], Validators.required);
         } else {
-          formControls[key] = new FormControl(this.row[key] !== undefined &&
-          this.row[key] !== null ? this.utilities.renderColumnData(this.dataMap[key].type,
-            this.row[key]) : '');
+          formControls[key] = new FormControl(this.row[key]);
         }
         if (this.dataMap[key].formControl.control === 'select') {
           this.selectsData[key] =
           this.dataProviderService.getDataFromApi(this.dataMap[key].type);
           if (this.row[key] === undefined || this.row[key] === null) {
             this.utilities.error(`this.row[${key}] es null o undefined`, this.row[key]);
-            formControls[key].patchValue('');
+            // formControls[key].patchValue('');
           }
         }
       }
-      if (this.dataMap[key].type === 'table') {
+      /*if (this.dataMap[key].type === 'table') {
         this.dataSource.data = this.row[key];
-      }
+      }*/
     });
     this.utilities.log('formControls', formControls);
     this.form = new FormGroup(formControls);
@@ -138,12 +150,13 @@ export class EditRowComponent implements OnInit {
         return {show: shouldShow, name: columnName};
       });
     }
+    this.utilities.log('------columnDefs', this.columnDefs);
 
     aux = this.columnDefs.slice();
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
-    this.selectsData.orderLines = {};
+    this.selectsData = {};
     this.columnDefs.forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {
@@ -153,7 +166,7 @@ export class EditRowComponent implements OnInit {
         filter.key = column.name;
         formControls[column.name] = new FormControl('');
         if (this.definitions[column.name].formControl.control === 'select') {
-          this.selectsData.orderLines[column.name] =
+          this.selectsData[column.name] =
           this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
           if (this.row[column.name] === undefined || this.row[column.name] === null) {
             formControls[column.name].patchValue(this.row[column.name]);
@@ -264,12 +277,18 @@ export class EditRowComponent implements OnInit {
           this.deleteRowFromTable(rows, key);
           // this.orderLineService.delete(row).subscribe(observer);
         }
+        if (this.type === IMPORTING_TYPES.TRANSPORTS && this.dataMap[key].type === IMPORTING_TYPES.ORDERS) {
+          this.subscriptions.push(this.dataProviderService.deleteOrder(row).subscribe(observer));
+        }
         // TODO: faltan los demas tipos de datos
       });
     } else {
       if (this.dataMap[key].type === IMPORTING_TYPES.ORDER_LINE) {
         this.deleteRowFromTable(rows, key);
         // this.orderLineService.delete(row).subscribe(observer);
+      }
+      if (this.type === IMPORTING_TYPES.TRANSPORTS && this.dataMap[key].type === IMPORTING_TYPES.ORDERS) {
+        this.subscriptions.push(this.dataProviderService.deleteOrder(rows.id).subscribe(observer));
       }
       // TODO: faltan los demas tipos de datos
     }
@@ -328,10 +347,13 @@ export class EditRowComponent implements OnInit {
         row: element,
         map: this.definitions,
         type: this.dataMap[key].type,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: (mode === 'edit' ? 'Edit' : 'View') + ' Row',
+        viewMode: mode,
+        defaultValues: this.defaultValues
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
             this.dataSource.data[element.index] = result;
@@ -341,16 +363,61 @@ export class EditRowComponent implements OnInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    }));
   }
 
-  addRow(key: string) {
-    this.utilities.log('map to send to add dialog', this.definitions);
+  addOrder() {
+    const dialogRef = this.dialog.open(OrderSelectorDialogComponent, {
+      height: '70vh',
+      width: '80vw',
+    });
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (Array.isArray(result)) {
+        let updatedCounter = 0;
+        const observer = {
+          next: (response) => {
+            this.utilities.log('update orders response', response);
+            if (updatedCounter === 0) {
+              this.utilities.showSnackBar('Order Updated', 'OK');
+            }
+            updatedCounter++;
+          },
+          error: (error) => {
+            this.utilities.error('Error on update orders', error);
+            if (updatedCounter === 0) {
+              if (error.error && error.error.errors && error.error.errors[0].includes('foreign')) {
+                this.utilities.showSnackBar('This order cant be update due foreign issue', 'OK');
+              } else {
+                this.utilities.showSnackBar('Error on update order', 'OK');
+              }
+            }
+            updatedCounter++;
+          }
+        } as Observer<any>;
+        const requests = [];
+        result.forEach(order => {
+          order.idTransport = this.row.id;
+          this.subscriptions.push(
+            this.dataProviderService.updateOrder(order, order.id, 'response', false).subscribe(observer)
+          );
+        });
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
+    }));
+  }
+
+  addRow(type: string) {
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.definitions,
-        type: this.dataMap[key].type,
-        remoteSync: true // para mandar los datos a la BD por la API
+        map: this.utilities.dataTypesModelMaps[type],
+        type: type,
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add Row',
+        defaultValues: this.defaultValues
       }
     });
     dialogRef.afterClosed().subscribe(result => {
@@ -530,6 +597,11 @@ export class EditRowComponent implements OnInit {
         this.dataProviderService.updatePickTask(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
       }
+
+      if (this.type === IMPORTING_TYPES.DOCKS) {
+        this.dataProviderService.updateDock(toUpload, this.row.id, 'response').pipe(retry(3))
+        .subscribe(observer);
+      }
     } else {
       this.sharedDataService.returnData = toUpload;
       this.location.back();
@@ -604,7 +676,7 @@ export class EditRowComponent implements OnInit {
               this.pageTitle = this.viewMode === 'edit' ? 'Edit Order Type' : 'View Order Type';
             } else if (this.type === IMPORTING_TYPES.SECTIONS) {
               this.utilities.log('object is a section');
-              this.row = row as OrderType;
+              this.row = row as Section;
               this.cardTitle = 'Section ' + this.row.code;
               this.pageTitle = this.viewMode === 'edit' ? 'Edit Section' : 'View Section';
             } else if (this.type === IMPORTING_TYPES.TRANSPORTS) {
@@ -622,6 +694,11 @@ export class EditRowComponent implements OnInit {
               this.row = row as PickTask;
               this.cardTitle = 'Pick Task #' + this.row.id;
               this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Task' : 'View Pick Task';
+            } else if (this.type === IMPORTING_TYPES.DOCKS) {
+              this.utilities.log('object is a dock');
+              this.row = row as Dock;
+              this.cardTitle = 'Dock #' + this.row.id;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Dock' : 'View Dock';
             } else {
               this.cardTitle = 'Unknown object type';
               console.error('object is unknown');
@@ -632,5 +709,9 @@ export class EditRowComponent implements OnInit {
         });
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

@@ -138,6 +138,7 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
     this.initItemsPaginatorSort();
     this.initLocationsPaginatorSort();
     this.initOrdersPaginatorSort();
+    this.initLoadPicksPaginatorSort();
   }
 
   ngOnDestroy(): void {

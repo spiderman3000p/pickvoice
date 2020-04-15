@@ -32,7 +32,7 @@
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <div class="filters-panel">
-                        <div class="col-sm-9 filters-controls">
+                        <div class="col-sm-12 filters-controls">
                             <form [formGroup]="filtersForm" *ngIf="showFilters" class="row" (ngSubmit)="applyFilters()">
                                 <div *ngFor="let filter of filters">
                                     <span *ngIf="filter.show" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
@@ -79,19 +79,22 @@
                                             <mat-icon>search</mat-icon>
                                             Filter
                                         </button>
-                                    <button mat-raised-button color="primary" class="btn btn-lg ml-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
+                                    <button mat-raised-button color="primary" class="btn btn-lg ml-md-3 ml-lg-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
                                             <mat-icon>not_interested</mat-icon>
                                             Reset Filters
                                         </button>
                                 </div>
                             </form>
-                        </div>
-                        <div class="col-sm-3 filters-list">
-                            <mat-selection-list>
-                                <mat-list-option *ngFor="let filter of filters" [selected]="filter.show" (click)="filter.show = !filter.show">
-                                    {{filter.name}}
-                                </mat-list-option>
-                            </mat-selection-list>
+                            <span class="toggle-filters-btn">
+                                <a href="javascript: void(0);" [matMenuTriggerFor]="toggleFiltersMenu">Toggle Filters</a>
+                            </span>
+                            <mat-menu #toggleFiltersMenu (click)="$event.stopPropagation()" style="position:absolute;right: 0;">
+                                <mat-selection-list (click)="$event.stopPropagation()">
+                                    <mat-list-option *ngFor="let filter of filters" [selected]="filter.show" (click)="filter.show = !filter.show">
+                                        {{filter.name}}
+                                    </mat-list-option>
+                                </mat-selection-list>
+                            </mat-menu>
                         </div>
                     </div>
                 </mat-expansion-panel>

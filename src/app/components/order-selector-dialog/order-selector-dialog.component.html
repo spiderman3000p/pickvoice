@@ -1,0 +1,123 @@
+<h2 mat-dialog-title>Select Order</h2>
+<div mat-dialog-content>
+    <p>Select one or more orders and press OK</p>
+    <span>
+        <div class="example-loading-shade" *ngIf="dataSource.loading$ | async">
+            <mat-spinner class="spinner"></mat-spinner>
+        </div>
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="orderNumber" matSortDirection="asc"
+        [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8">
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+            <!-- Data Columns -->
+            <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}}
+                    <span (keyup)="$event.stopPropagation()" (click)="$event.stopPropagation()"
+                    (keydow)="$event.stopPropagation()">
+                        <mat-icon class="column-filter-icon" [ngClass]="{'active': isFilteredBy(column)}" [matMenuTriggerFor]="filterColumnMenu">
+                            filter_list
+                        </mat-icon>
+                        <mat-menu #filterColumnMenu="matMenu" (keyup)="$event.stopPropagation()" class="column-filter-menu"
+                        (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                            <span (click)="$event.stopPropagation()" class="btn-filter2-wrapper">
+                                <!--button mat-mini-fab aria-label="Clear filter" class="btn-filter-menu"
+                                (click)="clearFilterInColumn(column)">
+                                    <mat-icon>block</mat-icon>
+                                </button-->
+                                <button mat-button aria-label="Clear filter" (click)="clearFilterInColumn(column)"
+                                class="btn-filter2">
+                                    <!--mat-icon style="font-size: 14px">block</mat-icon--> clear filter
+                                </button>
+                            </span>
+                            <span (keyup)="$event.stopPropagation()" class="form-group"
+                            (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()"
+                            *ngIf="definitions[column].formControl.control !== 'select' &&
+                            definitions[column].formControl.control !== 'toggle'">
+                                <select class="form-control" [formControl]="filters[column].controls.type"
+                                [name]="column+'-type'">
+                                    <option *ngFor="let type of filters[column].availableTypes"
+                                    [value]="type.value">
+                                        {{ type.name }}
+                                    </option>
+                                </select>
+                            </span>
+                            <span class="form-group" *ngIf="definitions[column].formControl.control === 'select'"
+                            (keyup)="$event.stopPropagation()" (click)="$event.stopPropagation()"
+                            (keydow)="$event.stopPropagation()">
+                                <select class="form-control" [formControl]="filters[column].controls.value"
+                                [name]="column">
+                                    <option value="">Select a value</option>
+                                    <option *ngFor="let data of selectsData[column]"
+                                    [value]="data.id !== undefined && data.id !== null ? data.id : 
+                                    (definitions[column].formControl.valueIndex !== null ?
+                                    data[definitions[column].formControl.valueIndex] : data)">
+                                        {{ definitions[column].formControl.displayIndex !== null ?
+                                            data[definitions[column].formControl.displayIndex] : data }}
+                                    </option>
+                                </select>
+                            </span>
+                            <span class="form-group" *ngIf="definitions[column].formControl.control === 'input' ||
+                            definitions[column].formControl.control === 'date'" (keyup)="$event.stopPropagation()"
+                            (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                                <input [type]="filters[column].type" class="form-control" [name]="column"
+                                [formControl]="filters[column].controls.value">
+                            </span>
+                            <span class="form-group" *ngIf="definitions[column].formControl.control === 'toggle'"
+                            (keyup)="$event.stopPropagation()" (click)="$event.stopPropagation()"
+                            (keydow)="$event.stopPropagation()">
+                                <mat-slide-toggle color="primary" [formControl]="filters[column].controls.value"></mat-slide-toggle>
+                            </span>
+                        </mat-menu>
+                    </span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{ element[column] }} </td>
+            </ng-container>
+            <!-- Options Sticky Column -->
+            <ng-container matColumnDef="options" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+                    {{'Options' | uppercase}}
+                    <button mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    
+                    <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                        <span (click)="$event.stopPropagation()">
+                            <button mat-menu-item (click)="toggleColumn()">Show all</button>
+                            <button mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                            (click)="toggleColumn(column)">
+                                <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                                {{column.name}}
+                            </button>
+                        </span>
+                    </mat-menu>
+                </th>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+            <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+            [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
+            <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+            [ngClass]="{'alert alert-danger': row.invalid}"></tr>
+        </table>
+        <mat-paginator [length]="dataSource.dataCount" [pageSize]="5" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+    </span>
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-button (click)="setSelectedElement()">OK</button>
+    <button mat-button mat-dialog-close>CANCEL</button>
+</div>

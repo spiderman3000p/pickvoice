@@ -11,7 +11,7 @@ import { SharedDataService } from '../../services/shared-data.service';
 import { from, Observable, Observer } from 'rxjs';
 import { retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { ModelMap, IMPORTING_TYPES, STATES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -60,6 +60,7 @@ export class EditPickTaskComponent implements OnInit {
   filters: any[] = [];
   actionForSelected: FormControl;
   selection = new SelectionModel<PickTaskLine>(true, []);
+  states = STATES;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(

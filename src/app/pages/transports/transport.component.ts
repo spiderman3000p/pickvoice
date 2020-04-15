@@ -4,6 +4,7 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
+import { OrderSelectorDialogComponent } from '../../components/order-selector-dialog/order-selector-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
 import { TransportService, Transport } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
@@ -13,9 +14,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { retry, takeLast } from 'rxjs/operators';
+import { retry, takeLast, mergeMap } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Observer, Subscription, merge } from 'rxjs';
+import { forkJoin, Observable, Observer, Subscription, merge } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -351,7 +352,8 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         map: this.definitions,
         type: IMPORTING_TYPES.TRANSPORTS,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Transport'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
@@ -359,6 +361,50 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
       if (result) {
         this.dataSource.data.push(result);
         this.refreshTable();
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
+    }));
+  }
+
+  addOrder(transport: any) {
+    const dialogRef = this.dialog.open(OrderSelectorDialogComponent, {
+      height: '70vh',
+      width: '80vw',
+    });
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (Array.isArray(result)) {
+        let updatedCounter = 0;
+        const observer = {
+          next: (response) => {
+            this.utilities.log('update orders response', response);
+            if (updatedCounter === 0) {
+              this.utilities.showSnackBar('Order Updated', 'OK');
+            }
+            updatedCounter++;
+          },
+          error: (error) => {
+            this.utilities.error('Error on update orders', error);
+            if (updatedCounter === 0) {
+              if (error.error && error.error.errors && error.error.errors[0].includes('foreign')) {
+                this.utilities.showSnackBar('This order cant be update due foreign issue', 'OK');
+              } else {
+                this.utilities.showSnackBar('Error on update order', 'OK');
+              }
+            }
+            updatedCounter++;
+          }
+        } as Observer<any>;
+        const requests = [];
+        result.forEach(order => {
+          order.idTransport = transport.id;
+          this.subscriptions.push(
+            this.dataProviderService.updateOrder(order, order.id, 'response', false).subscribe(observer)
+          );
+        });
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');

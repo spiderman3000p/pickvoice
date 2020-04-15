@@ -43,7 +43,7 @@ export class RecentOriginsService {
             let origin: RecentOrigin;
             for (const storage in localStorage) {
                 if (1) {
-                    // this.utilities.log('storage', storage);
+                    this.utilities.log('storage', storage);
                     if (storage.includes(`${type}_origin_`)) {
                         if (this[`${type}RecentOrigins`].findIndex(_origin => _origin.id === storage) === -1) {
                             this.utilities.log('origin found', storage);
@@ -61,9 +61,12 @@ export class RecentOriginsService {
     }
 
     addRecentOrigin(type: string, origin: RecentOrigin): Observable<boolean> {
+        /*this.utilities.log(`guardando recent origin en local storage ${type}_origin_${origin.date.getTime()}: `,
+        JSON.stringify(origin));*/
         // TODO: guardar un origen en la bd local
         return new Observable(suscriber => {
             localStorage.setItem(`${type}_origin_${origin.date.getTime()}`, JSON.stringify(origin));
+            // this.utilities.log(`local storage `, localStorage),
             suscriber.next(true);
             suscriber.complete();
         });

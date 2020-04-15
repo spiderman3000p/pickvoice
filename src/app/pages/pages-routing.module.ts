@@ -58,6 +58,10 @@ const routes: Routes = [
     loadChildren: () => import('./picking-task/picking-task.module').then(m => m.PickingTaskModule)
   },
   {
+    path: IMPORTING_TYPES.DOCKS,
+    loadChildren: () => import('./docks/docks.module').then(m => m.DocksModule)
+  },
+  {
     path: 'administration',
     loadChildren: () => import('./administration/administration.module').then(m => m.AdministrationModule),
     pathMatch: 'full'

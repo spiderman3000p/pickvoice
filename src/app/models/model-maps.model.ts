@@ -18,6 +18,7 @@ export const IMPORTING_TYPES = {
     DOCKS: 'docks',
     LOADPICKS_DTO: 'loadPicksDto',
     LOCATION_TYPE: 'locationTypes',
+    DOCK_TYPE: 'dockType',
     TRANSPORT_STATE: 'transportState',
     ITEM_STATE: 'itemState',
     TASK_STATE: 'taskState',
@@ -75,6 +76,16 @@ export const FILTER_TYPES = [
         availableForTypes: ['number', 'date']
     }
 ];
+/**
+ * Estado de la tarea (  PE - Pending, WP - Work In Progress,CP - Complete,CA - Canceled)
+ */
+export const STATES = {
+    PE: 'PENDING',
+    CA: 'CANCELED',
+    AC: 'ACTIVATED',
+    WP: 'IN PROGRESS',
+    CP: 'COMPLETED'
+};
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
     Cada propiedad aqui especificada, corresponde a las columnas de los archivos de importacion
@@ -587,7 +598,7 @@ export class ModelMap {
                 control: 'textarea'
             }
         },
-        transport: {
+        idTransport: {
             name: 'transport',
             required: false,
             type: IMPORTING_TYPES.TRANSPORTS,
@@ -750,6 +761,20 @@ export class ModelMap {
                 type: 'number'
             }
         },
+        orders: {
+            name: 'orders',
+            required: false,
+            type: IMPORTING_TYPES.ORDERS,
+            formControl: {
+                control: 'table',
+                type: 'normal'
+            },
+            addNew: {
+                text: 'Add new order',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.ORDERS
+            }
+        }
     };
     /* order line object map for CRUD */
     public static OrderLineMap = {
@@ -1236,6 +1261,69 @@ export class ModelMap {
             formControl: {
                 control: 'input',
                 type: 'text'
+            }
+        }
+    };
+    /* dock object map for CRUD */
+    public static DockMap = {
+        dockType: {
+            name: 'dock type',
+            required: false,
+            type: IMPORTING_TYPES.DOCK_TYPE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        section: {
+            name: 'section',
+            required: false,
+            type: IMPORTING_TYPES.SECTIONS,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
+            },
+            addNew: {
+                text: 'Add new section',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.SECTIONS
+            }
+        },
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        description: {
+            name: 'description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        status: {
+            name: 'status',
+            required: false,
+            unique: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
             }
         }
     };

@@ -1,4 +1,9 @@
 table.mat-table {
-    width: 100% !important;
-    display: table !important;
+    width: 100%;
+    display: table;
+}
+@media screen and (max-width:480px){
+    table.mat-table{
+      display: block;
+    }
 }

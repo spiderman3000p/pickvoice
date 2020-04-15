@@ -1,10 +1,14 @@
+<h1>{{title}}</h1>
 <div *ngIf="format === 'single'">
     <div *ngIf="!element">
         Nothing to print
     </div>
-    <p *ngFor="let property of properties">
-        <strong>{{property.label}}</strong> {{property.value}}
-    </p>
+    <table class="table table-sm" border="1">
+        <tr *ngFor="let property of properties">
+            <td width="120"><strong>{{property.label}}</strong></td>
+            <td>{{property.value}}</td>
+        </tr>
+    </table>
 </div>
 <div *ngIf="format === 'table'">
     <div *ngIf="!tableHeaders || !rows || !keys">

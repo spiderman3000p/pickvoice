@@ -13,6 +13,7 @@ import { SectionsResolverService } from './pages/sections/sections-resolver.serv
 import { LocationsResolverService } from './pages/locations/locations-resolver.service';
 import { CustomerResolverService } from './pages/customer/customer-resolver.service';
 import { OrdersResolverService } from './pages/orders/orders-resolver.service';
+import { DocksResolverService } from './pages/docks/docks-resolver.service';
 import { ItemTypesResolverService } from './pages/item-types/item-types-resolver.service';
 import { OrderTypeResolverService } from './pages/order-type/order-type-resolver.service';
 import { UomsResolverService } from './pages/uoms/uoms-resolver.service';
@@ -228,6 +229,18 @@ const routes: Routes = [
             type: IMPORTING_TYPES.PICK_TASKLINES,
             format: 'single',
             title: 'Print Pick Task Line'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.DOCKS + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: DocksResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.DOCKS,
+            format: 'single',
+            title: 'Print Dock'
           }
         }
     ]

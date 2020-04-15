@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, OrderLine, Section,
-         OrderType, Transport } from '@pickvoice/pickvoice-api';
+         OrderType, Transport, Dock } from '@pickvoice/pickvoice-api';
 import { SharedDataService } from '../../services/shared-data.service';
 import { DataProviderService} from '../../services/data-provider.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -28,6 +28,7 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
   row: any; // Item | Location | Order | ItemType | UnityOfMeasure
   isLoadingResults = false;
   selectsData: any;
+  defaultValues: any;
   subscriptions: Subscription[] = [];
   constructor(public dialogRef: MatDialogRef<AddRowDialogComponent>, private sharedDataService: SharedDataService,
               private dialog: MatDialog, private dataProviderService: DataProviderService,
@@ -41,6 +42,7 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
     this.utilities.log('title', this.dialogTitle);
     this.remoteSync = data.remoteSync; // map of object
     this.utilities.log('remoteSync', this.remoteSync);
+    this.defaultValues = data.defaultValues;
     const formControls = {};
     this.keys = Object.keys(this.dataMap);
     this.utilities.log('keys', this.keys);
@@ -96,6 +98,15 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
       this.row = ModelFactory.newEmptyTaskLine();
       this.utilities.log('new empty pick task line', this.row);
     }
+    if (this.type === IMPORTING_TYPES.DOCKS) {
+      this.row = ModelFactory.newEmptyDock();
+      this.utilities.log('new empty dock', this.row);
+    }
+    for (let key in this.defaultValues) {
+      if (this.row[key] !== undefined) {
+        this.row[key] = this.defaultValues[key];
+      }
+    }
     // init variables end
     this.utilities.log('row recibida', this.row);
     // build form group
@@ -111,10 +122,14 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
         formControls[key] = new FormControl(this.row[key]);
       }
       if (this.dataMap[key].formControl.control === 'select') {
-        this.selectsData[key] =
-        this.dataProviderService.getDataFromApi(this.dataMap[key].type)
-        .pipe(tap(result => this.utilities.log(`${key} results`, result)));
-        formControls[key].patchValue('');
+        if (this.defaultValues === undefined || (this.defaultValues !== undefined &&
+          this.defaultValues[key] === undefined)) {
+          this.utilities.log(`obteniendo select data para ${key}`);
+          this.selectsData[key] =
+          this.dataProviderService.getDataFromApi(this.dataMap[key].type)
+          .pipe(tap(result => this.utilities.log(`${key} results`, result)));
+          formControls[key].patchValue('');
+        }
       }
     });
     // console.log('form controls', formControls);
@@ -150,7 +165,7 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
       this.utilities.showSnackBar('Please check the required fields', 'OK');
       return;
     }
-    this.utilities.log('onSubmit');
+    this.utilities.log('onSubmit -------------');
     const formData = this.form.value;
     const toUpload = this.row;
     this.utilities.log('form data', formData);
@@ -236,6 +251,11 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
       if (this.type === IMPORTING_TYPES.PICK_TASKLINES) {
         /*this.subscriptions.push(this.dataProviderService.createPickTaskLine(toUpload, 'response').pipe(retry(3))
         .subscribe(observer));*/
+      }
+
+      if (this.type === IMPORTING_TYPES.DOCKS) {
+        this.subscriptions.push(this.dataProviderService.createDock(toUpload, 'response').pipe(retry(3))
+        .subscribe(observer));
       }
     } else {
       this.dialogRef.close(toUpload);

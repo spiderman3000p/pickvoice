@@ -2,10 +2,6 @@
     <!--div class="example-loading-shade" *ngIf="isLoadingResults">
         <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
     </div-->
-    <div id="printSection" style="display:none">
-        <app-print *ngIf="printableData !== null && printableData !== undefined" [format]="'table'"
-        [title]="'Items List'" [headers]="getPrintableColumns()" [element]="printableData" [type]="type"></app-print>
-    </div>
     <button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button>
     <div class="content">
       <div class="section-wrapper">

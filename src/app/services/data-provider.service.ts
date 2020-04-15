@@ -25,7 +25,7 @@ export class DataProviderService {
     private docksService: DockService, private userService: UserService) {
   }
 
-  getDataFromApi(type: any, params?: string, errorHandler?: any, id?: number): Observable<any> {
+  getDataFromApi(type: any, params = '', errorHandler?: any, id?: number): Observable<any> {
     let toReturn: Observable<any>;
     switch (type) {
       case IMPORTING_TYPES.CUSTOMERS: {
@@ -54,7 +54,8 @@ export class DataProviderService {
           toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/itemList/' + params)
           .pipe(retry(3));
         } else {
-          toReturn = this.itemService.retrieveAllItems().pipe(retry(3));
+          // toReturn = this.itemService.retrieveAllItems().pipe(retry(3));
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/itemList/startRow=0;endRow=1000;sort-sku=asc').pipe(retry(3));
         }
         break;
       }
@@ -163,6 +164,11 @@ export class DataProviderService {
       case IMPORTING_TYPES.TASK_TYPES: {
         this.utilities.log(`obteniendo pick task types...`);
         toReturn = this.getAllPickTaskTypes().pipe(retry(3));
+        break;
+      }
+      case IMPORTING_TYPES.DOCK_TYPE: {
+        this.utilities.log(`obteniendo dock types...`);
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Dock.DockTypeEnum)));
         break;
       }
       default: toReturn = new Observable(suscriber => {

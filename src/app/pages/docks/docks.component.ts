@@ -1,59 +1,54 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
-import { DataProviderService} from '../../services/data-provider.service';
+import { DataProviderService } from '../../services/data-provider.service';
+import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
-import { OrderService, Order, OrderType, OrderLine } from '@pickvoice/pickvoice-api';
-import { MyDataSource } from '../../models/my-data-source';
+import { Dock } from '@pickvoice/pickvoice-api/model/dock';
+import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { retry, takeLast } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
 import { merge, Observer, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-orders',
-  templateUrl: './orders.component.html',
-  styleUrls: ['./orders.component.css']
+  selector: 'app-docks',
+  templateUrl: './docks.component.html',
+  styleUrls: ['./docks.component.css']
 })
-export class OrdersComponent implements OnInit, AfterViewInit {
-  definitions: any = ModelMap.OrderMap;
-  dataSource: MyDataSource<Order>;
-  dataToSend: Order[];
+export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
+  definitions: any = ModelMap.DockMap;
+  dataSource: MatTableDataSource<Dock>;
+  dataToSend: Dock[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
   defaultColumnDefs: any[];
-
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
-
+  filter: FormControl;
   filtersForm: FormGroup;
   showFilters: boolean;
   filters: any[] = [];
-  filterParams = '';
-  paginatorParams = '';
-  sortParams = '';
-  filteredDone = false;
-
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.ORDERS;
+  type = IMPORTING_TYPES.DOCKS;
   selectsData: any;
   subscriptions: Subscription[] = [];
-  parserFn: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
     private utilities: UtilitiesService) {
+      this.dataSource = new MatTableDataSource([]);
+      this.filter = new FormControl('');
       this.dataToSend = [];
       this.actionForSelected = new FormControl('');
       this.displayedDataColumns = Object.keys(this.definitions);
@@ -62,94 +57,21 @@ export class OrdersComponent implements OnInit, AfterViewInit {
 
       this.initColumnsDefs(); // columnas a mostrarse
       this.utilities.log('filters', this.filters);
-      this.actionForSelected.valueChanges.subscribe(value => {
+      this.subscriptions.push(this.actionForSelected.valueChanges.subscribe(value => {
         this.actionForSelectedRows(value);
-      });
-      this.selection.changed.subscribe(selected => {
-        this.utilities.log('new selection', selected);
-      });
-      this.parserFn = (element: any, index) => {
-        element.transport = element.transport ? element.transport.name : '';
-        element.orderType = element.orderType ? element.orderType.name : '';
-        element.customer = element.customer ? element.customer.name : '';
-        return element;
-      };
+      }));
+
       this.utilities.log('displayed data columns', this.displayedDataColumns);
       this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
+      this.loadData();
   }
 
   ngOnInit() {
-    this.dataSource = new MyDataSource(this.dataProviderService);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
-    this.loadDataPage();
   }
 
   ngAfterViewInit() {
-    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-    merge(this.sort.sortChange, this.paginator.page)
-    .pipe(tap(() => this.loadDataPage()))
-    .subscribe();
-  }
-
-  getFilterParams(): string {
-    const formValues = this.filtersForm.value;
-    this.utilities.log('filter form values: ', formValues);
-    const filtersToUse = [];
-    for (const filterKey in this.filters) {
-      if (this.filters[filterKey].controls.value.value !== undefined &&
-          this.filters[filterKey].controls.value.value !== null &&
-          this.filters[filterKey].controls.value.value !== '') {
-        filtersToUse.push(this.filters[filterKey]);
-      }
-    }
-    const stringParams = filtersToUse.length > 0 ? filtersToUse.map(filter =>
-      `${filter.key}-filterType=${filter.type};${filter.key}-type=` +
-      `${this.definitions[filter.key].formControl.control === 'select' ? 'number'
-      : formValues[filter.key].type};${filter.key}-filter=${formValues[filter.key].value.toLowerCase()}`)
-      .join(';') : '';
-    this.utilities.log('filters to use: ', filtersToUse);
-    this.utilities.log('filters string params: ', stringParams);
-    return stringParams;
-  }
-
-  getPaginatorParams(): string {
-    const startRow = this.paginator.pageIndex * this.paginator.pageSize;
-    return `startRow=${startRow};endRow=${startRow + this.paginator.pageSize}`;
-  }
-
-  getSortParams(): string {
-    if (this.sort !== undefined) {
-      return `sort-${this.sort.active}=${this.sort.direction}`;
-    }
-    return `sort-orderNumber=asc`;
-  }
-
-  loadDataPage() {
-    this.paginatorParams = this.getPaginatorParams();
-    this.sortParams = this.getSortParams();
-    const paramsArray = Array.of(this.paginatorParams, this.filterParams, this.sortParams)
-    .filter(paramArray => paramArray.length > 0);
-    // this.utilities.log('paramsArray', paramsArray);
-    const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
-    // this.utilities.log('loading data with params', params);
-    this.dataSource.loadData(this.type, `${params}`)
-    .subscribe((response: any) => {
-        /*this.data = dataResults;
-        this.dataCount = 100;
-        this.dataSubject.next(dataResults);*/
-        if (response.content) {
-            this.dataSource.lastRow = response.pageSize;
-            this.dataSource.data = response.content.map(this.parserFn);
-            this.dataSource.dataCount = response.totalElements;
-            this.dataSource.dataSubject.next(this.dataSource.data);
-        }
-    }, error => {
-      this.utilities.error('Error fetching data from server');
-      this.utilities.showSnackBar('Error fetching data from server', 'OK');
-    });
   }
 
   initColumnsDefs() {
@@ -157,8 +79,8 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInOrdersPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInOrdersPage'));
+    if (localStorage.getItem('displayedColumnsInDocksPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInDocksPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -170,77 +92,25 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
-    this.selectsData = [];
-    this.columnDefs.slice().forEach((column, index) => {
+    this.selectsData = {};
+    this.columnDefs.forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
-        this.utilities.log(`this.definitions[${column.name}]`, this.definitions[column.name]);
         filter.name = this.definitions[column.name].name;
-        filter.type = this.definitions[column.name].formControl.type;
         filter.key = column.name;
-        if (this.definitions[column.name].formControl.control !== 'select' &&
-            this.definitions[column.name].formControl.control !== 'toggle') {
-          filter.availableTypes = FILTER_TYPES.filter(_filterType => _filterType.availableForTypes
-            .findIndex(availableType => filter.type === availableType
-            || availableType === 'all') > -1);
-        }
-        formControls[column.name] = new FormGroup({
-          type: new FormControl(FILTER_TYPES[0].value),
-          value: new FormControl('')
-        });
-        filter.controls = formControls[column.name].controls;
-        filter.controls.value.valueChanges.pipe(debounceTime(500), tap((value) => {
-          this.utilities.log(`valor del campo ${column.name} cambiando a: `, value);
-          this.applyFilters();
-        }))
-        .subscribe();
-        filter.controls.type.valueChanges.pipe(debounceTime(500), tap((type) => {
-          this.utilities.log(`tipo de filtro del campo ${column.name} cambiando a: `, type);
-          // TODO: acomodar esto de modo que al cambiar tipo y haber un valor, hacer la busqueda
-          if (false) {
-            this.applyFilters();
-          }
-        }))
-        .subscribe();
-        // formControls[column.name].get('type').patchValue(FILTER_TYPES[0].value);
+        formControls[column.name] = new FormControl('');
         if (this.definitions[column.name].formControl.control === 'select') {
-          this.dataProviderService.getDataFromApi(this.definitions[column.name].type).subscribe(results => {
-            this.selectsData[column.name] = results;
-            this.utilities.log('selectsData', this.selectsData);
-          });
-          // formControls[column.name].get('value').patchValue(-1);
-         // this.utilities.log('selectsData: ', this.selectsData);
+          this.selectsData[column.name] =
+          this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
+          formControls[column.name].patchValue(-1);
         }
-        this.filters[column.name] = filter;
+        this.filters.push(filter);
       }
     });
     this.filtersForm = new FormGroup(formControls);
     this.utilities.log('formControls', formControls);
-    this.utilities.log('form values', this.filtersForm.value);
-  }
-
-  reloadData() {
-    this.selection.clear();
-    this.loadDataPage();
-  }
-
-  applyFilters(): void {
-    this.filterParams = this.getFilterParams();
-    this.filteredDone = this.filterParams.length > 0;
-    this.paginator.pageIndex = 0;
-    this.loadDataPage();
-  }
-
-  isFilteredBy(column: string): boolean {
-    return this.filterParams.includes(column);
-  }
-
-  clearFilterInColumn(column: string) {
-    this.filters[column].controls.value.reset();
-    this.filters[column].controls.type.patchValue(FILTER_TYPES[0].value);
-    this.filteredDone = this.filterParams.length > 0;
   }
 
   getDisplayedHeadersColumns() {
@@ -265,7 +135,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInOrdersPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInDocksPage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -342,11 +212,14 @@ export class OrdersComponent implements OnInit, AfterViewInit {
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
+      const requests = [];
       rows.forEach(row => {
-        this.dataProviderService.deleteOrder(row.id, 'response', false).subscribe(observer);
+        requests.push(this.dataProviderService.deleteDock(row.id, 'response', false));
       });
+      this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.dataProviderService.deleteOrder(rows.id, 'response', false).subscribe(observer);
+      this.subscriptions.push(this.dataProviderService.deleteDock(rows.id, 'response', false)
+      .subscribe(observer));
     }
   }
 
@@ -367,33 +240,49 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     });
   }
 
+  handleError(error: any) {
+    this.utilities.error('error sending data to api', error);
+    this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
+  }
+
   renderColumnData(type: string, data: any) {
     const text = this.utilities.renderColumnData(type, data);
     return typeof text === 'string' ? text.slice(0, 30) : text;
   }
 
+  resetFilters() {
+    this.filtersForm.reset();
+    this.dataSource.filter = '';
+  }
+
+  applyFilters() {
+    const formValues = this.filtersForm.value;
+    let value;
+    let value2;
+    // this.utilities.log('filter form values: ', formValues);
+    const filters = this.filters.filter(filter => filter.show &&
+                    formValues[filter.key] && formValues[filter.key].length > 0);
+    // this.utilities.log('filters: ', filters);
+    this.dataSource.filterPredicate = (data: Dock, filter: string) => {
+      // this.utilities.log('data', data);
+      return filters.every(shownFilter => {
+        value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
+        value2 = formValues[shownFilter.key].toString();
+        /*
+        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
+        this.utilities.log('shownFilter.key', shownFilter.key);
+        this.utilities.log('value', value);
+        this.utilities.log('value2', value2);
+        this.utilities.log('--------------------------------------------');*/
+        return value !== undefined && value !== null && value.toString().toLowerCase().includes(value2.toLowerCase());
+      });
+    };
+    this.dataSource.filter = 'filtred';
+  }
+
   editRowOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
-    /*const dialogRef = this.dialog.open(EditRowComponent, {
-      data: {
-        row: element,
-        map: this.utilities.dataTypesModelMaps.orders,
-        type: IMPORTING_TYPES.ORDERS,
-        remoteSync: true // para mandar los datos a la BD por la API
-      }
-    });*/
-    /*dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-            this.dataSource.data[element.index] = result;
-            this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });*/
   }
 
   editRowOnDialog(element: any) {
@@ -402,11 +291,11 @@ export class OrdersComponent implements OnInit, AfterViewInit {
       data: {
         row: element,
         map: this.definitions,
-        type: IMPORTING_TYPES.ORDERS,
+        type: IMPORTING_TYPES.DOCKS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
             this.dataSource.data[element.index] = result;
@@ -416,20 +305,44 @@ export class OrdersComponent implements OnInit, AfterViewInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    }));
+  }
+
+  loadData(useCache = true) {
+    this.utilities.log('requesting docks');
+    this.isLoadingResults = true;
+    this.subscriptions.push(this.dataProviderService.getAllDocks().subscribe(results => {
+      this.isLoadingResults = false;
+      this.utilities.log('docks received', results);
+      if (results && results.length > 0) {
+        this.dataSource.data = results.map((element, i) => {
+          return { index: i, ... element};
+        });
+        this.refreshTable();
+      }
+    }, error => {
+      this.isLoadingResults = false;
+      this.utilities.error('error on requesting data');
+      this.utilities.showSnackBar('Error requesting data', 'OK');
+    }));
+  }
+
+  reloadData() {
+    this.selection.clear();
+    this.loadData(false);
   }
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.orders);
+    this.utilities.dataTypesModelMaps.docks);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.utilities.dataTypesModelMaps.orders,
-        type: IMPORTING_TYPES.ORDERS,
+        map: this.definitions,
+        type: IMPORTING_TYPES.DOCKS,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
         this.dataSource.data.push(result);
@@ -439,17 +352,14 @@ export class OrdersComponent implements OnInit, AfterViewInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    }));
   }
 
   export() {
-    const dataToExport = this.dataSource.data.slice().map((row: any) => {
-      delete row.id;
-      delete row.index;
-      return row;
+    const dataToExport = this.dataSource.data.map((row: any) => {
+      return this.utilities.getJsonFromObject(row, this.type);
     });
-
-    this.utilities.exportToXlsx(dataToExport, 'Orders List');
+    this.utilities.exportToXlsx(dataToExport, 'Docks List');
   }
 
   /*
@@ -457,8 +367,6 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     TODO: mejorar esta funcion usando this.dataSource y no el filtro
   */
   private refreshTable() {
-    this.loadDataPage();
-    /*
     // If there's no data in filter we do update using pagination, next page or previous page
     if (this.dataSource.filter === '') {
       const aux = this.dataSource.filter;
@@ -471,6 +379,14 @@ export class OrdersComponent implements OnInit, AfterViewInit {
       this.dataSource.filter = aux;
     }
     this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
+    this.dataSource.sort = this.sort;
+  }
+
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe);
   }
 }

@@ -43,10 +43,6 @@
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Description</mat-label>
-                        <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                         <mat-label>Process Date</mat-label>
                         <input matInput formControlName="processDate" [matDatepicker]="processDate"
                         [class.readonly]="viewMode === 'view'" readonly>
@@ -58,7 +54,7 @@
                         <mat-select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
                         [class.readonly]="viewMode === 'view'">
                             <mat-option *ngFor="let state of pickPlanningData.pickPlanningStates" [value]="state">
-                                {{ state }}
+                                {{ states[state] }}
                             </mat-option>
                             <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
                                 <span class="select-footer-content">
@@ -74,6 +70,11 @@
                     <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                         <mat-label>Root Work</mat-label>
                         <input class="w-100" matInput type="text" formControlName="rootWork" [class.readonly]="viewMode === 'view'">
+                    </mat-form-field>
+                    <mat-form-field class="col-sm-12 col-md-12 col-lg-12" [class.readonly]="viewMode === 'view'">
+                        <mat-label>Description</mat-label>
+                        <textarea class="w-100" matInput formControlName="description" [class.readonly]="viewMode === 'view'">
+                        </textarea>
                     </mat-form-field>
                     <hr>
                     <mat-tab-group class="tab-orders">
@@ -200,10 +201,10 @@
                                 <ng-template contextMenuItem (execute)="executeContext('assignToUser', $event.item)">
                                     Assign to user
                                 </ng-template>
-                                <ng-template contextMenuItem [subMenu]="viewSubmenu">
+                                <ng-template contextMenuItem (execute)="executeContext('viewBySku', $event.item)" *ngIf="selection.selected.length === 0">
                                     View
                                 </ng-template>
-                                <context-menu #viewSubmenu>
+                                <!--context-menu #viewSubmenu>
                                     <ng-template contextMenuItem
                                     (execute)="executeContext('viewBySku', $event.item)">
                                         By Sku
@@ -213,7 +214,7 @@
                                     (execute)="executeContext('viewByCode', $event.item)">
                                         By Code
                                     </ng-template>
-                                </context-menu>
+                                </context-menu-->
                             </context-menu>
                         </mat-tab>
                         <mat-tab label="Transports">
@@ -232,13 +233,13 @@
                                     [class.mat-table-hoverflow]="getDisplayedHeadersColumnsTransports().length > 12">
                                         <!-- Checkbox Column -->
                                         <ng-container matColumnDef="select">
-                                            <th mat-header-cell *matHeaderCellDef>
+                                            <!--th mat-header-cell *matHeaderCellDef>
                                                 <mat-checkbox (change)="$event ? masterToggleTransport() : null"
                                                     [checked]="selectionTransports.hasValue() && isAllSelectedTransports()"
                                                     [indeterminate]="selectionTransports.hasValue() && !isAllSelectedTransports()"
                                                     [aria-label]="checkboxLabelTransports()">
                                                 </mat-checkbox>
-                                            </th>
+                                            </th-->
                                             <td mat-cell *matCellDef="let row">
                                                 <mat-checkbox (click)="$event.stopPropagation()"
                                                     (change)="$event ? selectionTransports.toggle(row) : null"
@@ -313,7 +314,7 @@
                                             </th>
                                             <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
                                                 <a mat-icon-button (click)="expandedElement = expandedElement === element ? null : element">
-                                                    <img src="assets/icons/zoom.png">
+                                                    <mat-icon>add</mat-icon>
                                                 </a>
                                                 <!--a mat-icon-button (click)="['/pages/' + importingTypes.PICK_PLANNINGS + '/' + importingTypes.PICK_TASKS +'/edit', element.id]" *ngIf="viewMode === 'edit'">
                                                     <img src="assets/icons/page_edit.png">

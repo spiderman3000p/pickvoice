@@ -1,0 +1,151 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <div class="content">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>{{ pageTitle }}</h1>
+              </div>
+              <div class="actions actionbar-section right">
+                <button mat-raised-button color="accent" (click)="print()">
+                    <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
+                </button>
+                <button mat-raised-button color="warn" (click)="export()">
+                    <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                </button>
+              </div>
+          </div>
+      </div>
+      <mat-card>
+          <mat-card-content *ngIf="form">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Sku</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="sku" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Upc</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="upc" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Phonetic</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="phonetic" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Weight</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="weight" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Variable Weight</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="variableWeight" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Weight Tolerance</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="weightTolerance" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Expiry Date</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="expiryDate" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Serial</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="serial" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Batch Number</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="batchNumber" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Scanned Verification</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="scannedVerification" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Spoken Verification</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="spokenVerification" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Description</mat-label>
+                    <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Expiry Date</mat-label>
+                    <input matInput formControlName="expiryDate" [matDatepicker]="expiryDate"
+                    [class.readonly]="viewMode === 'view'" readonly>
+                    <mat-datepicker-toggle matSuffix [for]="expiryDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
+                    <mat-datepicker #expiryDate ></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>State</mat-label>
+                    <mat-select [compareWith]="dataMap.itemState.formControl.compareFn" formControlName="itemState"
+                    [class.readonly]="viewMode === 'view'">
+                        <mat-option *ngFor="let state of itemData.statesList" [value]="state">
+                            {{ state }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                    <mat-label>Type</mat-label>
+                    <mat-select [compareWith]="dataMap.itemType.formControl.compareFn" formControlName="itemType"
+                    [class.readonly]="viewMode === 'view'">
+                        <mat-option *ngFor="let type of itemData.itemTypeList" [value]="type">
+                            {{ type.description }}
+                        </mat-option>
+                        <div class="select-footer" *ngIf="dataMap.itemType.addNew && viewMode === 'edit'">
+                            <span class="select-footer-content">
+                                <a href="javascript: void(0)"
+                                (click)="addNewObject(importingTypes.ITEM_TYPE, 'Add new item type')">
+                                    <mat-icon *ngIf="dataMap.itemType.addNew.icon">{{ dataMap.itemType.addNew.icon }}</mat-icon>
+                                    <span>{{ dataMap.itemType.addNew.text }}</span>
+                                </a>
+                            </span>
+                        </div>
+                    </mat-select>
+                </mat-form-field>
+                <mat-tab-group class="tab-orders">
+                    <mat-tab label="Unity Of Measure">
+                        <ng-template matTabContent>
+                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Unity Of Measure</mat-label>
+                                    <mat-select [compareWith]="dataMap.uom.formControl.compareFn" formControlName="uom"
+                                    [class.readonly]="viewMode === 'view'">
+                                        <mat-option *ngFor="let uom of itemData.uomsList" [value]="uom">
+                                            {{ uom.name }}
+                                        </mat-option>
+                                        <div class="select-footer" *ngIf="dataMap.uom.addNew && viewMode === 'edit'">
+                                            <span class="select-footer-content">
+                                                <a href="javascript: void(0)"
+                                                (click)="addNewObject(importingTypes.UOMS, 'Add new Unity of measure')">
+                                                    <mat-icon *ngIf="dataMap.uom.addNew.icon">{{ dataMap.uom.addNew.icon }}</mat-icon>
+                                                    <span>{{ dataMap.uom.addNew.text }}</span>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </mat-select>
+                                </mat-form-field>
+                            <br><br>
+                            <h6>UOM Details</h6>
+                            <hr>
+                            <span *ngIf="form.get('uom').value">
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                    <mat-label>Code</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('uom').value.code" [class.readonly]="true">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                    <mat-label>Name</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('uom').value.name" [class.readonly]="true">
+                                </mat-form-field>
+                            </span>
+                        </ng-template>
+                    </mat-tab>
+                </mat-tab-group>
+                <div class="col-sm-12 text-right">
+                    <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </div>
+            </form>
+          </mat-card-content>
+      </mat-card>
+    </div>
+</div>

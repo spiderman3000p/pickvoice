@@ -29,6 +29,7 @@ import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDate
          MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { PagesModule } from './pages/pages.module';
@@ -37,6 +38,8 @@ import { ApiModule } from '@pickvoice/pickvoice-api';
 import { BASE_PATH } from '@pickvoice/pickvoice-api';
 
 import { EditOrderComponent } from './pages/edit-order/edit-order.component';
+import { EditItemComponent } from './pages/edit-item/edit-item.component';
+import { EditTaskLineComponent } from './pages/edit-task-line/edit-task-line.component';
 import { EditPickTaskComponent } from './pages/edit-pick-task/edit-pick-task.component';
 import { EditPickPlanningComponent } from './pages/edit-pick-planning/edit-pick-planning.component';
 import { EditRowComponent } from './pages/edit-row/edit-row.component';
@@ -52,6 +55,7 @@ import { DataPreviewComponent } from './components/importing-widget/pages/data-p
 import { CommonDialogComponent } from './components/common-dialog/common-dialog.component';
 import { ContextMenuModule } from 'ngx-contextmenu';
 import { UserSelectorDialogComponent } from './components/user-selector-dialog/user-selector-dialog.component';
+import { OrderSelectorDialogComponent } from './components/order-selector-dialog/order-selector-dialog.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -86,11 +90,14 @@ export const MY_FORMATS = {
     EditPickPlanningComponent,
     EditOrderComponent,
     EditPickTaskComponent,
+    EditItemComponent,
+    EditTaskLineComponent,
     AddRowDialogComponent,
     EditRowDialogComponent,
     PrintComponent,
     PrintLayoutComponent,
-    UserSelectorDialogComponent
+    UserSelectorDialogComponent,
+    OrderSelectorDialogComponent
   ],
   imports: [
     ApiModule,
@@ -121,6 +128,7 @@ export const MY_FORMATS = {
     MatTableModule,
     MatSelectModule,
     MatPaginatorModule,
+    MatSortModule,
     MatCheckboxModule,
     MatProgressBarModule,
 

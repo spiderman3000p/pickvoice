@@ -13,7 +13,7 @@ import { SharedDataService } from '../../services/shared-data.service';
 import { from, Observable, Observer } from 'rxjs';
 import { map, retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { ModelMap, IMPORTING_TYPES, STATES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -82,6 +82,7 @@ export class EditPickPlanningComponent implements OnInit {
   selection = new SelectionModel<PickTask>(true, []);
   selectionTransports = new SelectionModel<Transport>(true, []);
   expandedElement: any | null;
+  states = STATES;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) paginatorTransports: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -108,6 +109,17 @@ export class EditPickPlanningComponent implements OnInit {
   }
 
   executeContext(action: string, element: any) {
+    if (this.selection.selected.length === 0) {
+      this.executeContextSingle(action, element);
+    } else {
+      this.selection.selected.forEach(selectedElement => {
+        this.executeContextSingle(action, selectedElement);
+      });
+    }
+    this.refreshTable();
+  }
+
+  executeContextSingle(action: string, element: any) {
     switch (action) {
       case 'activateTask': {
         /*
@@ -208,7 +220,8 @@ export class EditPickPlanningComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe(selectedUser => {
           this.utilities.log('user selector dialog result:', selectedUser);
-          if (selectedUser && selectedUser.id !== element.user.id) {
+          if (selectedUser && (element.user !== undefined && (element.user === null ||
+             selectedUser.id !== element.user.id))) {
             this.dataProviderService.assignUserToPickTask(element, selectedUser).subscribe(response => {
               if (response) {
                 element.user = selectedUser;
@@ -297,7 +310,6 @@ export class EditPickPlanningComponent implements OnInit {
         break;
       }
     }
-    this.refreshTable();
   }
 
   generateTaskPdf(object?: any) {
@@ -362,14 +374,17 @@ export class EditPickPlanningComponent implements OnInit {
             },
             [
               {
+                margin: [20, 20, 0, 0],
                 text: `TASK # ${object.id} (${object.taskState})`,
                 style: 'h1'
               },
               {
-                text: `Type: ${object.taskType.name} - Priority: ${object.priority}`,
-                style: 'h2'
+                margin: [20, 0, 0, 0],
+                text: `Type: ${object.taskType.name} - Priority: ${STATES[object.priority]}`,
+                style: 'h3'
               },
               {
+                margin: [20, 0, 0, 0],
                 text: `Description: ${object.description}`,
                 style: 'small'
               }
@@ -389,121 +404,73 @@ export class EditPickPlanningComponent implements OnInit {
                 alignment: 'right',
                 text: `Assignment Date: ${object.dateAssignment}`,
                 style: 'small'
+              },
+              {
+                alignment: 'right',
+                image: this.generateBarCode(object.id)
               }
             ]
           ]
         },
-        {canvas: [ { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1 } ], margin: [0, 0, 0, 25]},
         {
           style: 'normal',
           alignment: 'left',
           margin: [0, 0, 0, 20],
-          columns: [
-            [
-              {
-                text: [
-                  { text: `Document: `, bold: true},
-                  `${object.document}`
-                ]
-              },
-              {
-                text: [
-                  { text: `User: `, bold: true},
-                  ` ${object.user ? object.user.firstName : ''} ${object.user ? object.user.lastName : ''} ${object.user ? '(' + object.user.userName + ')' : ''}`
-                ]
-              },
-              {
-                columns: [
-                  {
-                    margin: [0, 20, 0, 20],
-                    width: 'auto',
-                    text: 'Task',
-                    bold: true
-                  },
-                  {
-                    image: this.generateBarCode(object.id)
-                  }
-                ]
-              }
-            ],
-            [
-              {
-                text: [
-                  {
-                    text: 'Quantity: ', bold: true
-                  },
+          table: {
+            borderColor: 'darkgrey',
+            widths: ['auto', '*'],
+            headerRows: 0,
+            body: [
+              [
+                { text: `Document`, style: 'tableHeader' },
+                `${object.document}`
+              ],
+              [
+                { text: `User`, style: 'tableHeader' },
+                ` ${object.user ? object.user.firstName : ''} ${object.user ? object.user.lastName : ''} ${object.user ? '(' + object.user.userName + ')' : ''}`
+              ],
+              [
+                { text: 'Quantity', style: 'tableHeader' },
                   ` ${object.qty}`
-                ]
-              },
-              {
-                text: [
-                  {
-                    text: 'Lines: ', bold: true
-                  },
-                  `${object.lines}`
-                ]
-              },
-              {
-                text: [
-                  {
-                    text: `Current Line: `, bold: true
-                  },
-                  `${object.currentLine}`
-                ]
-              },
-              {
-                text: [
-                  {
-                    text: `Children Work: `, bold: true
-                  },
-                  `${object.childrenWork}`
-                ]
-              },
-              {
-                text: [
-                  {
-                    text: `Rule executed: `, bold: true
-                  },
-                  `${object.ruleExecuted}`
-                ]
-              },
-              {
-                text: [
-                  {
-                    text: `Validate Location: `, bold: true
-                  },
-                  `${object.validateLocation ? 'Yes' : 'No' }`
-                ]
-              },
-              {
-                text: [
-                  {
-                    text: `Pallet Complete: `, bold: true
-                  },
-                  `${object.palletComplete ? 'Yes' : 'No' }`
-                ]
-              },
-              {
-                text: [
-                  {
-                    text: `Validate Lpn: `, bold: true
-                  },
-                  `${object.validateLpn ? 'Yes' : 'No' }`
-                ]
-              },
-              {
-                text: [
-                  {
-                    text: `Validate Sku: `, bold: true
-                  },
-                  `${object.validateSku ? 'Yes' : 'No' }`
-                ]
-              }
+              ],
+              [
+                { text: 'Lines', style: 'tableHeader' },
+                `${object.lines}`
+              ],
+              [
+                { text: `Current Line`, style: 'tableHeader' },
+                `${object.currentLine}`
+              ],
+              [
+                { text: `Children Work`, style: 'tableHeader' },
+                `${object.childrenWork}`
+              ],
+              [
+                { text: `Rule executed`, style: 'tableHeader' },
+                `${object.ruleExecuted}`
+              ],
+              [
+                { text: `Validate Location`, style: 'tableHeader' },
+                `${object.validateLocation ? 'Yes' : 'No' }`
+              ],
+              [
+                { text: `Pallet Complete`, style: 'tableHeader' },
+                `${object.palletComplete ? 'Yes' : 'No' }`
+              ],
+              [
+                { text: `Validate Lpn`, style: 'tableHeader' },
+                `${object.validateLpn ? 'Yes' : 'No' }`
+              ],
+              [
+                { text: `Validate Sku`, style: 'tableHeader' },
+                `${object.validateSku ? 'Yes' : 'No' }`
+              ]
             ]
-          ]
+          }
         },
         {
           table: {
+            borderColor: 'darkgrey',
             widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             headerRows: 1,
             body: [
@@ -545,7 +512,7 @@ export class EditPickPlanningComponent implements OnInit {
         tableHeader: {
           color: 'white',
           bold: true,
-          fillColor: 'darkblue',
+          fillColor: 'darkgrey',
           fontSize: 8
         },
         tableRow: {
@@ -563,7 +530,7 @@ export class EditPickPlanningComponent implements OnInit {
     };
     tableContent.forEach(row => {
       row.style = 'tableRow';
-      content.content[3].table.body.push(row);
+      content.content[2].table.body.push(row);
     });
     image.src = '/assets/images/logo.png';
     return response;
@@ -598,7 +565,8 @@ export class EditPickPlanningComponent implements OnInit {
       this.utilities.log('dataSourceTransports.data', this.dataSourceTransports.data);
       this.displayedDataColumnsTransports = Object.keys(this.definitionsTransports);
       this.utilities.log('displayedDataColumnsTransports', this.displayedDataColumnsTransports);
-      this.displayedHeadersColumnsTransports = ['select'].concat(Object.keys(this.definitionsTransports));
+      // this.displayedHeadersColumnsTransports = ['select'].concat(Object.keys(this.definitionsTransports));
+      this.displayedHeadersColumnsTransports = Object.keys(this.definitionsTransports);
       this.displayedHeadersColumnsTransports.push('options');
       this.utilities.log('displayedHeadersColumnsTransports', this.displayedHeadersColumnsTransports);
       this.initColumnsDefsTransports(); // columnas a mostrarse en la tabla de transports

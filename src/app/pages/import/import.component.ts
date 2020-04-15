@@ -330,7 +330,6 @@ export class ImportComponent implements OnInit {
   }
 
   getDownloadingResponse() {
-
   }
 
   getEventMessage(event: any): string {
@@ -394,7 +393,7 @@ export class ImportComponent implements OnInit {
         newOrigin.totalRows = dataToSend.length; // numero de registros
         newOrigin.importedRows = this.importedRows; // numero de registros aceptados en la bd api
         newOrigin.rejectedRows = this.rejectedRows; // numero de registros no aceptados en la bd api
-        this.addRecentOrigin(newOrigin, this.selectedType);
+        this.addRecentOrigin(newOrigin, this.sharedDataService.getDataType());
       }
       if ((result.body.code === 200 || result.body.code === 201) &&
            result.body.rowErrors === null && result.body.status === 'OK') {
@@ -565,11 +564,10 @@ export class ImportComponent implements OnInit {
   }
 
   addRecentOrigin(newOrigin: RecentOrigin, type: string) {
-    this.recentOriginsService.addRecentOrigin(type, newOrigin);
+    this.recentOriginsService.addRecentOrigin(type, newOrigin).subscribe();
   }
 
   ngOnInit() {
     this.initPaginatorSort();
   }
-
 }

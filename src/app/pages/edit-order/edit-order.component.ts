@@ -48,11 +48,11 @@ export class EditOrderComponent implements OnInit {
   viewMode: string;
   ordersData: OrdersData;
 
-  columnDefs: any[];
+  columnDefs: any[] = [];
   dataSource: MatTableDataSource<OrderLine>;
-  displayedDataColumns: string[];
-  displayedHeadersColumns: any[];
-  defaultColumnDefs: any[];
+  displayedDataColumns: string[] = [];
+  displayedHeadersColumns: any[] = [];
+  defaultColumnDefs: any[] = [];
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
   filter: FormControl;
   filtersForm: FormGroup;
@@ -70,6 +70,10 @@ export class EditOrderComponent implements OnInit {
   ) {
     this.dataSource = new MatTableDataSource([]);
     this.ordersData = new Object() as OrdersData;
+    this.ordersData.customerList = [];
+    this.ordersData.orderLineList = [];
+    this.ordersData.orderTypeList = [];
+    this.ordersData.transportList = [];
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
     this.isLoadingResults = true;
   }
@@ -81,7 +85,7 @@ export class EditOrderComponent implements OnInit {
     this.getOrderTypeList();
     this.getOrderLineList();
     // inicializamos todo lo necesario para la tabla
-    if (this.row && this.ordersData.orderLineList && this.ordersData.orderLineList.length > 0) {
+    if (this.row) {
       this.dataSource.data = this.ordersData.orderLineList;
       // inicializar tabla mat-table
       this.displayedDataColumns = Object.keys(this.definitions);
@@ -121,11 +125,12 @@ export class EditOrderComponent implements OnInit {
         return {show: shouldShow, name: columnName};
       });
     }
-
     aux = this.columnDefs.slice();
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
+    this.utilities.log('columnDefs ', this.columnDefs);
+    this.utilities.log('defaultColumnDefs ', this.defaultColumnDefs);
 
     this.columnDefs.forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
