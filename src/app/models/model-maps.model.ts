@@ -3,6 +3,7 @@ export const IMPORTING_TYPES = {
     ITEMS: 'items',
     LOCATIONS: 'locations',
     ORDERS: 'orders',
+    ORDERS_TO_ASSIGN: 'ordersToAssign',
     ORDER_LINE: 'orderLine',
     ORDERS_DTO: 'ordersDto',
     ITEM_TYPE: 'itemTypes',

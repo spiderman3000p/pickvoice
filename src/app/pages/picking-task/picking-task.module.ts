@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { PickingTaskRoutingModule } from './picking-task-routing.module';
 import { PickingTaskComponent } from './picking-task.component';
-
+import { UserSelectorDialogComponent } from '../../components/user-selector-dialog/user-selector-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -27,6 +27,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 
+import { ContextMenuModule } from 'ngx-contextmenu';
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
 
@@ -51,7 +52,7 @@ export const MY_FORMATS = {
   },
 };
 @NgModule({
-  declarations: [PickingTaskComponent],
+  declarations: [PickingTaskComponent, UserSelectorDialogComponent],
   imports: [
     CommonModule,
     PickingTaskRoutingModule,
@@ -77,7 +78,8 @@ export const MY_FORMATS = {
     MatExpansionModule,
     MatListModule,
     MatTabsModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    ContextMenuModule
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]},

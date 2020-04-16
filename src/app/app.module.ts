@@ -38,10 +38,8 @@ import { ApiModule } from '@pickvoice/pickvoice-api';
 import { BASE_PATH } from '@pickvoice/pickvoice-api';
 
 import { EditOrderComponent } from './pages/edit-order/edit-order.component';
-import { EditItemComponent } from './pages/edit-item/edit-item.component';
 import { EditTaskLineComponent } from './pages/edit-task-line/edit-task-line.component';
 import { EditPickTaskComponent } from './pages/edit-pick-task/edit-pick-task.component';
-import { EditPickPlanningComponent } from './pages/edit-pick-planning/edit-pick-planning.component';
 import { EditRowComponent } from './pages/edit-row/edit-row.component';
 import { AddRowDialogComponent } from './components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from './components/edit-row-dialog/edit-row-dialog.component';
@@ -54,7 +52,6 @@ import { ImportTypeSelectionComponent } from './components/importing-widget/page
 import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
 import { CommonDialogComponent } from './components/common-dialog/common-dialog.component';
 import { ContextMenuModule } from 'ngx-contextmenu';
-import { UserSelectorDialogComponent } from './components/user-selector-dialog/user-selector-dialog.component';
 import { OrderSelectorDialogComponent } from './components/order-selector-dialog/order-selector-dialog.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -87,16 +84,13 @@ export const MY_FORMATS = {
     FileImportComponent,
     CommonDialogComponent,
     EditRowComponent,
-    EditPickPlanningComponent,
     EditOrderComponent,
     EditPickTaskComponent,
-    EditItemComponent,
     EditTaskLineComponent,
     AddRowDialogComponent,
     EditRowDialogComponent,
     PrintComponent,
     PrintLayoutComponent,
-    UserSelectorDialogComponent,
     OrderSelectorDialogComponent
   ],
   imports: [

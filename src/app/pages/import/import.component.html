@@ -43,18 +43,19 @@
                 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                 <br>
             </span>
-            <div class="text-center" >
+            <div class="text-right" >
+                <button mat-raised-button color="primary" (click)="cancelImportingProcess()">
+                    CANCEL
+                </button>
                 <button mat-raised-button color="primary"
                 *ngIf="
                 (uploadingDone && rejectedRows > 0) || (errorOnSave && uploadingDone)
                 || (uploadingDone && importedRows > 0) ||
                 (!isReadyToSend && (getInvalidRows().length > 0) &&
                 !uploadingDone && uploadingProgress === 0)"
+                class="ml-3"
                 (click)="showProcessingPopup = false">
                     OK
-                </button>
-                <button mat-raised-button color="primary" (click)="cancelImportingProcess()">
-                    CANCEL
                 </button>
             </div>
         </div>

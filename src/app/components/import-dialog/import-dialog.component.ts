@@ -62,12 +62,6 @@ export class ImportDialogComponent implements OnDestroy {
   }
 
   loadUrl() {
-
-    /*if (!this.urlInput.value.endsWith('.csv') && !this.urlInput.value.endsWith('.txt') &&
-        !this.urlInput.value.endsWith('.xls') && !this.urlInput.value.endsWith('.xlsx')) {
-      this.utilities.showSnackBar(`File extension in url is invalid`, 'OK');
-      return;
-        }*/
     this.isLoadingResults = true;
     this.subscriptions.push(this.httpClient.get(this.urlInput.value, { responseType: 'blob'}).pipe(
       tap(

@@ -3,6 +3,9 @@
     <p>{{ message }}</p>
     <input matInput placeholder="Filter" [formControl]="filterInput">
     <div class="user-list-wrapper">
+        <div class="example-loading-shade" *ngIf="isLoadingResults">
+            <mat-spinner class="spinner"></mat-spinner>
+        </div>
         <mat-action-list>
             <button class="text-left" mat-list-item *ngFor="let element of filteredCollection"
             (click)="setSelectedElement(element)">
@@ -12,5 +15,5 @@
     </div>
 </div>
 <div mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>CANCEL</button>
+    <button mat-button mat-dialog-close (click)="close()">CANCEL</button>
 </div>

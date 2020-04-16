@@ -85,7 +85,7 @@
                         </mat-menu>
                     </span>
                 </th>
-                <td mat-cell *matCellDef="let element"> {{ element[column] }} </td>
+                <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
             </ng-container>
             <!-- Options Sticky Column -->
             <ng-container matColumnDef="options" stickyEnd>

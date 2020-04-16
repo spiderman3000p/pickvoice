@@ -167,55 +167,61 @@
                                     </table>
                                     <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                                 </div>
+                                <context-menu #basicMenu>
+                                    <ng-template contextMenuItem [subMenu]="statusSubmenu">
+                                        Status
+                                    </ng-template>
+                                    <context-menu #statusSubmenu>
+                                        <ng-template contextMenuItem
+                                        (execute)="executeContext('activateTask', $event.item)">
+                                            {{ selection.selected.length === 0 ? 'Activate task' :
+                                             'Activate selected tasks'}}
+                                        </ng-template>
+                                        <ng-template contextMenuItem divider="true"></ng-template>
+                                        <ng-template contextMenuItem 
+                                        (execute)="executeContext('cancelTask', $event.item)">
+                                        {{ selection.selected.length === 0 ? 'Cancel task' :
+                                        'Cancel selected tasks'}}
+                                        </ng-template>
+                                    </context-menu>
+                                    <ng-template contextMenuItem let-item [subMenu]="prioritySubmenu"
+                                    *ngIf="selection.selected.length === 0">
+                                        Priority ({{item?.priority}})
+                                    </ng-template>
+                                    <context-menu #prioritySubmenu>
+                                        <ng-template contextMenuItem
+                                        (execute)="executeContext('incrementPriority', $event.item)">
+                                            Increment
+                                        </ng-template>
+                                        <ng-template contextMenuItem divider="true"></ng-template>
+                                        <ng-template contextMenuItem 
+                                        (execute)="executeContext('decrementPriority', $event.item)">
+                                            Decrement
+                                        </ng-template>
+                                    </context-menu>
+                                    <ng-template contextMenuItem divider="true"></ng-template>
+                                    <ng-template contextMenuItem (execute)="executeContext('assignToUser', $event.item)">
+                                            {{ selection.selected.length === 0 ? 'Assign task to user' :
+                                            'Assign selected tasks to user'}}
+                                    </ng-template>
+                                    <ng-template contextMenuItem (execute)="executeContext('viewBySku', $event.item)"
+                                    *ngIf="selection.selected.length === 0">
+                                        View
+                                    </ng-template>
+                                    <!--context-menu #viewSubmenu>
+                                        <ng-template contextMenuItem
+                                        (execute)="executeContext('viewBySku', $event.item)">
+                                            By Sku
+                                        </ng-template>
+                                        <ng-template contextMenuItem divider="true"></ng-template>
+                                        <ng-template contextMenuItem
+                                        (execute)="executeContext('viewByCode', $event.item)">
+                                            By Code
+                                        </ng-template>
+                                    </context-menu-->
+                                </context-menu>
                             </ng-template>
-                            <context-menu>
-                                <ng-template contextMenuItem [subMenu]="statusSubmenu">
-                                    Status
-                                </ng-template>
-                                <context-menu #statusSubmenu>
-                                    <ng-template contextMenuItem
-                                    (execute)="executeContext('activateTask', $event.item)">
-                                        Activate task
-                                    </ng-template>
-                                    <ng-template contextMenuItem divider="true"></ng-template>
-                                    <ng-template contextMenuItem 
-                                    (execute)="executeContext('cancelTask', $event.item)">
-                                        Cancel task
-                                    </ng-template>
-                                </context-menu>
-                                <ng-template contextMenuItem let-item [subMenu]="prioritySubmenu">
-                                    Priority ({{item?.priority}})
-                                </ng-template>
-                                <context-menu #prioritySubmenu>
-                                    <ng-template contextMenuItem
-                                    (execute)="executeContext('incrementPriority', $event.item)">
-                                        Increment
-                                    </ng-template>
-                                    <ng-template contextMenuItem divider="true"></ng-template>
-                                    <ng-template contextMenuItem 
-                                    (execute)="executeContext('decrementPriority', $event.item)">
-                                        Decrement
-                                    </ng-template>
-                                </context-menu>
-                                <ng-template contextMenuItem divider="true"></ng-template>
-                                <ng-template contextMenuItem (execute)="executeContext('assignToUser', $event.item)">
-                                    Assign to user
-                                </ng-template>
-                                <ng-template contextMenuItem (execute)="executeContext('viewBySku', $event.item)" *ngIf="selection.selected.length === 0">
-                                    View
-                                </ng-template>
-                                <!--context-menu #viewSubmenu>
-                                    <ng-template contextMenuItem
-                                    (execute)="executeContext('viewBySku', $event.item)">
-                                        By Sku
-                                    </ng-template>
-                                    <ng-template contextMenuItem divider="true"></ng-template>
-                                    <ng-template contextMenuItem
-                                    (execute)="executeContext('viewByCode', $event.item)">
-                                        By Code
-                                    </ng-template>
-                                </context-menu-->
-                            </context-menu>
+                            
                         </mat-tab>
                         <mat-tab label="Transports">
                             <ng-template matTabContent>

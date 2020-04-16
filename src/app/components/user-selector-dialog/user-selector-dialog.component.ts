@@ -16,6 +16,7 @@ export class UserSelectorDialogComponent implements OnInit {
   filterInput: FormControl;
   collection: any[];
   filteredCollection: any[];
+  isLoadingResults = true;
   constructor(public dialogRef: MatDialogRef<UserSelectorDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService) {
     if (data.title) {
@@ -26,10 +27,15 @@ export class UserSelectorDialogComponent implements OnInit {
     }
     if (data.collection) {
       data.collection.subscribe(results => {
+        this.isLoadingResults = false;
         this.utilities.log('user results', results);
         this.collection = results;
         this.filteredCollection = this.collection.slice();
         this.utilities.log('filtered collection', this.filteredCollection);
+      }, error => {
+        this.isLoadingResults = false;
+        this.utilities.error('Error loading users', error);
+        this.utilities.showSnackBar('Error fetching users', 'OK');
       });
     }
     this.filterInput = new FormControl('');
@@ -46,6 +52,10 @@ export class UserSelectorDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  close() {
+    this.dialogRef.close(null);
   }
 
 }

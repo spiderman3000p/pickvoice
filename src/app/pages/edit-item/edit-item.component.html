@@ -34,30 +34,6 @@
                     <input class="w-100" matInput type="text" formControlName="phonetic" [class.readonly]="viewMode === 'view'">
                 </mat-form-field>
                 <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Weight</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="weight" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Variable Weight</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="variableWeight" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Weight Tolerance</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="weightTolerance" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Expiry Date</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="expiryDate" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Serial</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="serial" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Batch Number</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="batchNumber" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                     <mat-label>Scanned Verification</mat-label>
                     <input class="w-100" matInput type="text" formControlName="scannedVerification" [class.readonly]="viewMode === 'view'">
                 </mat-form-field>
@@ -70,11 +46,8 @@
                     <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
                 </mat-form-field>
                 <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Expiry Date</mat-label>
-                    <input matInput formControlName="expiryDate" [matDatepicker]="expiryDate"
-                    [class.readonly]="viewMode === 'view'" readonly>
-                    <mat-datepicker-toggle matSuffix [for]="expiryDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                    <mat-datepicker #expiryDate ></mat-datepicker>
+                    <mat-label>Weight Tolerance</mat-label>
+                    <input class="w-100" matInput type="number" formControlName="weightTolerance" [class.readonly]="viewMode === 'view'">
                 </mat-form-field>
                 <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                     <mat-label>State</mat-label>
@@ -104,6 +77,52 @@
                     </mat-select>
                 </mat-form-field>
                 <mat-tab-group class="tab-orders">
+                    <mat-tab label="Especific Information">
+                        <ng-template matTabContent>
+                            <div class="col-sm-12 col-md-4 col-lg-3 input-group-wrapper">
+                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                appearance="none">
+                                    <input matInput formControlName="expiryDate"  hidden>
+                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                    [checked]="form.get('expiryDate').value">
+                                        Expiry Date
+                                    </mat-slide-toggle>
+                                </mat-form-field>
+                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                appearance="none">
+                                    <input matInput formControlName="weight"  hidden>
+                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                    [checked]="form.get('weight').value">
+                                    Weight
+                                    </mat-slide-toggle>
+                                </mat-form-field>
+                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                appearance="none">
+                                    <input matInput formControlName="variableWeight"  hidden>
+                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                    [checked]="form.get('variableWeight').value">
+                                    Variable Weight
+                                    </mat-slide-toggle>
+                                </mat-form-field>
+                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                appearance="none">
+                                    <input matInput formControlName="serial"  hidden>
+                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                    [checked]="form.get('serial').value">
+                                    Serial
+                                    </mat-slide-toggle>
+                                </mat-form-field>
+                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                appearance="none">
+                                    <input matInput formControlName="batchNumber" style="display: none">
+                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                    [checked]="form.get('batchNumber').value">
+                                    Batch Number
+                                    </mat-slide-toggle>
+                                </mat-form-field>
+                            </div>
+                        </ng-template>
+                    </mat-tab>
                     <mat-tab label="Unity Of Measure">
                         <ng-template matTabContent>
                             <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
@@ -124,19 +143,6 @@
                                         </div>
                                     </mat-select>
                                 </mat-form-field>
-                            <br><br>
-                            <h6>UOM Details</h6>
-                            <hr>
-                            <span *ngIf="form.get('uom').value">
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                    <mat-label>Code</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('uom').value.code" [class.readonly]="true">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                    <mat-label>Name</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('uom').value.name" [class.readonly]="true">
-                                </mat-form-field>
-                            </span>
                         </ng-template>
                     </mat-tab>
                 </mat-tab-group>

@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 
 import { ItemsRoutingModule } from './items-routing.module';
 import { ItemsComponent } from './items.component';
+import { EditItemComponent } from '../edit-item/edit-item.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -52,7 +54,7 @@ export const MY_FORMATS = {
 };
 @NgModule({
   declarations: [
-    ItemsComponent
+    ItemsComponent, EditItemComponent
   ],
   imports: [
     CommonModule,
@@ -78,6 +80,7 @@ export const MY_FORMATS = {
     MatSlideToggleModule,
     MatExpansionModule,
     MatListModule,
+    MatTabsModule,
     AgGridModule.withComponents([]),
   ],
   providers: [

@@ -36,7 +36,7 @@
           </div-->
         </div>
         <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 10"-->
-        <table mat-table [dataSource]="dataSource" matSort matSortActive="date" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8">
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="date" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 11">
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
@@ -163,11 +163,66 @@
           <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
           <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                     [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
-          <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
-            [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
+          <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+          [ngClass]="{'alert alert-danger': row.invalid}"
+          [routerLink]="['/pages/' + type + '/view', row.id]"
+          [contextMenu]="basicMenuC" [contextMenuSubject]="row"></tr>
         </table>
         <mat-paginator [length]="dataSource.dataCount" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
       </div>
+      <context-menu #basicMenu>
+          <ng-template contextMenuItem [subMenu]="statusSubmenu">
+              Status
+          </ng-template>
+          <context-menu #statusSubmenu>
+              <ng-template contextMenuItem
+              (execute)="executeContext('activateTask', $event.item)">
+                  {{ selection.selected.length === 0 ? 'Activate task' :
+                   'Activate selected tasks'}}
+              </ng-template>
+              <ng-template contextMenuItem divider="true"></ng-template>
+              <ng-template contextMenuItem 
+              (execute)="executeContext('cancelTask', $event.item)">
+              {{ selection.selected.length === 0 ? 'Cancel task' :
+              'Cancel selected tasks'}}
+              </ng-template>
+          </context-menu>
+          <ng-template contextMenuItem let-item [subMenu]="prioritySubmenu"
+          *ngIf="selection.selected.length === 0">
+              Priority ({{item?.priority}})
+          </ng-template>
+          <context-menu #prioritySubmenu>
+              <ng-template contextMenuItem
+              (execute)="executeContext('incrementPriority', $event.item)">
+                  Increment
+              </ng-template>
+              <ng-template contextMenuItem divider="true"></ng-template>
+              <ng-template contextMenuItem 
+              (execute)="executeContext('decrementPriority', $event.item)">
+                  Decrement
+              </ng-template>
+          </context-menu>
+          <ng-template contextMenuItem divider="true"></ng-template>
+          <ng-template contextMenuItem (execute)="executeContext('assignToUser', $event.item)">
+                  {{ selection.selected.length === 0 ? 'Assign task to user' :
+                  'Assign selected tasks to user'}}
+          </ng-template>
+          <ng-template contextMenuItem (execute)="executeContext('viewBySku', $event.item)"
+          *ngIf="selection.selected.length === 0">
+              View
+          </ng-template>
+          <!--context-menu #viewSubmenu>
+              <ng-template contextMenuItem
+              (execute)="executeContext('viewBySku', $event.item)">
+                  By Sku
+              </ng-template>
+              <ng-template contextMenuItem divider="true"></ng-template>
+              <ng-template contextMenuItem
+              (execute)="executeContext('viewByCode', $event.item)">
+                  By Code
+              </ng-template>
+          </context-menu-->
+      </context-menu>
     </div>
   </div>
 </div>

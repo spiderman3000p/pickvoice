@@ -26,7 +26,6 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 declare var JsBarcode: any;
 
 interface PickPlanningData {
@@ -103,23 +102,15 @@ export class EditPickPlanningComponent implements OnInit {
     this.isLoadingResults = true;
   }
 
-  showMessage(message: any) {
-    alert(message);
-    console.log(message);
-  }
-
   executeContext(action: string, element: any) {
-    if (this.selection.selected.length === 0) {
-      this.executeContextSingle(action, element);
-    } else {
-      this.selection.selected.forEach(selectedElement => {
-        this.executeContextSingle(action, selectedElement);
-      });
+    let newState;
+    let selectedTasks = [];
+    if (this.selection.selected.length > 0) {
+      this.utilities.log('selected tasks:', this.selection.selected);
+      selectedTasks = this.selection.selected;
+    } else if (element !== undefined && element !== null) {
+      selectedTasks.push(element);
     }
-    this.refreshTable();
-  }
-
-  executeContextSingle(action: string, element: any) {
     switch (action) {
       case 'activateTask': {
         /*
@@ -130,23 +121,8 @@ export class EditPickPlanningComponent implements OnInit {
           CP - Complete,
           CA - Canceled)
         */
-        if (element && element.taskState !== PickTask.TaskStateEnum.AC) {
-          this.utilities.log('activating task', element);
-          this.dataProviderService.activatePickTask(element.id).subscribe(result => {
-            this.utilities.log('activating result', result);
-            this.utilities.showSnackBar('Task activated successfully', 'OK');
-          }, error => {
-            this.utilities.error('activating error', error);
-            if (error.status === 500 && error.error && error.error.message) {
-              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
-            } else {
-              this.utilities.showSnackBar('Task could not be activated', 'OK');
-            }
-          });
-        } else {
-          this.utilities.error('Task is allready active');
-          this.utilities.showSnackBar('Task is allready active', 'OK');
-        }
+        newState = PickTask.TaskStateEnum.AC;
+        this.changeTaskState(selectedTasks, newState);
         break;
       }
       case 'cancelTask': {
@@ -158,26 +134,8 @@ export class EditPickPlanningComponent implements OnInit {
           CP - Complete,
           CA - Canceled)
         */
-        if (element && element.taskState !== PickTask.TaskStateEnum.CA) {
-          this.dataProviderService.updateStatePickTask(element.id, PickTask.TaskStateEnum.CA)
-          .subscribe(response => {
-            if (response) {
-              element.taskState = PickTask.TaskStateEnum.CA;
-              this.utilities.log('task cancel response', response);
-              this.utilities.showSnackBar('Task caceled successfully', 'OK');
-            }
-          }, error => {
-            this.utilities.error('task cancel error', error);
-            if (error.status === 500 && error.error && error.error.message) {
-              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
-            } else {
-              this.utilities.showSnackBar('Task could not be canceled', 'OK');
-            }
-          });
-        } else {
-          this.utilities.error('task is canceled');
-          this.utilities.showSnackBar('Task is allready canceled', 'OK');
-        }
+        newState = PickTask.TaskStateEnum.CA;
+        this.changeTaskState(selectedTasks, newState);
         break;
       }
       case 'closeTask': {
@@ -189,25 +147,8 @@ export class EditPickPlanningComponent implements OnInit {
           CP - Complete,
           CA - Canceled)
         */
-        if (element && element.taskState !== PickTask.TaskStateEnum.CP) {
-          this.dataProviderService.updateStatePickTask(element.id, PickTask.TaskStateEnum.CP).subscribe(response => {
-            if (response) {
-              element.taskState = PickTask.TaskStateEnum.CP;
-              this.utilities.log('task close response', response);
-              this.utilities.showSnackBar('Task closed successfully', 'OK');
-            }
-          }, error => {
-            this.utilities.error('task close error', error);
-            if (error.status === 500 && error.error && error.error.message) {
-              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
-            } else {
-              this.utilities.showSnackBar('Task could not be closed', 'OK');
-            }
-          });
-        } else {
-          this.utilities.error('task is allready closed');
-          this.utilities.showSnackBar('Task is allready closed', 'OK');
-        }
+        newState = PickTask.TaskStateEnum.CP;
+        this.changeTaskState(selectedTasks, newState);
         break;
       }
       case 'assignToUser': {
@@ -220,25 +161,14 @@ export class EditPickPlanningComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe(selectedUser => {
           this.utilities.log('user selector dialog result:', selectedUser);
-          if (selectedUser && (element.user !== undefined && (element.user === null ||
-             selectedUser.id !== element.user.id))) {
-            this.dataProviderService.assignUserToPickTask(element, selectedUser).subscribe(response => {
-              if (response) {
-                element.user = selectedUser;
-                this.utilities.log('user assign response', response);
-                this.utilities.showSnackBar('User assigned successfully', 'OK');
-              }
-            }, error => {
-              this.utilities.error('user assign error', error);
-              if (error.status === 500 && error.error && error.error.message) {
-                this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
-              } else {
-                this.utilities.showSnackBar('User could not be assigned', 'OK');
-              }
-            });
+          if (selectedUser === null) {
+            return;
+          }
+          if (selectedUser && selectedTasks.length > 0) {
+            this.assignUserToTaskList(selectedTasks, selectedUser);
           } else {
-            this.utilities.error('User is allready assigned');
-            this.utilities.showSnackBar('User is allready assigned', 'OK');
+            this.utilities.error('Selected user is invalid or none selected tasks');
+            this.utilities.showSnackBar('Selected user is invalid or none selected tasks', 'OK');
           }
         }, error => {
           this.utilities.error('error after closing user selector dialog');
@@ -254,20 +184,7 @@ export class EditPickPlanningComponent implements OnInit {
         if (element && element.priority < 10) {
           const elementCopy = Object.assign({}, element);
           elementCopy.priority++;
-          this.dataProviderService.updatePickTask(elementCopy, element.id).subscribe(response => {
-            if (response) {
-              element.priority++;
-              this.utilities.log('task priority increment response', response);
-              this.utilities.showSnackBar('Priority incremented successfully', 'OK');
-            }
-          }, error => {
-            this.utilities.error('task priority increment error', error);
-            if (error.status === 500 && error.error && error.error.message) {
-              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
-            } else {
-              this.utilities.showSnackBar('Priority could not be incremented', 'OK');
-            }
-          });
+          this.updatePickTask(elementCopy, element);
         } else {
           this.utilities.error('task already have priority 10');
           this.utilities.showSnackBar('Task allready have maximum priority', 'OK');
@@ -281,20 +198,7 @@ export class EditPickPlanningComponent implements OnInit {
         if (element && element.priority > 0) {
           const elementCopy = Object.assign({}, element);
           elementCopy.priority--;
-          this.dataProviderService.updatePickTask(elementCopy, element.id).subscribe(response => {
-            if (response) {
-              element.priority--;
-              this.utilities.log('task priority decrement response', response);
-              this.utilities.showSnackBar('Priority decremented successfully', 'OK');
-            }
-          }, error => {
-            this.utilities.error('task priority decrement error', error);
-            if (error.status === 500 && error.error && error.error.message) {
-              this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
-            } else {
-              this.utilities.showSnackBar('Priority could not be decremented', 'OK');
-            }
-          });
+          this.updatePickTask(elementCopy, element);
         } else {
           this.utilities.error('task already have priority 0');
           this.utilities.showSnackBar('Task allready have minimum priority', 'OK');
@@ -309,6 +213,69 @@ export class EditPickPlanningComponent implements OnInit {
         this.generateTaskPdf(element);
         break;
       }
+    }
+  }
+
+  assignUserToTaskList(tasks: any[], user: any) {
+    this.dataProviderService.assignUserToPickTaskList(tasks, user)
+    .subscribe(response => {
+      this.utilities.log('assign user to task list response', response);
+      if (response) {
+        tasks.forEach(task => {
+          task.user = user;
+        });
+        this.utilities.log('user assign response', response);
+        this.utilities.showSnackBar('User assigned successfully', 'OK');
+      }
+    }, error => {
+      this.utilities.error('user assign error', error);
+      if (error.status === 500 && error.error && error.error.message) {
+        this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+      } else {
+        this.utilities.showSnackBar('User could not be assigned', 'OK');
+      }
+    });
+  }
+
+  updatePickTask(newTask: any, oldTask: any) {
+    this.dataProviderService.updatePickTask(newTask, oldTask.id).subscribe(response => {
+      if (response) {
+        oldTask.priority = newTask;
+        this.utilities.log('task update response', response);
+        this.utilities.showSnackBar('Task updated successfully', 'OK');
+      }
+    }, error => {
+      this.utilities.error('task update error', error);
+      if (error.status === 500 && error.error && error.error.message) {
+        this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+      } else {
+        this.utilities.showSnackBar('task could not be updated', 'OK');
+      }
+    });
+  }
+
+  changeTaskState(tasks: any[], taskState: string) {
+    if (tasks && tasks.length > 0 && taskState !== undefined && taskState !== null) {
+      this.dataProviderService.updateStatePickTaskList(tasks, taskState)
+      .subscribe(response => {
+        if (response) {
+          tasks.forEach(task => {
+            task.taskState = taskState;
+          });
+          this.utilities.log('task state change response', response);
+          this.utilities.showSnackBar('Task state changed successfully', 'OK');
+        }
+      }, error => {
+        this.utilities.error('task state change error', error);
+        if (error.status === 500 && error.error && error.error.message) {
+          this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+        } else {
+          this.utilities.showSnackBar('Task state could not be changed', 'OK');
+        }
+      });
+    } else {
+      this.utilities.error('Error on selected task or selected state');
+      this.utilities.showSnackBar('Error on selected task or selected state', 'OK');
     }
   }
 
@@ -340,7 +307,6 @@ export class EditPickPlanningComponent implements OnInit {
       }
     });
   }
-
 
   generatePdfContent(object: any, tableContent: any[]): Observable<any> {
     let base64Logo;

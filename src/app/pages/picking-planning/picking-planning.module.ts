@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { PickingPlanningRoutingModule } from './picking-planning-routing.module';
 import { PickingPlanningComponent } from './picking-planning.component';
+import { EditPickPlanningComponent } from '../edit-pick-planning/edit-pick-planning.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -26,6 +27,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
+import { ContextMenuModule } from 'ngx-contextmenu';
 
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
@@ -51,14 +53,14 @@ export const MY_FORMATS = {
   },
 };
 @NgModule({
-  declarations: [PickingPlanningComponent],
+  declarations: [PickingPlanningComponent, EditPickPlanningComponent],
   imports: [
     CommonModule,
     PickingPlanningRoutingModule,
 
     FormsModule,
     ReactiveFormsModule,
-    
+
     MatNativeDateModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
@@ -77,7 +79,8 @@ export const MY_FORMATS = {
     MatExpansionModule,
     MatListModule,
     MatTabsModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    ContextMenuModule
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]},

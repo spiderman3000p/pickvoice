@@ -1,7 +1,7 @@
 import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
-
+import { ContextMenuComponent } from 'ngx-contextmenu';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -10,14 +10,20 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
+import { UserSelectorDialogComponent } from '../../components/user-selector-dialog/user-selector-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
+import { ModelMap, STATES, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { PickTask, PickTaskLine, PickTaskLines, LoadPick } from '@pickvoice/pickvoice-api';
 
 import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
-import { merge, Observer, Subscription } from 'rxjs';
+import { merge, Observable, Observer, Subscription } from 'rxjs';
 
 import { MyDataSource } from '../../models/my-data-source';
+
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+declare var JsBarcode: any;
 
 @Component({
   selector: 'app-picking-task',
@@ -53,6 +59,7 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
   parserFn: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(ContextMenuComponent) public basicMenuC: ContextMenuComponent;
   constructor(
     private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
     private utilities: UtilitiesService) {
@@ -106,6 +113,414 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.push(merge(this.sort.sortChange, this.paginator.page)
     .pipe(tap(() => this.loadDataPage()))
     .subscribe());
+  }
+
+  executeContext(action: string, element: any) {
+    let newState;
+    let selectedTasks = [];
+    if (this.selection.selected.length > 0) {
+      this.utilities.log('selected tasks:', this.selection.selected);
+      selectedTasks = this.selection.selected;
+    } else if (element !== undefined && element !== null) {
+      selectedTasks.push(element);
+    }
+    switch (action) {
+      case 'activateTask': {
+        /*
+          Estado de la tarea
+          PE - Pending,
+          WP - Work In Progress,
+          PS - Paused,
+          CP - Complete,
+          CA - Canceled)
+        */
+        newState = PickTask.TaskStateEnum.AC;
+        this.changeTaskState(selectedTasks, newState);
+        break;
+      }
+      case 'cancelTask': {
+        /*
+          Estado de la tarea
+          PE - Pending,
+          WP - Work In Progress,
+          PS - Paused,
+          CP - Complete,
+          CA - Canceled)
+        */
+        newState = PickTask.TaskStateEnum.CA;
+        this.changeTaskState(selectedTasks, newState);
+        break;
+      }
+      case 'closeTask': {
+        /*
+          Estado de la tarea
+          PE - Pending,
+          WP - Work In Progress,
+          PS - Paused,
+          CP - Complete,
+          CA - Canceled)
+        */
+        newState = PickTask.TaskStateEnum.CP;
+        this.changeTaskState(selectedTasks, newState);
+        break;
+      }
+      case 'assignToUser': {
+        const dialogRef = this.dialog.open(UserSelectorDialogComponent, {
+          data: {
+            collection: this.dataProviderService.getAllUsers(),
+            title: 'Select User',
+            message: 'Please select a user from the list'
+          }
+        });
+        dialogRef.afterClosed().subscribe(selectedUser => {
+          this.utilities.log('user selector dialog result:', selectedUser);
+          if (selectedUser === null) {
+            return;
+          }
+          if (selectedUser && selectedTasks.length > 0) {
+            this.assignUserToTaskList(selectedTasks, selectedUser);
+          } else {
+            this.utilities.error('Selected user is invalid or none selected tasks');
+            this.utilities.showSnackBar('Selected user is invalid or none selected tasks', 'OK');
+          }
+        }, error => {
+          this.utilities.error('error after closing user selector dialog');
+          this.utilities.showSnackBar('Error after closing user selector dialog', 'OK');
+          this.isLoadingResults = false;
+        });
+        break;
+      }
+      case 'incrementPriority': {
+        /*
+          10 max
+        */
+        if (element && element.priority < 10) {
+          const elementCopy = Object.assign({}, element);
+          elementCopy.priority++;
+          this.updatePickTask(elementCopy, element);
+        } else {
+          this.utilities.error('task already have priority 10');
+          this.utilities.showSnackBar('Task allready have maximum priority', 'OK');
+        }
+        break;
+      }
+      case 'decrementPriority': {
+        /*
+          0 min
+        */
+        if (element && element.priority > 0) {
+          const elementCopy = Object.assign({}, element);
+          elementCopy.priority--;
+          this.updatePickTask(elementCopy, element);
+        } else {
+          this.utilities.error('task already have priority 0');
+          this.utilities.showSnackBar('Task allready have minimum priority', 'OK');
+        }
+        break;
+      }
+      case 'viewBySku': {
+        this.generateTaskPdf(element);
+        break;
+      }
+      case 'viewByCode': {
+        this.generateTaskPdf(element);
+        break;
+      }
+    }
+  }
+
+  assignUserToTaskList(tasks: any[], user: any) {
+    this.dataProviderService.assignUserToPickTaskList(tasks, user)
+    .subscribe(response => {
+      this.utilities.log('assign user to task list response', response);
+      if (response) {
+        tasks.forEach(task => {
+          task.user = user;
+        });
+        this.utilities.log('user assign response', response);
+        this.utilities.showSnackBar('User assigned successfully', 'OK');
+      }
+    }, error => {
+      this.utilities.error('user assign error', error);
+      if (error.status === 500 && error.error && error.error.message) {
+        this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+      } else {
+        this.utilities.showSnackBar('User could not be assigned', 'OK');
+      }
+    });
+  }
+
+  updatePickTask(newTask: any, oldTask: any) {
+    this.dataProviderService.updatePickTask(newTask, oldTask.id).subscribe(response => {
+      if (response) {
+        oldTask.priority = newTask;
+        this.utilities.log('task update response', response);
+        this.utilities.showSnackBar('Task updated successfully', 'OK');
+      }
+    }, error => {
+      this.utilities.error('task update error', error);
+      if (error.status === 500 && error.error && error.error.message) {
+        this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+      } else {
+        this.utilities.showSnackBar('task could not be updated', 'OK');
+      }
+    });
+  }
+
+  changeTaskState(tasks: any[], taskState: string) {
+    if (tasks && tasks.length > 0 && taskState !== undefined && taskState !== null) {
+      this.dataProviderService.updateStatePickTaskList(tasks, taskState)
+      .subscribe(response => {
+        if (response) {
+          tasks.forEach(task => {
+            task.taskState = taskState;
+          });
+          this.utilities.log('task state change response', response);
+          this.utilities.showSnackBar('Task state changed successfully', 'OK');
+        }
+      }, error => {
+        this.utilities.error('task state change error', error);
+        if (error.status === 500 && error.error && error.error.message) {
+          this.utilities.showSnackBar(`Error: ${error.error.message}`, 'OK');
+        } else {
+          this.utilities.showSnackBar('Task state could not be changed', 'OK');
+        }
+      });
+    } else {
+      this.utilities.error('Error on selected task or selected state');
+      this.utilities.showSnackBar('Error on selected task or selected state', 'OK');
+    }
+  }
+
+  generateTaskPdf(object?: any) {
+    this.dataProviderService.getAllPickTaskLinesByTask(object.id).
+    subscribe(taskLines => {
+      taskLines = taskLines.map((taskLine: any) =>
+      [
+        { text: taskLine.pickTaskLineId, style: 'tableRow'},
+        { text: taskLine.sku, style: 'tableRow'},
+        { text: taskLine.skuDescription, style: 'tableRow'},
+        { text: taskLine.batchNumber, style: 'tableRow'},
+        { text: taskLine.serial, style: 'tableRow'},
+        { text: taskLine.locationCode, style: 'tableRow'},
+        { text: taskLine.expiryDate, style: 'tableRow'},
+        { text: taskLine.uomCode, style: 'tableRow'},
+        { text: taskLine.lpnCode, style: 'tableRow'},
+        /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
+        { text: taskLine.qtyToPicked, style: 'tableRow'}
+      ]);
+      this.generatePdfContent(object, taskLines)
+      .subscribe(documentDefinition => pdfMake.createPdf(documentDefinition).open());
+    }, error => {
+      this.utilities.error('Error al cargar task lines', error);
+      if (error && error.error.message) {
+        this.utilities.showSnackBar(error.error.message, 'OK');
+      } else {
+        this.utilities.showSnackBar('Error fetching task lines', 'OK');
+      }
+    });
+  }
+
+  generatePdfContent(object: any, tableContent: any[]): Observable<any> {
+    let base64Logo;
+    let canvas;
+    let content;
+    const image = new Image();
+    canvas = document.createElement('canvas');
+    canvas.style.height = 50 + 'px';
+    const response = new Observable(suscriber => {
+      image.onload = () => {
+        const context = canvas.getContext('2d');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        context.drawImage(image, 0, 0);
+        base64Logo = canvas.toDataURL('image/png');
+        content.images.logo = base64Logo;
+        suscriber.next(content);
+        suscriber.complete();
+      };
+    });
+    content = {
+      content: [
+        {
+          margin: [20, 0, 20, 10],
+          alignment: 'left',
+          columns: [
+            {
+              width: 80,
+              image: 'logo',
+              margin: [0, 0, 10, 0]
+            },
+            [
+              {
+                margin: [20, 20, 0, 0],
+                text: `TASK # ${object.id} (${object.taskState})`,
+                style: 'h1'
+              },
+              {
+                margin: [20, 0, 0, 0],
+                text: `Type: ${object.taskType.name} - Priority: ${STATES[object.priority]}`,
+                style: 'h3'
+              },
+              {
+                margin: [20, 0, 0, 0],
+                text: `Description: ${object.description}`,
+                style: 'small'
+              }
+            ],
+            [
+              {
+                alignment: 'right',
+                text: `Enable Date: ${object.enableDate}`,
+                style: 'small'
+              },
+              {
+                alignment: 'right',
+                text: `Date: ${object.date}`,
+                style: 'small'
+              },
+              {
+                alignment: 'right',
+                text: `Assignment Date: ${object.dateAssignment}`,
+                style: 'small'
+              },
+              {
+                alignment: 'right',
+                image: this.generateBarCode(object.id)
+              }
+            ]
+          ]
+        },
+        {
+          style: 'normal',
+          alignment: 'left',
+          margin: [0, 0, 0, 20],
+          table: {
+            borderColor: 'darkgrey',
+            widths: ['auto', '*'],
+            headerRows: 0,
+            body: [
+              [
+                { text: `Document`, style: 'tableHeader' },
+                `${object.document}`
+              ],
+              [
+                { text: `User`, style: 'tableHeader' },
+                ` ${object.user ? object.user.firstName : ''} ${object.user ? object.user.lastName : ''} ${object.user ? '(' + object.user.userName + ')' : ''}`
+              ],
+              [
+                { text: 'Quantity', style: 'tableHeader' },
+                  ` ${object.qty}`
+              ],
+              [
+                { text: 'Lines', style: 'tableHeader' },
+                `${object.lines}`
+              ],
+              [
+                { text: `Current Line`, style: 'tableHeader' },
+                `${object.currentLine}`
+              ],
+              [
+                { text: `Children Work`, style: 'tableHeader' },
+                `${object.childrenWork}`
+              ],
+              [
+                { text: `Rule executed`, style: 'tableHeader' },
+                `${object.ruleExecuted}`
+              ],
+              [
+                { text: `Validate Location`, style: 'tableHeader' },
+                `${object.validateLocation ? 'Yes' : 'No' }`
+              ],
+              [
+                { text: `Pallet Complete`, style: 'tableHeader' },
+                `${object.palletComplete ? 'Yes' : 'No' }`
+              ],
+              [
+                { text: `Validate Lpn`, style: 'tableHeader' },
+                `${object.validateLpn ? 'Yes' : 'No' }`
+              ],
+              [
+                { text: `Validate Sku`, style: 'tableHeader' },
+                `${object.validateSku ? 'Yes' : 'No' }`
+              ]
+            ]
+          }
+        },
+        {
+          table: {
+            borderColor: 'darkgrey',
+            widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            headerRows: 1,
+            body: [
+              [
+                {text: 'Line', style: 'tableHeader', alignment: 'center'},
+                {text: 'Sku', style: 'tableHeader', alignment: 'center'},
+                {text: 'Sku Description', style: 'tableHeader', alignment: 'center'},
+                {text: 'Batch', style: 'tableHeader', alignment: 'center'},
+                {text: 'Serial', style: 'tableHeader', alignment: 'center'},
+                {text: 'Location', style: 'tableHeader', alignment: 'center'},
+                {text: 'Expiry Date', style: 'tableHeader', alignment: 'center'},
+                {text: 'Uom Code', style: 'tableHeader', alignment: 'center'},
+                {text: 'Lpn Code', style: 'tableHeader', alignment: 'center'},
+                /* {text: 'Scanned Verification', style: 'tableHeader', alignment: 'center'},*/
+                {text: 'Qty To Picked', style: 'tableHeader', alignment: 'center'}
+              ]
+            ]
+          }
+        }
+      ],
+      styles: {
+        h1: {
+          fontSize: '18',
+          bold: true
+        },
+        h2: {
+          fontSize: '14',
+          bold: true
+        },
+        small: {
+          fontSize: '10'
+        },
+        normal: {
+          fontSize: '11'
+        },
+        medium: {
+          fontSize: '12'
+        },
+        tableHeader: {
+          color: 'white',
+          bold: true,
+          fillColor: 'darkgrey',
+          fontSize: 8
+        },
+        tableRow: {
+          fontSize: 8
+        },
+        invisible: {
+          opacity: 0,
+        }
+      },
+      images: {
+        // logo: img.src
+        // logo: base64Logo
+        logo: base64Logo
+      }
+    };
+    tableContent.forEach(row => {
+      row.style = 'tableRow';
+      content.content[2].table.body.push(row);
+    });
+    image.src = '/assets/images/logo.png';
+    return response;
+  }
+
+  generateBarCode(input: string) {
+    const canvas = document.createElement('canvas');
+    JsBarcode(canvas, input, { height: 30, fontSize: 10});
+    const base64 = canvas.toDataURL('image/jpg');
+    this.utilities.log('base64 bar code', base64);
+    return base64;
   }
 
   getFilterParams(): string {

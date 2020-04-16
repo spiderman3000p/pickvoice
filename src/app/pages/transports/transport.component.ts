@@ -398,13 +398,14 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
             updatedCounter++;
           }
         } as Observer<any>;
-        const requests = [];
+        /*const requests = [];
         result.forEach(order => {
           order.idTransport = transport.id;
           this.subscriptions.push(
             this.dataProviderService.updateOrder(order, order.id, 'response', false).subscribe(observer)
           );
-        });
+        });*/
+        this.dataProviderService.updateOrdersTransport(result, transport.id).subscribe(observer);
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');

@@ -84,6 +84,16 @@ export class DataProviderService {
         }
         break;
       }
+      case IMPORTING_TYPES.ORDERS_TO_ASSIGN: {
+        this.utilities.log(`obteniendo orders con sin transporte asignado...`);
+        if (params) {
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/outbound/ordersToAssign/all;' +
+          params).pipe(retry(3));
+        } else {
+          toReturn = of([]);
+        }
+        break;
+      }
       case IMPORTING_TYPES.ORDER_LINE: {
         break;
       }
@@ -319,6 +329,12 @@ export class DataProviderService {
     return this.orderService.updateOrder(data, id, observe, reportProgress);
   }
 
+  public updateOrdersTransport(data: any[], idTransport: number, observe: any = 'body', reportProgress = false) {
+    // return this.orderService.updateOrder(data, id, observe, reportProgress);
+    return this.httpClient.post(environment.apiBaseUrl +
+      '/console/outbound/orders/assignmentTransport?idTransport=' + idTransport, data);
+  }
+
   public createOrder(data: any, observe: any = 'body', reportProgress = false) {
     return this.orderService.createOrder(data, observe, reportProgress);
   }
@@ -493,8 +509,20 @@ export class DataProviderService {
     return this.pickTaskService.changePickTaskStatus(id, state, observe, reportProgress);
   }
 
+  public updateStatePickTaskList(data: any[], status: string, observe: any = 'body', reportProgress = false) {
+    // return this.orderService.updateOrder(data, id, observe, reportProgress);
+    return this.httpClient.put(environment.apiBaseUrl +
+      '/console/outbound/pick/changePickTaskStatus?codeState=' + status, data);
+  }
+
   public assignUserToPickTask(data: any, user: any, observe: any = 'body', reportProgress = false) {
     return this.pickTaskService.assignUserPickTask(data, user.userName);
+  }
+
+  public assignUserToPickTaskList(data: any[], user: any, observe: any = 'body', reportProgress = false) {
+    // return this.pickTaskService.assignUserPickTask(data, user.userName);
+    return this.httpClient.put(environment.apiBaseUrl +
+      '/console/outbound/pick/assignUserPickTask?userName=' + user.userName, data);
   }
 
   public getTasksByPickPlanning(id: number, observe: any = 'body', reportProgress = false) {

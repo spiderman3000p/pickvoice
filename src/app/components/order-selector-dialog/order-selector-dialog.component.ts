@@ -127,14 +127,15 @@ export class OrderSelectorDialogComponent implements OnInit, AfterViewInit {
     // this.utilities.log('paramsArray', paramsArray);
     const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
     // this.utilities.log('loading data with params', params);
-    this.dataSource.loadData(this.type, `${params}`)
+    this.dataSource.loadData(IMPORTING_TYPES.ORDERS_TO_ASSIGN, `${params}`)
     .subscribe((response: any) => {
         /*this.data = dataResults;
         this.dataCount = 100;
         this.dataSubject.next(dataResults);*/
         if (response.content) {
             this.dataSource.lastRow = response.pageSize;
-            this.dataSource.data = response.content.map(this.parserFn);
+            // this.dataSource.data = response.content.map(this.parserFn);
+            this.dataSource.data = response.content;
             this.dataSource.dataCount = response.totalElements;
             this.dataSource.dataSubject.next(this.dataSource.data);
         }
