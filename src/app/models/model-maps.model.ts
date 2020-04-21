@@ -1,11 +1,20 @@
 export const IMPORTING_TYPES = {
     USERS: 'users',
     ITEMS: 'items',
+    ITEM_CLASSIFICATIONS: 'itemClassifications',
+    LOADITEMS_DTO: 'itemsDto',
+    ITEMUOMS: 'itemUoms',
     LOCATIONS: 'locations',
+    LOCATION_STATE: 'locationState',
+    OPERATION_TYPE: 'operationType',
+    LOADLOCATIONS_DTO: 'locationsDto',
+    RACK_TYPE: 'rackType',
+    QUALITY_STATES: 'qualityStates',
+    QUALITY_STATE_TYPES: 'qualityStateTypes',
     ORDERS: 'orders',
     ORDERS_TO_ASSIGN: 'ordersToAssign',
     ORDER_LINE: 'orderLine',
-    ORDERS_DTO: 'ordersDto',
+    LOADORDERS_DTO: 'ordersDto',
     ITEM_TYPE: 'itemTypes',
     UOMS: 'uoms',
     CUSTOMERS: 'customers',
@@ -301,8 +310,8 @@ export class ModelMap {
                 control: 'toggle'
             }
         },
-        itemState: {
-            name: 'item state',
+        state: {
+            name: 'state',
             required: true,
             type: IMPORTING_TYPES.ITEM_STATE,
             formControl: {
@@ -313,6 +322,47 @@ export class ModelMap {
                 compareFn: (c1, c2) => {
                     return c1 === c2;
                 }
+            }
+        },
+        classification: {
+            name: 'classification',
+            required: true,
+            type: IMPORTING_TYPES.ITEM_CLASSIFICATIONS,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        cost: {
+            name: 'cost',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        tolerance: {
+            name: 'tolerance',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        shelfLife: {
+            name: 'shelf life',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
             }
         }
     };
@@ -338,6 +388,183 @@ export class ModelMap {
         },
         description: {
             name: 'description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
+    /* item uom object map for CRUD */
+    public static ItemUomMap = {
+        denominator: {
+            name: 'denominator',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        numerator: {
+            name: 'numerator',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        factor: {
+            name: 'factor',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        length: {
+            name: 'length',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        width: {
+            name: 'width',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        height: {
+            name: 'height',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        eanCode: {
+            name: 'ean code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        uom: {
+            name: 'uom',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new uom',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.UOMS
+            }
+        },
+        item: {
+            name: 'item',
+            required: false,
+            type: IMPORTING_TYPES.ITEMS,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new item',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.ITEMS
+            }
+        }
+    };
+    /* quality state object map for CRUD */
+    public static QualityStateMap = {
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        name: {
+            name: 'name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        optionalCode: {
+            name: 'optional code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        state: {
+            name: 'status',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        qualityStateType: {
+            name: 'type',
+            required: false,
+            type: IMPORTING_TYPES.QUALITY_STATE_TYPES,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                displayIndex: 'name',
+                valueIndex: 'id',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            }
+        }
+    };
+    /* quality state type object map for CRUD */
+    public static QualityStateTypeMap = {
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        name: {
+            name: 'name',
             required: false,
             type: 'string',
             formControl: {
@@ -463,7 +690,7 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        deep: {
+        depth: {
             name: 'deep',
             required: false,
             type: 'string',
@@ -486,7 +713,7 @@ export class ModelMap {
                 type: 'number'
             }
         },
-        type: {
+        locationType: {
             name: 'type',
             required: false,
             type: IMPORTING_TYPES.LOCATION_TYPE,
@@ -496,14 +723,98 @@ export class ModelMap {
                 displayIndex: null,
                 valueIndex: null,
                 compareFn: (c1, c2) => {
-                    console.log('c1', c1);
-                    console.log('c2', c2);
                     return c1 === c2;
                 }
             }
         },
-        state: {
-            name: 'status',
+        operationType: {
+            name: 'operation',
+            required: false,
+            type: IMPORTING_TYPES.OPERATION_TYPE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        rackType: {
+            name: 'rack type',
+            required: false,
+            type: IMPORTING_TYPES.RACK_TYPE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        widthSize: {
+            name: 'width',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        heightSize: {
+            name: 'height',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        depthSize: {
+            name: 'depth',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        allowedLpns: {
+            name: 'allowed lpns',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        locationState: {
+            name: 'state',
+            required: false,
+            type: IMPORTING_TYPES.LOCATION_STATE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        pickHeight: {
+            name: 'pick height',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        multireference: {
+            name: 'multi reference',
             required: false,
             type: 'boolean',
             formControl: {
@@ -1333,7 +1644,7 @@ export class ModelMap {
     **********************************************/
 
     /* order dto map (for importing proccess) */
-    public static OrderDtoMap = {
+    public static LoadOrderDtoMap = {
         orderNumber:  {
             name: 'order number',
             required: true,
@@ -1466,10 +1777,15 @@ export class ModelMap {
             name: 'uom code',
             required: false,
             unique: false,
-            type: 'string',
+            type: IMPORTING_TYPES.UOMS,
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'select',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'description',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
             }
         },
         batchNumber:  {
@@ -1514,14 +1830,19 @@ export class ModelMap {
             name: 'quality state',
             required: false,
             unique: false,
-            type: 'string',
+            type: IMPORTING_TYPES.QUALITY_STATES,
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
             }
         }
     };
-    /* loadPick map (for importing proccess) */
+    /* loadPick map (for importing process) */
     public static LoadPickDtoMap = {
         batchNumber: {
             name: 'batch number',
@@ -1825,6 +2146,395 @@ export class ModelMap {
             name: 'base item',
             required: false,
             unique: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        }
+    };
+    /* item dto map (for importing process) */
+    public static LoadItemDtoMap = {
+        sku:  {
+            name: 'sku',
+            required: true,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        upc:  {
+            name: 'upc',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        phonetic:  {
+            name: 'phonetic',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        description:  {
+            name: 'description',
+            required: false,
+            unique: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        weight: {
+            name: 'weight',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        variableWeight: {
+            name: 'variable weight',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        weightTolerance: {
+            name: 'weight tolerance',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        expiryDate: {
+            name: 'expiry date',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        serial: {
+            name: 'serial',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        batchNumber: {
+            name: 'batch number',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        scannedVerification: {
+            name: 'scanned verification',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        spokenVerification: {
+            name: 'spoken verification',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        state: {
+            name: 'state',
+            required: false,
+            type: IMPORTING_TYPES.ITEM_STATE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        itemTypeCode: {
+            name: 'type code',
+            required: false,
+            type: IMPORTING_TYPES.ITEM_TYPE,
+            formControl: {
+                control: 'input',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'description',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
+            }
+        },
+        uomCode: {
+            name: 'uom code',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                control: 'input',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
+            }
+        },
+        classification: {
+            name: 'classification',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        cost:  {
+            name: 'cost',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        tolerance:  {
+            name: 'tolerance',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        shelfLife:  {
+            name: 'shelf life',
+            required: false,
+            unique: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        qualityStatesCode:  {
+            name: 'quality state',
+            required: false,
+            unique: false,
+            type: IMPORTING_TYPES.QUALITY_STATES,
+            formControl: {
+                control: 'input',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
+            }
+        }
+    };
+    /* locationr dto map for importing process */
+    public static LoadLocationDtoMap = {
+        code: {
+            name: 'code',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        description: {
+            name: 'description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        sectionCode: {
+            name: 'section',
+            required: false,
+            type: IMPORTING_TYPES.SECTIONS,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
+            },
+            addNew: {
+                text: 'Add new section',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.SECTIONS
+            }
+        },
+        lane: {
+            name: 'lane',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        columnAt: {
+            name: 'column',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        height: {
+            name: 'height',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        depth: {
+            name: 'deep',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationType: {
+            name: 'type',
+            required: false,
+            type: IMPORTING_TYPES.LOCATION_TYPE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        operationType: {
+            name: 'operation',
+            required: false,
+            type: IMPORTING_TYPES.OPERATION_TYPE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        locationState: {
+            name: 'status',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        rackType: {
+            name: 'rack type',
+            required: false,
+            type: IMPORTING_TYPES.RACK_TYPE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                displayIndex: null,
+                valueIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        multireference: {
+            name: 'multi reference',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        widthSize: {
+            name: 'width',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        heightSize: {
+            name: 'height',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        depthSize: {
+            name: 'depth',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        allowedLpns: {
+            name: 'allowed lpns',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        pickHeight: {
+            name: 'pick height',
+            required: false,
             type: 'boolean',
             formControl: {
                 control: 'toggle'

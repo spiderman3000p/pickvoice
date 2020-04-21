@@ -453,7 +453,8 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
       data: {
         map: this.utilities.dataTypesModelMaps.pickTasks,
         type: IMPORTING_TYPES.PICK_TASKS,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Picking'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {

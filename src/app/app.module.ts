@@ -58,22 +58,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
 import { AgGridModule } from 'ag-grid-angular';
-import { NgxPrintModule } from 'ngx-print';
 
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
 
-// See the Moment.js docs for the meaning of these formats:
-// https://momentjs.com/docs/#/displaying/format/
-export const MY_FORMATS = {
-  parse: {
-    dateInput: 'YYYY-MM-DD',
-  },
-  display: {
-    dateInput: 'YYYY-MM-DD'
-  },
-};
 @NgModule({
   declarations: [
     AppComponent,
@@ -130,7 +119,6 @@ export const MY_FORMATS = {
     AuthModule,
     FormsModule,
     ReactiveFormsModule,
-    NgxPrintModule,
     AgGridModule.withComponents([]),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     RouterModule,
@@ -141,14 +129,7 @@ export const MY_FORMATS = {
   ],
   providers: [
     { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }},
-    { provide: BASE_PATH, useValue: environment.apiBaseUrl },
-    // { provide: MAT_DATE_LOCALE, useValue: 'es'},
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
-    },
-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
+    { provide: BASE_PATH, useValue: environment.apiBaseUrl }
   ],
   bootstrap: [AppComponent]
 })

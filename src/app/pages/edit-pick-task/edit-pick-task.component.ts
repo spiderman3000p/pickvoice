@@ -323,7 +323,8 @@ export class EditPickTaskComponent implements OnInit {
       data: {
         map: this.definitions,
         type: IMPORTING_TYPES.PICK_TASKLINES,
-        remoteSync: false // para mandar los datos a la BD por la API
+        remoteSync: false, // para mandar los datos a la BD por la API
+        title: 'Add New Task Line'
       }
     });
     dialogRef.afterClosed().subscribe(result => {

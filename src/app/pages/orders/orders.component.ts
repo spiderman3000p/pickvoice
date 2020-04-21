@@ -426,7 +426,8 @@ export class OrdersComponent implements OnInit, AfterViewInit {
       data: {
         map: this.utilities.dataTypesModelMaps.orders,
         type: IMPORTING_TYPES.ORDERS,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Order'
       }
     });
     dialogRef.afterClosed().subscribe(result => {

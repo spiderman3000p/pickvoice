@@ -53,6 +53,12 @@ export class PagesComponent implements OnInit, OnDestroy  {
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.UOMS,
               children: []
+            },
+            {
+              text: 'Quality States',
+              icon: 'home',
+              route: '/pages/' + IMPORTING_TYPES.QUALITY_STATES,
+              children: []
             }
           ]
         },

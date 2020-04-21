@@ -34,6 +34,10 @@ const routes: Routes = [
     loadChildren: () => import('./uoms/uoms.module').then(m => m.UomsModule)
   },
   {
+    path: IMPORTING_TYPES.QUALITY_STATES,
+    loadChildren: () => import('./quality-states/quality-states.module').then(m => m.QualityStatesModule)
+  },
+  {
     path: IMPORTING_TYPES.CUSTOMERS,
     loadChildren: () => import('./customer/customer.module').then(m => m.CustomerModule)
   },

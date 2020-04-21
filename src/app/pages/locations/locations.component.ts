@@ -424,7 +424,8 @@ export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         map: this.utilities.dataTypesModelMaps.locations,
         type: IMPORTING_TYPES.LOCATIONS,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Location'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {

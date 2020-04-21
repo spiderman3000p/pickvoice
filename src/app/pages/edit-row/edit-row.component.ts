@@ -543,65 +543,8 @@ export class EditRowComponent implements OnInit, OnDestroy {
         }
       };
       this.utilities.log('data to upload', toUpload);
-      if (this.type === IMPORTING_TYPES.ITEMS) {
-        this.dataProviderService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.LOCATIONS) {
-        this.dataProviderService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.ORDERS) {
-        this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
-        this.dataProviderService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.UOMS) {
-        this.dataProviderService.updateUom(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.CUSTOMERS) {
-        this.dataProviderService.updateCustomer(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
-        this.dataProviderService.updateOrderType(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.SECTIONS) {
-        this.dataProviderService.updateSection(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.TRANSPORTS) {
-        this.dataProviderService.updateTransport(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
-        this.dataProviderService.updatePickPlanning(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.PICK_TASKS) {
-        this.dataProviderService.updatePickTask(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
-
-      if (this.type === IMPORTING_TYPES.DOCKS) {
-        this.dataProviderService.updateDock(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer);
-      }
+      this.subscriptions.push(this.dataProviderService.updateObject(this.type, toUpload, this.row.id)
+      .subscribe(observer));
     } else {
       this.sharedDataService.returnData = toUpload;
       this.location.back();
@@ -699,6 +642,11 @@ export class EditRowComponent implements OnInit, OnDestroy {
               this.row = row as Dock;
               this.cardTitle = 'Dock #' + this.row.id;
               this.pageTitle = this.viewMode === 'edit' ? 'Edit Dock' : 'View Dock';
+            } else if (this.type === IMPORTING_TYPES.QUALITY_STATES) {
+              this.utilities.log('object is a quality state');
+              this.row = row as Dock;
+              this.cardTitle = 'Quality State #' + this.row.code;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Quality State' : 'View Quality State';
             } else {
               this.cardTitle = 'Unknown object type';
               console.error('object is unknown');

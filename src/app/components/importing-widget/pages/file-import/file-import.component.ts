@@ -29,14 +29,14 @@ export class FileImportComponent implements OnInit, OnDestroy {
     // Obtener las columnas a mostrar segun el tipo de datos recibidos
     this.displayedColumns = Object.keys(this.utilities.dataTypesModelMaps[this.dataTypeToImport]);
     // eliminar campos por defecto y demas settings segun el tipo de datos seleccionado
-    if (this.dataTypeToImport === IMPORTING_TYPES.ITEMS) {
+    if (this.dataTypeToImport === IMPORTING_TYPES.LOADITEMS_DTO) {
       this.title = 'Importing Items';
       this.displayedColumns = this.displayedColumns.filter(column => column !== 'itemState');
     }
-    if (this.dataTypeToImport === IMPORTING_TYPES.LOCATIONS) {
+    if (this.dataTypeToImport === IMPORTING_TYPES.LOADLOCATIONS_DTO) {
       this.title = 'Importing Locations';
     }
-    if (this.dataTypeToImport === IMPORTING_TYPES.ORDERS_DTO) {
+    if (this.dataTypeToImport === IMPORTING_TYPES.LOADORDERS_DTO) {
       this.title = 'Importing Orders';
     }
     if (this.dataTypeToImport === IMPORTING_TYPES.LOADPICKS_DTO) {
@@ -54,8 +54,8 @@ export class FileImportComponent implements OnInit, OnDestroy {
     this.utilities.log('file size', this.file.size);
     this.utilities.log('file type', this.file.type);
     // this.utilities.log('file path', this.file.webkitRelativePath);
-    if (this.file.size > (5 * 1024 * 1024)) {
-      this.utilities.showSnackBar('The file size is bigger than 5MB', 'OK');
+    if (this.file.size > (10 * 1024 * 1024)) {
+      this.utilities.showSnackBar('The file size is bigger than 10MB', 'OK');
       return;
     }
     if (this.file.type !== 'text/csv' && this.file.type !== 'application/vnd.ms-excel'

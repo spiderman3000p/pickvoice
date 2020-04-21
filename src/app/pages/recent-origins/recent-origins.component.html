@@ -6,7 +6,7 @@
             <h1>Recent Origins</h1>
         </div>
         <div class="float-right">
-          <button mat-raised-button color="accent" (click)="clearStorage(importingTypes.ITEMS)">
+          <button mat-raised-button color="accent" (click)="clearStorage(importingTypes.LOADITEMS_DTO)">
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">Clear All</span>
           </button>
         </div>
@@ -18,13 +18,13 @@
     <mat-tab-group>
       <mat-tab label="Items">
         <div class="float-right">
-          <button mat-raised-button color="accent" (click)="clearStorage(importingTypes.ITEMS)">
+          <button mat-raised-button color="accent" (click)="clearStorage(importingTypes.LOADITEMS_DTO)">
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">clear all for items</span>
           </button>
         </div>
         <mat-form-field class="w-100">
           <mat-label>Filter</mat-label>
-          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.ITEMS)" placeholder="Ex. Feb, 14 2019" >
+          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOADITEMS_DTO)" placeholder="Ex. Feb, 14 2019" >
         </mat-form-field> 
         <div>
           <table mat-table [dataSource]="itemsDataSource" matSort>
@@ -44,13 +44,13 @@
       </mat-tab>
       <mat-tab label="Locations">
         <div class="float-right">
-          <button mat-raised-button color="accent" (click)="clearStorage(importingTypes.LOCATIONS)">
+          <button mat-raised-button color="accent" (click)="clearStorage(importingTypes.LOADLOCATIONS_DTO)">
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">clear all for locations</span>
           </button>
         </div>
         <mat-form-field class="w-100">
           <mat-label>Filter</mat-label>
-          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOCATIONS)" placeholder="Ex. Feb, 14 2019" >
+          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOADLOCATIONS_DTO)" placeholder="Ex. Feb, 14 2019" >
         </mat-form-field> 
         <div>
           <table mat-table [dataSource]="locationsDataSource" matSort>
@@ -70,13 +70,13 @@
       </mat-tab>
       <mat-tab label="Orders">
         <div class="float-right">
-          <button mat-raised-button color="accent" (click)="clearStorage(importingTypes.ORDERS_DTO)">
+          <button mat-raised-button color="accent" (click)="clearStorage(importingTypes.LOADORDERS_DTO)">
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">clear all for orders</span>
           </button>
         </div>
         <mat-form-field class="w-100">
           <mat-label>Filter</mat-label>
-          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.ORDERS_DTO)" placeholder="Ex. Feb, 14 2019" >
+          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOADORDERS_DTO)" placeholder="Ex. Feb, 14 2019" >
         </mat-form-field> 
         <div>
           <table mat-table [dataSource]="ordersDataSource" matSort>

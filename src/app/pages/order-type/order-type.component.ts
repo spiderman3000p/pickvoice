@@ -338,7 +338,8 @@ export class OrderTypeComponent implements OnInit, AfterViewInit {
       data: {
         map: this.definitions,
         type: IMPORTING_TYPES.ORDER_TYPE,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Order Type'
       }
     });
     dialogRef.afterClosed().subscribe(result => {

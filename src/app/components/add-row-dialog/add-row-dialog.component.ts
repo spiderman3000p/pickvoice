@@ -46,62 +46,8 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
     const formControls = {};
     this.keys = Object.keys(this.dataMap);
     this.utilities.log('keys', this.keys);
-    if (this.type === IMPORTING_TYPES.ITEMS) {
-      this.row = ModelFactory.newEmptyItem();
-      this.utilities.log('new empty item', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.LOCATIONS) {
-      this.row = ModelFactory.newEmptyLocation();
-      this.utilities.log('new empty location', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.ORDERS) {
-      this.row = ModelFactory.newEmptyOrder();
-      this.utilities.log('new empty order', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
-      this.row = ModelFactory.newEmptyItemType();
-      this.utilities.log('new empty item type', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.UOMS) {
-      this.row = ModelFactory.newEmptyUnityOfMeasure();
-      this.utilities.log('new empty uom', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.CUSTOMERS) {
-      this.row = ModelFactory.newEmptyCustomer();
-      this.utilities.log('new empty customer', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
-      this.row = ModelFactory.newEmptyOrderType();
-      this.utilities.log('new empty order type', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.ORDER_LINE) {
-      this.row = ModelFactory.newEmptyOrderLine();
-      this.utilities.log('new empty order line', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.SECTIONS) {
-      this.row = ModelFactory.newEmptySection();
-      this.utilities.log('new empty section', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.TRANSPORTS) {
-      this.row = ModelFactory.newEmptyTransport();
-      this.utilities.log('new empty transport', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
-      this.row = ModelFactory.newEmptyPickPlanning();
-      this.utilities.log('new empty pick planning', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.PICK_TASKS) {
-      this.row = ModelFactory.newEmptyTask();
-      this.utilities.log('new empty pick task', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.PICK_TASKLINES) {
-      this.row = ModelFactory.newEmptyTaskLine();
-      this.utilities.log('new empty pick task line', this.row);
-    }
-    if (this.type === IMPORTING_TYPES.DOCKS) {
-      this.row = ModelFactory.newEmptyDock();
-      this.utilities.log('new empty dock', this.row);
-    }
+    this.row = ModelFactory.newEmptyObject(this.type);
+    this.utilities.log('new empty ' + this.type, this.row);
     for (let key in this.defaultValues) {
       if (this.row[key] !== undefined) {
         this.row[key] = this.defaultValues[key];
@@ -193,70 +139,8 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
           this.utilities.error('error on create', error);
         }
       };
-      if (this.type === IMPORTING_TYPES.ITEMS) {
-        this.subscriptions.push(this.dataProviderService.createItem(toUpload, 'response', false).pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.LOCATIONS) {
-        this.subscriptions.push(this.dataProviderService.createLocation(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.ORDERS) {
-        this.subscriptions.push(this.dataProviderService.createOrder(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
-        this.subscriptions.push(this.dataProviderService.createItemType(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.UOMS) {
-        this.subscriptions.push(this.dataProviderService.createUom(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.CUSTOMERS) {
-        this.subscriptions.push(this.dataProviderService.createCustomer(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
-        this.subscriptions.push(this.dataProviderService.createOrderType(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.SECTIONS) {
-        this.subscriptions.push(this.dataProviderService.createSection(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.TRANSPORTS) {
-        this.subscriptions.push(this.dataProviderService.createTransport(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
-        this.subscriptions.push(this.dataProviderService.createPickPlanning(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.PICK_TASKS) {
-        /* this.subscriptions.push(this.dataProviderService.createPickTask(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));*/ 
-      }
-
-      if (this.type === IMPORTING_TYPES.PICK_TASKLINES) {
-        /*this.subscriptions.push(this.dataProviderService.createPickTaskLine(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));*/
-      }
-
-      if (this.type === IMPORTING_TYPES.DOCKS) {
-        this.subscriptions.push(this.dataProviderService.createDock(toUpload, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
+      this.subscriptions.push(this.dataProviderService.createObject(this.type, toUpload)
+      .subscribe(observer));
     } else {
       this.dialogRef.close(toUpload);
     }

@@ -1,24 +1,108 @@
-import {Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, OrderDto, Transport,
-        Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine,
-        PickTaskLines, Dock, User, Role, TaskType
+import {Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, Transport,
+        Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine, LoadOrder,
+        PickTaskLines, Dock, User, Role, TaskType, LoadItem, LoadLocation, ItemUom, QualityStates,
+        QualityStateType
      } from '@pickvoice/pickvoice-api';
+import { IMPORTING_TYPES } from './model-maps.model';
 
 export class ModelFactory {
 
     constructor() {
     }
 
+    public static newEmptyObject(type: string) {
+        if (type === IMPORTING_TYPES.ITEMS) {
+            return this.newEmptyItem();
+        }
+        if (type === IMPORTING_TYPES.LOCATIONS) {
+            return this.newEmptyLocation();
+        }
+        if (type === IMPORTING_TYPES.ORDERS) {
+            return this.newEmptyOrder();
+        }
+        if (type === IMPORTING_TYPES.ITEM_TYPE) {
+            return this.newEmptyItemType();
+        }
+        if (type === IMPORTING_TYPES.ITEMUOMS) {
+            return this.newEmptyItemUom();
+        }
+        if (type === IMPORTING_TYPES.UOMS) {
+            return this.newEmptyUnityOfMeasure();
+        }
+        if (type === IMPORTING_TYPES.CUSTOMERS) {
+            return this.newEmptyCustomer();
+        }
+        if (type === IMPORTING_TYPES.ORDER_TYPE) {
+            return this.newEmptyOrderType();
+        }
+        if (type === IMPORTING_TYPES.ORDER_LINE) {
+            return this.newEmptyOrderLine();
+        }
+        if (type === IMPORTING_TYPES.SECTIONS) {
+            return this.newEmptySection();
+        }
+        if (type === IMPORTING_TYPES.TRANSPORTS) {
+            return this.newEmptyTransport();
+        }
+        if (type === IMPORTING_TYPES.PICK_PLANNINGS) {
+            return this.newEmptyPickPlanning();
+        }
+        if (type === IMPORTING_TYPES.PICK_TASKS) {
+            return this.newEmptyTask();
+        }
+        if (type === IMPORTING_TYPES.PICK_TASKLINES) {
+            return this.newEmptyTaskLine();
+        }
+        if (type === IMPORTING_TYPES.DOCKS) {
+            return this.newEmptyDock();
+        }
+        return null;
+    }
+
+    public static newEmptyQualityState(): QualityStates {
+        const object = new Object() as QualityStates;
+        object.code = '';
+        object.name = '';
+        object.optionalCode = '';
+        object.qualityStateType = this.newEmptyQualityStateType();
+        object.state = false;
+        return object;
+    }
+
+    public static newEmptyQualityStateType(): QualityStateType {
+        const object = new Object() as QualityStateType;
+        object.code = '';
+        object.name = '';
+        return object;
+    }
+
+    public static newEmptyItemUom(): ItemUom {
+        const object = new Object() as ItemUom;
+        object.denominator = 0;
+        object.eanCode = '';
+        object.factor = 0;
+        object.height = 0;
+        object.item = this.newEmptyItem();
+        object.length = 0;
+        object.numerator = 0;
+        object.uom = this.newEmptyUnityOfMeasure();
+        object.width = 0;
+        return object;
+    }
+
     public static newEmptyItem(): Item {
         const object = new Object() as Item;
         object.sku = '';
         object.batchNumber = false;
+        object.classification = Item.ClassificationEnum.A;
+        object.cost = 0;
         object.description = '';
         object.expiryDate = false;
-        object.itemState = Item.ItemStateEnum.Active;
         object.itemType = this.newEmptyItemType();
         object.phonetic = '';
         object.scannedVerification = '';
         object.serial = false;
+        object.shelfLife = 0;
         object.spokenVerification = '';
         object.uom = this.newEmptyUnityOfMeasure();
         object.upc = '';
@@ -28,23 +112,78 @@ export class ModelFactory {
         return object;
     }
 
+    public static newEmptyLoadItem(): LoadItem {
+        const object = new Object() as LoadItem;
+        object.batchNumber = false;
+        object.classification = Item.ClassificationEnum.A;
+        object.cost = 0;
+        object.description = '';
+        object.itemTypeCode = '';
+        object.expiryDate = false;
+        object.phonetic = '';
+        object.scannedVerification = '';
+        object.serial = false;
+        object.shelfLife = 0;
+        object.spokenVerification = '';
+        object.upc = '';
+        object.variableWeight = false;
+        object.weight = false;
+        object.weightTolerance = 0;
+        object.qualityStatesCode = '';
+        object.sku = '';
+        object.state = LoadItem.StateEnum.Active;
+        object.tolerance = 0;
+        object.uomCode = '';
+        return object;
+    }
+
     public static newEmptyLocation(): Location {
         const object = new Object() as Location;
+        object.allowedLpns = 0;
         object.checkDigit = 0;
         object.code = '';
         object.columnAt = '';
-        object.deep = '';
+        object.depth = '';
+        object.depthSize = 0;
         object.description = '';
         object.height = '';
+        object.heightSize = 0;
         object.lane = '';
         object.section = this.newEmptySection();
-        object.state = false;
-        object.type = Location.TypeEnum.Picking;
+        object.locationState = Location.LocationStateEnum.DO;
+        object.locationType = Location.LocationTypeEnum.Location;
+        object.multireference = false;
+        object.operationType = Location.OperationTypeEnum.Picking;
+        object.pickHeight = false;
+        object.rackType = Location.RackTypeEnum.CV;
+        object.widthSize = 0;
+        return object;
+    }
+
+    public static newEmptyLoadLocation(): LoadLocation {
+        const object = new Object() as LoadLocation;
+        object.allowedLpns = 0;
+        object.code = '';
+        object.columnAt = '';
+        object.depth = '';
+        object.depthSize = 0;
+        object.description = '';
+        object.height = '';
+        object.heightSize = 0;
+        object.lane = '';
+        object.sectionCode = '';
+        object.locationState = Location.LocationStateEnum.DO;
+        object.locationType = Location.LocationTypeEnum.Location;
+        object.multireference = false;
+        object.operationType = Location.OperationTypeEnum.Picking;
+        object.pickHeight = false;
+        object.rackType = Location.RackTypeEnum.CV;
+        object.widthSize = 0;
         return object;
     }
 
     public static newEmptyOrderDto() {
-        const object = new Object() as OrderDto;
+        const object = new Object() as LoadOrder;
         object.batchNumber = '';
         object.createDate = '';
         object.customerAddress = '';
@@ -77,7 +216,8 @@ export class ModelFactory {
         object.orderType = this.newEmptyOrderType();
         object.priority = 0;
         object.note = '';
-        object.idTransport = null;
+        object.orderDate = '';
+        object.transport = this.newEmptyTransport();
         object.customer = this.newEmptyCustomer();
         object.orderLines = [] as OrderLines;
         return object;
@@ -193,16 +333,11 @@ export class ModelFactory {
         object.enableDate = '';
         object.id = 0;
         object.lines = 0;
-        // object.palletComple = false;
         object.priority = 0;
         object.qyt = 0;
-        // object.ruleExecuted = '';
         object.taskState = PickTask.TaskStateEnum.AC;
         object.taskType = this.newEmptyTaskType();
         object.user = this.newEmptyUser();
-        // object.validateLocation = false;
-        // object.validateLpn = false;
-        // object.validateSku = false;
         return object;
     }
 
@@ -267,7 +402,8 @@ export class ModelFactory {
         object.description = '';
         object.dockType = Dock.DockTypeEnum.Bivalent;
         object.section = this.newEmptySection();
-        object.status = false;
+        object.locationState = Dock.LocationStateEnum.A;
+        object.locationType = Dock.LocationTypeEnum.Dock;
         return object;
     }
 

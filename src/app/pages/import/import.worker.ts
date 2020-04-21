@@ -7,16 +7,22 @@ import { environment } from '../../../environments/environment';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 const dataTypesModelMaps = {
   items: ModelMap.ItemMap,
+  itemsDto: ModelMap.LoadItemDtoMap,
   itemTypes: ModelMap.ItemTypeMap,
   locations: ModelMap.LocationMap,
+  locationsDto: ModelMap.LoadLocationDtoMap,
   orders: ModelMap.OrderMap,
   uoms: ModelMap.UomMap,
-  ordersDto: ModelMap.OrderDtoMap,
+  ordersDto: ModelMap.LoadOrderDtoMap,
   customers: ModelMap.CustomerMap,
   orderTypes: ModelMap.OrderTypeMap,
   sections: ModelMap.SectionMap,
   transports: ModelMap.TransportMap,
-  loadPicksDto: ModelMap.LoadPickDtoMap
+  loadPicksDto: ModelMap.LoadPickDtoMap,
+  pickPlannings: ModelMap.PickPlanningMap,
+  pickTasks: ModelMap.PickTaskMap,
+  pickTaskLines: ModelMap.PickTaskLineMap,
+  docks: ModelMap.DockMap
 };
 let globalData;
 let response;
@@ -55,9 +61,9 @@ function mapData() {
             row[field] = false;
           }
         }
-        if (globalData.selectedType === IMPORTING_TYPES.ITEMS) {
+        if (globalData.selectedType === IMPORTING_TYPES.LOADITEMS_DTO) {
           // this.utilities.log('validating compound items data');
-          if (field === 'itemType' && typeof row.itemType !== 'object') {
+          /*if (field === 'itemType' && typeof row.itemType !== 'object') {
             const aux = row.itemType;
             row.itemType = new Object();
             row.itemType.code = aux;
@@ -69,19 +75,19 @@ function mapData() {
             row.uom = new Object();
             row.uom.code = aux;
             row.uom.description = '';
-          }
+          }*/
           // añadimos campos por defecto
-          row.itemState = 'Active';
-        } else if (globalData.selectedType === IMPORTING_TYPES.LOCATIONS) {
+          row.state = 'Active';
+        } else if (globalData.selectedType === IMPORTING_TYPES.LOADLOCATIONS_DTO) {
           // this.utilities.log('validating compound locations data');
-          if (field === 'section' && typeof row.section !== 'object') {
+          /*if (field === 'section' && typeof row.section !== 'object') {
             const aux = row.section;
             row.section = new Object();
             row.section.code = aux;
             row.section.description = '';
             row.section.name = '';
-          }
-        } else if (globalData.selectedType === IMPORTING_TYPES.ORDERS_DTO) {
+          }*/
+        } else if (globalData.selectedType === IMPORTING_TYPES.LOADORDERS_DTO) {
           // this.utilities.log('validating compound orders data');
           // no hay datos compuestos en orders dto
         } else if (globalData.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
@@ -154,7 +160,7 @@ function validateData() {
           currentRowErrors.push(validationError);
         }
         // comprobando si el campo es unico
-        /*if (headers[field].unique && row[field] !== '') {
+        if (headers[field].unique && row[field] !== '') {
           const exists = globalData.data.filter((element, index) => index !== rowIndex && element[field] == row[field]).length;
           if (exists > 0) {
             const validationError = new Object() as any;
@@ -163,7 +169,7 @@ function validateData() {
               must be unique in all the collection. It repits ${exists} times`;
             currentRowErrors.push(validationError);
           }
-        }*/
+        }
       }
     }
     if (currentRowErrors.length === 0) {

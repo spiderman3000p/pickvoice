@@ -528,7 +528,8 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         map: this.utilities.dataTypesModelMaps.items,
         type: IMPORTING_TYPES.ITEMS,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Item'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {

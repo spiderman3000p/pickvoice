@@ -58,13 +58,13 @@ export class DataPreviewComponent implements OnInit, OnDestroy {
       this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
     }));
     const dataTypeToImport = this.sharedDataService.getDataType();
-    if (dataTypeToImport === IMPORTING_TYPES.ITEMS) {
+    if (dataTypeToImport === IMPORTING_TYPES.LOADLOCATIONS_DTO) {
       this.title = 'Importing Items';
     }
-    if (dataTypeToImport === IMPORTING_TYPES.LOCATIONS) {
+    if (dataTypeToImport === IMPORTING_TYPES.LOADLOCATIONS_DTO) {
       this.title = 'Importing Locations';
     }
-    if (dataTypeToImport === IMPORTING_TYPES.ORDERS_DTO) {
+    if (dataTypeToImport === IMPORTING_TYPES.LOADORDERS_DTO) {
       this.title = 'Importing Orders';
     }
     if (dataTypeToImport === IMPORTING_TYPES.LOADPICKS_DTO) {

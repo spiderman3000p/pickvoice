@@ -240,11 +240,6 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  handleError(error: any) {
-    this.utilities.error('error sending data to api', error);
-    this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
-  }
-
   renderColumnData(type: string, data: any) {
     const text = this.utilities.renderColumnData(type, data);
     return typeof text === 'string' ? text.slice(0, 30) : text;
@@ -339,7 +334,8 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         map: this.definitions,
         type: IMPORTING_TYPES.UOMS,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Uom'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {

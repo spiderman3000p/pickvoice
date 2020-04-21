@@ -124,11 +124,11 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.itemsSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.ITEMS).
+    this.itemsSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADITEMS_DTO).
     subscribe(itemsObserver);
-    this.locationsSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOCATIONS).
+    this.locationsSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADLOCATIONS_DTO).
     subscribe(locationsObserver);
-    this.ordersSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.ORDERS_DTO).
+    this.ordersSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADORDERS_DTO).
     subscribe(ordersObserver);
     this.loadPicksSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADPICKS_DTO).
     subscribe(loadPicksObserver);

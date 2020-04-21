@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { OnDestroy, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { RecentOriginsService } from '../../services/recent-origins.service';
@@ -12,9 +12,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-import { map, retry, tap, last } from 'rxjs/operators';
-import { Item, ItemType, Customer, OrderLine, OrderDto, Order, Transport, Location, UnityOfMeasure,
-         Section, LoadPick } from '@pickvoice/pickvoice-api';
+import { timeout, map, retry, tap, last } from 'rxjs/operators';
 import { DataProviderService} from '../../services/data-provider.service';
 import { HttpResponse, HttpEventType } from '@angular/common/http';
 import { Observable, Subscription } from 'rxjs';
@@ -25,7 +23,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './import.component.html',
   styleUrls: ['./import.component.css']
 })
-export class ImportComponent implements OnInit {
+export class ImportComponent implements OnInit, OnDestroy {
   headers: any; // contendra las cabeceras de las columnas a mostrar en la tabla
   validationRequested = false;
   dataSource: MatTableDataSource<any>;
@@ -92,8 +90,8 @@ export class ImportComponent implements OnInit {
         const headers = this.utilities.dataTypesModelMaps[this.selectedType];
         let displayedColumns = Object.keys(headers);
         // eliminar campos por defecto
-        if (this.selectedType === IMPORTING_TYPES.ITEMS) {
-          displayedColumns = displayedColumns.filter(column => column !== 'itemState');
+        if (this.selectedType === IMPORTING_TYPES.LOADITEMS_DTO) {
+          displayedColumns = displayedColumns.filter(column => column !== 'state');
         }
         this.utilities.log('displayedColumns in import component', displayedColumns);
 
@@ -263,11 +261,11 @@ export class ImportComponent implements OnInit {
     this.isUploadingData = true;
     this.uploadingDone = false;
     this.uploadingProgress = 0;
-    if (this.selectedType === IMPORTING_TYPES.ITEMS) {
+    if (this.selectedType === IMPORTING_TYPES.LOADITEMS_DTO) {
       request = this.sendItemsData(dataToSend);
-    } else if (this.selectedType === IMPORTING_TYPES.LOCATIONS) {
+    } else if (this.selectedType === IMPORTING_TYPES.LOADLOCATIONS_DTO) {
       request = this.sendLocationsData(dataToSend);
-    } else if (this.selectedType === IMPORTING_TYPES.ORDERS_DTO) {
+    } else if (this.selectedType === IMPORTING_TYPES.LOADORDERS_DTO) {
       request = this.sendOrdersData(dataToSend);
     } else if (this.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
       request = this.sendLoadPicksData(dataToSend);
@@ -359,22 +357,22 @@ export class ImportComponent implements OnInit {
 
   sendItemsData(dataToSend: any[]) {
     this.utilities.log('sending items');
-    return this.dataProviderService.createItems(dataToSend, 'events', true);
+    return this.dataProviderService.createItems(dataToSend, 'events', true).pipe(timeout(300000));
   }
 
   sendLocationsData(dataToSend: any[]) {
     this.utilities.log('sending locations');
-    return this.dataProviderService.createLocations(dataToSend, 'events', true);
+    return this.dataProviderService.createLocations(dataToSend, 'events', true).pipe(timeout(300000));
   }
 
   sendOrdersData(dataToSend: any[]) {
     this.utilities.log('sending orders');
-    return this.dataProviderService.createOrders(dataToSend, 'events', true);
+    return this.dataProviderService.createOrders(dataToSend, 'events', true).pipe(timeout(300000));
   }
 
   sendLoadPicksData(dataToSend: any[]) {
     this.utilities.log('sending load picks');
-    return this.dataProviderService.createLoadPicks(dataToSend, 'events', true);
+    return this.dataProviderService.createLoadPicks(dataToSend, 'events', true).pipe(timeout(300000));
   }
 
   handleApiCallResult(result: any, dataToSend: any[]) {
@@ -438,19 +436,19 @@ export class ImportComponent implements OnInit {
     this.utilities.log('first element in data source', this.dataSource.data[0]);
     errors.forEach(error => {
       const existentIndex = this.dataSource.data.findIndex(row => {
-        if (this.selectedType === IMPORTING_TYPES.ITEMS) {
+        if (this.selectedType === IMPORTING_TYPES.LOADITEMS_DTO) {
           if ((row && row.sku && error && error.element && error.element.sku) &&
              (row.sku == error.element.sku)) {
             return true;
           }
         }
-        if (this.selectedType === IMPORTING_TYPES.LOCATIONS) {
+        if (this.selectedType === IMPORTING_TYPES.LOADLOCATIONS_DTO) {
           if ((row && row.code && error && error.element && error.element.code) &&
              (row.code == error.element.code)) {
             return true;
           }
         }
-        if (this.selectedType === IMPORTING_TYPES.ORDERS_DTO) {
+        if (this.selectedType === IMPORTING_TYPES.LOADORDERS_DTO) {
           if ((row && row.code && error && error.element && error.element.code) &&
              (row.code == error.element.code)) {
             return true;
@@ -569,5 +567,11 @@ export class ImportComponent implements OnInit {
 
   ngOnInit() {
     this.initPaginatorSort();
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

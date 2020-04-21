@@ -339,7 +339,8 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         map: this.definitions,
         type: IMPORTING_TYPES.DOCKS,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Dock'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {

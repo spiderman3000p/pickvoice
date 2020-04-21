@@ -3,7 +3,8 @@ import { environment } from '../../environments/environment';
 import { Transport, Location, Item, UomService, SectionService, OrderService, OrderTypeService,
          LocationsService, TransportService, LoadPickService, ItemTypeService, ItemsService,
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
-         PickTaskLine, PickTaskLines, LoadPick, Section, DockService, UserService } from '@pickvoice/pickvoice-api';
+         DockService, UserService, ItemUomService, QualityStates, QualityStatesService,
+         QualityStateTypeService } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
 import { of, Observable } from 'rxjs';
@@ -22,7 +23,131 @@ export class DataProviderService {
     private sectionService: SectionService, private orderService: OrderService,
     private transportService: TransportService, private httpClient: HttpClient,
     private pickTaskService: PickTaskService, private pickPlanningService: PickPlanningService,
-    private docksService: DockService, private userService: UserService) {
+    private docksService: DockService, private userService: UserService,
+    private itemUomService: ItemUomService, private qualityStateService: QualityStatesService,
+    private qualityStateTypeService: QualityStateTypeService) {
+  }
+
+  createObject(type: string, toUpload: any, observe: string = 'body', reportProgress: boolean = false) {
+    if (type === IMPORTING_TYPES.ITEMS) {
+      return this.createItem(toUpload, 'response', false);
+    }
+
+    if (type === IMPORTING_TYPES.LOCATIONS) {
+      return this.createLocation(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.ORDERS) {
+      return this.createOrder(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.ITEM_TYPE) {
+      return this.createItemType(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.ITEMUOMS) {
+      return this.createItemUom(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.QUALITY_STATE_TYPES) {
+      return this.createQualityStateType(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.QUALITY_STATES) {
+      return this.createQualityState(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.UOMS) {
+      return this.createUom(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.CUSTOMERS) {
+      return this.createCustomer(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.ORDER_TYPE) {
+      return this.createOrderType(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.SECTIONS) {
+      return this.createSection(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.TRANSPORTS) {
+      return this.createTransport(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.PICK_PLANNINGS) {
+      return this.createPickPlanning(toUpload, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.PICK_TASKS) {
+      /* return this.createPickTask(toUpload, 'response').pipe(retry(3));*/ 
+    }
+
+    if (type === IMPORTING_TYPES.PICK_TASKLINES) {
+      /*return this.createPickTaskLine(toUpload, 'response').pipe(retry(3));*/
+    }
+
+    if (type === IMPORTING_TYPES.DOCKS) {
+      return this.createDock(toUpload, 'response').pipe(retry(3));
+    }
+    return of({});
+  }
+
+  updateObject(type: string, toUpload: any, id: number): Observable<any> {
+    if (type === IMPORTING_TYPES.ITEMS) {
+      return this.updateItem(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.LOCATIONS) {
+      return this.updateLocation(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.LOADORDERS_DTO) {
+      return this.updateOrder(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.ITEM_TYPE) {
+      return this.updateItemType(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.ORDERS) {
+      return this.updateOrder(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.ORDER_TYPE) {
+      return this.updateOrderType(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.UOMS) {
+      return this.updateUom(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.TRANSPORTS) {
+      return this.updateTransport(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.SECTIONS) {
+      return this.updateSection(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.CUSTOMERS) {
+      return this.updateCustomer(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.PICK_PLANNINGS) {
+      return this.updatePickPlanning(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.PICK_TASKS) {
+      return this.updatePickTask(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.DOCKS) {
+      return this.updateDock(toUpload, id, 'response').pipe(retry(3));
+    }
+    return of(null);
   }
 
   getDataFromApi(type: any, params = '', errorHandler?: any, id?: number): Observable<any> {
@@ -45,7 +170,12 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.ITEM_STATE: {
         this.utilities.log(`obteniendo item states...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Item.ItemStateEnum)));
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Item.StateEnum)));
+        break;
+      }
+      case IMPORTING_TYPES.QUALITY_STATE_TYPES: {
+        this.utilities.log(`obteniendo quality state types...`);
+        toReturn = this.qualityStateService.retrieveAllQualityStates().pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.ITEMS: {
@@ -71,7 +201,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.LOCATION_TYPE: {
         this.utilities.log(`obteniendo locations types...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Location.TypeEnum)));
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Location.LocationTypeEnum)));
         break;
       }
       case IMPORTING_TYPES.ORDERS: {
@@ -181,6 +311,11 @@ export class DataProviderService {
         toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Dock.DockTypeEnum)));
         break;
       }
+      case IMPORTING_TYPES.ITEM_CLASSIFICATIONS: {
+        this.utilities.log(`obteniendo item classifications...`);
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Item.ClassificationEnum)));
+        break;
+      }
       default: toReturn = new Observable(suscriber => {
         suscriber.error(`El tipo de dato '${type}' no tiene un metodo api asociado`);
         suscriber.next([]);
@@ -265,6 +400,76 @@ export class DataProviderService {
 
   public getUom(id: number, observe: any = 'body', reportProgress = false) {
     return this.uomService.retrieveUomById(id, observe, reportProgress);
+  }
+  /**********************************************************************************
+    Grupo de metodos para item uoms
+  ***********************************************************************************/
+  public getAllItemUoms(idItem: number, observe: any = 'body', reportProgress = false) {
+    return this.itemUomService.itemUomByItemId(idItem, observe, reportProgress);
+  }
+
+  public deleteItemUom(id: number, observe: any = 'body', reportProgress = false) {
+    return this.itemUomService.deleteItemUom(id, observe, reportProgress);
+  }
+
+  public updateItemUom(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.itemUomService.updateItemUom(data, id, observe, reportProgress);
+  }
+
+  public createItemUom(data: any, observe: any = 'body', reportProgress = false) {
+    return this.itemUomService.createItemUom(data, observe, reportProgress);
+  }
+
+  public createItemUomList(data: any, observe: any = 'body', reportProgress = false) {
+    return this.itemUomService.createItemUomList(data, observe, reportProgress);
+  }
+
+  public getItemUom(id: number, observe: any = 'body', reportProgress = false) {
+    return this.itemUomService.retrieveItemUom(id, observe, reportProgress);
+  }
+  /**********************************************************************************
+    Grupo de metodos para quality state
+  ***********************************************************************************/
+  public getAllQualityStates(observe: any = 'body', reportProgress = false) {
+    return this.qualityStateService.retrieveAllQualityStates(observe, reportProgress);
+  }
+
+  public deleteQualityState(id: number, observe: any = 'body', reportProgress = false) {
+    return this.qualityStateService.deleteQualityStates(id, observe, reportProgress);
+  }
+
+  public updateQualityState(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.qualityStateService.updateQualityStates(data, id, observe, reportProgress);
+  }
+
+  public createQualityState(data: any, observe: any = 'body', reportProgress = false) {
+    return this.qualityStateService.createQualityStates(data, observe, reportProgress);
+  }
+
+  public getQualityState(id: number, observe: any = 'body', reportProgress = false) {
+    return this.qualityStateService.retrieveQualityStatesById(id, observe, reportProgress);
+  }
+  /**********************************************************************************
+    Grupo de metodos para quality state types
+  ***********************************************************************************/
+  public getAllQualityStateTypes(observe: any = 'body', reportProgress = false) {
+    return this.qualityStateTypeService.retrieveAllQualityStateType(observe, reportProgress);
+  }
+
+  public deleteQualityStateType(id: number, observe: any = 'body', reportProgress = false) {
+    // return this.qualityStateTypeService.(id, observe, reportProgress);
+  }
+
+  public updateQualityStateType(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    // return this.qualityStateService.updateQualityStates(data, id, observe, reportProgress);
+  }
+
+  public createQualityStateType(data: any, observe: any = 'body', reportProgress = false) {
+    return this.qualityStateService.createQualityStates(data, observe, reportProgress);
+  }
+
+  public getQualityStateType(observe: any = 'body', reportProgress = false) {
+    return of({});
   }
   /**********************************************************************************
     Grupo de metodos para locations
@@ -501,18 +706,19 @@ export class DataProviderService {
     return this.pickTaskService.updatePickTask(data, id, observe, reportProgress);
   }
 
-  public activatePickTask(id: number, observe: any = 'body', reportProgress = false) {
-    return this.pickTaskService.changePickTaskStatus(id, PickTask.TaskStateEnum.AC, observe, reportProgress);
+  /*public activatePickTask(data: any[], observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.changePickTaskStatus(data, PickTask.TaskStateEnum.AC, observe, reportProgress);
   }
 
-  public updateStatePickTask(id: number, state: PickTask.TaskStateEnum, observe: any = 'body', reportProgress = false) {
-    return this.pickTaskService.changePickTaskStatus(id, state, observe, reportProgress);
-  }
+  public updateStatePickTask(data: any[], state: PickTask.TaskStateEnum, observe: any = 'body', reportProgress = false) {
+    return this.pickTaskService.changePickTaskStatus(data, state, observe, reportProgress);
+  }*/
 
-  public updateStatePickTaskList(data: any[], status: string, observe: any = 'body', reportProgress = false) {
+  public updateStatePickTaskList(data: any[], state: string, observe: any = 'body', reportProgress = false) {
     // return this.orderService.updateOrder(data, id, observe, reportProgress);
-    return this.httpClient.put(environment.apiBaseUrl +
-      '/console/outbound/pick/changePickTaskStatus?codeState=' + status, data);
+    /*return this.httpClient.put(environment.apiBaseUrl +
+      '/console/outbound/pick/changePickTaskStatus?codeState=' + status, data);*/
+      return this.pickTaskService.changePickTaskStatus(data, state, observe, reportProgress);
   }
 
   public assignUserToPickTask(data: any, user: any, observe: any = 'body', reportProgress = false) {

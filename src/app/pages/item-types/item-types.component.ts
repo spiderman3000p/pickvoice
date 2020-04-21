@@ -364,7 +364,8 @@ export class ItemTypesComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         map: this.utilities.dataTypesModelMaps.itemTypes,
         type: IMPORTING_TYPES.ITEM_TYPE,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
+        title: 'Add New Item Types'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {

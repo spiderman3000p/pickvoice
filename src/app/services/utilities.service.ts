@@ -21,11 +21,15 @@ export interface ValidationError {
 export class UtilitiesService implements OnDestroy {
   public dataTypesModelMaps = {
     items: ModelMap.ItemMap,
+    itemsDto: ModelMap.LoadItemDtoMap,
+    itemUoms: ModelMap.ItemUomMap,
     itemTypes: ModelMap.ItemTypeMap,
+    qualityStates: ModelMap.QualityStateMap,
     locations: ModelMap.LocationMap,
+    locationsDto: ModelMap.LoadLocationDtoMap,
     orders: ModelMap.OrderMap,
     uoms: ModelMap.UomMap,
-    ordersDto: ModelMap.OrderDtoMap,
+    ordersDto: ModelMap.LoadOrderDtoMap,
     customers: ModelMap.CustomerMap,
     orderTypes: ModelMap.OrderTypeMap,
     sections: ModelMap.SectionMap,
@@ -82,6 +86,7 @@ export class UtilitiesService implements OnDestroy {
         case IMPORTING_TYPES.TRANSPORTS: dataValue = data && data.nameRoute ? data.nameRoute : ''; break;
         case IMPORTING_TYPES.CUSTOMERS: dataValue = data && data.name ? data.name : ''; break;
         case IMPORTING_TYPES.ORDER_TYPE: dataValue = data && data.description ? data.description : ''; break;
+        case IMPORTING_TYPES.QUALITY_STATE_TYPES: dataValue = data && data.name ? data.name : ''; break;
         case IMPORTING_TYPES.ORDER_LINE: dataValue = data && data.length ? `${data.length} orders` : 'none'; break;
         default: dataValue = data;
       }

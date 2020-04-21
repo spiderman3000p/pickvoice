@@ -94,17 +94,17 @@ export class EditOrderComponent implements OnInit {
       this.initColumnsDefs(); // columnas a mostrarse en la tabla
     }
     this.form = new FormGroup({
-      orderNumber: new FormControl(this.row.orderNumber, Validators.required),
-      purchaseNumber: new FormControl(this.row.purchaseNumber),
-      invoiceNumber: new FormControl(this.row.invoiceNumber),
-      orderDate: new FormControl(this.row.orderDate),
-      deliveryDate: new FormControl(this.row.deliveryDate),
-      orderType: new FormControl(this.row.orderType),
-      priority: new FormControl(this.row.priority),
-      note: new FormControl(this.row.note),
+      orderNumber: new FormControl(this.row.orderNumber ? this.row.orderNumber : '', Validators.required),
+      purchaseNumber: new FormControl(this.row.purchaseNumber ? this.row.purchaseNumber : ''),
+      invoiceNumber: new FormControl(this.row.invoiceNumber ? this.row.invoiceNumber : ''),
+      orderDate: new FormControl(this.row.orderDate ? this.row.orderDate : ''),
+      deliveryDate: new FormControl(this.row.deliveryDate ? this.row.deliveryDate : ''),
+      orderType: new FormControl(this.row.orderType ? this.row.orderType : ''),
+      priority: new FormControl(this.row.priority ? this.row.priority : ''),
+      note: new FormControl(this.row.note ? this.row.note : ''),
       // idTransport: new FormControl(this.row.idTransport),
-      transport: new FormControl(this.row.transport),
-      customer: new FormControl(this.row.customer)
+      transport: new FormControl(this.row.transport ? this.row.transport : ''),
+      customer: new FormControl(this.row.customer ? this.row.customer : '')
     });
     /*if (this.viewMode === 'view') {
       this.form.disable();

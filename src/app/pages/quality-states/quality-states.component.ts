@@ -1,11 +1,11 @@
 import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
-import { DataProviderService} from '../../services/data-provider.service';
+import { DataProviderService } from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { SectionService, Section } from '@pickvoice/pickvoice-api';
+import { QualityStates } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -15,18 +15,18 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
 import { retry, takeLast } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Subscription, Observable, Observer, merge } from 'rxjs';
+import { merge, Observer, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-sections',
-  templateUrl: './sections.component.html',
-  styleUrls: ['./sections.component.css']
+  selector: 'app-quality-states',
+  templateUrl: './quality-states.component.html',
+  styleUrls: ['./quality-states.component.css']
 })
-export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.SectionMap;
-  dataSource: MatTableDataSource<Section>;
-  dataToSend: Section[];
+export class QualityStatesComponent implements OnInit, AfterViewInit, OnDestroy {
+  definitions: any = ModelMap.QualityStateMap;
+  dataSource: MatTableDataSource<QualityStates>;
+  dataToSend: QualityStates[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
@@ -39,7 +39,7 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.SECTIONS;
+  type = IMPORTING_TYPES.QUALITY_STATES;
   selectsData: any;
   subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -60,9 +60,6 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.subscriptions.push(this.actionForSelected.valueChanges.subscribe(value => {
         this.actionForSelectedRows(value);
       }));
-      this.subscriptions.push(this.selection.changed.subscribe(selected => {
-        this.utilities.log('new selection', selected);
-      }));
 
       this.utilities.log('displayed data columns', this.displayedDataColumns);
       this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
@@ -82,8 +79,8 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInSectionsPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInSectionsPage'));
+    if (localStorage.getItem('displayedColumnsInQualityStatesPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInQualityStatesPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -107,7 +104,7 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.definitions[column.name].formControl.control === 'select') {
           this.selectsData[column.name] =
           this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
-          formControls[column.name].patchValue(-1);
+          formControls[column.name].patchValue('');
         }
         this.filters.push(filter);
       }
@@ -138,7 +135,7 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInSectionsPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInQualityStatesPage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -217,11 +214,11 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (Array.isArray(rows)) {
       const requests = [];
       rows.forEach(row => {
-        requests.push(this.dataProviderService.deleteSection(row.id, 'response', false));
+        requests.push(this.dataProviderService.deleteQualityState(row.id, 'response', false));
       });
       this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteSection(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deleteQualityState(rows.id, 'response', false)
       .subscribe(observer));
     }
   }
@@ -266,7 +263,7 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
     const filters = this.filters.filter(filter => filter.show &&
                     formValues[filter.key] && formValues[filter.key].length > 0);
     // this.utilities.log('filters: ', filters);
-    this.dataSource.filterPredicate = (data: Section, filter: string) => {
+    this.dataSource.filterPredicate = (data: QualityStates, filter: string) => {
       // this.utilities.log('data', data);
       return filters.every(shownFilter => {
         value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
@@ -294,7 +291,7 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         row: element,
         map: this.definitions,
-        type: IMPORTING_TYPES.SECTIONS,
+        type: IMPORTING_TYPES.QUALITY_STATES,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -311,12 +308,12 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
   }
 
-  loadData(useCache = true) {
-    this.utilities.log('requesting sections');
+  loadData() {
+    this.utilities.log('requesting quality states');
     this.isLoadingResults = true;
-    this.subscriptions.push(this.dataProviderService.getAllSections().subscribe(results => {
+    this.subscriptions.push(this.dataProviderService.getAllQualityStates().subscribe(results => {
       this.isLoadingResults = false;
-      this.utilities.log('sections received', results);
+      this.utilities.log('quality states received', results);
       if (results && results.length > 0) {
         this.dataSource.data = results.map((element, i) => {
           return { index: i, ... element};
@@ -332,18 +329,18 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   reloadData() {
     this.selection.clear();
-    this.loadData(false);
+    this.loadData();
   }
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.sections);
+    this.utilities.dataTypesModelMaps.qualityStates);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.definitions,
-        type: IMPORTING_TYPES.SECTIONS,
+        type: IMPORTING_TYPES.QUALITY_STATES,
         remoteSync: true, // para mandar los datos a la BD por la API
-        title: 'Add New Section'
+        title: 'Add New Quality State'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
@@ -360,11 +357,10 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   export() {
-    const dataToExport = this.dataSource.data.slice().map((row: any) => {
-      delete row.id;
-      delete row.index;
+    const dataToExport = this.dataSource.data.map((row: any) => {
+      return this.utilities.getJsonFromObject(row, this.type);
     });
-    this.utilities.exportToXlsx(dataToExport, 'Sections List');
+    this.utilities.exportToXlsx(dataToExport, 'Quality State List');
   }
 
   /*
@@ -392,6 +388,6 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.forEach(subscription => subscription.unsubscribe);
   }
 }

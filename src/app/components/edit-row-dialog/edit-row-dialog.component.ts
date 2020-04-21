@@ -9,7 +9,7 @@ import { AddRowDialogComponent } from '../add-row-dialog/add-row-dialog.componen
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { SharedDataService } from '../../services/shared-data.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Subscription, from, Observable } from 'rxjs';
+import { Observer, Subscription, from, Observable } from 'rxjs';
 import { retry } from 'rxjs/operators';
 
 @Component({
@@ -52,6 +52,11 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
     this.utilities.log('keys', this.keys);
     this.utilities.log('data type', this.type);
     this.selectsData = {};
+    for (let key in this.defaultValues) {
+      if (this.row[key] !== undefined) {
+        this.row[key] = this.defaultValues[key];
+      }
+    }
     this.keys.forEach((key, index) => {
       if (this.row === undefined) {
         return;
@@ -63,10 +68,13 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
         formControls[key] = new FormControl(this.row[key]);
       }
       if (this.dataMap[key].formControl.control === 'select') {
-        this.selectsData[key] =
-        this.dataProviderService.getDataFromApi(this.dataMap[key].type);
-        if (typeof this.row[key] === 'object') {
-          formControls[key].setValue(this.row[key]);
+        if (this.defaultValues === undefined || (this.defaultValues !== undefined &&
+          this.defaultValues[key] === undefined)) {
+          this.selectsData[key] =
+          this.dataProviderService.getDataFromApi(this.dataMap[key].type);
+          if (typeof this.row[key] === 'object') {
+            formControls[key].setValue(this.row[key]);
+          }
         }
       }
     });
@@ -131,50 +139,8 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
         }
       };
       this.utilities.log('data to upload', toUpload);
-      if (this.type === IMPORTING_TYPES.ITEMS) {
-        this.subscriptions.push(this.dataProviderService.updateItem(toUpload, this.row.id, 'response', false).pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.LOCATIONS) {
-        this.subscriptions.push(this.dataProviderService.updateLocation(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.ORDERS_DTO) {
-        this.subscriptions.push(this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.ITEM_TYPE) {
-        this.subscriptions.push(this.dataProviderService.updateItemType(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.ORDERS) {
-        this.subscriptions.push(this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.ORDER_TYPE) {
-        this.subscriptions.push(this.dataProviderService.updateOrderType(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.UOMS) {
-        this.subscriptions.push(this.dataProviderService.updateUom(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.TRANSPORTS) {
-        this.subscriptions.push(this.dataProviderService.updateTransport(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
-
-      if (this.type === IMPORTING_TYPES.SECTIONS) {
-        this.subscriptions.push(this.dataProviderService.updateSection(toUpload, this.row.id, 'response').pipe(retry(3))
-        .subscribe(observer));
-      }
+      this.subscriptions.push(this.dataProviderService.updateObject(this.type, toUpload, this.row.id)
+      .subscribe(observer));
     } else {
       this.dialogRef.close(toUpload);
     }
