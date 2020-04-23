@@ -23,6 +23,7 @@ export class UtilitiesService implements OnDestroy {
     items: ModelMap.ItemMap,
     itemsDto: ModelMap.LoadItemDtoMap,
     itemUoms: ModelMap.ItemUomMap,
+    itemUomsDto: ModelMap.LoadItemUomDtoMap,
     itemTypes: ModelMap.ItemTypeMap,
     qualityStates: ModelMap.QualityStateMap,
     locations: ModelMap.LocationMap,

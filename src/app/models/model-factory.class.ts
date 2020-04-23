@@ -229,8 +229,23 @@ export class ModelFactory {
         object.route = '';
         object.nameRoute = '';
         object.carrierCode = '';
-        object.transportState = Transport.TransportStateEnum.Pending;
-        object.orders = [];
+        object.transportationStatus = Transport.TransportationStatusEnum.Checkin;
+        object.actualCheckin = '';
+        object.actualEndLoading = '';
+        object.containerNumber = '';
+        object.currentShipmentCompletion = '';
+        object.currentStartLoading = '';
+        object.description = '';
+        object.plannedCheckin = '';
+        object.plannedEndLoading = '';
+        object.plannedShipmentCompletion = '';
+        object.plannedStartLoading = '';
+        object.shipmentDate = '';
+        object.trailer = '';
+        object.uomVolume = this.newEmptyUnityOfMeasure();
+        object.uomWeight = this.newEmptyUnityOfMeasure();
+        object.vehicle = '';
+        object.weight = 0;
         return object;
     }
 

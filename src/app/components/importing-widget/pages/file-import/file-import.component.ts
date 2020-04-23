@@ -42,6 +42,9 @@ export class FileImportComponent implements OnInit, OnDestroy {
     if (this.dataTypeToImport === IMPORTING_TYPES.LOADPICKS_DTO) {
       this.title = 'Importing Load Picks';
     }
+    if (this.dataTypeToImport === IMPORTING_TYPES.LOADITEMUOMS_DTO) {
+      this.title = 'Importing Item Uoms';
+    }
     this.utilities.log('displayedColumns', this.displayedColumns);
   }
 

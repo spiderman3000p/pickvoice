@@ -244,7 +244,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.TRANSPORT_STATE: {
         this.utilities.log(`obteniendo transport states...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Transport.TransportStateEnum)));
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Transport.TransportationStatusEnum)));
         break;
       }
       case IMPORTING_TYPES.UOMS: {
@@ -418,6 +418,10 @@ export class DataProviderService {
 
   public createItemUom(data: any, observe: any = 'body', reportProgress = false) {
     return this.itemUomService.createItemUom(data, observe, reportProgress);
+  }
+
+  public createItemUoms(data: any, observe: any = 'body', reportProgress = false) {
+    return this.itemUomService.createItemUomList(data, observe, reportProgress);
   }
 
   public createItemUomList(data: any, observe: any = 'body', reportProgress = false) {

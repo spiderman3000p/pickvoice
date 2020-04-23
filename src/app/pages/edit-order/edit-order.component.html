@@ -65,12 +65,6 @@
                                             </span>
                                         </div>
                                     </mat-select>
-                                    <!-- hint, link o button -->
-                                    <!--mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
-                                        <a (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')" color="primary">
-                                            <mat-icon>add</mat-icon> Add new order type
-                                        </a>
-                                    </mat-hint-->
                                 </mat-form-field>
                                 <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                                     <mat-label>Priority</mat-label>
@@ -181,8 +175,108 @@
                                     <input class="w-100" matInput type="text" [value]="form.get('transport').value.carrierCode" [class.readonly]="viewMode === 'view'">
                                 </mat-form-field>
                                 <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Transport State</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.transportState" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Shipment Date</mat-label>
+                                    <input matInput [value]="form.get('transport').value.shipmentDate" [matDatepicker]="shipmentDate" [class.readonly]="viewMode === 'view'" readonly>
+                                    <mat-datepicker-toggle matSuffix [for]="shipmentDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
+                                    <mat-datepicker #shipmentDate ></mat-datepicker>
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Transportation Status</mat-label>
+                                    <mat-select [compareWith]="dataMap.transportationStatus.formControl.compareFn" formControlName="transportationStatus" [class.readonly]="viewMode === 'view'">
+                                        <mat-option *ngFor="let status of ordersData.transportList" [value]="status">
+                                            {{ status }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Vehicle</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.vehicle" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Container Number</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.containerNumber" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Weight</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.weight" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Trailer</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.trailer" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Carrier Code</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.carrierCode" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Description</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.description" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Planned Checkin</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.plannedCheckin" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Actual Checkin</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.actualCheckin" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Planned Start Loading</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.plannedStartLoading" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Current Start Loading</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.currentStartLoading" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Planned End Loading</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.plannedEndLoading" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Actual End Loading</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.actualEndLoading" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Planned Shipment Completion</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.plannedShipmentCompletion" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Current Shipment Completion</mat-label>
+                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.currentShipmentCompletion" [class.readonly]="viewMode === 'view'">
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Uom Weight</mat-label>
+                                    <mat-select [compareWith]="dataMap.uomWeight.formControl.compareFn" formControlName="uomWeight" [class.readonly]="viewMode === 'view'">
+                                        <mat-option *ngFor="let uom of ordersData.uomList" [value]="uom">
+                                            {{ status }}
+                                        </mat-option>
+                                        <div class="select-footer" *ngIf="dataMap.uomWeight.addNew && viewMode === 'edit'">
+                                            <span class="select-footer-content">
+                                                <a href="javascript: void(0)"
+                                                (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
+                                                    <mat-icon *ngIf="dataMap.uomWeight.addNew.icon">{{ dataMap.uomWeight.addNew.icon }}</mat-icon>
+                                                    <span>{{ dataMap.uomWeight.addNew.text }}</span>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                    <mat-label>Uom Volume</mat-label>
+                                    <mat-select [compareWith]="dataMap.uomVolume.formControl.compareFn" formControlName="uomVolume" [class.readonly]="viewMode === 'view'">
+                                        <mat-option *ngFor="let uom of ordersData.uomList" [value]="uom">
+                                            {{ status }}
+                                        </mat-option>
+                                        <div class="select-footer" *ngIf="dataMap.uomVolume.addNew && viewMode === 'edit'">
+                                            <span class="select-footer-content">
+                                                <a href="javascript: void(0)"
+                                                (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
+                                                    <mat-icon *ngIf="dataMap.uomVolume.addNew.icon">{{ dataMap.uomVolume.addNew.icon }}</mat-icon>
+                                                    <span>{{ dataMap.uomVolume.addNew.text }}</span>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </mat-select>
                                 </mat-form-field>
                             </span>
                         </ng-template>

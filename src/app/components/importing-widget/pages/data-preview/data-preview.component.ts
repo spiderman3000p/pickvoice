@@ -70,6 +70,9 @@ export class DataPreviewComponent implements OnInit, OnDestroy {
     if (dataTypeToImport === IMPORTING_TYPES.LOADPICKS_DTO) {
       this.title = 'Importing Load Picks';
     }
+    if (dataTypeToImport === IMPORTING_TYPES.LOADITEMUOMS_DTO) {
+      this.title = 'Importing Item Uoms';
+    }
   }
 
   setData() {

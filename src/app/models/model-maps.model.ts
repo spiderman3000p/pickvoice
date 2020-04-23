@@ -4,6 +4,7 @@ export const IMPORTING_TYPES = {
     ITEM_CLASSIFICATIONS: 'itemClassifications',
     LOADITEMS_DTO: 'itemsDto',
     ITEMUOMS: 'itemUoms',
+    LOADITEMUOMS_DTO: 'itemUomsDto',
     LOCATIONS: 'locations',
     LOCATION_STATE: 'locationState',
     OPERATION_TYPE: 'operationType',
@@ -1022,8 +1023,8 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        deliverDate: {
-            name: 'delivery date',
+        shipmentDate: {
+            name: 'shipment date',
             required: false,
             type: 'date',
             formControl: {
@@ -1031,7 +1032,7 @@ export class ModelMap {
                 type: 'date'
             }
         },
-        state: {
+        transportationStatus: {
             name: 'state',
             required: false,
             type: IMPORTING_TYPES.TRANSPORT_STATE,
@@ -1045,14 +1046,13 @@ export class ModelMap {
                 }
             }
         },
-        cubicMeters: {
-            name: 'meters',
+        vehicle: {
+            name: 'vehicle',
             required: false,
-            type: 'number',
+            type: 'string',
             formControl: {
                 control: 'input',
-                type: 'number',
-                min: 0
+                type: 'text'
             }
         },
         containerNumber: {
@@ -1073,20 +1073,124 @@ export class ModelMap {
                 type: 'number'
             }
         },
-        orders: {
-            name: 'orders',
+        trailer: {
+            name: 'trailer',
             required: false,
-            type: IMPORTING_TYPES.ORDERS,
+            type: 'string',
             formControl: {
-                control: 'table',
-                type: 'normal'
-            },
-            addNew: {
-                text: 'Add new order',
-                icon: 'add',
-                modelType: IMPORTING_TYPES.ORDERS
+                control: 'input',
+                type: 'text'
             }
-        }
+        },
+        uomWeight: {
+            name: 'uom weight',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        uomVolume: {
+            name: 'uom volume',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        description: {
+            name: 'description',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        plannedCheckin: {
+            name: 'planned checkin',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        actualCheckin: {
+            name: 'actual checkin',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        plannedStartLoading: {
+            name: 'planned start loading',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        currentStartLoading: {
+            name: 'current start loading',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        plannedEndLoading: {
+            name: 'planned end loading',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        actualEndLoading: {
+            name: 'actual end loading',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        plannedShipmentCompletion: {
+            name: 'planned shipment completion',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        currentShipmentCompletion: {
+            name: 'current shipment completion',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
     };
     /* order line object map for CRUD */
     public static OrderLineMap = {
@@ -2360,6 +2464,110 @@ export class ModelMap {
                 compareFn: (c1, c2) => {
                     return c1.code === c2.code;
                 }
+            }
+        }
+    };
+    /* item uom dto map (for importing process) */
+    public static LoadItemUomDtoMap = {
+        denominator: {
+            name: 'denominator',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        numerator: {
+            name: 'numerator',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        factor: {
+            name: 'factor',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        length: {
+            name: 'length',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        width: {
+            name: 'width',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        height: {
+            name: 'height',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        eanCode: {
+            name: 'ean code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        uomCode: {
+            name: 'uom',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new uom',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.UOMS
+            }
+        },
+        itemSku: {
+            name: 'item',
+            required: false,
+            type: IMPORTING_TYPES.ITEMS,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: 'sku',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.sku === c2.sku;
+                }
+            },
+            addNew: {
+                text: 'Add new item',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.ITEMS
             }
         }
     };

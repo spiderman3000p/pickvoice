@@ -19,6 +19,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { NumericEditorComponent } from './numeric-editor.component';
 
 interface ItemData {
   uomsList: UnityOfMeasure[];
@@ -46,6 +47,79 @@ export class EditItemComponent implements OnInit {
   printElement = {};
   viewMode: string;
   itemData: ItemData;
+  /* para tabla ag-grid */
+  gridApi;
+  gridColumnApi;
+  frameworkComponents: any;
+  itemUomsColDefs: any[] = [
+    {
+      headerName: 'DENOMINATOR',
+      field: 'denominator',
+      width: 100,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
+      headerName: 'NUMERATOR',
+      field: 'numerator',
+      width: 100,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
+      headerName: 'FACTOR',
+      field: 'factor',
+      width: 100,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
+      headerName: 'LENGTH',
+      field: 'length',
+      width: 100,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
+      headerName: 'WIDTH',
+      field: 'width',
+      width: 100,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
+      headerName: 'HEIGHT',
+      field: 'height',
+      width: 100,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
+      headerName: 'EAN CODE',
+      field: 'eanCode',
+      editable: true
+    },
+    {
+      headerName: 'UOM',
+      field: 'uom',
+      valueFormatter: uomFormatter,
+      valueParser: uomParser,
+      /*valueGetter: uomGetter,
+      valueSetter: uomSetter,*/
+      cellEditor: 'agSelectCellEditor',
+      cellEditorParams: (params) => {
+        return {
+          values: this.selectsData.uom.map(uom => uom.code)
+        };
+      },
+      editable: true
+    },
+    {
+      headerName: 'OPTIONS',
+      field: 'options'
+    }
+  ];
+  itemUomsData: any = [];
   /* para tabla de item uoms */
   definitions: any = ModelMap.ItemUomMap;
   dataSource: MatTableDataSource<ItemUom>;
@@ -75,8 +149,15 @@ export class EditItemComponent implements OnInit {
     this.itemData.statesList = [];
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Item' : 'View Item';
     this.isLoadingResults = true;
+    /* para tabla ag-grid */
+    this.displayedDataColumns = Object.keys(this.definitions);
+    this.frameworkComponents = {
+      /*moodRenderer: MoodRenderer,
+      moodEditor: MoodEditor,*/
+      numericEditor: NumericEditorComponent,
+    };
     /* para tabla de item uom */
-    this.dataSource = new MatTableDataSource([]);
+    /*this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
     this.dataToSend = [];
     this.actionForSelected = new FormControl('');
@@ -92,6 +173,8 @@ export class EditItemComponent implements OnInit {
 
     this.utilities.log('displayed data columns', this.displayedDataColumns);
     this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
+    */
+    this.initColumnsDefs(); // columnas a mostrarse
   }
 
   init() {
@@ -121,7 +204,8 @@ export class EditItemComponent implements OnInit {
       tolerance: new FormControl(this.row.tolerance),
       shelfLife: new FormControl(this.row.shelfLife)
     });
-    this.loadData();
+    // this.loadData();
+    this.itemUomsData = this.dataProviderService.getAllItemUoms(this.row.id);
   }
 
   handleError(error: any) {
@@ -262,8 +346,8 @@ export class EditItemComponent implements OnInit {
       this.remoteSync = true;
     });
     /* para la tabla de item uom */
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    /*this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;*/
   }
 
   /* Metodos para la tabla de item uom */
@@ -272,15 +356,15 @@ export class EditItemComponent implements OnInit {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInEditItemPage')) {
+    /*if (localStorage.getItem('displayedColumnsInEditItemPage')) {
       this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInEditItemPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
         return {show: shouldShow, name: columnName};
       });
-    }
-    aux = this.columnDefs.slice();
+    }*/
+    /*aux = this.columnDefs.slice();
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
@@ -303,6 +387,15 @@ export class EditItemComponent implements OnInit {
     });
     this.filtersForm = new FormGroup(formControls);
     this.utilities.log('formControls', formControls);
+    */
+    this.selectsData = {};
+    for (let key in this.definitions) {
+      if (this.definitions[key].formControl.control === 'select') {
+        this.dataProviderService.getDataFromApi(this.definitions[key].type).subscribe(result => {
+          this.selectsData[key] = result;
+        });
+      }
+    }
   }
 
   getDisplayedHeadersColumns() {
@@ -507,10 +600,10 @@ export class EditItemComponent implements OnInit {
       this.isLoadingResults = false;
       this.utilities.log('item uoms received', results);
       if (results && results.length > 0) {
-        this.dataSource.data = results.map((element, i) => {
+        /*this.dataSource.data = results.map((element, i) => {
           return { index: i, ... element};
         });
-        this.refreshTable();
+        this.refreshTable();*/
       }
     }, error => {
       this.isLoadingResults = false;
@@ -541,8 +634,8 @@ export class EditItemComponent implements OnInit {
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
-        this.dataSource.data.push(result);
-        this.refreshTable();
+        // this.dataSource.data.push(result);
+        this.itemUomsData = this.dataProviderService.getAllItemUoms(this.row.id);
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');
@@ -581,5 +674,44 @@ export class EditItemComponent implements OnInit {
   toggleFilters() {
     this.showFilters = !this.showFilters;
   }
+
+  updateItemUom(event) {
+    console.log(event);
+    const itemUom = event.data;
+    console.log('updateItemUom', event.params);
+    itemUom.uom = this.selectsData.uom.find(uom => uom.code === itemUom.uom);
+    this.dataProviderService.updateItemUom(itemUom, itemUom.id).subscribe(result => {
+      this.utilities.log('item uom update result', result);
+      if (result) {
+        this.utilities.showSnackBar('Item uom updated successfully', 'OK');
+      }
+    });
+  }
+  onGridReady(params) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+    // new EventListener(this.gridApi.onRow)
+  }
   /* fin de metodos para la tabla de item uoms */
+}
+
+function uomFormatter(params) {
+  console.log('uomFormatter', params.value);
+  return params.value.code;
+}
+
+function uomParser(params) {
+  console.log('uomParser', params);
+  return params.newValue.code;
+}
+
+function uomGetter(params) {
+  console.log('uomGetter', params);
+  return params.data.uom.name;
+}
+
+function uomSetter(params) {
+  console.log('uomSetter', params);
+  params.data.uom = params.newValue;
+  return true;
 }

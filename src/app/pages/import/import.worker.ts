@@ -8,6 +8,7 @@ import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 const dataTypesModelMaps = {
   items: ModelMap.ItemMap,
   itemsDto: ModelMap.LoadItemDtoMap,
+  itemUomsDto: ModelMap.LoadItemUomDtoMap,
   itemTypes: ModelMap.ItemTypeMap,
   locations: ModelMap.LocationMap,
   locationsDto: ModelMap.LoadLocationDtoMap,
@@ -91,6 +92,9 @@ function mapData() {
           // this.utilities.log('validating compound orders data');
           // no hay datos compuestos en orders dto
         } else if (globalData.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
+          // this.utilities.log('validating compound orders data');
+          // no hay datos compuestos en loadpicks dto
+        } else if (globalData.selectedType === IMPORTING_TYPES.LOADITEMUOMS_DTO) {
           // this.utilities.log('validating compound orders data');
           // no hay datos compuestos en loadpicks dto
         }

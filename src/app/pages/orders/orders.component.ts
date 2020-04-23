@@ -173,7 +173,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     this.selectsData = [];
     this.columnDefs.slice().forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
-      if (index > 0 && index < this.columnDefs.length - 1) {
+      if (index > 0 && index < this.columnDefs.length - 1 && this.definitions[column.name] !== undefined) {
         filter = new Object();
         filter.show = column.show;
         this.utilities.log(`this.definitions[${column.name}]`, this.definitions[column.name]);

@@ -87,6 +87,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
       if (jsonResult && jsonResult.length > 0) {
         const receivedKeys: any[] = Object.keys(jsonResult[0]);
+        this.utilities.log('receivedKeys', receivedKeys);
         const headers = this.utilities.dataTypesModelMaps[this.selectedType];
         let displayedColumns = Object.keys(headers);
         // eliminar campos por defecto
@@ -163,7 +164,8 @@ export class ImportComponent implements OnInit, OnDestroy {
   }
 
   initValidateData() {
-    if (this.dataSource.data === undefined || this.dataSource.data === null || this.dataSource.data.length === 0) {
+    if (this.dataSource.data === undefined || this.dataSource.data === null ||
+        this.dataSource.data.length === 0) {
       this.utilities.error('table data is empty or invalid. Can not validate');
       return;
     }
@@ -269,6 +271,8 @@ export class ImportComponent implements OnInit, OnDestroy {
       request = this.sendOrdersData(dataToSend);
     } else if (this.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
       request = this.sendLoadPicksData(dataToSend);
+    } else if (this.selectedType === IMPORTING_TYPES.LOADITEMUOMS_DTO) {
+      request = this.sendItemUomsData(dataToSend);
     }
 
     this.subscription = request.pipe(map(event => this.getEventMessage(event)))
@@ -375,6 +379,11 @@ export class ImportComponent implements OnInit, OnDestroy {
     return this.dataProviderService.createLoadPicks(dataToSend, 'events', true).pipe(timeout(300000));
   }
 
+  sendItemUomsData(dataToSend: any[]) {
+    this.utilities.log('sending item uoms');
+    return this.dataProviderService.createItemUoms(dataToSend, 'events', true).pipe(timeout(300000));
+  }
+
   handleApiCallResult(result: any, dataToSend: any[]) {
     let snackMessage = '';
     this.importedRows = 0;
@@ -455,8 +464,12 @@ export class ImportComponent implements OnInit, OnDestroy {
           }
         }
         if (this.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
-          if ((row && row.cartonCode && error && error.element && error.element.cartonCode) &&
-             (row.cartonCode == error.element.cartonCode)) {
+          if ((row && error && error.element) && (row === error.element)) {
+            return true;
+          }
+        }
+        if (this.selectedType === IMPORTING_TYPES.LOADITEMUOMS_DTO) {
+          if ((row && error && error.element) && (row === error.element)) {
             return true;
           }
         }

@@ -1,0 +1,33 @@
+[debug] [2020-04-23T00:52:51.914Z] ----------------------------------------------------------------------
+[debug] [2020-04-23T00:52:51.918Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Rafa\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2020-04-23T00:52:51.918Z] CLI Version:   7.12.1
+[debug] [2020-04-23T00:52:51.918Z] Platform:      win32
+[debug] [2020-04-23T00:52:51.918Z] Node Version:  v10.15.1
+[debug] [2020-04-23T00:52:51.921Z] Time:          Wed Apr 22 2020 20:52:51 GMT-0400 (GMT-04:00)
+[debug] [2020-04-23T00:52:51.921Z] ----------------------------------------------------------------------
+[debug] [2020-04-23T00:52:51.921Z] 
+[debug] [2020-04-23T00:52:51.941Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-04-23T00:52:51.942Z] > authorizing via signed-in user
+[debug] [2020-04-23T00:52:51.942Z] [iam] checking project pickvoice for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2020-04-23T00:52:51.945Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/pickvoice:testIamPermissions  
+
+[debug] [2020-04-23T00:53:02.849Z] [iam] error while checking permissions, command may fail: FirebaseError: Server Error. Client network socket disconnected before secure TLS connection was established
+[debug] [2020-04-23T00:53:02.853Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/pickvoice  
+ 
+[debug] [2020-04-23T00:53:21.946Z] Server Error. Client network socket disconnected before secure TLS connection was established
+[debug] [2020-04-23T00:53:21.954Z] FirebaseError: Server Error. Client network socket disconnected before secure TLS connection was established
+    at Request._callback (C:\Users\Rafa\AppData\Roaming\npm\node_modules\firebase-tools\lib\api.js:30:31)
+    at self.callback (C:\Users\Rafa\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\request\request.js:185:22)
+    at Request.emit (events.js:189:13)
+    at Request.EventEmitter.emit (domain.js:441:20)
+    at Request.onRequestError (C:\Users\Rafa\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\request\request.js:881:8)
+    at ClientRequest.emit (events.js:194:15)
+    at ClientRequest.EventEmitter.emit (domain.js:441:20)
+    at TLSSocket.socketErrorListener (_http_client.js:392:9)
+    at TLSSocket.emit (events.js:189:13)
+    at TLSSocket.EventEmitter.emit (domain.js:441:20)
+    at emitErrorNT (internal/streams/destroy.js:82:8)
+    at emitErrorAndCloseNT (internal/streams/destroy.js:50:3)
+    at process._tickCallback (internal/process/next_tick.js:63:19)
+[error] 
+[error] Error: Failed to get Firebase project pickvoice. Please make sure the project exists and your account has permission to access it.

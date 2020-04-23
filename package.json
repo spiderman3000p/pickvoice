@@ -27,7 +27,7 @@
     "@angular/platform-server": "~9.0.0-rc.12",
     "@angular/router": "~9.0.0-rc.12",
     "@angular/service-worker": "~9.0.0-rc.12",
-    "@pickvoice/pickvoice-api": "^0.2.7",
+    "@pickvoice/pickvoice-api": "^0.2.8",
     "ag-grid-angular": "^22.1.1",
     "ag-grid-community": "^22.1.1",
     "ag-grid-enterprise": "^22.1.1",
