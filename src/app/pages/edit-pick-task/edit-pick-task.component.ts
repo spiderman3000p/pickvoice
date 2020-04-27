@@ -48,11 +48,11 @@ export class EditPickTaskComponent implements OnInit {
   viewMode: string;
   pickTaskData: PickTaskData;
 
-  columnDefs: any[];
+  columnDefs: any[] = [];
   dataSource: MatTableDataSource<PickTaskLine>;
-  displayedDataColumns: string[];
-  displayedHeadersColumns: any[];
-  defaultColumnDefs: any[];
+  displayedDataColumns: string[] = [];
+  displayedHeadersColumns: any[] = [];
+  defaultColumnDefs: any[] = [];
   pageSizeOptions = [5, 10, 15, 30, 50, 100];
   filter: FormControl;
   filtersForm: FormGroup;
@@ -63,6 +63,14 @@ export class EditPickTaskComponent implements OnInit {
   states = STATES;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.setDataSourceAttributes();
+  }
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSourceAttributes();
+  }
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
     private activatedRoute: ActivatedRoute, private dataProviderService: DataProviderService,
@@ -76,6 +84,27 @@ export class EditPickTaskComponent implements OnInit {
     this.pickTaskData.userList = [];
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Task' : 'View Pick Task';
     this.isLoadingResults = true;
+
+    this.form = new FormGroup({
+      description: new FormControl(''),
+      enableDate: new FormControl(''),
+      dateAssignment: new FormControl(''),
+      date: new FormControl(''),
+      priority: new FormControl(''),
+      lines: new FormControl(''),
+      qty: new FormControl(''),
+      document: new FormControl(''),
+      taskState: new FormControl(''),
+      user: new FormControl(''),
+      taskType: new FormControl(''),
+      currentLine: new FormControl(''),
+      childrenWork: new FormControl('')
+    });
+  }
+
+  setDataSourceAttributes() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   init() {

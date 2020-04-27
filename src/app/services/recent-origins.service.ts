@@ -4,59 +4,37 @@ import { Observable, from, of, Subject } from 'rxjs';
 import { map, retry } from 'rxjs/operators';
 import { UtilitiesService } from './utilities.service';
 
-interface RecentOriginsFilters {
-    fromDate: Date;
-    toDate: Date;
-    filename: string;
-    filepath: string;
-    user: string;
-    totalRows: number;
-    invalidRows: number;
-}
 @Injectable({
     providedIn: 'root'
 })
 export class RecentOriginsService {
-    itemsRecentOrigins: RecentOrigin[];
-    locationsRecentOrigins: RecentOrigin[];
-    ordersDtoRecentOrigins: RecentOrigin[];
-    loadPicksDtoRecentOrigins: RecentOrigin[];
-    itemsFilters: RecentOriginsFilters;
-    locationsFilters: RecentOriginsFilters;
-    ordersFilters: RecentOriginsFilters;
-    loadPicksDtoFilters: RecentOriginsFilters;
 
     constructor(private utilities: UtilitiesService) {
         if (typeof(Storage) === 'undefined') {
             throw new Error('The Local Storage is not available in this browser');
         }
-        this.itemsRecentOrigins = [];
-        this.locationsRecentOrigins = [];
-        this.ordersDtoRecentOrigins = [];
-        this.loadPicksDtoRecentOrigins = [];
     }
 
-    getRecentOrigins(type: string, filters?: RecentOriginsFilters): Observable<RecentOrigin[]> {
+    getRecentOrigins(type: string): Observable<RecentOrigin[]> {
         // TODO: obtener origenes recientes desde bd local
+        const origins = [];
         return new Observable(suscriber => {
             // this.utilities.log('localStorage', localStorage);
             let origin: RecentOrigin;
             for (const storage in localStorage) {
                 if (1) {
-                    this.utilities.log('storage', storage);
+                    // this.utilities.log('storage', storage);
                     if (storage.includes(`${type}_origin_`)) {
-                        if (this[`${type}RecentOrigins`].findIndex(_origin => _origin.id === storage) === -1) {
-                            this.utilities.log('origin found', storage);
-                            origin = JSON.parse(localStorage.getItem(storage)) as RecentOrigin;
-                            this.utilities.log('origin object', origin);
-                            if (origin.id) {
-                                this[`${type}RecentOrigins`].push(origin);
-                            }
+                        origin = JSON.parse(localStorage.getItem(storage)) as RecentOrigin;
+                        this.utilities.log('origin object', origin);
+                        if (origin.id) {
+                            origins.push(origin);
                         }
                     }
                 }
             }
-            suscriber.next(this[`${type}RecentOrigins`]);
+            suscriber.next(origins);
+            suscriber.complete();
         });
     }
 
@@ -83,7 +61,21 @@ export class RecentOriginsService {
                     }
                 }
             }
-            this[`${type}RecentOrigins`] = [];
+            suscriber.next(true);
+        });
+    }
+
+    clearAll(): Observable<boolean> {
+        return new Observable(suscriber => {
+            // eliminar origines en local storage
+            for (const storage in localStorage) {
+                if (1) {
+                    this.utilities.log('storage', storage);
+                    if (storage.includes(`_origin_`)) {
+                        localStorage.removeItem(storage);
+                    }
+                }
+            }
             suscriber.next(true);
         });
     }

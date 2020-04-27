@@ -1,285 +1,323 @@
 <div class="content-area">
-    <div class="example-loading-shade" *ngIf="isLoadingResults">
-        <mat-spinner class="spinner"></mat-spinner>
-    </div>
     <div class="content">
-      <div class="section-wrapper">
-          <div class="header actionbar align-content-top">
-              <div class="title actionbar-section align-content-top">
-                  <h1>{{ pageTitle }}</h1>
-              </div>
-              <div class="actions actionbar-section right">
-                <button type="button" mat-raised-button color="accent" (click)="print()">
-                    <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
-                </button>
-                <button type="button" mat-raised-button color="warn" (click)="export()">
-                    <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
-                </button>
-              </div>
-          </div>
+        <div class="section-wrapper">
+            <div class="header actionbar align-content-top">
+                <div class="title actionbar-section align-content-top">
+                    <h1>{{ pageTitle }}</h1>
+                </div>
+                <div class="actions actionbar-section right">
+                    <button type="button" mat-raised-button color="accent" (click)="print()">
+                        <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
+                    </button>
+                    <button type="button" mat-raised-button color="warn" (click)="export()">
+                        <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                    </button>
+                </div>
+            </div>
       </div>
       <mat-card>
-          <mat-card-content *ngIf="form">
-            <form [formGroup]="form" (ngSubmit)="onSubmit()">
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Sku</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="sku" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Upc</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="upc" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Phonetic</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="phonetic" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Scanned Verification</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="scannedVerification" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Spoken Verification</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="spokenVerification" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Description</mat-label>
-                    <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Weight Tolerance</mat-label>
-                    <input class="w-100" matInput type="number" formControlName="weightTolerance" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Cost</mat-label>
-                    <input class="w-100" matInput type="number" formControlName="cost" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Tolerance</mat-label>
-                    <input class="w-100" matInput type="number" formControlName="tolerance" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Shelf Life</mat-label>
-                    <input class="w-100" matInput type="number" formControlName="shelfLife" [class.readonly]="viewMode === 'view'">
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>State</mat-label>
-                    <mat-select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
-                    [class.readonly]="viewMode === 'view'">
-                        <mat-option *ngFor="let state of itemData.statesList" [value]="state">
-                            {{ state }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Type</mat-label>
-                    <mat-select [compareWith]="dataMap.itemType.formControl.compareFn" formControlName="itemType"
-                    [class.readonly]="viewMode === 'view'">
-                        <mat-option *ngFor="let type of itemData.itemTypeList" [value]="type">
-                            {{ type.description }}
-                        </mat-option>
-                        <div class="select-footer" *ngIf="dataMap.itemType.addNew && viewMode === 'edit'">
-                            <span class="select-footer-content">
-                                <a href="javascript: void(0)"
-                                (click)="addNewObject(importingTypes.ITEM_TYPE, 'Add new item type')">
-                                    <mat-icon *ngIf="dataMap.itemType.addNew.icon">{{ dataMap.itemType.addNew.icon }}</mat-icon>
-                                    <span>{{ dataMap.itemType.addNew.text }}</span>
-                                </a>
-                            </span>
+            <div class="example-loading-shade" *ngIf="isLoadingResults">
+                <mat-spinner class="spinner"></mat-spinner>
+            </div>
+            <mat-card-content>
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Sku</label>
+                                <input class="form-control"  type="text" formControlName="sku"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Upc</label>
+                                <input class="form-control"  type="text" formControlName="upc"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
                         </div>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                    <mat-label>Classification</mat-label>
-                    <mat-select [compareWith]="dataMap.classification.formControl.compareFn" formControlName="classification"
-                    [class.readonly]="viewMode === 'view'">
-                        <mat-option *ngFor="let classification of itemData.classificationsList" [value]="classification">
-                            {{ classification }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-tab-group class="tab-orders">
-                    <mat-tab label="Especific Information">
-                        <ng-template matTabContent>
-                            <div class="col-sm-12 col-md-4 col-lg-3 input-group-wrapper">
-                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                appearance="none">
-                                    <input matInput formControlName="expiryDate"  hidden>
-                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                    [checked]="form.get('expiryDate').value">
-                                        Expiry Date
-                                    </mat-slide-toggle>
-                                </mat-form-field>
-                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                appearance="none">
-                                    <input matInput formControlName="weight"  hidden>
-                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                    [checked]="form.get('weight').value">
-                                    Weight
-                                    </mat-slide-toggle>
-                                </mat-form-field>
-                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                appearance="none">
-                                    <input matInput formControlName="variableWeight"  hidden>
-                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                    [checked]="form.get('variableWeight').value">
-                                    Variable Weight
-                                    </mat-slide-toggle>
-                                </mat-form-field>
-                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                appearance="none">
-                                    <input matInput formControlName="serial"  hidden>
-                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                    [checked]="form.get('serial').value">
-                                    Serial
-                                    </mat-slide-toggle>
-                                </mat-form-field>
-                                <mat-form-field class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                appearance="none">
-                                    <input matInput formControlName="batchNumber" style="display: none">
-                                    <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                    [checked]="form.get('batchNumber').value">
-                                    Batch Number
-                                    </mat-slide-toggle>
-                                </mat-form-field>
-                            </div>
-                        </ng-template>
-                    </mat-tab>
-                    <mat-tab label="Unity Of Measure">
-                        <ng-template matTabContent>
-                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Unity Of Measure</mat-label>
-                                    <mat-select [compareWith]="dataMap.uom.formControl.compareFn" formControlName="uom"
-                                    [class.readonly]="viewMode === 'view'">
-                                        <mat-option *ngFor="let uom of itemData.uomsList" [value]="uom">
-                                            {{ uom.name }}
-                                        </mat-option>
-                                        <div class="select-footer" *ngIf="dataMap.uom.addNew && viewMode === 'edit'">
-                                            <span class="select-footer-content">
-                                                <a href="javascript: void(0)"
-                                                (click)="addNewObject(importingTypes.UOMS, 'Add new Unity of measure')">
-                                                    <mat-icon *ngIf="dataMap.uom.addNew.icon">{{ dataMap.uom.addNew.icon }}</mat-icon>
-                                                    <span>{{ dataMap.uom.addNew.text }}</span>
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </mat-select>
-                                </mat-form-field>
-                        </ng-template>
-                    </mat-tab>
-                    <mat-tab label="Item Uom">
-                        <ng-template matTabContent>
-                            <div>
-                                <div class="w-100 text-right">
-                                    <a href="javascript:void(0)" mat-raised-button color="warn" (click)="export()">
-                                        <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
-                                    </a>
-                                    <a href="javascript:void(0)" mat-raised-button color="accent" (click)="addRow()" class="ml-2">
-                                        <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
-                                    </a>
-                                    <br><br>
-                                </div>
-                                <!--strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong-->
-                                <div class="table-toolbar" *ngIf="selection.selected.length > 0">
-                                    <div class="col-sm-6 text-left toolbar-label">
-                                        <label>Selected rows: {{selection.selected.length}}</label>
-                                    </div>
-                                    <div class="col-sm-6 text-right toolbar-buttons">
-                                        <!--button class="print-button" (click)="printRows(selection.selected)">Print</button-->
-                                        <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button-->
-                                        <button type="button" class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
-                                    </div>
-                                </div>
-                                <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8"-->
-                                <!--table mat-table [dataSource]="dataSource" matSort>
-                                    <!-- Checkbox Column -->
-                                    <!--ng-container matColumnDef="select">
-                                        <th mat-header-cell *matHeaderCellDef>
-                                            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
-                                                [aria-label]="checkboxLabel()">
-                                            </mat-checkbox>
-                                        </th>
-                                        <td mat-cell *matCellDef="let row">
-                                            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
-                                                [aria-label]="checkboxLabel(row)">
-                                            </mat-checkbox>
-                                        </td>
-                                    </ng-container>
-                                    <!-- Data Columns ->
-                                    <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
-                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
-                                        <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
-                                    </ng-container>
-                                    <!-- Options Sticky Column ->
-                                    <ng-container matColumnDef="options" stickyEnd>
-                                        <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
-                                            {{'Options' | uppercase}}
-                                            <button type="button" mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
-                                                <mat-icon>more_vert</mat-icon>
-                                            </button>
-                
-                                            <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
-                                                <span>
-                                                    <button type="button" mat-menu-item (click)="toggleColumn()">Show all</button>
-                                                    <button type="button" mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
-                                                    (click)="toggleColumn(column)">
-                                                        <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                                        {{column.name}}
-                                                    </button>
-                                                </span>
-                                            </mat-menu>
-                                        </th>
-                                        <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                                            <!--button mat-icon-button (click)="editRowOnDialog(element)">
-                                                <img src="assets/icons/zoom.png">
-                                            </button-->
-                                            <!--button mat-icon-button (click)="editRowOnPage(element)">
-                                                <img src="assets/icons/zoom.png">
-                                            </button->
-                                            <button type="button" mat-icon-button (click)="editRowOnDialog(element, 'view')">
-                                                <img src="assets/icons/zoom.png">
-                                            </button>
-                                            <button type="button" mat-icon-button (click)="editRowOnDialog(element, 'edit')">
-                                                <img src="assets/icons/page_edit.png">
-                                            </button>
-                                            <!--button mat-icon-button (click)="printRow(element)">
-                                                <img src="assets/icons/printer.png">
-                                            </button->
-                                            <a mat-icon-button [href]="'/print/' + importingTypes.ITEMUOMS + '/' + element.id" target="_blank">
-                                                <img src="assets/icons/printer.png">
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Type</label>
+                                <select [compareWith]="dataMap.itemType.formControl.compareFn" formControlName="itemType"
+                                [class.readonly]="viewMode === 'view'" class="form-control" [readonly]="viewMode === 'view'">
+                                    <option *ngFor="let type of itemData.itemTypeList" [value]="type">
+                                        {{ type.description }}
+                                    </option>
+                                    <!--div class="select-footer" *ngIf="dataMap.itemType.addNew && viewMode === 'edit'">
+                                        <span class="select-footer-content">
+                                            <a href="javascript: void(0)"
+                                            (click)="addNewObject(importingTypes.ITEM_TYPE, 'Add new item type')">
+                                                <mat-icon *ngIf="dataMap.itemType.addNew.icon">{{ dataMap.itemType.addNew.icon }}</mat-icon>
+                                                <span>{{ dataMap.itemType.addNew.text }}</span>
                                             </a>
-                                            <button type="button" mat-icon-button (click)="deletePrompt(element)">
-                                                <img src="assets/icons/delete.png">
-                                            </button>
-                                        </td>
-                                    </ng-container>
-                
-                                    <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
-                                    <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                                    [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr->
-                                    <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
-                                        [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
-                                </table>
-                                <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator-->
-                                    <ag-grid-angular
-                                    style="width: 100%; height: 300px;"
-                                    class="ag-theme-balham"
-                                    [frameworkComponents]="frameworkComponents"
-                                    [rowData]="itemUomsData | async"
-                                    [columnDefs]="itemUomsColDefs"
-                                    editType="fullRow"
-                                    (gridReady)="onGridReady($event)"
-                                    (rowValueChanged)="updateItemUom($event)">
-                                    </ag-grid-angular>
+                                        </span>
+                                    </div-->
+                                </select>
                             </div>
-                        </ng-template>
-                    </mat-tab>
-                </mat-tab-group>
-                <div class="col-sm-12 text-right">
-                    <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
-                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
-                </div>
-            </form>
-          </mat-card-content>
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Classification</label>
+                                <select [compareWith]="dataMap.classification.formControl.compareFn" formControlName="classification"
+                                [class.readonly]="viewMode === 'view'" class="form-control" [readonly]="viewMode === 'view'">
+                                    <option *ngFor="let classification of itemData.classificationsList" [value]="classification">
+                                        {{ classification }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Phonetic</label>
+                                <input class="form-control"  type="text" formControlName="phonetic"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>State</label>
+                                <select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
+                                [class.readonly]="viewMode === 'view'" class="form-control" [readonly]="viewMode === 'view'">
+                                    <option *ngFor="let state of itemData.statesList" [value]="state">
+                                        {{ state }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Description</label>
+                                <input class="form-control"  type="text" formControlName="description"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                    </div>
+                    <mat-tab-group class="tab-specific-information">
+                        <mat-tab label="Especific Information">
+                            <ng-template matTabContent>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-3 col-lg-2 pt-3">
+                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                        appearance="none">
+                                            <input  formControlName="expiryDate" [readonly]="viewMode === 'view'"  hidden>
+                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                            [checked]="form.get('expiryDate').value"
+                                            (change)="form.get('expiryDate').setValue(!form.get('expiryDate').value)">
+                                                Expiry Date
+                                            </mat-slide-toggle>
+                                        </div>
+                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                        appearance="none">
+                                            <input  formControlName="weight" [readonly]="viewMode === 'view'"  hidden>
+                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                            [checked]="form.get('weight').value"
+                                            (change)="form.get('weight').setValue(!form.get('weight').value)">
+                                            Weight
+                                            </mat-slide-toggle>
+                                        </div>
+                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                        appearance="none">
+                                            <input  formControlName="variableWeight" [readonly]="viewMode === 'view'"  hidden>
+                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                            [checked]="form.get('variableWeight').value"
+                                            (change)="form.get('variableWeight').setValue(!form.get('variableWeight').value)">
+                                            Variable Weight
+                                            </mat-slide-toggle>
+                                        </div>
+                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                        appearance="none">
+                                            <input  formControlName="serial" [readonly]="viewMode === 'view'" hidden>
+                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                            [checked]="form.get('serial').value"
+                                            (change)="form.get('serial').setValue(!form.get('serial').value)">
+                                            Serial
+                                            </mat-slide-toggle>
+                                        </div>
+                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
+                                        appearance="none">
+                                            <input  formControlName="batchNumber" [readonly]="viewMode === 'view'"
+                                            style="display: none">
+                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
+                                            [checked]="form.get('batchNumber').value"
+                                            (change)="form.get('batchNumber').setValue(!form.get('batchNumber').value)">
+                                            Batch Number
+                                            </mat-slide-toggle>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-9 col-lg-10">
+                                        <div class="row">
+                                            <div class="col-sm-4 pt-3">
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>Unity Of Measure</label>
+                                                    <select [compareWith]="dataMap.uom.formControl.compareFn" formControlName="uom"
+                                                    [class.readonly]="viewMode === 'view'" class="form-control" [readonly]="viewMode === 'view'">
+                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom">
+                                                            {{ uom.name }}
+                                                        </option>
+                                                        <!--div class="select-footer" *ngIf="dataMap.uom.addNew && viewMode === 'edit'">
+                                                            <span class="select-footer-content">
+                                                                <a href="javascript: void(0)"
+                                                                (click)="addNewObject(importingTypes.UOMS, 'Add new Unity of measure')">
+                                                                    <mat-icon *ngIf="dataMap.uom.addNew.icon">{{ dataMap.uom.addNew.icon }}</mat-icon>
+                                                                    <span>{{ dataMap.uom.addNew.text }}</span>
+                                                                </a>
+                                                            </span>
+                                                        </div-->
+                                                    </select>
+                                                </div>
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>Weight Tolerance</label>
+                                                    <input class="form-control"  type="number" formControlName="weightTolerance"
+                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                                </div>
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>Tolerance</label>
+                                                    <input class="form-control"  type="number" formControlName="tolerance"
+                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 pt-3">
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>Scanned Verification</label>
+                                                    <input class="form-control"  type="text" formControlName="scannedVerification"
+                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                                </div>
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>Spoken Verification</label>
+                                                    <input class="form-control"  type="text" formControlName="spokenVerification"
+                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 pt-3">
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>Cost</label>
+                                                    <input class="form-control"  type="number" formControlName="cost"
+                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                                </div>
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>Shelf Life</label>
+                                                    <input class="form-control"  type="number" formControlName="shelfLife"
+                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                        <mat-tab label="Item Uom" class="tab-example0">
+                            <ng-template matTabContent class="tab-example">
+                                <div class="tab-example1">
+                                    <div class="w-100 text-right">
+                                        <a href="javascript:void(0)" mat-raised-button color="warn" (click)="export()">
+                                            <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                                        </a>
+                                        <a href="javascript:void(0)" mat-raised-button color="accent" (click)="addRow()"
+                                        class="ml-2" *ngIf="viewMode === 'edit'">
+                                            <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                                        </a>
+                                        <br><br>
+                                    </div>
+                                    <!--strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong-->
+                                    <div class="table-toolbar" *ngIf="selection.selected.length > 0">
+                                        <div class="col-sm-6 text-left toolbar-label">
+                                            <label class="col-sm-2 col-form-label">Selected rows: {{selection.selected.length}}</label>
+                                        </div>
+                                        <div class="col-sm-6 text-right toolbar-buttons">
+                                            <!--button class="print-button" (click)="printRows(selection.selected)">Print</button-->
+                                            <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button-->
+                                            <button type="button" class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
+                                        </div>
+                                    </div>
+                                    <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8"-->
+                                    <!--table mat-table [dataSource]="dataSource" matSort>
+                                        <!-- Checkbox Column -->
+                                        <!--ng-container matColumnDef="select">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                                    [aria-label]="checkboxLabel()">
+                                                </mat-checkbox>
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
+                                                    [aria-label]="checkboxLabel(row)">
+                                                </mat-checkbox>
+                                            </td>
+                                        </ng-container>
+                                        <!-- Data Columns ->
+                                        <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
+                                            <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
+                                        </ng-container>
+                                        <!-- Options Sticky Column ->
+                                        <ng-container matColumnDef="options" stickyEnd>
+                                            <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+                                                {{'Options' | uppercase}}
+                                                <button type="button" mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                                                    <mat-icon>more_vert</mat-icon>
+                                                </button>
+                    
+                                                <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                                                    <span>
+                                                        <button type="button" mat-menu-item (click)="toggleColumn()">Show all</button>
+                                                        <button type="button" mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                                                        (click)="toggleColumn(column)">
+                                                            <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                                                            {{column.name}}
+                                                        </button>
+                                                    </span>
+                                                </mat-menu>
+                                            </th>
+                                            <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                                                <!--button mat-icon-button (click)="editRowOnDialog(element)">
+                                                    <img src="assets/icons/zoom.png">
+                                                </button-->
+                                                <!--button mat-icon-button (click)="editRowOnPage(element)">
+                                                    <img src="assets/icons/zoom.png">
+                                                </button->
+                                                <button type="button" mat-icon-button (click)="editRowOnDialog(element, 'view')">
+                                                    <img src="assets/icons/zoom.png">
+                                                </button>
+                                                <button type="button" mat-icon-button (click)="editRowOnDialog(element, 'edit')">
+                                                    <img src="assets/icons/page_edit.png">
+                                                </button>
+                                                <!--button mat-icon-button (click)="printRow(element)">
+                                                    <img src="assets/icons/printer.png">
+                                                </button->
+                                                <a mat-icon-button [href]="'/print/' + importingTypes.ITEMUOMS + '/' + element.id" target="_blank">
+                                                    <img src="assets/icons/printer.png">
+                                                </a>
+                                                <button type="button" mat-icon-button (click)="deletePrompt(element)">
+                                                    <img src="assets/icons/delete.png">
+                                                </button>
+                                            </td>
+                                        </ng-container>
+                    
+                                        <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+                                        <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                                        [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr->
+                                        <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
+                                            [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
+                                    </table>
+                                    <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator-->
+                                        <ag-grid-angular
+                                        style="width: 100%; height: 300px;"
+                                        class="ag-theme-balham"
+                                        [frameworkComponents]="frameworkComponents"
+                                        [rowData]="itemUomsData | async"
+                                        [columnDefs]="itemUomsColDefs"
+                                        [suppressClickEdit]="true"
+                                        editType="fullRow"
+                                        (keydown)="checkKeyPressed($event)"
+                                        (keypress)="checkKeyPressed($event)"
+                                        (gridReady)="onGridReady($event)"
+                                        (rowValueChanged)="updateItemUom($event)">
+                                        </ag-grid-angular>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="col-sm-12 text-right">
+                        <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
+                        <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                    </div>
+                </form>
+            </mat-card-content>
       </mat-card>
     </div>
 </div>

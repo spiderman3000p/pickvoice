@@ -82,10 +82,26 @@ export class EditPickPlanningComponent implements OnInit {
   selectionTransports = new SelectionModel<Transport>(true, []);
   expandedElement: any | null;
   states = STATES;
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatPaginator, {static: true}) paginatorTasks: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) paginatorTransports: MatPaginator;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatSort, {static: true}) sortTasks: MatSort;
   @ViewChild(MatSort, {static: true}) sortTransports: MatSort;
+  @ViewChild(MatSort) set matSortTasks(ms: MatSort) {
+    this.sortTasks = ms;
+    this.setTasksDataSourceAttributes();
+  }
+  @ViewChild(MatPaginator) set matPaginatorTasks(mp: MatPaginator) {
+    this.paginatorTasks = mp;
+    this.setTasksDataSourceAttributes();
+  }
+  @ViewChild(MatSort) set matSortTransports(ms: MatSort) {
+    this.sortTransports = ms;
+    this.setTransportDataSourceAttributes();
+  }
+  @ViewChild(MatPaginator) set matPaginatorTransports(mp: MatPaginator) {
+    this.paginatorTransports = mp;
+    this.setTransportDataSourceAttributes();
+  }
   @ViewChild(ContextMenuComponent) public basicMenu: ContextMenuComponent;
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
@@ -100,6 +116,16 @@ export class EditPickPlanningComponent implements OnInit {
     this.pickPlanningData.transportList = [];
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Planning' : 'View Pick Planning';
     this.isLoadingResults = true;
+  }
+
+  setTasksDataSourceAttributes() {
+    this.dataSource.paginator = this.paginatorTasks;
+    this.dataSource.sort = this.sortTasks;
+  }
+
+  setTransportDataSourceAttributes() {
+    this.dataSourceTransports.paginator = this.paginatorTransports;
+    this.dataSourceTransports.sort = this.sortTransports;
   }
 
   executeContext(action: string, element: any) {
@@ -312,6 +338,7 @@ export class EditPickPlanningComponent implements OnInit {
     let base64Logo;
     let canvas;
     let content;
+    const dateNow = new Date();
     const image = new Image();
     canvas = document.createElement('canvas');
     canvas.style.height = 50 + 'px';
@@ -330,7 +357,7 @@ export class EditPickPlanningComponent implements OnInit {
     content = {
       content: [
         {
-          margin: [20, 0, 20, 10],
+          margin: [0, 0, 0, 10],
           alignment: 'left',
           columns: [
             {
@@ -351,26 +378,10 @@ export class EditPickPlanningComponent implements OnInit {
               },
               {
                 margin: [20, 0, 0, 0],
-                text: `Description: ${object.description}`,
-                style: 'small'
+                text: `Description: ${object.description}`
               }
             ],
             [
-              {
-                alignment: 'right',
-                text: `Enable Date: ${object.enableDate}`,
-                style: 'small'
-              },
-              {
-                alignment: 'right',
-                text: `Date: ${object.date}`,
-                style: 'small'
-              },
-              {
-                alignment: 'right',
-                text: `Assignment Date: ${object.dateAssignment}`,
-                style: 'small'
-              },
               {
                 alignment: 'right',
                 image: this.generateBarCode(object.id)
@@ -379,60 +390,88 @@ export class EditPickPlanningComponent implements OnInit {
           ]
         },
         {
-          style: 'normal',
-          alignment: 'left',
           margin: [0, 0, 0, 20],
-          table: {
-            borderColor: 'darkgrey',
-            widths: ['auto', '*'],
-            headerRows: 0,
-            body: [
-              [
-                { text: `Document`, style: 'tableHeader' },
-                `${object.document}`
-              ],
-              [
-                { text: `User`, style: 'tableHeader' },
-                ` ${object.user ? object.user.firstName : ''} ${object.user ? object.user.lastName : ''} ${object.user ? '(' + object.user.userName + ')' : ''}`
-              ],
-              [
-                { text: 'Quantity', style: 'tableHeader' },
-                  ` ${object.qty}`
-              ],
-              [
-                { text: 'Lines', style: 'tableHeader' },
-                `${object.lines}`
-              ],
-              [
-                { text: `Current Line`, style: 'tableHeader' },
-                `${object.currentLine}`
-              ],
-              [
-                { text: `Children Work`, style: 'tableHeader' },
-                `${object.childrenWork}`
-              ],
-              [
-                { text: `Rule executed`, style: 'tableHeader' },
-                `${object.ruleExecuted}`
-              ],
-              [
-                { text: `Validate Location`, style: 'tableHeader' },
-                `${object.validateLocation ? 'Yes' : 'No' }`
-              ],
-              [
-                { text: `Pallet Complete`, style: 'tableHeader' },
-                `${object.palletComplete ? 'Yes' : 'No' }`
-              ],
-              [
-                { text: `Validate Lpn`, style: 'tableHeader' },
-                `${object.validateLpn ? 'Yes' : 'No' }`
-              ],
-              [
-                { text: `Validate Sku`, style: 'tableHeader' },
-                `${object.validateSku ? 'Yes' : 'No' }`
-              ]
-            ]
-          }
+          columns: [
+            {
+              layout: 'noBorders',
+              margin: [0, 0, 0, 5],
+              alignment: 'left',
+              table: {
+                widths: ['auto', '*'],
+                headerRows: 0,
+                body: [
+                  [
+                    { text: `Document`, style: 'tableHeader2' },
+                    `${object.document}`
+                  ],
+                  [
+                    { text: `Enable Date`, style: 'tableHeader2'},
+                    `${object.enableDate}`
+                  ],
+                  [
+                    { text: `Date`, style: 'tableHeader2'},
+                    `${object.date}`
+                  ],
+                  [
+                    { text: `Assignment Date`, style: 'tableHeader2' },
+                    `${object.dateAssignment}`
+                  ],
+                  [
+                    { text: `User`, style: 'tableHeader2' },
+                    ` ${object.user ? object.user.firstName : ''} ${object.user ?
+                      object.user.lastName : ''} ${object.user ? '(' + object.user.userName + ')' : ''}`
+                  ],
+                  [
+                    { text: 'Quantity', style: 'tableHeader2' },
+                      ` ${object.qty}`
+                  ],
+                  [
+                    { text: 'Lines', style: 'tableHeader2' },
+                    `${object.lines}`
+                  ]
+                ]
+              }
+            },
+            {
+              alignment: 'left',
+              layout: 'noBorders',
+              margin: [5, 0, 0, 0],
+              table: {
+                widths: ['auto', '*'],
+                headerRows: 0,
+                body: [
+                  [
+                    { text: `Current Line`, style: 'tableHeader2' },
+                    `${object.currentLine}`
+                  ],
+                  [
+                    { text: `Children Work`, style: 'tableHeader2' },
+                    `${object.childrenWork}`
+                  ],
+                  [
+                    { text: `Rule executed`, style: 'tableHeader2' },
+                    `${object.ruleExecuted}`
+                  ],
+                  [
+                    { text: `Validate Location`, style: 'tableHeader2' },
+                    `${object.validateLocation ? 'Yes' : 'No' }`
+                  ],
+                  [
+                    { text: `Pallet Complete`, style: 'tableHeader2' },
+                    `${object.palletComplete ? 'Yes' : 'No' }`
+                  ],
+                  [
+                    { text: `Validate Lpn`, style: 'tableHeader2' },
+                    `${object.validateLpn ? 'Yes' : 'No' }`
+                  ],
+                  [
+                    { text: `Validate Sku`, style: 'tableHeader2' },
+                    `${object.validateSku ? 'Yes' : 'No' }`
+                  ]
+                ]
+              }
+            }
+          ]
         },
         {
           table: {
@@ -479,6 +518,10 @@ export class EditPickPlanningComponent implements OnInit {
           color: 'white',
           bold: true,
           fillColor: 'darkgrey',
+          fontSize: '8'
+        },
+        tableHeader2: {
+          bold: true,
           fontSize: 8
         },
         tableRow: {
@@ -488,11 +531,30 @@ export class EditPickPlanningComponent implements OnInit {
           opacity: 0,
         }
       },
+      defaultStyle: {
+        fontSize: '8',
+        bold: true
+      },
       images: {
         // logo: img.src
         // logo: base64Logo
         logo: base64Logo
-      }
+      },
+      footer: function(currentPage, pageCount) {
+        return {
+          alignment: 'right',
+          margin: [0, 0, 0, 20],
+          text: 'Page' + currentPage.toString() + ' of ' + pageCount
+        };
+      },
+      header: function(currentPage, pageCount, pageSize) {
+        // you can apply any logic and return any valid pdfmake element
+        return [{
+          text: 'Date: ' + dateNow.toLocaleDateString(),
+          alignment: 'right',
+          margin: [0, 20, 20, 0]
+        },];
+      },
     };
     tableContent.forEach(row => {
       row.style = 'tableRow';
@@ -937,8 +999,8 @@ export class EditPickPlanningComponent implements OnInit {
       this.dataSource.filter = '';
       this.dataSource.filter = aux;
     }
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginatorTasks;
+    this.dataSource.sort = this.sortTasks;
   }
 
   private refreshTableTransports() {
@@ -1086,8 +1148,8 @@ export class EditPickPlanningComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginatorTasks;
+    this.dataSource.sort = this.sortTasks;
     this.activatedRoute.data.subscribe((data: {
       row: any,
       viewMode: string,

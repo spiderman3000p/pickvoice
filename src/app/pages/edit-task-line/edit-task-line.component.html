@@ -127,7 +127,8 @@
                                     <mat-label>Status</mat-label>
                                     <input matInput [formControlName]="key"  hidden>
                                     <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                    [checked]="form.get('targetDock').value.status">
+                                    [checked]="form.get('targetDock').value.status"
+                                    (change)="form.get('targetDock').setValue(!form.get('targetDock').value)">
                                         Status
                                     </mat-slide-toggle>
                                 </mat-form-field>

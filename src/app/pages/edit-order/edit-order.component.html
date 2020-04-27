@@ -1,7 +1,4 @@
 <div class="content-area">
-    <div class="example-loading-shade" *ngIf="isLoadingResults">
-        <mat-spinner class="spinner"></mat-spinner>
-    </div>
     <div class="content">
       <div class="section-wrapper">
           <div class="header actionbar align-content-top">
@@ -19,127 +16,169 @@
           </div>
       </div>
       <mat-card>
-          <mat-card-content *ngIf="form">
+          <div class="example-loading-shade" *ngIf="isLoadingResults">
+            <mat-spinner class="spinner"></mat-spinner>
+          </div>
+          <mat-card-content>
             <form [formGroup]="form" (ngSubmit)="onSubmit()">
                 <mat-tab-group class="tab-orders">
                     <mat-tab label="Details">
                         <ng-template matTabContent>
-                            <div class="col-sm-12">
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Order Number</mat-label>
-                                    <input class="w-100" matInput type="text" formControlName="orderNumber" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Purchase Number</mat-label>
-                                    <input class="w-100" matInput type="text" formControlName="purchaseNumber" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Invoice Number</mat-label>
-                                    <input class="w-100" matInput type="text" formControlName="invoiceNumber" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Order Date</mat-label>
-                                    <input matInput formControlName="orderDate" [matDatepicker]="orderDate" [class.readonly]="viewMode === 'view'" readonly>
-                                    <mat-datepicker-toggle matSuffix [for]="orderDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                                    <mat-datepicker #orderDate ></mat-datepicker>
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Delivery Date</mat-label>
-                                    <input matInput formControlName="deliveryDate" [matDatepicker]="deliveryDate" [class.readonly]="viewMode === 'view'" readonly>
-                                    <mat-datepicker-toggle matSuffix [for]="deliveryDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                                    <mat-datepicker #deliveryDate ></mat-datepicker>
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Order Type</mat-label>
-                                    <mat-select [compareWith]="dataMap.orderType.formControl.compareFn" formControlName="orderType" [class.readonly]="viewMode === 'view'">
-                                        <mat-option *ngFor="let type of ordersData.orderTypeList" [value]="type">
-                                            {{ type.description }}
-                                        </mat-option>
-                                        <div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
-                                            <span class="select-footer-content">
-                                                <a href="javascript: void(0)"
-                                                (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')">
-                                                    <mat-icon *ngIf="dataMap.orderType.addNew.icon">{{ dataMap.orderType.addNew.icon }}</mat-icon>
-                                                    <span>{{ dataMap.orderType.addNew.text }}</span>
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Priority</mat-label>
-                                    <input class="w-100" matInput type="number" formControlName="priority" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Note</mat-label>
-                                    <textarea class="w-100" matInput formControlName="note" [class.readonly]="viewMode === 'view'">
-                                    </textarea>
-                                </mat-form-field>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Order Number</label>
+                                        <input class="form-control" type="text" formControlName="orderNumber"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Purchase Number</label>
+                                        <input class="form-control" type="text" formControlName="purchaseNumber"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>    
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Invoice Number</label>
+                                        <input class="form-control" type="text" formControlName="invoiceNumber"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Order Date</label>
+                                        <input type="date" class="form-control" formControlName="orderDate" [matDatepicker]="orderDate"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Delivery Date</label>
+                                        <input formControlName="deliveryDate" type="date" class="form-control"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Order Type</label>
+                                        <select [compareWith]="dataMap.orderType.formControl.compareFn" formControlName="orderType"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'" class="form-control">
+                                            <option *ngFor="let type of ordersData.orderTypeList" [ngValue]="type">
+                                                {{ type.description }}
+                                            </option>
+                                            <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
+                                                <span class="select-footer-content">
+                                                    <a href="javascript: void(0)"
+                                                    (click)="addNewObject(importingTypes.ORDER_TYPE, 'Add new order type')">
+                                                        <mat-icon *ngIf="dataMap.orderType.addNew.icon">{{ dataMap.orderType.addNew.icon }}</mat-icon>
+                                                        <span>{{ dataMap.orderType.addNew.text }}</span>
+                                                    </a>
+                                                </span>
+                                            </div-->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Priority</label>
+                                        <input class="form-control" type="number" formControlName="priority"
+                                        class="form-control"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Note</label>
+                                        <textarea class="form-control" formControlName="note"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </textarea>
+                                    </div>
+                                </div>
                             </div>
                         </ng-template>
                     </mat-tab>
                     <mat-tab label="Customer">
                         <ng-template matTabContent>
-                            <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                <mat-label>Customer</mat-label>
-                                <mat-select [compareWith]="dataMap.customer.formControl.compareFn" formControlName="customer">
-                                    <mat-option *ngFor="let customer of ordersData.customerList" [value]="customer">
-                                        {{ customer.name }}
-                                    </mat-option>
-                                    <div class="select-footer" *ngIf="dataMap.customer.addNew && viewMode === 'edit'">
-                                        <span class="select-footer-content">
-                                            <a href="javascript: void(0)"
-                                            (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')">
-                                                <mat-icon *ngIf="dataMap.customer.addNew.icon">{{ dataMap.customer.addNew.icon }}</mat-icon>
-                                                {{ dataMap.customer.addNew.text }}
-                                            </a>
-                                        </span>
-                                    </div>
-                                </mat-select>
-                                <!-- hint, link o button -->
-                                <!--mat-hint *ngIf="viewMode === 'edit'" color="primary" class="add-new-link">
-                                    <a (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')" color="primary">
-                                        <mat-icon>add</mat-icon> Add new customer
-                                    </a>
-                                </mat-hint-->
-                            </mat-form-field>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label>Customer</label>
+                                    <select [compareWith]="dataMap.customer.formControl.compareFn"
+                                    formControlName="customer" class="form-control">
+                                        <option *ngFor="let customer of ordersData.customerList" [ngValue]="customer">
+                                            {{ customer.name }}
+                                        </option>
+                                        <!--div class="select-footer" *ngIf="dataMap.customer.addNew && viewMode === 'edit'">
+                                            <span class="select-footer-content">
+                                                <a href="javascript: void(0)"
+                                                (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')">
+                                                    <mat-icon *ngIf="dataMap.customer.addNew.icon">{{ dataMap.customer.addNew.icon }}</mat-icon>
+                                                    {{ dataMap.customer.addNew.text }}
+                                                </a>
+                                            </span>
+                                        </div-->
+                                    </select>
+                                </div>
+                            </div>
                             <br><br>
                             <h6>Customer Details</h6>
                             <hr>
-                            <span *ngIf="form.get('customer').value">
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                    <mat-label>Customer Code</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('customer').value.code" [class.readonly]="true">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                    <mat-label>Name</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('customer').value.name" [class.readonly]="true">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                    <mat-label>Contact</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('customer').value.contact" [class.readonly]="true">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Phone</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('customer').value.phone" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Address</mat-label>
-                                    <textarea class="w-100" matInput [value]="form.get('customer').value.address" [class.readonly]="viewMode === 'view'">
-                                    </textarea>
-                                </mat-form-field>
+                            <span *ngIf="form.get('customer').value" class="row">
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Customer Code</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('customer').value.code ? form.get('customer').value.code : ''"
+                                        [class.readonly]="true" [readonly]="true">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('customer').value.name ? form.get('customer').value.name : ''"
+                                        [class.readonly]="true" [readonly]="true">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Contact</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('customer').value.contact ? form.get('customer').value.contact : ''"
+                                        [class.readonly]="true" [readonly]="true">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Phone</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('customer').value.phone ? form.get('customer').value.phone : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Address</label>
+                                        <textarea class="form-control"
+                                        [value]="form.get('customer').value.address ? form.get('customer').value.address : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </textarea>
+                                    </div>
+                                </div>
                             </span>
                         </ng-template>
                     </mat-tab>
                     <mat-tab label="Transport">
                         <ng-template matTabContent>
-                            <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                <mat-label>Transport</mat-label>
-                                <mat-select formControlName="transport" [compareWith]="dataMap.transport.formControl.compareFn">
-                                    <mat-option *ngFor="let transport of ordersData.transportList" [value]="transport">
-                                        {{ transport.nameRoute }}
-                                    </mat-option>
-                                    <div class="select-footer" *ngIf="dataMap.transport.addNew && viewMode === 'edit'">
+                            <div class="form-group">
+                                <label>Transport</label>
+                                <select formControlName="transport" class="form-control"
+                                [compareWith]="dataMap.transport.formControl.compareFn">
+                                    <option *ngFor="let trans of ordersData.transportList" [ngValue]="trans">
+                                        {{ trans.nameRoute }}
+                                    </option>
+                                    <!--div class="select-footer" *ngIf="dataMap.transport.addNew && viewMode === 'edit'">
                                         <span class="select-footer-content">
                                             <a href="javascript: void(0)"
                                             (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')">
@@ -147,137 +186,222 @@
                                                 {{ dataMap.transport.addNew.text }}
                                             </a>
                                         </span>
-                                    </div>
-                                </mat-select>
-                            </mat-form-field>
+                                    </div-->
+                                </select>
+                            </div>
                             <br><br>
                             <h5>Transport Details</h5>
                             <hr>
-                            <span *ngIf="form.get('transport').value">
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Transport Number</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.transportNumber" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Route</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.route" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Name Route</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.nameRoute" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Dispatch Platforms</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.dispatchPlatforms" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Carrier Code</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.carrierCode" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Shipment Date</mat-label>
-                                    <input matInput [value]="form.get('transport').value.shipmentDate" [matDatepicker]="shipmentDate" [class.readonly]="viewMode === 'view'" readonly>
-                                    <mat-datepicker-toggle matSuffix [for]="shipmentDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                                    <mat-datepicker #shipmentDate ></mat-datepicker>
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Transportation Status</mat-label>
-                                    <mat-select [compareWith]="dataMap.transportationStatus.formControl.compareFn" formControlName="transportationStatus" [class.readonly]="viewMode === 'view'">
-                                        <mat-option *ngFor="let status of ordersData.transportList" [value]="status">
-                                            {{ status }}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Vehicle</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.vehicle" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Container Number</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.containerNumber" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Weight</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.weight" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Trailer</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.trailer" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Carrier Code</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.carrierCode" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Description</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.description" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Planned Checkin</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.plannedCheckin" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Actual Checkin</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.actualCheckin" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Planned Start Loading</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.plannedStartLoading" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Current Start Loading</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.currentStartLoading" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Planned End Loading</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.plannedEndLoading" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Actual End Loading</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.actualEndLoading" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Planned Shipment Completion</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.plannedShipmentCompletion" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Current Shipment Completion</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.currentShipmentCompletion" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Uom Weight</mat-label>
-                                    <mat-select [compareWith]="dataMap.uomWeight.formControl.compareFn" formControlName="uomWeight" [class.readonly]="viewMode === 'view'">
-                                        <mat-option *ngFor="let uom of ordersData.uomList" [value]="uom">
-                                            {{ status }}
-                                        </mat-option>
-                                        <div class="select-footer" *ngIf="dataMap.uomWeight.addNew && viewMode === 'edit'">
-                                            <span class="select-footer-content">
-                                                <a href="javascript: void(0)"
-                                                (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
-                                                    <mat-icon *ngIf="dataMap.uomWeight.addNew.icon">{{ dataMap.uomWeight.addNew.icon }}</mat-icon>
-                                                    <span>{{ dataMap.uomWeight.addNew.text }}</span>
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Uom Volume</mat-label>
-                                    <mat-select [compareWith]="dataMap.uomVolume.formControl.compareFn" formControlName="uomVolume" [class.readonly]="viewMode === 'view'">
-                                        <mat-option *ngFor="let uom of ordersData.uomList" [value]="uom">
-                                            {{ status }}
-                                        </mat-option>
-                                        <div class="select-footer" *ngIf="dataMap.uomVolume.addNew && viewMode === 'edit'">
-                                            <span class="select-footer-content">
-                                                <a href="javascript: void(0)"
-                                                (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
-                                                    <mat-icon *ngIf="dataMap.uomVolume.addNew.icon">{{ dataMap.uomVolume.addNew.icon }}</mat-icon>
-                                                    <span>{{ dataMap.uomVolume.addNew.text }}</span>
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </mat-select>
-                                </mat-form-field>
+                            <span class="row">
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Transport Number</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.transportNumber ? form.get('transport').value.transportNumber : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Route</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.route ? form.get('transport').value.route : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Name Route</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.nameRoute ? form.get('transport').value.nameRoute : ''"
+                                        [class.readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Carrier Code</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.carrierCode ? form.get('transport').value.carrierCode : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Shipment Date</label>
+                                        <input class="form-control" type="date"
+                                        [value]="form.get('transport').value.shipmentDate ? form.get('transport').value.shipmentDate : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Transportation Status</label>
+                                        <select class="form-control"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                            <option *ngFor="let status of ordersData.transportStatus"
+                                            [selected]="form.get('transport').value.transportationStatus === status"
+                                            [ngValue]="status">
+                                                {{ status }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Vehicle</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.vehicle ? form.get('transport').value.vehicle : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Container Number</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.containerNumber ? form.get('transport').value.containerNumber : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Weight</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.weight ? form.get('transport').value.weight : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Trailer</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.trailer ? form.get('transport').value.trailer : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Carrier Code</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.carrierCode ? form.get('transport').value.carrierCode : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.description ? form.get('transport').value.description : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Planned Checkin</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.plannedCheckin ? form.get('transport').value.plannedCheckin : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Actual Checkin</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.actualCheckin ? form.get('transport').value.actualCheckin : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Planned Start Loading</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.plannedStartLoading ? form.get('transport').value.plannedStartLoading : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Current Start Loading</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.currentStartLoading ? form.get('transport').value.currentStartLoading : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Planned End Loading</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.plannedEndLoading ? form.get('transport').value.plannedEndLoading : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Actual End Loading</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.actualEndLoading ? form.get('transport').value.actualEndLoading : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Planned Shipment Completion</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.plannedShipmentCompletion ? form.get('transport').value.plannedShipmentCompletion : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Current Shipment Completion</label>
+                                        <input class="form-control" type="text"
+                                        [value]="form.get('transport').value.currentShipmentCompletion ? form.get('transport').value.currentShipmentCompletion : ''"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Uom Weight</label>
+                                        <select class="form-control"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                            <option *ngFor="let uom of ordersData.uomList"
+                                            [selected]="form.get('transport').value.uomWeight ? form.get('transport').value.uomWeight.id === uom.id : 'false'"
+                                            [ngValue]="uom">
+                                                {{ uom.name }}
+                                            </option>
+                                            <!--div class="select-footer" *ngIf="transportDataMap.uomWeight.addNew && viewMode === 'edit'">
+                                                <span class="select-footer-content">
+                                                    <a href="javascript: void(0)"
+                                                    (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
+                                                        <mat-icon *ngIf="transportDataMap.uomWeight.addNew.icon">{{ transportDataMap.uomWeight.addNew.icon }}</mat-icon>
+                                                        <span>{{ transportDataMap.uomWeight.addNew.text }}</span>
+                                                    </a>
+                                                </span>
+                                            </div-->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Uom Volume</label>
+                                        <select class="form-control"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                            <option *ngFor="let uom of ordersData.uomList"
+                                            [selected]="form.get('transport').value.uomVolume ? form.get('transport').value.uomVolume.id === uom.id : 'false'"
+                                            [ngValue]="uom">
+                                                {{ uom.name }}
+                                            </option>
+                                            <!--div class="select-footer" *ngIf="transportDataMap.uomVolume.addNew && viewMode === 'edit'">
+                                                <span class="select-footer-content">
+                                                    <a href="javascript: void(0)"
+                                                    (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
+                                                        <mat-icon *ngIf="transportDataMap.uomVolume.addNew.icon">{{ transportDataMap.uomVolume.addNew.icon }}</mat-icon>
+                                                        <span>{{ transportDataMap.uomVolume.addNew.text }}</span>
+                                                    </a>
+                                                </span>
+                                            </div-->
+                                        </select>
+                                    </div>
+                                </div>
                             </span>
                         </ng-template>
                     </mat-tab>
@@ -367,7 +491,7 @@
                         <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                         [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.code]"></tr>
                     </table>
-                    <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                    <mat-paginator [length]="dataSource.data.length" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                 </div>
                 <div class="col-sm-12 text-right">
                     <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>

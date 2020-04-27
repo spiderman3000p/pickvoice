@@ -15,6 +15,16 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   overflow-y: hidden;
+  font-size: 12px;
+}
+.form-control{
+  font-size: 12px;
+}
+.col-form-label {
+  font-size: 12px;
+}
+.mat-card-content {
+  font-size: 12px;
 }
 button:focus {
   outline: none !important;
@@ -403,7 +413,7 @@ td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
   background-size: cover;
 }
 mat-sidenav-content{
-  padding-bottom: 20%;
+  padding-bottom: 10px;
 };
 mat-label{
   /*word-break: break-all;*/
@@ -413,10 +423,10 @@ mat-label{
   position: absolute;
   top: 0;
   left: 0;
-  bottom: 0px;
+  bottom: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.15);
-  z-index: 1;
+  background: rgba(255, 255, 255, 0.82);
+  z-index: 999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -541,19 +551,44 @@ a.mat-list-item.active .mat-list-item-content:before {
   margin-top: 3% !important;
   height: unset;
 }
+.tab-specific-information .mat-tab-body-content {
+  overflow: hidden !important;
+}
+.mat-tab-body-content {
+  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.row{
+  margin-right: 0px;
+  margin-left: 0px;
+}
 a:hover {
   color: $primary;
   text-decoration: underline;
 }
+a.mat-raise-button{
+  text-decoration: none;
+}
 .readonly {
   pointer-events: none !important;
   cursor: not-allowed !important;
+  background-color: #e9ecef00;
+}
+.form-control[readonly] {
+  background-color: #e9ecef00;
 }
 .mat-form-field.mat-form-field-invalid .mat-form-field-label {
   color: #f74343;
 }
 .mat-form-field.mat-form-field-invalid .mat-form-field-ripple, .mat-form-field.mat-form-field-invalid .mat-form-field-ripple.mat-accent {
   background-color: #f74343;
+}
+.ng-valid[required], .ng-valid.required  {
+  border-left: 5px solid #42A948; /* green */
+}
+.ng-invalid:not(form)  {
+  border-left: 5px solid #a94442; /* red */
 }
 .footer-label{
   float: inherit; flex: auto; display: flex; left: 0;
@@ -590,7 +625,7 @@ a:hover {
   border: outset rgb(229, 229, 229);
   padding-left: 20px;
   padding-right: 20px;
-  max-width: 200px;
+  /*max-width: 200px;*/
   padding-bottom: 10px;
 }
 @media screen and (max-width:800px){

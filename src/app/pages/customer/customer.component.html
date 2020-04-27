@@ -232,7 +232,7 @@
                     <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
                         [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
                 </table>
-                <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                <mat-paginator [length]="dataSource.dataCount" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
             </div>
         </div>
     </div>

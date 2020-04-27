@@ -9,6 +9,7 @@ import { DataPreviewComponent } from './components/importing-widget/pages/data-p
 import { PrintComponent } from './components/print/print.component';
 import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
 import { ItemsResolverService } from './pages/items/items-resolver.service';
+import { QualityStatesResolverService } from './pages/quality-states/quality-states-resolver.service';
 import { SectionsResolverService } from './pages/sections/sections-resolver.service';
 import { LocationsResolverService } from './pages/locations/locations-resolver.service';
 import { CustomerResolverService } from './pages/customer/customer-resolver.service';
@@ -241,6 +242,18 @@ const routes: Routes = [
             type: IMPORTING_TYPES.DOCKS,
             format: 'single',
             title: 'Print Dock'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.QUALITY_STATES + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: QualityStatesResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.QUALITY_STATES,
+            format: 'single',
+            title: 'Print Quality State'
           }
         }
     ]

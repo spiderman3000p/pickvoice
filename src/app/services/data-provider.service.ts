@@ -147,6 +147,10 @@ export class DataProviderService {
     if (type === IMPORTING_TYPES.DOCKS) {
       return this.updateDock(toUpload, id, 'response').pipe(retry(3));
     }
+
+    if (type === IMPORTING_TYPES.QUALITY_STATES) {
+      return this.updateQualityState(toUpload, id, 'response').pipe(retry(3));
+    }
     return of(null);
   }
 
@@ -175,7 +179,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.QUALITY_STATE_TYPES: {
         this.utilities.log(`obteniendo quality state types...`);
-        toReturn = this.qualityStateService.retrieveAllQualityStates().pipe(retry(3));
+        toReturn = this.qualityStateTypeService.retrieveAllQualityStateType().pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.ITEMS: {
@@ -197,6 +201,21 @@ export class DataProviderService {
         } else {
           toReturn = this.locationService.retrieveAllLocation().pipe(retry(3));
         }
+        break;
+      }
+      case IMPORTING_TYPES.LOCATION_STATE: {
+        this.utilities.log(`obteniendo locations states...`);
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Location.LocationStateEnum)));
+        break;
+      }
+      case IMPORTING_TYPES.OPERATION_TYPE: {
+        this.utilities.log(`obteniendo operation types...`);
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Location.OperationTypeEnum)));
+        break;
+      }
+      case IMPORTING_TYPES.RACK_TYPE: {
+        this.utilities.log(`obteniendo rack types...`);
+        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Location.RackTypeEnum)));
         break;
       }
       case IMPORTING_TYPES.LOCATION_TYPE: {

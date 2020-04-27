@@ -191,7 +191,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -271,50 +271,11 @@ export class ModelMap {
                 type: 'number'
             }
         },
-        weight: {
-            name: 'item weight',
-            required: false,
-            type: 'boolean',
-            formControl: {
-                control: 'toggle'
-            }
-        },
-        variableWeight: {
-            name: 'variable weight',
-            required: true,
-            type: 'boolean',
-            formControl: {
-                control: 'toggle'
-            }
-        },
-        expiryDate: {
-            name: 'expiry date',
-            required: false,
-            type: 'boolean',
-            formControl: {
-                control: 'toggle'
-            }
-        },
-        serial: {
-            name: 'item serial',
-            required: false,
-            type: 'boolean',
-            formControl: {
-                control: 'toggle'
-            }
-        },
-        batchNumber: {
-            name: 'batch number',
-            required: false,
-            type: 'boolean',
-            formControl: {
-                control: 'toggle'
-            }
-        },
         state: {
             name: 'state',
             required: true,
             type: IMPORTING_TYPES.ITEM_STATE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -329,6 +290,7 @@ export class ModelMap {
             name: 'classification',
             required: true,
             type: IMPORTING_TYPES.ITEM_CLASSIFICATIONS,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -365,6 +327,46 @@ export class ModelMap {
                 control: 'input',
                 type: 'number'
             }
+        },
+        batchNumber: {
+            name: 'batch number',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        weight: {
+            name: 'item weight',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        variableWeight: {
+            name: 'variable weight',
+            required: true,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        expiryDate: {
+            name: 'expiry date',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
+        },
+        serial: {
+            name: 'item serial',
+            required: false,
+            type: 'boolean',
+            formControl: {
+                control: 'toggle'
+            }
         }
     };
     /* item type object map for CRUD */
@@ -392,7 +394,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         }
@@ -620,7 +622,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         }
@@ -641,7 +643,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -718,6 +720,7 @@ export class ModelMap {
             name: 'type',
             required: false,
             type: IMPORTING_TYPES.LOCATION_TYPE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -732,6 +735,7 @@ export class ModelMap {
             name: 'operation',
             required: false,
             type: IMPORTING_TYPES.OPERATION_TYPE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -746,6 +750,7 @@ export class ModelMap {
             name: 'rack type',
             required: false,
             type: IMPORTING_TYPES.RACK_TYPE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -796,6 +801,7 @@ export class ModelMap {
             name: 'state',
             required: false,
             type: IMPORTING_TYPES.LOCATION_STATE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -911,14 +917,14 @@ export class ModelMap {
                 control: 'textarea'
             }
         },
-        idTransport: {
+        transport: {
             name: 'transport',
             required: false,
             type: IMPORTING_TYPES.TRANSPORTS,
             formControl: {
                 control: 'select',
                 type: 'number',
-                valueIndex: 'id',
+                valueIndex: 'transportNumber',
                 displayIndex: 'transportNumber',
                 compareFn: (c1, c2) => {
                     return c1.transportNumber === c2.transportNumber;
@@ -980,7 +986,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         }
@@ -1036,6 +1042,7 @@ export class ModelMap {
             name: 'state',
             required: false,
             type: IMPORTING_TYPES.TRANSPORT_STATE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -1112,16 +1119,16 @@ export class ModelMap {
         },
         description: {
             name: 'description',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
         plannedCheckin: {
             name: 'planned checkin',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1130,7 +1137,7 @@ export class ModelMap {
         },
         actualCheckin: {
             name: 'actual checkin',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1139,7 +1146,7 @@ export class ModelMap {
         },
         plannedStartLoading: {
             name: 'planned start loading',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1148,7 +1155,7 @@ export class ModelMap {
         },
         currentStartLoading: {
             name: 'current start loading',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1157,7 +1164,7 @@ export class ModelMap {
         },
         plannedEndLoading: {
             name: 'planned end loading',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1166,7 +1173,7 @@ export class ModelMap {
         },
         actualEndLoading: {
             name: 'actual end loading',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1175,7 +1182,7 @@ export class ModelMap {
         },
         plannedShipmentCompletion: {
             name: 'planned shipment completion',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1184,7 +1191,7 @@ export class ModelMap {
         },
         currentShipmentCompletion: {
             name: 'current shipment completion',
-            required: true,
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1324,7 +1331,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -1332,6 +1339,7 @@ export class ModelMap {
             name: 'state',
             required: false,
             type: IMPORTING_TYPES.PICK_STATE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -1377,7 +1385,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -1466,6 +1474,7 @@ export class ModelMap {
             name: 'state',
             required: false,
             type: IMPORTING_TYPES.TASK_STATE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -1540,7 +1549,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -1686,6 +1695,7 @@ export class ModelMap {
             name: 'dock type',
             required: false,
             type: IMPORTING_TYPES.DOCK_TYPE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -1729,7 +1739,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -2133,7 +2143,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -2294,7 +2304,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -2369,6 +2379,7 @@ export class ModelMap {
             name: 'state',
             required: false,
             type: IMPORTING_TYPES.ITEM_STATE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -2410,7 +2421,8 @@ export class ModelMap {
         classification: {
             name: 'classification',
             required: true,
-            type: 'string',
+            type: IMPORTING_TYPES.ITEM_CLASSIFICATIONS,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -2587,7 +2599,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
-                control: 'input',
+                control: 'textarea',
                 type: 'text'
             }
         },
@@ -2650,6 +2662,7 @@ export class ModelMap {
             name: 'type',
             required: false,
             type: IMPORTING_TYPES.LOCATION_TYPE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -2664,6 +2677,7 @@ export class ModelMap {
             name: 'operation',
             required: false,
             type: IMPORTING_TYPES.OPERATION_TYPE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',
@@ -2686,6 +2700,7 @@ export class ModelMap {
             name: 'rack type',
             required: false,
             type: IMPORTING_TYPES.RACK_TYPE,
+            validate: true,
             formControl: {
                 control: 'select',
                 type: 'text',

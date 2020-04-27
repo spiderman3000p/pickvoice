@@ -56,6 +56,9 @@ export class ModelFactory {
         if (type === IMPORTING_TYPES.DOCKS) {
             return this.newEmptyDock();
         }
+        if (type === IMPORTING_TYPES.QUALITY_STATES) {
+            return this.newEmptyQualityState();
+        }
         return null;
     }
 

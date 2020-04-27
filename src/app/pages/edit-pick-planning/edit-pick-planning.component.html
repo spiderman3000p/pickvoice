@@ -165,7 +165,7 @@
                                         [ngClass]="{'alert alert-danger': row.invalid}" 
                                         [contextMenu]="basicMenu" [contextMenuSubject]="row"></tr>
                                     </table>
-                                    <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                                    <mat-paginator [length]="dataSource.data.length" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                                 </div>
                                 <context-menu #basicMenu>
                                     <ng-template contextMenuItem [subMenu]="statusSubmenu">
@@ -352,7 +352,7 @@
                                         ></tr>
                                         <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
                                     </table>
-                                    <mat-paginator [pageSizeOptions]="pageSizeOptionsTransports"></mat-paginator>
+                                    <mat-paginator [length]="dataSourceTransports.data.length" [pageSize]="10" [pageSizeOptions]="pageSizeOptionsTransports"></mat-paginator>
                                 </div>
                             </ng-template>
                         </mat-tab>

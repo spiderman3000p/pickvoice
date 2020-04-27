@@ -3,25 +3,25 @@
         <mat-spinner class="spinner"></mat-spinner>
     </div>
     <div class="content">
-      <div class="section-wrapper">
-          <div class="header actionbar align-content-top">
-              <div class="title actionbar-section align-content-top">
-                  <h1>{{ pageTitle }}</h1>
-              </div>
-              <div class="actions actionbar-section right">
-                <button mat-raised-button color="accent" (click)="print()">
-                    <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
-                </button>
-                <button mat-raised-button color="warn" (click)="export()">
-                    <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
-                </button>
-              </div>
-          </div>
-      </div>
-      <mat-card>
-          <mat-card-content *ngIf="form">
-            <form [formGroup]="form" (ngSubmit)="onSubmit()">
-                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+        <div class="section-wrapper">
+            <div class="header actionbar align-content-top">
+                <div class="title actionbar-section align-content-top">
+                    <h1>{{ pageTitle }}</h1>
+                </div>
+                <div class="actions actionbar-section right">
+                    <button mat-raised-button color="accent" (click)="print()">
+                        <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
+                    </button>
+                    <button mat-raised-button color="warn" (click)="export()">
+                        <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <mat-card>
+            <mat-card-content>
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                         <mat-label>Description</mat-label>
                         <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
                     </mat-form-field>
@@ -176,7 +176,7 @@
                                         <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                                         [ngClass]="{'alert alert-danger': row.invalid}"></tr>
                                     </table>
-                                    <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                                    <mat-paginator [length]="dataSource.data.length" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                                 </div>
                             </ng-template>
                         </mat-tab>
@@ -234,6 +234,6 @@
                     </div>
                 </form>
             </mat-card-content>
-      </mat-card>
+        </mat-card>
     </div>
 </div>

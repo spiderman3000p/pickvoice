@@ -530,9 +530,11 @@ export class EditRowComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          if ((response.status === 204 || response.status === 200 || response.status === 201)
+          if (response && (response.status === 204 || response.status === 200 || response.status === 201)
             && response.statusText === 'OK') {
             this.utilities.showSnackBar('Update Successfull', 'OK');
+          } else {
+            this.utilities.showSnackBar('Unknown Error', 'OK');
           }
           // this.back();
         },

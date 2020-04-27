@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { environment } from '../../../environments/environment';
-import { ItemUom, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+import { Transport, Order, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
@@ -22,24 +22,22 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NumericEditorComponent } from './numeric-editor.component';
 import { RowOptionComponent } from './row-option.component';
 
-interface ItemData {
+interface TransportData {
   uomsList: UnityOfMeasure[];
-  statesList: string[];
-  itemTypeList: ItemType[];
-  classificationsList: string[];
+  statusList: string[];
 }
 @Component({
-  selector: 'app-edit-item',
-  templateUrl: './edit-item.component.html',
-  styleUrls: ['./edit-item.component.scss']
+  selector: 'app-edit-transport',
+  templateUrl: './edit-transport.component.html',
+  styleUrls: ['./edit-transport.component.scss']
 })
 
-export class EditItemComponent implements OnInit {
+export class EditTransportComponent implements OnInit {
   form: FormGroup;
   pageTitle = '';
   cardTitle = '';
-  type = IMPORTING_TYPES.ITEMS;
-  dataMap = ModelMap.ItemMap;
+  type = IMPORTING_TYPES.TRANSPORTS;
+  dataMap = ModelMap.TransportMap;
   remoteSync: boolean;
   keys: string[];
   row: any;
@@ -47,93 +45,10 @@ export class EditItemComponent implements OnInit {
   isLoadingResults = false;
   printElement = {};
   viewMode: string;
-  itemData: ItemData;
-  /* para tabla ag-grid */
-  gridApi;
-  gridColumnApi;
-  frameworkComponents: any;
-  itemUomsColDefs: any[] = [
-    {
-      headerName: 'UOM',
-      field: 'uom',
-      valueFormatter: uomFormatter,
-      valueParser: uomParser,
-      /*valueGetter: uomGetter,
-      valueSetter: uomSetter,*/
-      cellEditor: 'agSelectCellEditor',
-      cellEditorParams: (params) => {
-        return {
-          values: this.selectsData.uom.map(uom => uom.code)
-        };
-      },
-      width: 150,
-      editable: true
-    },
-    {
-      headerName: 'DENOMINATOR',
-      field: 'denominator',
-      width: 120,
-      cellEditor: 'numericEditor',
-      editable: true
-    },
-    {
-      headerName: 'NUMERATOR',
-      field: 'numerator',
-      width: 100,
-      cellEditor: 'numericEditor',
-      editable: true
-    },
-    {
-      headerName: 'FACTOR',
-      field: 'factor',
-      width: 100,
-      cellEditor: 'numericEditor',
-      editable: true
-    },
-    {
-      headerName: 'LENGTH',
-      field: 'length',
-      width: 100,
-      cellEditor: 'numericEditor',
-      editable: true
-    },
-    {
-      headerName: 'WIDTH',
-      field: 'width',
-      width: 100,
-      cellEditor: 'numericEditor',
-      editable: true
-    },
-    {
-      headerName: 'HEIGHT',
-      field: 'height',
-      width: 100,
-      cellEditor: 'numericEditor',
-      editable: true
-    },
-    {
-      headerName: 'EAN CODE',
-      field: 'eanCode',
-      editable: true,
-      width: 100,
-    },
-    {
-      headerName: 'OPTIONS',
-      field: 'options',
-      cellRenderer: 'rowOption',
-      cellRendererParams: {
-        that: this,
-        deleteItemUom: this.deleteItemUom.bind(this),
-        startEditItemUom: this.startEditItemUom.bind(this),
-        finishEditItemUom: this.finishEditItemUom.bind(this),
-      }
-    }
-  ];
-  itemUomsData: any = [];
+  transportData: TransportData;
   /* para tabla de item uoms */
-  definitions: any = ModelMap.ItemUomMap;
-  dataSource: MatTableDataSource<ItemUom>;
-  dataToSend: ItemUom[];
+  definitions: any = ModelMap.OrderMap;
+  dataSource: MatTableDataSource<Order>;
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
@@ -149,49 +64,51 @@ export class EditItemComponent implements OnInit {
   subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.setDataSourceAttributes();
+  }
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSourceAttributes();
+  }
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService,
     private location: WebLocation, private activatedRoute: ActivatedRoute,
     private dataProviderService: DataProviderService, private router: Router, private dialog: MatDialog
   ) {
-    this.itemData = new Object() as ItemData;
-    this.itemData.uomsList = [];
-    this.itemData.statesList = [];
-    this.pageTitle = this.viewMode === 'edit' ? 'Edit Item' : 'View Item';
+    this.transportData = new Object() as TransportData;
+    this.pageTitle = this.viewMode === 'edit' ? 'Edit Transport' : 'View Transport';
     this.isLoadingResults = true;
     this.form = new FormGroup({
-      description: new FormControl(''),
-      sku: new FormControl(''),
-      upc: new FormControl(''),
-      phonetic: new FormControl(''),
-      itemType: new FormControl(''),
-      uom: new FormControl(''),
+      transportNumber: new FormControl(''),
+      route: new FormControl(''),
+      nameRoute: new FormControl(''),
+      carrierCode: new FormControl(''),
+      shipmentDate: new FormControl(''),
+      vehicle: new FormControl(''),
+      trailer: new FormControl(''),
+      containerNumber: new FormControl(''),
+      uomWeight: new FormControl(''),
       weight: new FormControl(''),
-      variableWeight: new FormControl(''),
-      weightTolerance: new FormControl(''),
-      expiryDate: new FormControl(''),
-      serial: new FormControl(''),
-      batchNumber: new FormControl(''),
-      scannedVerification: new FormControl(''),
-      spokenVerification: new FormControl(''),
-      state: new FormControl(''),
-      classification: new FormControl(''),
-      cost: new FormControl(''),
-      tolerance: new FormControl(''),
-      shelfLife: new FormControl('')
+      uomVolume: new FormControl(''),
+      transportationStatus: new FormControl(''),
+      description: new FormControl(''),
+      plannedCheckin: new FormControl(''),
+      actualCheckin: new FormControl(''),
+      plannedStartLoading: new FormControl(''),
+      currentStartLoading: new FormControl(''),
+      plannedEndLoading: new FormControl(''),
+      actualEndLoading: new FormControl(''),
+      plannedShipmentCompletion: new FormControl(''),
+      currentShipmentCompletion: new FormControl('')
     });
+    // console.log('form', this.form.value);
     /* para tabla ag-grid */
     this.displayedDataColumns = Object.keys(this.definitions);
-    this.frameworkComponents = {
-      /*moodRenderer: MoodRenderer,
-      moodEditor: MoodEditor,*/
-      rowOption: RowOptionComponent,
-      numericEditor: NumericEditorComponent,
-    };
     /* para tabla de item uom */
-    /*this.dataSource = new MatTableDataSource([]);
+    this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
-    this.dataToSend = [];
     this.actionForSelected = new FormControl('');
     this.displayedDataColumns = Object.keys(this.definitions);
     this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
@@ -205,39 +122,42 @@ export class EditItemComponent implements OnInit {
 
     this.utilities.log('displayed data columns', this.displayedDataColumns);
     this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
-    */
     this.initColumnsDefs(); // columnas a mostrarse
   }
 
+  setDataSourceAttributes() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
   init() {
-    this.utilities.log('item', this.row);
+    this.utilities.log('transport', this.row);
     this.getUomsList();
-    this.getStatesList();
-    this.getItemTypeList();
-    this.getClassificationsList();
+    this.getTransportationStatusList();
     this.form = new FormGroup({
-      description: new FormControl(this.row.description),
-      sku: new FormControl(this.row.sku),
-      upc: new FormControl(this.row.upc),
-      phonetic: new FormControl(this.row.phonetic),
-      itemType: new FormControl(this.row.itemType),
-      uom: new FormControl(this.row.uom),
+      transportNumber: new FormControl(this.row.transportNumber),
+      route: new FormControl(this.row.route),
+      nameRoute: new FormControl(this.row.nameRoute),
+      carrierCode: new FormControl(this.row.nameRoute),
+      shipmentDate: new FormControl(this.row.shipmentDate),
+      vehicle: new FormControl(this.row.vehicle),
+      trailer: new FormControl(this.row.trailer),
+      containerNumber: new FormControl(this.row.containerNumber),
+      uomWeight: new FormControl(this.row.uomWeight),
       weight: new FormControl(this.row.weight),
-      variableWeight: new FormControl(this.row.variableWeight),
-      weightTolerance: new FormControl(this.row.weightTolerance),
-      expiryDate: new FormControl(this.row.expiryDate),
-      serial: new FormControl(this.row.serial),
-      batchNumber: new FormControl(this.row.batchNumber),
-      scannedVerification: new FormControl(this.row.scannedVerification),
-      spokenVerification: new FormControl(this.row.spokenVerification),
-      state: new FormControl(this.row.state),
-      classification: new FormControl(this.row.classification),
-      cost: new FormControl(this.row.cost),
-      tolerance: new FormControl(this.row.tolerance),
-      shelfLife: new FormControl(this.row.shelfLife)
+      uomVolume: new FormControl(this.row.uomVolume),
+      transportationStatus: new FormControl(this.row.transportationStatus),
+      description: new FormControl(this.row.description),
+      plannedCheckin: new FormControl(this.row.plannedCheckin),
+      actualCheckin: new FormControl(this.row.actualCheckin),
+      plannedStartLoading: new FormControl(this.row.plannedStartLoading),
+      currentStartLoading: new FormControl(this.row.currentStartLoading),
+      plannedEndLoading: new FormControl(this.row.plannedEndLoading),
+      actualEndLoading: new FormControl(this.row.actualEndLoading),
+      plannedShipmentCompletion: new FormControl(this.row.plannedShipmentCompletion),
+      currentShipmentCompletion: new FormControl(this.row.currentShipmentCompletion)
     });
-    // this.loadData();
-    this.itemUomsData = this.dataProviderService.getAllItemUoms(this.row.id);
+    this.loadData();
   }
 
   handleError(error: any) {
@@ -248,35 +168,19 @@ export class EditItemComponent implements OnInit {
   export() {
     // TODO: hacer la exportacion de la orden completa
     const dataToExport = this.row;
-    this.utilities.exportToXlsx(dataToExport, 'Item # ' + this.row.sku);
+    this.utilities.exportToXlsx(dataToExport, 'Transport # ' + this.row.sku);
   }
 
   getUomsList() {
     this.dataProviderService.getAllUoms().subscribe(results => {
-      this.itemData.uomsList = results;
-      this.utilities.log('uoms list', this.itemData.uomsList);
+      this.transportData.uomsList = results;
+      this.utilities.log('uoms list', this.transportData.uomsList);
     });
   }
 
-  getStatesList() {
-    this.itemData.statesList = Object.keys(Item.StateEnum);
-  }
-
-  getClassificationsList() {
-    this.itemData.classificationsList = Object.keys(Item.ClassificationEnum);
-  }
-
-  getItemTypeList() {
-    this.dataProviderService.getAllItemTypes().subscribe(results => {
-      this.itemData.itemTypeList = results;
-      this.utilities.log('item types list', this.itemData.itemTypeList);
-    });
-  }
-
-  print() {
-    // this.utilities.print('printSection');
-    // this.router.navigate([`/pages/${this.type}/print`, this.row.id]);
-    window.open(`/print/${this.type}/${this.row.id}`, '_blank');
+  getTransportationStatusList() {
+    this.transportData.statusList = Object.keys(Transport.TransportationStatusEnum);
+    this.utilities.log('status list', this.transportData.statusList);
   }
 
   onSubmit() {
@@ -287,7 +191,6 @@ export class EditItemComponent implements OnInit {
     }
     this.utilities.log('onSubmit');
     const formData = this.form.value;
-
     const toUpload = this.row;
     this.utilities.log('form data', formData);
     for (let key in formData) {
@@ -315,7 +218,7 @@ export class EditItemComponent implements OnInit {
           this.utilities.error('error on update', error);
         }
       };
-      this.dataProviderService.updateItem(toUpload, this.row.id, 'response').pipe(retry(3))
+      this.dataProviderService.updateTransport(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
     } else {
       this.sharedDataService.returnData = toUpload;
@@ -344,7 +247,7 @@ export class EditItemComponent implements OnInit {
       this.utilities.log('dialog result:', result);
       if (result) {
         if (objectType === IMPORTING_TYPES.UOMS) {
-          this.itemData.uomsList.push(result);
+          this.transportData.uomsList.push(result);
         }
         // TODO: agregar los tipos de datos que se pueden agregar desde selects
       }
@@ -372,14 +275,14 @@ export class EditItemComponent implements OnInit {
         this.isLoadingResults = false;
         this.utilities.log('ngOnInit => row received', element);
         this.row = element;
-        this.cardTitle = 'Item # ' + this.row.id;
+        this.cardTitle = 'Transport # ' + this.row.id;
         this.init();
       });
       this.remoteSync = true;
     });
     /* para la tabla de item uom */
-    /*this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   /* Metodos para la tabla de item uom */
@@ -388,15 +291,15 @@ export class EditItemComponent implements OnInit {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    /*if (localStorage.getItem('displayedColumnsInEditItemPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInEditItemPage'));
+    if (localStorage.getItem('displayedColumnsInEditTransportPage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInEditTransportPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
         return {show: shouldShow, name: columnName};
       });
-    }*/
-    /*aux = this.columnDefs.slice();
+    }
+    aux = this.columnDefs.slice();
     aux.pop();
     aux.shift();
     this.defaultColumnDefs = aux;
@@ -419,7 +322,6 @@ export class EditItemComponent implements OnInit {
     });
     this.filtersForm = new FormGroup(formControls);
     this.utilities.log('formControls', formControls);
-    */
     this.selectsData = {};
     for (let key in this.definitions) {
       if (this.definitions[key].formControl.control === 'select') {
@@ -452,7 +354,7 @@ export class EditItemComponent implements OnInit {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInEditItemPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInEditTransportPage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -531,11 +433,11 @@ export class EditItemComponent implements OnInit {
     if (Array.isArray(rows)) {
       const requests = [];
       rows.forEach(row => {
-        requests.push(this.dataProviderService.deleteItemUom(row.id, 'response', false));
+        requests.push(this.dataProviderService.deleteOrder(row.id, 'response', false));
       });
       this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteItemUom(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deleteOrder(rows.id, 'response', false)
       .subscribe(observer));
     }
   }
@@ -575,7 +477,7 @@ export class EditItemComponent implements OnInit {
     const filters = this.filters.filter(filter => filter.show &&
                     formValues[filter.key] && formValues[filter.key].length > 0);
     // this.utilities.log('filters: ', filters);
-    this.dataSource.filterPredicate = (data: ItemUom, filter: string) => {
+    this.dataSource.filterPredicate = (data: Order, filter: string) => {
       // this.utilities.log('data', data);
       return filters.every(shownFilter => {
         value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
@@ -603,7 +505,7 @@ export class EditItemComponent implements OnInit {
       data: {
         row: element,
         map: this.definitions,
-        type: IMPORTING_TYPES.ITEMUOMS,
+        type: IMPORTING_TYPES.ORDERS,
         remoteSync: true, // para mandar los datos a la BD por la API
         viewMode: mode,
         defaultValues: {
@@ -625,17 +527,17 @@ export class EditItemComponent implements OnInit {
   }
 
   loadData(useCache = true) {
-    this.utilities.log('requesting item uoms');
+    this.utilities.log('requesting orders');
     this.isLoadingResults = true;
-    this.subscriptions.push(this.dataProviderService.getAllItemUoms(this.row.id)
+    this.subscriptions.push(this.dataProviderService.getTransportsOrders(this.row.id)
     .subscribe(results => {
       this.isLoadingResults = false;
-      this.utilities.log('item uoms received', results);
+      this.utilities.log('orders received', results);
       if (results && results.length > 0) {
-        /*this.dataSource.data = results.map((element, i) => {
+        this.dataSource.data = results.map((element, i) => {
           return { index: i, ... element};
         });
-        this.refreshTable();*/
+        this.refreshTable();
       }
     }, error => {
       this.isLoadingResults = false;
@@ -651,23 +553,22 @@ export class EditItemComponent implements OnInit {
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.itemUoms);
+    this.utilities.dataTypesModelMaps.orders);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.definitions,
-        type: IMPORTING_TYPES.ITEMUOMS,
+        type: IMPORTING_TYPES.ORDERS,
         remoteSync: true, // para mandar los datos a la BD por la API
-        title: 'Add New Item Uom',
+        title: 'Add New Order',
         defaultValues: {
-          item: this.row
+          transport: this.row
         }
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
-        // this.dataSource.data.push(result);
-        this.itemUomsData = this.dataProviderService.getAllItemUoms(this.row.id);
+        this.dataSource.data.push(result);
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');
@@ -678,9 +579,9 @@ export class EditItemComponent implements OnInit {
 
   exportTableData() {
     const dataToExport = this.dataSource.data.map((row: any) => {
-      return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ITEMUOMS);
+      return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ORDERS);
     });
-    this.utilities.exportToXlsx(dataToExport, 'Item Uoms List');
+    this.utilities.exportToXlsx(dataToExport, 'Orders List');
   }
 
   /*
@@ -707,82 +608,34 @@ export class EditItemComponent implements OnInit {
     this.showFilters = !this.showFilters;
   }
 
-  updateItemUom(event) {
+  updateOrder(event) {
     console.log(event);
-    const itemUom = event.data;
-    console.log('updateItemUom', event);
-    itemUom.uom = this.selectsData.uom.find(uom => uom.code === itemUom.uom);
-    this.dataProviderService.updateItemUom(itemUom, itemUom.id).subscribe(result => {
-      this.utilities.log('item uom update result', result);
+    const order = event.data;
+    console.log('updateOrder', event);
+    // order.uom = this.selectsData.uom.find(uom => uom.code === itemUom.uom);
+    this.dataProviderService.updateOrder(order, order.id).subscribe(result => {
+      this.utilities.log('order update result', result);
       if (result) {
-        this.utilities.showSnackBar('Item uom updated successfully', 'OK');
+        this.utilities.showSnackBar('Order updated successfully', 'OK');
       }
     }, error => {
-      this.utilities.error('Error on update item uom', error);
-      this.utilities.showSnackBar('Error on update item uom', 'OK');
+      this.utilities.error('Error on update order', error);
+      this.utilities.showSnackBar('Error on update order', 'OK');
     });
   }
 
-  deleteItemUom(params: any) {
-    this.utilities.log('edit-item. deleteItemUom params', params);
-    this.dataProviderService.deleteItemUom(params.rowData.id).subscribe(results => {
-      this.utilities.log('delete item uom results', results);
+  deleteOrder(order: any) {
+    this.utilities.log('edit-transport. deleteOrder', order);
+    this.dataProviderService.deleteItemUom(order.id).subscribe(results => {
+      this.utilities.log('delete order results', results);
       if (results) {
-        this.utilities.showSnackBar('Item uom deleted successfully', 'OK');
-        this.itemUomsData = this.dataProviderService.getAllItemUoms(this.row.id);
+        this.utilities.showSnackBar('Order deleted successfully', 'OK');
+        this.refreshTable();
       }
     }, error => {
-      this.utilities.error('Error on delete item uom', error);
-      this.utilities.showSnackBar('Error on delete item uom', 'OK');
+      this.utilities.error('Error on delete order', error);
+      this.utilities.showSnackBar('Error on delete order', 'OK');
     });
   }
-
-  startEditItemUom(params: any) {
-    this.utilities.log('edit-item. startEditItemUom params', params);
-    this.gridApi.startEditingCell({rowIndex: 0, colKey: 'uom'});
-  }
-
-  finishEditItemUom(params: any) {
-    this.utilities.log('edit-item. finishEditItemUom params', params);
-    this.gridApi.stopEditing();
-  }
-
-  checkKeyPressed(event: KeyboardEvent) {
-    console.log('event', event);
-    if (event.key && event.key === 'Enter') {
-      event.stopPropagation();
-    }
-  }
-
-  onGridReady(params) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    // new EventListener(this.gridApi.onRow)
-  }
-  rowOption(params) {
-    // console.log('rowOptions', params);
-    // this.utilities.log('sdsd');
-  }
-  /* fin de metodos para la tabla de item uoms */
-}
-
-function uomFormatter(params) {
-  console.log('uomFormatter', params.value);
-  return params.value.code;
-}
-
-function uomParser(params) {
-  console.log('uomParser', params);
-  return params.newValue.code;
-}
-
-function uomGetter(params) {
-  console.log('uomGetter', params);
-  return params.data.uom.name;
-}
-
-function uomSetter(params) {
-  console.log('uomSetter', params);
-  params.data.uom = params.newValue;
-  return true;
+  /* fin de metodos para la tabla de orders */
 }

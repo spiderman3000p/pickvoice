@@ -233,7 +233,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.rejectedRows = 0;
     const dataToSend = this.getValidRows();
     this.dataToSendLength = dataToSend.length;
-    this.isReadyToSend = dataToSend.length > 0;
+    this.isReadyToSend = dataToSend.length > 0 && dataToSend.length === this.dataSource.data.length;
     this.utilities.log('ready to send? ', this.isReadyToSend);
     if (this.isReadyToSend) {
       this.utilities.log('sending data to api:', dataToSend);

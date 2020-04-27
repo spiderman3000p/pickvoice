@@ -5,6 +5,7 @@ import { ItemsRoutingModule } from './items-routing.module';
 import { ItemsComponent } from './items.component';
 import { EditItemComponent } from '../edit-item/edit-item.component';
 import { NumericEditorComponent } from '../edit-item/numeric-editor.component';
+import { RowOptionComponent } from '../edit-item/row-option.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatTabsModule } from '@angular/material/tabs';
@@ -54,7 +55,7 @@ export const MY_FORMATS = {
 };
 @NgModule({
   declarations: [
-    ItemsComponent, EditItemComponent, NumericEditorComponent
+    ItemsComponent, EditItemComponent, NumericEditorComponent, RowOptionComponent
   ],
   imports: [
     CommonModule,

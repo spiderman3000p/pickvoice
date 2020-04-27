@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Order, OrderService, Customer, OrderLine, OrderType, Transport, CustomerService,
-         OrderTypeService, TransportService } from '@pickvoice/pickvoice-api';
+         OrderTypeService, TransportService, UomService, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
@@ -25,6 +25,8 @@ interface OrdersData {
   transportList: Transport[];
   customerList: Customer[];
   orderLineList: OrderLine[];
+  transportStatus: string[];
+  uomList: UnityOfMeasure[];
 }
 @Component({
   selector: 'app-edit-order',
@@ -60,13 +62,23 @@ export class EditOrderComponent implements OnInit {
   filters: any[] = [];
   actionForSelected: FormControl;
   selection = new SelectionModel<OrderLine>(true, []);
+  transportDataMap = ModelMap.TransportMap;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.setDataSourceAttributes();
+  }
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSourceAttributes();
+  }
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
     private activatedRoute: ActivatedRoute, private orderService: OrderService,
     private router: Router, private dialog: MatDialog, private orderTypeService: OrderTypeService,
-    private customerService: CustomerService, private transportService: TransportService
+    private customerService: CustomerService, private transportService: TransportService,
+    private uomService: UomService
   ) {
     this.dataSource = new MatTableDataSource([]);
     this.ordersData = new Object() as OrdersData;
@@ -76,6 +88,23 @@ export class EditOrderComponent implements OnInit {
     this.ordersData.transportList = [];
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
     this.isLoadingResults = true;
+    this.form = new FormGroup({
+      orderNumber: new FormControl(''),
+      purchaseNumber: new FormControl(''),
+      invoiceNumber: new FormControl(''),
+      orderDate: new FormControl(''),
+      deliveryDate: new FormControl(''),
+      orderType: new FormControl(''),
+      priority: new FormControl(''),
+      note: new FormControl(''),
+      transport: new FormControl(''),
+      customer: new FormControl('')
+    });
+  }
+
+  setDataSourceAttributes() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   init() {
@@ -84,6 +113,8 @@ export class EditOrderComponent implements OnInit {
     this.getCustomerList();
     this.getOrderTypeList();
     this.getOrderLineList();
+    this.getTransportStatusList();
+    this.getUomList();
     // inicializamos todo lo necesario para la tabla
     if (this.row) {
       this.dataSource.data = this.ordersData.orderLineList;
@@ -417,6 +448,17 @@ export class EditOrderComponent implements OnInit {
       this.ordersData.transportList = results;
       this.utilities.log('this.ordersData.transportList', this.ordersData.transportList);
     });
+  }
+
+  getUomList() {
+    this.uomService.retrieveAllUom().subscribe(results => {
+      this.ordersData.uomList = results;
+      this.utilities.log('this.ordersData.uomList', this.ordersData.uomList);
+    });
+  }
+
+  getTransportStatusList() {
+    this.ordersData.transportStatus = Object.keys(Transport.TransportationStatusEnum);
   }
 
   print() {

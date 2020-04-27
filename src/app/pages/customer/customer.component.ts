@@ -146,6 +146,8 @@ export class CustomerComponent implements OnInit, AfterViewInit {
             this.dataSource.data = response.content;
             this.dataSource.dataCount = response.totalElements;
             this.dataSource.dataSubject.next(this.dataSource.data);
+            this.dataSource.paginator = this.paginator;
+            this.dataSource.sort = this.sort;
         }
     }, error => {
       this.utilities.error('Error fetching data from server');

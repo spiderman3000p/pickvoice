@@ -4,9 +4,12 @@
     "outDir": "./out-tsc/worker",
     "lib": [
       "es2018",
+      "es2015",
       "webworker"
     ],
-    "types": []
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "src/**/*.worker.ts"

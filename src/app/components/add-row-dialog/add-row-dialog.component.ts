@@ -63,7 +63,7 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
       }
       // value = this.utilities.renderColumnData(this.dataMap[key].type, this.row[key]);
       if (this.dataMap[key].required) {
-        formControls[key] = new FormControl(this.row[key], Validators.required);
+        formControls[key] = new FormControl(this.row[key], [Validators.required]);
       } else {
         formControls[key] = new FormControl(this.row[key]);
       }
@@ -107,6 +107,7 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (!this.form.valid) {
+      this.utilities.log('formulario:', this.form.value);
       this.utilities.error('formulario invalido');
       this.utilities.showSnackBar('Please check the required fields', 'OK');
       return;
@@ -148,14 +149,12 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
 
   getColumnsClasses() {
     let classes = 'col-sm-12 col-md-4 col-lg-3';
-    if (this.keys.length > 1) {
-      classes = 'col-sm-12 col-md-6 col-lg-6';
-    }
-    if (this.keys.length >= 3) {
-      classes = 'col-sm-12 col-md-4 col-lg-4';
-    }
     if (this.keys.length >= 5) {
       classes = 'col-sm-12 col-md-4 col-lg-3';
+    } else if (this.keys.length >= 3) {
+      classes = 'col-sm-12 col-md-4 col-lg-4';
+    } else if (this.keys.length > 1) {
+      classes = 'col-sm-12 col-md-6 col-lg-6';
     }
     return classes;
   }

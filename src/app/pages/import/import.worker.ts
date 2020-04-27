@@ -1,6 +1,11 @@
 /// <reference lib="webworker" />
-/*import { Section, ItemType, UnityOfMeasure, Item } from '@pickvoice/pickvoice-api';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { Transport } from '../../models/enums/transport.enum';
+import { PickTask } from '../../models/enums/picktask.enum';
+import { PickPlanning } from '../../models/enums/pickplanning.enum';
+import { Location } from '../../models/enums/location.enum';
+import { Item } from '../../models/enums/item.enum';
+import { Dock } from '../../models/enums/dock.enum';
+/*import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { ValidationError } from './validation-error';
 import { environment } from '../../../environments/environment';
 */
@@ -122,6 +127,7 @@ function mapData() {
 
 function validateData() {
   let headers = dataTypesModelMaps[globalData.selectedType];
+  const enumTypes = {};
   let currentRowErrors;
   let dataLength = globalData.data.length;
   if (!headers) {
@@ -131,7 +137,20 @@ function validateData() {
     }});
     return;
   }
+  enumTypes[IMPORTING_TYPES.LOCATION_STATE] = Location.LocationStateEnum;
+  enumTypes[IMPORTING_TYPES.ITEM_STATE] = Item.StateEnum;
+  enumTypes[IMPORTING_TYPES.ITEM_CLASSIFICATIONS] = Item.ClassificationEnum;
+  enumTypes[IMPORTING_TYPES.PICK_STATE] = PickPlanning.StateEnum;
+  enumTypes[IMPORTING_TYPES.TASK_STATE] = PickTask.TaskStateEnum;
+  enumTypes[IMPORTING_TYPES.TRANSPORT_STATE] = Transport.TransportationStatusEnum;
+  enumTypes[IMPORTING_TYPES.DOCK_TYPE] = Dock.DockTypeEnum;
+  enumTypes[IMPORTING_TYPES.LOCATION_TYPE] = Location.LocationTypeEnum;
+  enumTypes[IMPORTING_TYPES.OPERATION_TYPE] = Location.OperationTypeEnum;
+  enumTypes[IMPORTING_TYPES.RACK_TYPE] = Location.RackTypeEnum;
+  console.log('enumTypes', enumTypes);
   let batchProcessedData = [];
+  let auxIndex;
+  let existEnum;
   globalData.data.forEach((row, rowIndex) => {
     currentRowErrors = [];
     for (const field in headers) {
@@ -163,8 +182,41 @@ function validateData() {
             must be lower than ${headers[field].max}`;
           currentRowErrors.push(validationError);
         }
+
+        if (headers[field].formControl.control === 'select' && headers[field].validate === true &&
+          enumTypes[headers[field].type] !== undefined) {
+          console.log(`buscando enum type ${headers[field].type} que coincida con ${row[field]}`);
+          console.log(`enumTypes[${headers[field].type}]`, enumTypes[headers[field].type]);
+          existEnum = enumTypes[headers[field].type].findIndex(type => {
+            auxIndex = headers[field].formControl.valueIndex;
+            if (auxIndex === null) {
+              if (type === row[field]) {
+                return true;
+              }
+            } else {
+              if (type[auxIndex] === row[field]) {
+                return true;
+              }
+            }
+            return false;
+          });
+          if (existEnum === -1) {
+            console.error(`el enum type ${headers[field].type} con valor ${row[field]} no existe`);
+            const validationError = new Object() as any;
+            validationError.index = rowIndex;
+            validationError.error = `The field ${headers[field].name} (${field}) with value ${row[field]}
+              does not exists in the available collection: ${enumTypes[headers[field].type].toString()}`;
+            currentRowErrors.push(validationError);
+          } else {
+            console.log(`el enum type ${headers[field].type} con valor ${row[field]} si existe`);
+          }
+        } else {
+          console.log(`el campo ${field} de control ${headers[field].formControl.control} y tipo
+          ${headers[field].type} no es un select o no tiene enumType asociado`);
+          console.log(`enumType[${headers[field].type}]: `, enumTypes[headers[field].type]);
+        }
         // comprobando si el campo es unico
-        if (headers[field].unique && row[field] !== '') {
+        /*if (headers[field].unique && row[field] !== '') {
           const exists = globalData.data.filter((element, index) => index !== rowIndex && element[field] == row[field]).length;
           if (exists > 0) {
             const validationError = new Object() as any;
@@ -173,7 +225,7 @@ function validateData() {
               must be unique in all the collection. It repits ${exists} times`;
             currentRowErrors.push(validationError);
           }
-        }
+        }*/
       }
     }
     if (currentRowErrors.length === 0) {

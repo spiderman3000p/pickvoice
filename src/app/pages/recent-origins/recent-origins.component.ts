@@ -15,30 +15,27 @@ import { Observable, Observer, Subscription } from 'rxjs';
   styleUrls: ['./recent-origins.component.css']
 })
 export class RecentOriginsComponent implements OnInit, OnDestroy {
-  itemsDataSource: MatTableDataSource<RecentOrigin>;
-  locationsDataSource: MatTableDataSource<RecentOrigin>;
-  ordersDataSource: MatTableDataSource<RecentOrigin>;
-  loadPicksDataSource: MatTableDataSource<RecentOrigin>;
+  itemsDtoDataSource: MatTableDataSource<RecentOrigin>;
+  locationsDtoDataSource: MatTableDataSource<RecentOrigin>;
+  ordersDtoDataSource: MatTableDataSource<RecentOrigin>;
+  loadPicksDtoDataSource: MatTableDataSource<RecentOrigin>;
+  itemUomsDtoDataSource: MatTableDataSource<RecentOrigin>;
   displayedColumns = Object.keys(ModelMap.RecentOriginMap);
   headers: any = ModelMap.RecentOriginMap;
   filter: FormControl;
   isLoadingResults = false;
-  itemsRecentOrigins: RecentOrigin[];
-  locationsRecentOrigins: RecentOrigin[];
-  ordersRecentOrigins: RecentOrigin[];
-  itemsSubscriber: Subscription;
-  locationsSubscriber: Subscription;
-  ordersSubscriber: Subscription;
-  loadPicksSubscriber: Subscription;
+  subscribers: Subscription[] = [];
   importingTypes = IMPORTING_TYPES;
   @ViewChild(MatPaginator, {static: true}) itemsPaginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) locationsPaginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) ordersPaginator: MatPaginator;
   @ViewChild(MatPaginator, {static: true}) loadPicksPaginator: MatPaginator;
+  @ViewChild(MatPaginator, {static: true}) itemUomsPaginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) itemsSort: MatSort;
   @ViewChild(MatSort, {static: true}) locationsSort: MatSort;
   @ViewChild(MatSort, {static: true}) ordersSort: MatSort;
   @ViewChild(MatSort, {static: true}) loadPicksSort: MatSort;
+  @ViewChild(MatSort, {static: true}) itemUomsSort: MatSort;
   @ViewChild(MatPaginator) set matItemsPaginator(mp: MatPaginator) {
     this.itemsPaginator = mp;
     this.initItemsPaginatorSort();
@@ -54,6 +51,10 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) set matLoadPicksPaginator(mp: MatPaginator) {
     this.loadPicksPaginator = mp;
     this.initLoadPicksPaginatorSort();
+  }
+  @ViewChild(MatPaginator) set matItemUomsPaginator(mp: MatPaginator) {
+    this.itemUomsPaginator = mp;
+    this.initItemUomsPaginatorSort();
   }
   @ViewChild(MatSort) set matItemsSort(ms: MatSort) {
     this.itemsSort = ms;
@@ -71,17 +72,22 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
     this.loadPicksSort = ms;
     this.initLoadPicksPaginatorSort();
   }
+  @ViewChild(MatSort) set matItemUomsSort(ms: MatSort) {
+    this.itemUomsSort = ms;
+    this.initItemUomsPaginatorSort();
+  }
   constructor(private recentOriginsService: RecentOriginsService, private utilities: UtilitiesService) {
-    this.itemsDataSource = new MatTableDataSource([]);
-    this.locationsDataSource = new MatTableDataSource([]);
-    this.ordersDataSource = new MatTableDataSource([]);
-    this.loadPicksDataSource = new MatTableDataSource([]);
+    this.itemsDtoDataSource = new MatTableDataSource([]);
+    this.locationsDtoDataSource = new MatTableDataSource([]);
+    this.ordersDtoDataSource = new MatTableDataSource([]);
+    this.loadPicksDtoDataSource = new MatTableDataSource([]);
+    this.itemUomsDtoDataSource = new MatTableDataSource([]);
 
     const itemsObserver = {
       next: (origins) => {
         this.utilities.log('items results type ', typeof origins);
         this.utilities.log('items recent origins', origins);
-        this.itemsDataSource.data = origins;
+        this.itemsDtoDataSource.data = origins;
       },
       error: (error) => {
         this.utilities.error('error requesting items recent origins: ', error);
@@ -93,7 +99,7 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
       next: (origins) => {
         this.utilities.log('locations results type ', typeof origins);
         this.utilities.log('locations recent origins', origins);
-        this.locationsDataSource.data = origins;
+        this.locationsDtoDataSource.data = origins;
       },
       error: (error) => {
         this.utilities.error('error requesting locations recent origins: ', error);
@@ -105,7 +111,7 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
       next: (origins) => {
         this.utilities.log('orders results type ', typeof origins);
         this.utilities.log('orders recent origins', origins);
-        this.ordersDataSource.data = origins;
+        this.ordersDtoDataSource.data = origins;
       },
       error: (error) => {
         this.utilities.error('error requesting orders recent origins: ', error);
@@ -116,22 +122,35 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
       next: (origins) => {
         this.utilities.log('load picks results type ', typeof origins);
         this.utilities.log('load picks recent origins', origins);
-        this.loadPicksDataSource.data = origins;
+        this.loadPicksDtoDataSource.data = origins;
       },
       error: (error) => {
         this.utilities.error('error requesting load picks recent origins: ', error);
         this.utilities.showSnackBar('Error requesting load picks recent origins', 'OK');
       }
     };
+    const itemUomsObserver = {
+      next: (origins) => {
+        this.utilities.log('item uoms results type ', typeof origins);
+        this.utilities.log('item uoms recent origins', origins);
+        this.itemUomsDtoDataSource.data = origins;
+      },
+      error: (error) => {
+        this.utilities.error('error requesting item uoms recent origins: ', error);
+        this.utilities.showSnackBar('Error requesting item uoms recent origins', 'OK');
+      }
+    };
 
-    this.itemsSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADITEMS_DTO).
-    subscribe(itemsObserver);
-    this.locationsSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADLOCATIONS_DTO).
-    subscribe(locationsObserver);
-    this.ordersSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADORDERS_DTO).
-    subscribe(ordersObserver);
-    this.loadPicksSubscriber = this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADPICKS_DTO).
-    subscribe(loadPicksObserver);
+    this.subscribers.push(this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADITEMS_DTO).
+    subscribe(itemsObserver));
+    this.subscribers.push(this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADLOCATIONS_DTO).
+    subscribe(locationsObserver));
+    this.subscribers.push(this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADORDERS_DTO).
+    subscribe(ordersObserver));
+    this.subscribers.push(this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADPICKS_DTO).
+    subscribe(loadPicksObserver));
+    this.subscribers.push(this.recentOriginsService.getRecentOrigins(IMPORTING_TYPES.LOADITEMUOMS_DTO).
+    subscribe(itemUomsObserver));
   }
 
   ngOnInit(): void {
@@ -139,49 +158,86 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
     this.initLocationsPaginatorSort();
     this.initOrdersPaginatorSort();
     this.initLoadPicksPaginatorSort();
+    this.initItemUomsPaginatorSort();
   }
 
   ngOnDestroy(): void {
-    this.itemsSubscriber.unsubscribe();
-    this.locationsSubscriber.unsubscribe();
-    this.ordersSubscriber.unsubscribe();
-    this.loadPicksSubscriber.unsubscribe();
+    this.subscribers.forEach(sub => sub.unsubscribe());
   }
 
   applyFilter(filterValue: string, type) {
-    this[`${type}DataSource`].filter = filterValue.trim().toLowerCase();
+    this[`${type}DtoDataSource`].filter = filterValue.trim().toLowerCase();
 
-    if (this[`${type}DataSource`].paginator) {
-      this[`${type}DataSource`].paginator.firstPage();
+    if (this[`${type}DtoDataSource`].paginator) {
+      this[`${type}DtoDataSource`].paginator.firstPage();
     }
   }
 
   initItemsPaginatorSort() {
-    this.itemsDataSource.paginator = this.itemsPaginator;
-    this.itemsDataSource.sort = this.itemsSort;
+    this.itemsDtoDataSource.paginator = this.itemsPaginator;
+    this.itemsDtoDataSource.sort = this.itemsSort;
   }
 
   initLocationsPaginatorSort() {
-    this.locationsDataSource.paginator = this.locationsPaginator;
-    this.locationsDataSource.sort = this.locationsSort;
+    this.locationsDtoDataSource.paginator = this.locationsPaginator;
+    this.locationsDtoDataSource.sort = this.locationsSort;
   }
 
   initOrdersPaginatorSort() {
-    this.ordersDataSource.paginator = this.ordersPaginator;
-    this.ordersDataSource.sort = this.ordersSort;
+    this.ordersDtoDataSource.paginator = this.ordersPaginator;
+    this.ordersDtoDataSource.sort = this.ordersSort;
   }
 
   initLoadPicksPaginatorSort() {
-    this.loadPicksDataSource.paginator = this.loadPicksPaginator;
-    this.loadPicksDataSource.sort = this.loadPicksSort;
+    this.loadPicksDtoDataSource.paginator = this.loadPicksPaginator;
+    this.loadPicksDtoDataSource.sort = this.loadPicksSort;
+  }
+
+  initItemUomsPaginatorSort() {
+    this.itemUomsDtoDataSource.paginator = this.itemUomsPaginator;
+    this.itemUomsDtoDataSource.sort = this.itemUomsSort;
   }
 
   renderColumnData(type: string, column: any) {
     return this.utilities.renderColumnData(type, column);
   }
 
+  clearAllRecentOrigins() {
+    const observer = {
+      next: (response) => {
+        if (response === true) {
+          this.isLoadingResults = true;
+          this.recentOriginsService.clearAll().subscribe(result => {
+            this.isLoadingResults = false;
+            this.itemsDtoDataSource.data = [];
+            this.locationsDtoDataSource.data = [];
+            this.ordersDtoDataSource.data = [];
+            this.loadPicksDtoDataSource.data = [];
+            this.itemUomsDtoDataSource.data = [];
+            this.utilities.log(`all recent origins cleared`);
+            this.utilities.showSnackBar(`All recent origins cleared`, 'OK');
+          }, error => {
+            this.utilities.error('Error on clearing all recent origins');
+            this.utilities.showSnackBar(`Error trying to clear all recent origins`, 'OK');
+          });
+        }
+      },
+      error: (error) => {
+        this.utilities.error('Error on clear all recent origins', error);
+        this.utilities.showSnackBar('Error on clear all recent origins', 'OK');
+      }
+    } as Observer<any>;
+
+    this.utilities.showCommonDialog(observer, {
+      title: 'Clear Storage',
+      message: 'Are you sure about clear all records? This action cannot be undone.'
+    });
+  }
+
   clearStorage(type: string) {
-    if (this[`${type}DataSource`].data.length === 0) {
+    if (this[`${type}DtoDataSource`] === undefined || this[`${type}DtoDataSource`] === null ||
+        this[`${type}DtoDataSource`].data === undefined || this[`${type}DtoDataSource`].data === undefined
+        || this[`${type}DtoDataSource`].data.length === 0) {
       return;
     }
     const observer = {
@@ -190,7 +246,7 @@ export class RecentOriginsComponent implements OnInit, OnDestroy {
           this.isLoadingResults = true;
           this.recentOriginsService.clearStorage(type).subscribe(result => {
             this.isLoadingResults = false;
-            this[`${type}DataSource`].data = [];
+            this[`${type}DtoDataSource`].data = [];
             this.utilities.log(`${type} local storage cleared`);
             this.utilities.showSnackBar(`${type} local storage cleared`, 'OK');
           }, error => {
