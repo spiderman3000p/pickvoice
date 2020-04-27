@@ -16,6 +16,17 @@ body{
     color: white;
 }
 
+.group-input{
+    position: relative;
+}
+
+.floating-right{
+    float: right;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
 @media screen and (max-width: 480px) {
     .login-sliders{
         display: none;

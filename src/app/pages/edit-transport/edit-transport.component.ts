@@ -46,7 +46,7 @@ export class EditTransportComponent implements OnInit {
   printElement = {};
   viewMode: string;
   transportData: TransportData;
-  /* para tabla de item uoms */
+  /* para tabla de orders */
   definitions: any = ModelMap.OrderMap;
   dataSource: MatTableDataSource<Order>;
   displayedDataColumns: string[];
@@ -106,7 +106,7 @@ export class EditTransportComponent implements OnInit {
     // console.log('form', this.form.value);
     /* para tabla ag-grid */
     this.displayedDataColumns = Object.keys(this.definitions);
-    /* para tabla de item uom */
+    /* para tabla de orders */
     this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
     this.actionForSelected = new FormControl('');
@@ -168,7 +168,7 @@ export class EditTransportComponent implements OnInit {
   export() {
     // TODO: hacer la exportacion de la orden completa
     const dataToExport = this.row;
-    this.utilities.exportToXlsx(dataToExport, 'Transport # ' + this.row.sku);
+    this.utilities.exportToXlsx(dataToExport, 'Transport # ' + this.row.transportNumber);
   }
 
   getUomsList() {
@@ -280,12 +280,18 @@ export class EditTransportComponent implements OnInit {
       });
       this.remoteSync = true;
     });
-    /* para la tabla de item uom */
+    /* para la tabla de orders */
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
-  /* Metodos para la tabla de item uom */
+  print() {
+    // this.utilities.print('printSection');
+    // this.router.navigate([`/pages/${this.type}/print`, this.row.id]);
+    window.open(`/print/${this.type}/${this.row.id}`, '_blank');
+  }
+
+  /* Metodos para la tabla de orders */
   initColumnsDefs() {
     let shouldShow: boolean;
     let filter: any;
@@ -507,10 +513,7 @@ export class EditTransportComponent implements OnInit {
         map: this.definitions,
         type: IMPORTING_TYPES.ORDERS,
         remoteSync: true, // para mandar los datos a la BD por la API
-        viewMode: mode,
-        defaultValues: {
-          item: this.row
-        }
+        viewMode: mode
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
@@ -577,7 +580,7 @@ export class EditTransportComponent implements OnInit {
     }));
   }
 
-  exportTableData() {
+  exportOrders() {
     const dataToExport = this.dataSource.data.map((row: any) => {
       return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ORDERS);
     });
@@ -612,7 +615,6 @@ export class EditTransportComponent implements OnInit {
     console.log(event);
     const order = event.data;
     console.log('updateOrder', event);
-    // order.uom = this.selectsData.uom.find(uom => uom.code === itemUom.uom);
     this.dataProviderService.updateOrder(order, order.id).subscribe(result => {
       this.utilities.log('order update result', result);
       if (result) {
@@ -626,7 +628,7 @@ export class EditTransportComponent implements OnInit {
 
   deleteOrder(order: any) {
     this.utilities.log('edit-transport. deleteOrder', order);
-    this.dataProviderService.deleteItemUom(order.id).subscribe(results => {
+    this.dataProviderService.deleteOrder(order.id).subscribe(results => {
       this.utilities.log('delete order results', results);
       if (results) {
         this.utilities.showSnackBar('Order deleted successfully', 'OK');
