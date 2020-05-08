@@ -34,7 +34,6 @@ export class RowOptionComponent {
   agInit(params: any): void {
     this.params = params;
     document.addEventListener('keydown', (event) => {
-      console.log('event listener', event);
       if (event.key && event.key === 'Enter') {
         event.stopPropagation();
       }

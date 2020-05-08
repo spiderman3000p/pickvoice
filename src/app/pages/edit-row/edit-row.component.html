@@ -25,20 +25,21 @@
                 <mat-card-title>{{cardTitle}}</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-                <div mat-dialog-content>
-                    <span *ngFor="let key of keys">
+                <div mat-dialog-content class="row">
+                    <div *ngFor="let key of keys" [ngClass]="getColumnsClasses()">
                         <!-- campos compuestos/objetos select -->
-                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        <div class="form-group"
                         *ngIf="dataMap[key].formControl.control === 'select'">
-                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                            <mat-select [compareWith]="dataMap[key].formControl.compareFn" [formControlName]="key"
-                            [class.readonly]="viewMode === 'view'">
-                                <mat-option *ngFor="let data of selectsData[key] | async"
-                                [value]="data">
+                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                            <select [compareWith]="dataMap[key].formControl.compareFn" [formControlName]="key"
+                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'"
+                            class="form-control">
+                                <option *ngFor="let data of selectsData[key] | async"
+                                [ngValue]="data">
                                     {{ dataMap[key].formControl.displayIndex !== null && dataMap[key].formControl.displayIndex !== null ?
                                         data[dataMap[key].formControl.displayIndex] : data }}
-                                </mat-option>
-                                <div class="select-footer" *ngIf="dataMap[key].addNew && viewMode === 'edit'">
+                                </option>
+                                <!--div class="select-footer" *ngIf="dataMap[key].addNew && viewMode === 'edit'">
                                     <span class="select-footer-content">
                                         <a href="javascript: void(0)"
                                         (click)="addNewObject(key, dataMap[key].addNew.modelType)">
@@ -46,43 +47,42 @@
                                             <span>{{ dataMap[key].addNew.text }}</span>
                                         </a>
                                     </span>
-                                </div>
-                            </mat-select>
-                        </mat-form-field>
+                                </div-->
+                            </select>
+                        </div>
                         <!-- campos number -->
-                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        <div  class="form-group"
                         *ngIf="dataMap[key].formControl.control === 'input' &&
                         dataMap[key].formControl.type === 'number'">
-                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                            <input class="w-100" matInput type="number" [formControlName]="key" 
-                            [class.readonly]="viewMode === 'view'">
-                        </mat-form-field>
+                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                            <input class="form-control" type="number" [formControlName]="key" 
+                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                        </div>
                         <!-- campos date -->
-                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        <div class="form-group"
                         *ngIf="dataMap[key].formControl.control === 'date'">
-                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                            <input matInput [formControlName]="key" [matDatepicker]="pickerDate" *ngIf="dataMap[key].type === 'date'"
-                            [class.readonly]="viewMode === 'view'" readonly>
-                            <mat-datepicker-toggle matSuffix [for]="pickerDate" *ngIf="dataMap[key].type === 'date' && viewMode === 'edit'" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                            <mat-datepicker #pickerDate ></mat-datepicker>
-                        </mat-form-field>
+                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                            <input type="date" [formControlName]="key" *ngIf="dataMap[key].type === 'date'"
+                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'"
+                            class="form-control">
+                        </div>
                         <!-- campos string -->
-                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
+                        <div  class="form-group"
                         *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'text'">
-                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                            <input class="w-100" matInput type="text" [formControlName]="key" [class.readonly]="viewMode === 'view'">
-                        </mat-form-field>
+                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                            <input class="form-control" type="text" [formControlName]="key"
+                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                        </div>
                         <!-- campos boolean -->
-                        <mat-form-field  [ngClass]="getColumnsClasses()" [class.readonly]="viewMode === 'view'"
-                        [appearance]="dataMap[key].type === 'boolean' ? 'none' : ''"
+                        <div  class="form-group"
                         *ngIf="dataMap[key].formControl.control === 'toggle'">
-                            <mat-label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</mat-label>
-                            <input matInput [formControlName]="key"  hidden>
+                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                            <input [formControlName]="key"  hidden>
                             <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
                             (change)="form.get(key).setValue(!form.get(key).value)" [checked]="form.get(key).value">
                                 {{dataMap[key].name}}
                             </mat-slide-toggle>
-                        </mat-form-field>
+                        </div>
                         <!-- campos table -->
                         <span *ngIf="dataMap[key].formControl.control === 'table'">
                             <br><hr><br>
@@ -178,7 +178,7 @@
                             </table>
                             <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                         </span>
-                    </span>
+                    </div>
                 </div>
             </mat-card-content>
             <mat-card-actions align="end" [ngClass]="'mb-0'">

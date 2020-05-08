@@ -71,9 +71,16 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
         if (this.defaultValues === undefined || (this.defaultValues !== undefined &&
           this.defaultValues[key] === undefined)) {
           this.utilities.log(`obteniendo select data para ${key}`);
-          this.selectsData[key] =
-          this.dataProviderService.getDataFromApi(this.dataMap[key].type)
-          .pipe(tap(result => this.utilities.log(`${key} results`, result)));
+          this.subscriptions.push(this.dataProviderService.getDataFromApi(this.dataMap[key].type)
+          .pipe(tap(result => this.utilities.log(`${key} results`, result))).subscribe(results => {
+            if (results) {
+              if (results.content && results.pageSize) {
+                this.selectsData[key] = results.content;
+              } else {
+                this.selectsData[key] = results;
+              }
+            }
+          }));
           formControls[key].patchValue('');
         }
       }

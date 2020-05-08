@@ -147,7 +147,7 @@ function validateData() {
   enumTypes[IMPORTING_TYPES.LOCATION_TYPE] = Location.LocationTypeEnum;
   enumTypes[IMPORTING_TYPES.OPERATION_TYPE] = Location.OperationTypeEnum;
   enumTypes[IMPORTING_TYPES.RACK_TYPE] = Location.RackTypeEnum;
-  console.log('enumTypes', enumTypes);
+  // console.log('enumTypes', enumTypes);
   let batchProcessedData = [];
   let auxIndex;
   let existEnum;
@@ -185,8 +185,8 @@ function validateData() {
 
         if (headers[field].formControl.control === 'select' && headers[field].validate === true &&
           enumTypes[headers[field].type] !== undefined) {
-          console.log(`buscando enum type ${headers[field].type} que coincida con ${row[field]}`);
-          console.log(`enumTypes[${headers[field].type}]`, enumTypes[headers[field].type]);
+          // console.log(`buscando enum type ${headers[field].type} que coincida con ${row[field]}`);
+          // console.log(`enumTypes[${headers[field].type}]`, enumTypes[headers[field].type]);
           existEnum = enumTypes[headers[field].type].findIndex(type => {
             auxIndex = headers[field].formControl.valueIndex;
             if (auxIndex === null) {
@@ -201,19 +201,19 @@ function validateData() {
             return false;
           });
           if (existEnum === -1) {
-            console.error(`el enum type ${headers[field].type} con valor ${row[field]} no existe`);
+            // console.error(`el enum type ${headers[field].type} con valor ${row[field]} no existe`);
             const validationError = new Object() as any;
             validationError.index = rowIndex;
             validationError.error = `The field ${headers[field].name} (${field}) with value ${row[field]}
               does not exists in the available collection: ${enumTypes[headers[field].type].toString()}`;
             currentRowErrors.push(validationError);
           } else {
-            console.log(`el enum type ${headers[field].type} con valor ${row[field]} si existe`);
+            // console.log(`el enum type ${headers[field].type} con valor ${row[field]} si existe`);
           }
         } else {
-          console.log(`el campo ${field} de control ${headers[field].formControl.control} y tipo
+          /* console.log(`el campo ${field} de control ${headers[field].formControl.control} y tipo
           ${headers[field].type} no es un select o no tiene enumType asociado`);
-          console.log(`enumType[${headers[field].type}]: `, enumTypes[headers[field].type]);
+          console.log(`enumType[${headers[field].type}]: `, enumTypes[headers[field].type]);*/
         }
         // comprobando si el campo es unico
         /*if (headers[field].unique && row[field] !== '') {

@@ -10,7 +10,7 @@ import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { SharedDataService } from '../../services/shared-data.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observer, Subscription, from, Observable } from 'rxjs';
-import { retry } from 'rxjs/operators';
+import { retry, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-edit-row-dialog',
@@ -70,8 +70,17 @@ export class EditRowDialogComponent implements OnInit, OnDestroy {
       if (this.dataMap[key].formControl.control === 'select') {
         if (this.defaultValues === undefined || (this.defaultValues !== undefined &&
           this.defaultValues[key] === undefined)) {
-          this.selectsData[key] =
-          this.dataProviderService.getDataFromApi(this.dataMap[key].type);
+            this.subscriptions.push(this.dataProviderService.getDataFromApi(this.dataMap[key].type)
+            .pipe(tap(result => this.utilities.log(`${key} results`, result)))
+            .subscribe((results: any) => {
+              if (results) {
+                if (results.content && results.pageSize) {
+                  this.selectsData[key] = results.content;
+                } else {
+                  this.selectsData[key] = results;
+                }
+              }
+            }));
           if (typeof this.row[key] === 'object') {
             formControls[key].setValue(this.row[key]);
           }

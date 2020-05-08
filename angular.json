@@ -11,12 +11,9 @@
       "schematics": {},
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/PickVoiceWarehouseAdmin/browser",
-            "customWebpackConfig": {
-              "path": "./extra-webpack.config.js"
-            },
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",

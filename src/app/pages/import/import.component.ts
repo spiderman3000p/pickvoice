@@ -361,27 +361,27 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   sendItemsData(dataToSend: any[]) {
     this.utilities.log('sending items');
-    return this.dataProviderService.createItems(dataToSend, 'events', true).pipe(timeout(300000));
+    return this.dataProviderService.createItems(dataToSend, 'events', true).pipe(timeout(1000 * 60 * 30));
   }
 
   sendLocationsData(dataToSend: any[]) {
     this.utilities.log('sending locations');
-    return this.dataProviderService.createLocations(dataToSend, 'events', true).pipe(timeout(300000));
+    return this.dataProviderService.createLocations(dataToSend, 'events', true).pipe(timeout(1000 * 60 * 30));
   }
 
   sendOrdersData(dataToSend: any[]) {
     this.utilities.log('sending orders');
-    return this.dataProviderService.createOrders(dataToSend, 'events', true).pipe(timeout(300000));
+    return this.dataProviderService.createOrders(dataToSend, 'events', true).pipe(timeout(1000 * 60 * 30));
   }
 
   sendLoadPicksData(dataToSend: any[]) {
     this.utilities.log('sending load picks');
-    return this.dataProviderService.createLoadPicks(dataToSend, 'events', true).pipe(timeout(300000));
+    return this.dataProviderService.createLoadPicks(dataToSend, 'events', true).pipe(timeout(1000 * 60 * 30));
   }
 
   sendItemUomsData(dataToSend: any[]) {
     this.utilities.log('sending item uoms');
-    return this.dataProviderService.createItemUoms(dataToSend, 'events', true).pipe(timeout(300000));
+    return this.dataProviderService.createItemUoms(dataToSend, 'events', true).pipe(timeout(1000 * 60 * 30));
   }
 
   handleApiCallResult(result: any, dataToSend: any[]) {

@@ -22,10 +22,13 @@
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">clear all for items</span>
           </button>
         </div>
-        <mat-form-field class="w-100">
-          <mat-label>Filter</mat-label>
-          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOADITEMS_DTO)" placeholder="Ex. Feb, 14 2019" >
-        </mat-form-field> 
+        <div class="col-sm-8">
+          <div class="form-group">
+            <label>Filter</label>
+            <input (keyup)="applyFilter($event.target.value, importingTypes.LOADITEMS_DTO)"
+            placeholder="Ex. Feb, 14 2019" class="form-control">
+          </div> 
+        </div>
         <div>
           <table mat-table [dataSource]="itemsDtoDataSource" matSort>
             <!-- ID Column -->
@@ -48,10 +51,13 @@
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">clear all for locations</span>
           </button>
         </div>
-        <mat-form-field class="w-100">
-          <mat-label>Filter</mat-label>
-          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOADLOCATIONS_DTO)" placeholder="Ex. Feb, 14 2019" >
-        </mat-form-field> 
+        <div class="col-sm-8">
+          <div class="form-group">
+            <label>Filter</label>
+            <input (keyup)="applyFilter($event.target.value, importingTypes.LOADLOCATIONS_DTO)"
+            placeholder="Ex. Feb, 14 2019" class="form-control">
+          </div> 
+        </div>
         <div>
           <table mat-table [dataSource]="locationsDtoDataSource" matSort>
             <!-- ID Column -->
@@ -74,10 +80,13 @@
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">clear all for orders</span>
           </button>
         </div>
-        <mat-form-field class="w-100">
-          <mat-label>Filter</mat-label>
-          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOADORDERS_DTO)" placeholder="Ex. Feb, 14 2019" >
-        </mat-form-field> 
+        <div class="col-sm-8">
+          <div class="form-group">
+            <label>Filter</label>
+            <input (keyup)="applyFilter($event.target.value, importingTypes.LOADORDERS_DTO)"
+            placeholder="Ex. Feb, 14 2019" class="form-control">
+          </div> 
+        </div>
         <div>
           <table mat-table [dataSource]="ordersDtoDataSource" matSort>
             <!-- ID Column -->
@@ -100,10 +109,13 @@
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">clear all for load picks</span>
           </button>
         </div>
-        <mat-form-field class="w-100">
-          <mat-label>Filter</mat-label>
-          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOADPICKS_DTO)" placeholder="Ex. Feb, 14 2019" >
-        </mat-form-field> 
+        <div class="col-sm-8">
+          <div class="form-group">
+            <label>Filter</label>
+            <input (keyup)="applyFilter($event.target.value, importingTypes.LOADPICKS_DTO)"
+            placeholder="Ex. Feb, 14 2019" class="form-control">
+          </div> 
+        </div>
         <div>
           <table mat-table [dataSource]="loadPicksDtoDataSource" matSort>
             <!-- ID Column -->
@@ -126,10 +138,13 @@
             <mat-icon>delete_sweep</mat-icon> <span class="btn-label">clear all for load picks</span>
           </button>
         </div>
-        <mat-form-field class="w-100">
-          <mat-label>Filter</mat-label>
-          <input matInput (keyup)="applyFilter($event.target.value, importingTypes.LOADITEMUOMS_DTO)" placeholder="Ex. Feb, 14 2019" >
-        </mat-form-field> 
+        <div class="col-sm-8">
+          <div class="form-group">
+            <label>Filter</label>
+            <input (keyup)="applyFilter($event.target.value, importingTypes.LOADITEMUOMS_DTO)"
+            placeholder="Ex. Feb, 14 2019" class="form-control">
+          </div> 
+        </div>
         <div>
           <table mat-table [dataSource]="itemUomsDtoDataSource" matSort>
             <!-- ID Column -->

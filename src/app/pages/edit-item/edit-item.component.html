@@ -39,7 +39,7 @@
                                 <label>Type</label>
                                 <select [compareWith]="dataMap.itemType.formControl.compareFn" formControlName="itemType"
                                 [class.readonly]="viewMode === 'view'" class="form-control" [readonly]="viewMode === 'view'">
-                                    <option *ngFor="let type of itemData.itemTypeList" [value]="type">
+                                    <option *ngFor="let type of itemData.itemTypeList" [ngValue]="type">
                                         {{ type.description }}
                                     </option>
                                     <!--div class="select-footer" *ngIf="dataMap.itemType.addNew && viewMode === 'edit'">
@@ -57,7 +57,7 @@
                                 <label>Classification</label>
                                 <select [compareWith]="dataMap.classification.formControl.compareFn" formControlName="classification"
                                 [class.readonly]="viewMode === 'view'" class="form-control" [readonly]="viewMode === 'view'">
-                                    <option *ngFor="let classification of itemData.classificationsList" [value]="classification">
+                                    <option *ngFor="let classification of itemData.classificationsList" [ngValue]="classification">
                                         {{ classification }}
                                     </option>
                                 </select>
@@ -73,7 +73,7 @@
                                 <label>State</label>
                                 <select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
                                 [class.readonly]="viewMode === 'view'" class="form-control" [readonly]="viewMode === 'view'">
-                                    <option *ngFor="let state of itemData.statesList" [value]="state">
+                                    <option *ngFor="let state of itemData.statesList" [ngValue]="state">
                                         {{ state }}
                                     </option>
                                 </select>
@@ -146,7 +146,7 @@
                                                     <label>Unity Of Measure</label>
                                                     <select [compareWith]="dataMap.uom.formControl.compareFn" formControlName="uom"
                                                     [class.readonly]="viewMode === 'view'" class="form-control" [readonly]="viewMode === 'view'">
-                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom">
+                                                        <option *ngFor="let uom of itemData.uomsList" [ngValue]="uom">
                                                             {{ uom.name }}
                                                         </option>
                                                         <!--div class="select-footer" *ngIf="dataMap.uom.addNew && viewMode === 'edit'">

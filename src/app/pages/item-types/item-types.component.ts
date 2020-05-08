@@ -157,7 +157,7 @@ export class ItemTypesComponent implements OnInit, AfterViewInit, OnDestroy {
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
+        this.dataSource.filteredData.forEach(row => this.selection.select(row));
   }
 
   /** The label for the checkbox on the passed row */

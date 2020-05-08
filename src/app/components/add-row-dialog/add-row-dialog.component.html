@@ -10,21 +10,21 @@
             (defaultValues !== undefined && defaultValues[key] === undefined) ? '' : 'none'">
                 <!-- campos compuestos/objetos -->
                 <div class="form-group"
-                *ngIf="dataMap[key].formControl.control === 'select' && selectsData[key]">
+                *ngIf="dataMap[key].formControl.control === 'select'">
                     <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
                     <select [compareWith]="dataMap[key].formControl.compareFn"
                     [formControlName]="key" class="form-control" [required]="dataMap[key].required">
                         <mat-option [value]="">
                             Select a value
                         </mat-option>
-                        <option *ngFor="let data of selectsData[key] | async"
+                        <option *ngFor="let data of selectsData[key]"
                         [ngValue]="data">
                             {{ 
                             dataMap[key].formControl.displayIndex !== null ?
                             data[dataMap[key].formControl.displayIndex] : data
                             }}
                         </option>
-                        <div class="select-footer" *ngIf="dataMap[key].addNew">
+                        <!--div class="select-footer" *ngIf="dataMap[key].addNew">
                             <span class="select-footer-content">
                                 <a href="javascript: void(0)"
                                 (click)="addNewObject(key, dataMap[key].addNew.modelType, 'Add new ' + dataMap[key].name)">
@@ -32,7 +32,7 @@
                                     <span>{{ dataMap[key].addNew.text }}</span>
                                 </a>
                             </span>
-                        </div>
+                        </div-->
                     </select>
                 </div>
                 <!-- campos number -->
@@ -40,7 +40,10 @@
                 *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'number'">
                     <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
                     <input class="form-control"  type="number" [formControlName]="key"
-                    [required]="dataMap[key].required">
+                    [required]="dataMap[key].required" 
+                    [min]="dataMap[key].min ? dataMap[key].min : 0"
+                    [max]="dataMap[key].max ? dataMap[key].min : 999999999999"
+                    [maxlength]="dataMap[key].maxlength ? dataMap[key].maxlength : 12">
                 </div>
                 <!-- campos date -->
                 <div class="form-group"

@@ -123,7 +123,7 @@ export class EditItemComponent implements OnInit {
       cellRenderer: 'rowOption',
       cellRendererParams: {
         that: this,
-        deleteItemUom: this.deleteItemUom.bind(this),
+        deleteItemUom: this.deletePrompt.bind(this),
         startEditItemUom: this.startEditItemUom.bind(this),
         finishEditItemUom: this.finishEditItemUom.bind(this),
       }
@@ -478,20 +478,6 @@ export class EditItemComponent implements OnInit {
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.index + 1}`;
   }
 
-  actionForSelectedRows(action) {
-    this.utilities.log('action selected', action);
-    switch (action) {
-      case 'delete':
-        if (this.selection.selected.length > 0) {
-          this.deletePrompt(this.selection.selected);
-        } else {
-          this.utilities.showSnackBar('You have no selected records', 'OK');
-        }
-        break;
-      default: break;
-    }
-  }
-
   deleteRow(row: any) {
     if (this.selection.isSelected(row)) {
       this.selection.deselect(row);
@@ -540,11 +526,11 @@ export class EditItemComponent implements OnInit {
     }
   }
 
-  deletePrompt(rows?: any) {
+  deletePrompt(params: any) {
     const observer = {
       next: (result) => {
         if (result) {
-          this.deleteRows(rows);
+          this.deleteItemUom(params);
         }
       },
       error: (error) => {
