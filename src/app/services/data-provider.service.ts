@@ -343,11 +343,25 @@ export class DataProviderService {
     }
     return toReturn;
   }
+
+  getDashboardDataHeader(from?: string, to?: string) {
+    from = from ? from : this.utilities.formatDate(new Date(Date.now() - (365 * 24 * 60 * 60000)));
+    to = to ? to : this.utilities.formatDate(new Date());
+    return this.httpClient.get(`${environment.apiBaseUrl}/console/outbound/dashboard/header?` +
+    `initialPeriod=${from}&finalPeriod=${to}`);
+  }
+
+  getDashboardDataBody(from?: string, to?: string) {
+    from = from ? from : this.utilities.formatDate(new Date(Date.now() - (365 * 24 * 60 * 60000)));
+    to = to ? to : this.utilities.formatDate(new Date());
+    return this.httpClient.get(`${environment.apiBaseUrl}/console/outbound/dashboard/body?` +
+    `initialPeriod=${from}&finalPeriod=${to}`);
+  }
   /**********************************************************************************
     Grupo de metodos para items
   ***********************************************************************************/
   public getAllUsers(observe: any = 'body', reportProgress = false): Observable<any[]> {
-    return this.httpClient.get<any[]>('https://tau-tech.co:8443/api/settings/user');
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/settings/user`);
     // return of([]);
   }
   /**********************************************************************************

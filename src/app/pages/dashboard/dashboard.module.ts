@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
 
@@ -39,6 +39,8 @@ export const MY_FORMATS = {
   imports: [
     CommonModule,
     DashboardRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
 
     MatGridListModule,
     MatCardModule,

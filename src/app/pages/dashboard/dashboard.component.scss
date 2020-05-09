@@ -19,3 +19,112 @@
 .dashboard-card-content {
   text-align: center;
 }
+
+.card {
+  border-radius: 12px;
+  box-shadow: 0 6px 10px -4px rgba(0,0,0,.15);
+  background-color: #fff;
+  color: #252422;
+  margin-bottom: 20px;
+  position: relative;
+  border: 0;
+  transition: box-shadow .2s ease,-webkit-transform .3s cubic-bezier(.34,2,.6,1);
+  transition: transform .3s cubic-bezier(.34,2,.6,1),box-shadow .2s ease;
+  transition: transform .3s cubic-bezier(.34,2,.6,1),box-shadow .2s ease,-webkit-transform .3s cubic-bezier(.34,2,.6,1);
+}
+
+.card-stats .card-body .numbers .card-category {
+  color: #9a9a9a;
+  font-size: 16px;
+  line-height: 1.4em;
+}
+
+.card-stats .card-body .numbers p {
+  margin-bottom: 0;
+  font-size: 2.2em;
+}
+.card-category {
+  font-size: 1em;
+}
+.card-category, .category {
+  text-transform: capitalize;
+  font-weight: 400;
+  color: #9a9a9a;
+  font-size: .7142em;
+}
+.card-stats .card-footer {
+  padding: 0 15px 15px;
+}
+
+.card .card-footer {
+  background-color: transparent;
+  border: 0;
+}
+.card-footer:last-child {
+  border-radius: 0 0 calc(.25rem - 1px) calc(.25rem - 1px);
+}
+.card-stats .card-footer .stats {
+  color: #9a9a9a;
+  display: inline-flex;
+}
+.card-stats .icon-big {
+  font-size: 5em;
+  line-height: 0;
+}
+.card-stats .card-body {
+  padding: 15px 15px 0;
+}
+.card .card-footer .stats .mat-icon {
+  margin-right: 5px;
+  position: relative;
+  top: 0;
+  color: #66615b;
+  font-size: 18px;
+  line-height: 18px;
+  height: 18px;
+  width: auto;
+}
+
+.card-stats .icon-big i {
+  line-height: 59px;
+}
+.nc-icon {
+  display: inline-block;
+  font-size: inherit;
+  speak: none;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.card .card-header:not([data-background-color]) {
+  background-color: transparent;
+}
+
+.card .card-header {
+  padding: 15px 15px 0;
+  border: 0;
+}
+.card-header:first-child {
+  border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+}
+.card-header {
+  padding: .75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: rgba(0,0,0,.03);
+  border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.card .card-header .form-row .form-group label{
+  margin-top: 0.7em;
+  margin-right: 1em;
+}
+.card .card-header .form-row {
+  position: absolute;
+  top: 1.5em;
+  right: 2em;
+  /* display: inline-flex; */
+  align-self: end;
+}
+.card .card-header .form-row .form-group {
+  display: inline-flex;
+}

@@ -369,6 +369,11 @@ export class UtilitiesService implements OnDestroy {
     return moment(date, 'YYYY/MM/DD').format('DD/MM/YYYY');
   }
 
+  formatDate(date: Date, format?: string): string {
+    format = format ? format : 'YYYY-MM-DD';
+    return moment(date).format(format);
+  }
+
   public showCommonDialog(observer: Observer<any>, options?: any) {
     const dialogRef = this.dialog.open(CommonDialogComponent,
     {
