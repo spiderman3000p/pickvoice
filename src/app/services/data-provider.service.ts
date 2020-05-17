@@ -9,7 +9,7 @@ import { UtilitiesService } from './utilities.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
 import { of, Observable } from 'rxjs';
 import { HttpHeaders, HttpParams, HttpClient } from '@angular/common/http';
-import { retry } from 'rxjs/operators';
+import { retry, delay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -157,6 +157,19 @@ export class DataProviderService {
   getDataFromApi(type: any, params = '', errorHandler?: any, id?: number): Observable<any> {
     let toReturn: Observable<any>;
     switch (type) {
+      case IMPORTING_TYPES.INVENTORY: {
+        this.utilities.log(`obteniendo inventory...`);
+        /*toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/storage/lpnItemsVO1')
+        .pipe(retry(3));*/
+        if (params) {
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/storage/lpnItemsVO1/' + params)
+          .pipe(retry(3));
+        } else {
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/storage/lpnItemsVO1')
+          .pipe(retry(3));
+        }
+        break;
+      }
       case IMPORTING_TYPES.CUSTOMERS: {
         this.utilities.log(`obteniendo customers...`);
         if (params) {
@@ -434,6 +447,66 @@ export class DataProviderService {
   public getUom(id: number, observe: any = 'body', reportProgress = false) {
     return this.uomService.retrieveUomById(id, observe, reportProgress);
   }
+  /*********************************************************************************
+   *  Grupo de metodos para lpns
+   *********************************************************************************/
+  public getLpns(id: number, observe: any = 'body', reportProgress = false): Observable<any> {
+   /*return of({
+     id: 7868,
+     code: 'jhgj',
+     type: 'kjkj',
+     interface: 'jkjh',
+     state: 'jkjkh',
+     labelWithMaterial: true
+   }).pipe(delay(1000));
+   */
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/console/storage/lpnItemsVO2?lpnItemId=${id}`);
+  }
+
+  public getAllLpns(observe: any = 'body', reportProgress = false): Observable<any[]> {
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/console/storage/lpnsVO1`);
+  }
+
+  public deleteLpns(id: number, observe: any = 'body', reportProgress = false) {
+    return this.uomService.deleteUom(id, observe, reportProgress);
+  }
+
+  public updateLpns(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.uomService.updateUom(data, id, observe, reportProgress);
+  }
+
+  public createLpns(data: any, observe: any = 'body', reportProgress = false) {
+    return this.uomService.createUom(data, observe, reportProgress);
+  }
+  /*********************************************************************************
+   *  Grupo de metodos para inventory
+   *********************************************************************************/
+  public getInventoryItem(id: number, observe: any = 'body', reportProgress = false): Observable<any> {
+    return of({
+      id: 7868,
+      code: 'jhgj',
+      type: 'kjkj',
+      interface: 'jkjh',
+      state: 'jkjkh',
+      labelWithMaterial: true
+    }).pipe(delay(1000));
+   }
+ 
+   public getAllInventoryItems(observe: any = 'body', reportProgress = false): Observable<any[]> {
+     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/console/storage/lpnsVO1`);
+   }
+ 
+   public deleteInventoryItem(id: number, observe: any = 'body', reportProgress = false) {
+     return this.uomService.deleteUom(id, observe, reportProgress);
+   }
+ 
+   public updateInventoryItem(data: any, id: number, observe: any = 'body', reportProgress = false) {
+     return this.uomService.updateUom(data, id, observe, reportProgress);
+   }
+ 
+   public createInventoryItem(data: any, observe: any = 'body', reportProgress = false) {
+     return this.uomService.createUom(data, observe, reportProgress);
+   }
   /**********************************************************************************
     Grupo de metodos para item uoms
   ***********************************************************************************/
@@ -675,6 +748,14 @@ export class DataProviderService {
     return this.pickTaskService.taskByPickPlanning(pickPlanningId, observe, reportProgress);
   }
 
+  public getAllPickPlanningTasksVO3(pickPlanningId: number, observe: any = 'body', reportProgress = false) {
+    // return this.pickTaskService.taskByPickPlanning(pickPlanningId, observe, reportProgress);
+    // return this.httpClient.get<any>(`${environment.apiBaseUrl}/console/outbound/pick/tasksVO3?pickPlanningId=${pickPlanningId}`)
+    return this.httpClient.get<any>(`${environment.apiBaseUrl}/console/outbound/pick/tasksVO3/` +
+    `all;pickPlanningId-type=equals;pickPlanningId-filter=${pickPlanningId};pickPlanningId-filterType` +
+    `=number;startRow=0;endRow=200;`);
+  }
+
   public getAllPickPlanningStates(observe: any = 'body', reportProgress = false): Observable<string[]> {
     return new Observable(suscriber  => suscriber.next(Object.keys(PickPlanning.StateEnum)));
   }
@@ -717,6 +798,21 @@ export class DataProviderService {
   public getAllPickTaskLinesByTask(idTask: number, observe: any = 'body', reportProgress = false): Observable<any[]> {
     console.log('obteniendo task lines de task: ', idTask);
     return this.pickTaskService.taskLineByPickTaskId(idTask, observe, reportProgress);
+  }
+
+  public getAllPickTaskLinesBySku(idTask: number, observe: any = 'body', reportProgress = false): Observable<any[]> {
+    console.log('obteniendo task lines de task by sku: ', idTask);
+    return this.httpClient.get<any>(`${environment.apiBaseUrl}/console/outbound/pick/taskLineVO1?pickTaskId=${idTask}`);
+  }
+
+  public getAllPickTaskLinesByLines(idTask: number, observe: any = 'body', reportProgress = false): Observable<any[]> {
+    console.log('obteniendo task lines de task by lines: ', idTask);
+    // return this.httpClient.get<any>(`${environment.apiBaseUrl}/console/outbound/pick/taskLineVO1?pickTaskId=${idTask}`);
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/` +
+    `console/outbound/pick/taskLineVO1/pickTaskId-type=equals;` +
+    `pickTaskId-filter=${idTask};pickTaskId-filterType=number;startRow=0;endRow=1000;`);
+    // `console/outbound/pick/taskLineVO1/all;startRow=0;endRow=25` +
+    // `console/outbound/pick/taskLineVO1?pickTaskId=${idTask}`);
   }
 
   public getAllPickTaskTypes(observe: any = 'body', reportProgress = false): Observable<any[]> {

@@ -20,74 +20,65 @@
         </div>
         <mat-card>
             <mat-card-content>
-                <form [formGroup]="form" (ngSubmit)="onSubmit()">
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Description</mat-label>
-                        <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Enable Date</mat-label>
-                        <input matInput formControlName="enableDate" [matDatepicker]="enableDate"
-                        [class.readonly]="viewMode === 'view'" readonly>
-                        <mat-datepicker-toggle matSuffix [for]="enableDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                        <mat-datepicker #enableDate ></mat-datepicker>
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Date Assignment</mat-label>
-                        <input matInput formControlName="dateAssignment" [matDatepicker]="dateAssignment"
-                        [class.readonly]="viewMode === 'view'" readonly>
-                        <mat-datepicker-toggle matSuffix [for]="dateAssignment" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                        <mat-datepicker #dateAssignment ></mat-datepicker>
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Date</mat-label>
-                        <input matInput formControlName="date" [matDatepicker]="date"
-                        [class.readonly]="viewMode === 'view'" readonly>
-                        <mat-datepicker-toggle matSuffix [for]="date" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                        <mat-datepicker #date></mat-datepicker>
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Priority</mat-label>
-                        <input class="w-100" matInput type="number" formControlName="priority" [class.readonly]="viewMode === 'view'">
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Lines</mat-label>
-                        <input class="w-100" matInput type="number" formControlName="lines" [class.readonly]="viewMode === 'view'">
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Quantity</mat-label>
-                        <input class="w-100" matInput type="number" formControlName="qty" [class.readonly]="viewMode === 'view'">
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Document</mat-label>
-                        <input class="w-100" matInput type="text" formControlName="document" [class.readonly]="viewMode === 'view'">
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Current Line</mat-label>
-                        <input class="w-100" matInput type="text" formControlName="currentLine" [class.readonly]="viewMode === 'view'">
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Children Work</mat-label>
-                        <input class="w-100" matInput type="text" formControlName="childrenWork" [class.readonly]="viewMode === 'view'">
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>State</mat-label>
-                        <mat-select [compareWith]="dataMap.taskState.formControl.compareFn" formControlName="taskState"
-                        [class.readonly]="viewMode === 'view'">
-                            <mat-option *ngFor="let state of pickTaskData.taskStateList" [value]="state">
+                <form [formGroup]="form" (ngSubmit)="onSubmit()" class="row">
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Description</label>
+                        <input class="form-control"  type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Enable Date</label>
+                        <input formControlName="enableDate" type="date" class="form-control" [class.readonly]="viewMode === 'view'">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Date Assignment</label>
+                        <input  formControlName="dateAssignment" type="date" [class.readonly]="viewMode === 'view'" class="form-control">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Date</label>
+                        <input  formControlName="date" type="date" [class.readonly]="viewMode === 'view'" class="form-control">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Priority</label>
+                        <input class="form-control"  type="number" formControlName="priority" [class.readonly]="viewMode === 'view'">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Lines</label>
+                        <input class="form-control"  type="number" formControlName="lines" [class.readonly]="viewMode === 'view'">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Quantity</label>
+                        <input class="form-control"  type="number" formControlName="qty" [class.readonly]="viewMode === 'view'">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Document</label>
+                        <input class="form-control"  type="text" formControlName="document" [class.readonly]="viewMode === 'view'">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Current Line</label>
+                        <input class="form-control"  type="text" formControlName="currentLine" [class.readonly]="viewMode === 'view'">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Children Work</label>
+                        <input class="form-control"  type="text" formControlName="childrenWork" [class.readonly]="viewMode === 'view'">
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>State</label>
+                        <select [compareWith]="dataMap.taskState.formControl.compareFn" formControlName="taskState"
+                        [class.readonly]="viewMode === 'view'" [disabled]="viewMode === 'view'" class="form-control">
+                            <option *ngFor="let state of pickTaskData.taskStateList" [ngValue]="state">
                                 {{ states[state] }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                        <mat-label>Type</mat-label>
-                        <mat-select [compareWith]="dataMap.taskType.formControl.compareFn" formControlName="taskType"
-                        [class.readonly]="viewMode === 'view'">
-                            <mat-option *ngFor="let type of pickTaskData.taskTypesList" [value]="type">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Type</label>
+                        <select [compareWith]="dataMap.taskType.formControl.compareFn" formControlName="taskType"
+                        [class.readonly]="viewMode === 'view'" [disabled]="viewMode === 'view'" class="form-control">
+                            <option *ngFor="let type of pickTaskData.taskTypesList" [ngValue]="type">
                                 {{ type.name }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                            </option>
+                        </select>
+                    </div>
                     <hr>
                     <mat-tab-group class="tab-orders">
                         <mat-tab label="Task Lines">
@@ -182,48 +173,48 @@
                         </mat-tab>
                         <mat-tab label="User">
                             <ng-template matTabContent>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                        <mat-label>User</mat-label>
-                                        <mat-select [compareWith]="dataMap.user.formControl.compareFn" formControlName="user"
+                                <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                        <label>User</label>
+                                        <select [compareWith]="dataMap.user.formControl.compareFn" formControlName="user"
                                         [class.readonly]="viewMode === 'view'">
-                                            <mat-option *ngFor="let user of pickTaskData.userList" [value]="user">
+                                            <option *ngFor="let user of pickTaskData.userList" [value]="user">
                                                 {{ user.firstName }} {{ user.lastName }}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
+                                            </option>
+                                        </select>
+                                    </div>
                                 <br><br>
                                 <h6>User Details</h6>
                                 <hr>
                                 <span *ngIf="form.get('user').value">
-                                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                        <mat-label>Username</mat-label>
-                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.userName" [class.readonly]="true">
-                                    </mat-form-field>
-                                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                        <mat-label>First Name</mat-label>
-                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.firstName" [class.readonly]="true">
-                                    </mat-form-field>
-                                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                        <mat-label>Last Name</mat-label>
-                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.lastName" [class.readonly]="true">
-                                    </mat-form-field>
-                                    <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                        <mat-label>Email</mat-label>
-                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.email" [class.readonly]="viewMode === 'view'">
-                                    </mat-form-field>
-                                    <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                        <mat-label>Phone</mat-label>
-                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.phone" [class.readonly]="viewMode === 'view'">
-                                    </mat-form-field>
-                                    <!--mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                        <mat-label>Rol</mat-label>
-                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.rol.name" [class.readonly]="viewMode === 'view'">
-                                    </mat-form-field-->
-                                    <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                        <mat-label>Status</mat-label>
-                                        <input matInput  hidden>
-                                        <input class="w-100" matInput type="text" [value]="form.get('user').value.status" [class.readonly]="viewMode === 'view'">
-                                    </mat-form-field>
+                                    <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                        <label>Username</label>
+                                        <input class="w-100"  type="text" [value]="form.get('user').value.userName" [class.readonly]="true">
+                                    </div>
+                                    <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                        <label>First Name</label>
+                                        <input class="w-100"  type="text" [value]="form.get('user').value.firstName" [class.readonly]="true">
+                                    </div>
+                                    <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
+                                        <label>Last Name</label>
+                                        <input class="w-100"  type="text" [value]="form.get('user').value.lastName" [class.readonly]="true">
+                                    </div>
+                                    <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
+                                        <label>Email</label>
+                                        <input class="w-100"  type="text" [value]="form.get('user').value.email" [class.readonly]="viewMode === 'view'">
+                                    </div>
+                                    <div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                        <label>Phone</label>
+                                        <input class="w-100"  type="text" [value]="form.get('user').value.phone" [class.readonly]="viewMode === 'view'">
+                                    </div>
+                                    <!--div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                        <label>Rol</label>
+                                        <input class="w-100"  type="text" [value]="form.get('user').value.rol.name" [class.readonly]="viewMode === 'view'">
+                                    </div-->
+                                    <div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
+                                        <label>Status</label>
+                                        <input   hidden>
+                                        <input class="w-100"  type="text" [value]="form.get('user').value.status" [class.readonly]="viewMode === 'view'">
+                                    </div>
                                 </span>
                             </ng-template>
                         </mat-tab>

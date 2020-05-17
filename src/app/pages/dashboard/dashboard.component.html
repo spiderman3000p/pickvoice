@@ -1,5 +1,25 @@
 <div class="content-area">
   <div class="content">
+    <div class="card card-stats sticky-top" id="date-filters">
+      <div class="card-body row">
+        <div class="col-sm-6">
+          <h5>Date Filter</h5>
+          <small>Select a date period</small>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-row">
+            <div class="form-group">
+              <label>From</label>
+              <input type="date" [formControl]="chartsFrom" class="form-control" placeholder="from">
+            </div>
+            <div class="form-group ml-2">
+              <label>To</label>
+              <input type="date" [formControl]="chartsTo" class="form-control" placeholder="to">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
       <!--div class="section-wrapper">
           <div class="header actionbar align-content-top">
               <div class="title actionbar-section align-content-top">
@@ -40,28 +60,18 @@
           <div class="card ">
             <div class="card-header ">
               <h5 class="card-title">Tasks Chart</h5>
-              <p class="card-category">From {{taskChartFrom.value}} to {{taskChartTo.value}}</p>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>From</label>
-                  <input type="date" [formControl]="taskChartFrom" class="form-control" placeholder="from">
-                </div>
-                <div class="form-group ml-2">
-                  <label>To</label>
-                  <input type="date" [formControl]="taskChartTo" class="form-control" placeholder="to">
-                </div>
-              </div>
+              <p class="card-category">From {{chartsFrom.value}} to {{chartsTo.value}}</p>
             </div>
             <div class="card-body ">
-              <div class="chartjs-size-monitor">
-                <div class="chartjs-size-monitor-expand">
-                  <div class=""></div>
-                </div>
-                <div class="chartjs-size-monitor-shrink">
-                  <div class=""></div>
-                </div>
+              <div class="chartjs-labels">
+                <span *ngFor="let label of tasksChartLabels">
+                    <span class="square" [style.background-color]="label.color"></span>
+                    {{label.name}}
+                </span>
               </div>
-              <canvas height="249" id="chartTasks" width="944" style="display: block; width: 944px; height: 249px;" class="chartjs-render-monitor"></canvas>
+              <div class="chart-wrapper">
+                <canvas height="325" id="chartTasks" width="950" style="display: block; width: 950px; height: 325px;" class="chartjs-render-monitor"></canvas>
+              </div>
             </div>
             <div class="card-footer ">
               <hr>
@@ -76,50 +86,44 @@
         <div class="col-md-4">
           <div class="card ">
             <div class="card-header ">
-              <h5 class="card-title">Email Statistics</h5>
-              <p class="card-category">Last Campaign Performance</p>
+              <h5 class="card-title">Picking Plannings</h5>
+              <p class="card-category">From {{chartsFrom.value}} to {{chartsTo.value}}</p>
             </div>
             <div class="card-body ">
-              <div class="chartjs-size-monitor">
-                <div class="chartjs-size-monitor-expand">
-                  <div class=""></div>
-                </div>
-                <div class="chartjs-size-monitor-shrink">
-                  <div class=""></div>
-                </div>
+              <div class="chart-wrapper">
+                <canvas id="chartPlannings" width="250" height="325" class="chartjs-render-monitor" style="display: block; width: 250px; height: 325px;"></canvas>
               </div>
-              <canvas id="chartEmail" width="293" height="146" class="chartjs-render-monitor" style="display: block; width: 293px; height: 146px;"></canvas>
             </div>
-            <div class="card-footer ">
+            <!--div class="card-footer ">
               <div class="legend"><i class="fa fa-circle text-primary"></i> Opened <i class="fa fa-circle text-warning"></i> Read <i class="fa fa-circle text-danger"></i>                Deleted <i class="fa fa-circle text-gray"></i> Unopened </div>
               <hr>
               <div class="stats"><i class="fa fa-calendar"></i> Number of emails sent </div>
-            </div>
+            </div-->
           </div>
         </div>
         <div class="col-md-8">
           <div class="card card-chart">
             <div class="card-header">
-              <h5 class="card-title">NASDAQ: AAPL</h5>
-              <p class="card-category">Line Chart with Points</p>
+              <h5 class="card-title">Picking Plannings Progress</h5>
+              <p class="card-category">From {{chartsFrom.value}} to {{chartsTo.value}}</p>
             </div>
             <div class="card-body">
-              <div class="chartjs-size-monitor">
-                <div class="chartjs-size-monitor-expand">
-                  <div class=""></div>
+                <div class="chartjs-labels">
+                  <span *ngFor="let label of planningProgressChartLabels">
+                      <span class="square" [style.background-color]="label.color"></span>
+                      {{label.name}}
+                  </span>
                 </div>
-                <div class="chartjs-size-monitor-shrink">
-                  <div class=""></div>
-                </div>
+              <div class="chart-wrapper">
+                <canvas height="325" id="chartProgress" width="650" class="chartjs-render-monitor" style="display: block; width: 650px; height: 325px;"></canvas>
               </div>
-              <canvas height="161" id="speedChart" width="646" class="chartjs-render-monitor" style="display: block; width: 646px; height: 161px;"></canvas>
             </div>
-            <div class="card-footer">
+            <!--div class="card-footer">
               <div class="chart-legend"><i class="fa fa-circle text-info"></i> Tesla Model S <i class="fa fa-circle text-warning"></i> BMW 5 Series
                 </div>
               <hr>
               <div class="card-stats"><i class="fa fa-check"></i> Data information certified </div>
-            </div>
+            </div-->
           </div>
         </div>
       </div>

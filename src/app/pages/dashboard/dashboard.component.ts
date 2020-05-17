@@ -7,6 +7,78 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { FormControl } from '@angular/forms';
 
+const BODY_DUMMY_DATA = [
+  {
+    period: '2019-05-12',
+    rootWork: '455646',
+    state: 'WP',
+    numberTask: '45',
+    progress: 5
+  },
+  {
+    period: '2019-05-12',
+    rootWork: '455655',
+    state: 'WP',
+    numberTask: '455',
+    progress: 55
+  },
+  {
+    period: '2019-05-13',
+    rootWork: '455646',
+    state: 'PE',
+    numberTask: '45',
+    progress: 6
+  },
+  {
+    period: '2019-05-14',
+    rootWork: '455646',
+    state: 'CP',
+    numberTask: '45',
+    progress: 100
+  },
+  {
+    period: '2019-05-14',
+    rootWork: '45545546',
+    state: 'CP',
+    numberTask: '485',
+    progress: 100
+  },
+  {
+    period: '2019-05-15',
+    rootWork: '455646',
+    state: 'CA',
+    numberTask: '45',
+    progress: 65
+  },
+  {
+    period: '2019-05-16',
+    rootWork: '455646',
+    state: 'CP',
+    numberTask: '45',
+    progress: 100
+  },
+  {
+    period: '2019-05-17',
+    rootWork: '455646',
+    state: 'WP',
+    numberTask: '45',
+    progress: 35
+  },
+  {
+    period: '2019-05-18',
+    rootWork: '455646',
+    state: 'PE',
+    numberTask: '45',
+    progress: 5
+  },
+  {
+    period: '2019-05-18',
+    rootWork: '455646',
+    state: 'PE',
+    numberTask: '45',
+    progress: 55
+  }
+];
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -14,6 +86,57 @@ import { FormControl } from '@angular/forms';
 })
 export class DashboardComponent implements OnInit {
   chartTasks: any;
+  chartPlannings: any;
+  chartProgress: any;
+  isHandset = false;
+  tasksChartLabels = [
+    {
+      name: 'Pending Tasks',
+      color: '#fd7e14'
+    },
+    {
+      name: 'Active Tasks',
+      color: '#e83e8c'
+    },
+    {
+      name: 'Paused Tasks',
+      color: '#6c757d'
+    },
+    {
+      name: 'Completed Tasks',
+      color: '#28a745'
+    },
+    {
+      name: 'Canceled Tasks',
+      color: '#dc3545'
+    },
+    {
+      name: 'Planned Tasks',
+      color: '#6610f2'
+    },
+    {
+      name: 'Received Tasks',
+      color: '#007bff'
+    }
+  ];
+  planningProgressChartLabels = [
+    {
+      name: 'Pending',
+      color: '#6c757d'
+    },
+    {
+      name: 'In progress',
+      color: '#007bff'
+    },
+    {
+      name: 'Completed',
+      color: '#6610f2'
+    },
+    {
+      name: 'Canceled',
+      color: '#e83e8c'
+    }
+  ];
   /** Based on the screen size, switch from standard to one column per row */
   topCards = [
     {
@@ -60,6 +183,7 @@ export class DashboardComponent implements OnInit {
   cards = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
     map(({ matches }) => {
       if (matches) {
+        this.isHandset = true;
         this.utilities.log('is handset');
         return [
           { title: 'Card 1', cols: 2, rows: 1 },
@@ -68,6 +192,7 @@ export class DashboardComponent implements OnInit {
           { title: 'Card 4', cols: 2, rows: 1 }
         ];
       }
+      this.isHandset = false;
       this.utilities.log('is not handset');
       return [
         { title: 'Card 1', cols: 1, rows: 1 },
@@ -77,45 +202,57 @@ export class DashboardComponent implements OnInit {
       ];
     })
   );
-  taskChartFrom = new FormControl('');
-  taskChartTo = new FormControl('');
+  chartsFrom = new FormControl('');
+  chartsTo = new FormControl('');
   constructor(private breakpointObserver: BreakpointObserver, private authService: AuthService,
               private utilities: UtilitiesService, private dataProviderService: DataProviderService) {
     this.utilities.log('last url', this.authService.redirectUrl);
-    this.taskChartFrom.setValue(this.utilities.formatDate(new Date(Date.now() - (365 * 24 * 60 * 60000)), 'YYYY-MM-DD'));
-    this.taskChartTo.setValue(this.utilities.formatDate(new Date(), 'YYYY-MM-DD'));
-    console.log('this.taskChartTo: ', this.taskChartTo.value);
-    console.log('this.taskChartFrom: ', this.taskChartFrom.value);
-    this.calculateTaskChart();
-    this.taskChartFrom.valueChanges.pipe(debounceTime(1000)).subscribe(date => {
-      console.log('this.taskChartFrom: ', date);
-      this.calculateTaskChart();
+    this.chartsFrom.setValue(this.utilities.formatDate(new Date(Date.now() - (30 * 24 * 60 * 60000)), 'YYYY-MM-DD'));
+    this.chartsTo.setValue(this.utilities.formatDate(new Date(), 'YYYY-MM-DD'));
+    this.utilities.log('this.taskChartTo: ', this.chartsTo.value);
+    this.utilities.log('this.taskChartFrom: ', this.chartsFrom.value);
+    this.calculateTasksChart();
+    this.calculatePlanningsChart();
+    this.chartsFrom.valueChanges.pipe(debounceTime(1000)).subscribe(date => {
+      this.utilities.log('this.chartsFrom: ', date);
+      this.calculateTasksChart();
+      this.calculatePlanningsChart();
     });
-    this.taskChartTo.valueChanges.pipe(debounceTime(1000)).subscribe(date => {
-      console.log('this.taskChartTo: ', date);
-      this.calculateTaskChart();
+    this.chartsTo.valueChanges.pipe(debounceTime(1000)).subscribe(date => {
+      this.utilities.log('this.chartsTo: ', date);
+      this.calculateTasksChart();
+      this.calculatePlanningsChart();
     });
   }
 
-  calculateTaskChart() {
-    this.dataProviderService.getDashboardDataHeader(this.taskChartFrom.value, this.taskChartTo.value)
+  calculateTasksChart() {
+    this.dataProviderService.getDashboardDataHeader(this.chartsFrom.value, this.chartsTo.value)
     .subscribe(result => {
       if (result) {
-        this.generateData(result);
+        this.generateTasksChartData(result);
       }
-      console.log('Results dashboard header data: ', result);
+      this.utilities.log('Results dashboard header data: ', result);
     });
     this.dataProviderService.getDashboardDataBody().subscribe(result => {
-      console.log('Results dashboard body data: ', result);
+      this.utilities.log('Results dashboard body data: ', result);
     });
   }
 
-  generateData(data: any) {
+  calculatePlanningsChart() {
+    this.dataProviderService.getDashboardDataBody(this.chartsFrom.value, this.chartsTo.value)
+    .subscribe(result => {
+      if (result) {
+        this.generatePlanningsProgressChartData(BODY_DUMMY_DATA);
+        this.generatePlanningsStatesChartData(BODY_DUMMY_DATA);
+      }
+      this.utilities.log('Results dashboard body data: ', result);
+    });
+  }
+
+  generateTasksChartData(data: any) {
     const colors = [];
-    const taskTypes = [
-      {
-        type: 'paused',
-        data: {
+    const taskTypes = {
+      paused: {
           label: 'Paused Tasks',
           fill: false,
           borderColor: '#6c757d',
@@ -126,11 +263,8 @@ export class DashboardComponent implements OnInit {
           pointBorderWidth: 1,
           borderWidth: 1,
           data: []
-        }
       },
-      {
-        type: 'received',
-        data: {
+      received: {
           label: 'Received Tasks',
           fill: false,
           borderColor: '#007bff',
@@ -141,11 +275,8 @@ export class DashboardComponent implements OnInit {
           pointBorderWidth: 1,
           borderWidth: 1,
           data: []
-        }
       },
-      {
-        type: 'planned',
-        data: {
+      planned: {
           label: 'Planned Tasks',
           fill: false,
           borderColor: '#6610f2',
@@ -156,11 +287,8 @@ export class DashboardComponent implements OnInit {
           pointBorderWidth: 1,
           borderWidth: 1,
           data: []
-        }
       },
-      {
-        type: 'active',
-        data: {
+      active: {
           label: 'Active Tasks',
           fill: false,
           borderColor: '#e83e8c',
@@ -171,11 +299,8 @@ export class DashboardComponent implements OnInit {
           pointBorderWidth: 1,
           borderWidth: 1,
           data: []
-        }
       },
-      {
-        type: 'pending',
-        data: {
+      pending: {
           label: 'Pending Tasks',
           fill: false,
           borderColor: '#fd7e14',
@@ -186,12 +311,8 @@ export class DashboardComponent implements OnInit {
           pointBorderWidth: 1,
           borderWidth: 1,
           data: []
-        }
       },
-      {
-        type: 'complete',
-        color: '',
-        data: {
+      complete: {
           label: 'Completed Tasks',
           fill: false,
           borderColor: '#28a745',
@@ -202,11 +323,8 @@ export class DashboardComponent implements OnInit {
           pointBorderWidth: 1,
           borderWidth: 1,
           data: []
-        }
       },
-      {
-        type: 'canceled',
-        data: {
+      canceled: {
           label: 'Canceled Tasks',
           fill: false,
           borderColor: '#dc3545',
@@ -217,42 +335,27 @@ export class DashboardComponent implements OnInit {
           pointBorderWidth: 1,
           borderWidth: 1,
           data: []
-        }
       }
-    ];
-    const receivedIndex = taskTypes.findIndex(taskType => taskType.type === 'received');
-    const plannedIndex = taskTypes.findIndex(taskType => taskType.type === 'planned');
-    const activeIndex = taskTypes.findIndex(taskType => taskType.type === 'active');
-    const pausedIndex = taskTypes.findIndex(taskType => taskType.type === 'paused');
-    const completedIndex = taskTypes.findIndex(taskType => taskType.type === 'complete');
-    const canceledIndex = taskTypes.findIndex(taskType => taskType.type === 'canceled');
-    const pendingIndex = taskTypes.findIndex(taskType => taskType.type === 'pending');
-    const receiveds = taskTypes[receivedIndex];
-    const planneds = taskTypes[plannedIndex];
-    const actives = taskTypes[activeIndex];
-    const pauseds = taskTypes[pausedIndex];
-    const completeds = taskTypes[completedIndex];
-    const canceleds = taskTypes[canceledIndex];
-    const pendings = taskTypes[pendingIndex];
-
+    };
     data.forEach(element => {
       // received
-      receiveds.data.data.push({ t: new Date(element.period), y: element.received});
+      taskTypes.received.data.push({ t: new Date(element.period), y: element.received});
       // planned
-      planneds.data.data.push({ t: new Date(element.period), y: element.planned});
+      taskTypes.planned.data.push({ t: new Date(element.period), y: element.planned});
       // active
-      actives.data.data.push({ t: new Date(element.period), y: element.active});
+      taskTypes.active.data.push({ t: new Date(element.period), y: element.active});
       // paused
-      pauseds.data.data.push({ t: new Date(element.period), y: element.paused});
+      taskTypes.paused.data.push({ t: new Date(element.period), y: element.paused});
       // complete
-      completeds.data.data.push({ t: new Date(element.period), y: element.complete});
+      taskTypes.complete.data.push({ t: new Date(element.period), y: element.complete});
       // canceled
-      canceleds.data.data.push({ t: new Date(element.period), y: element.cenceled});
+      taskTypes.canceled.data.push({ t: new Date(element.period), y: element.cenceled});
       // pending
-      pendings.data.data.push({ t: new Date(element.period), y: element.pending});
+      taskTypes.pending.data.push({ t: new Date(element.period), y: element.pending});
     });
-    this.chartTasks.data.datasets = [].concat(pendings.data, actives.data, pauseds.data, completeds.data,
-      canceleds.data, planneds.data, receiveds.data);
+    this.chartTasks.data.datasets = [].concat(taskTypes.pending, taskTypes.active,
+      taskTypes.paused, taskTypes.complete, taskTypes.canceled, taskTypes.planned,
+      taskTypes.received);
     if (data.length <= 750) {
       this.chartTasks.options.scales.xAxes[0].time.unit = 'year';
     }
@@ -265,24 +368,154 @@ export class DashboardComponent implements OnInit {
     if (data.length <= 90) {
       this.chartTasks.options.scales.xAxes[0].time.unit = 'day';
     }
-    console.log('new datasets', this.chartTasks.data.datasets);
+    this.utilities.log('new datasets', this.chartTasks.data.datasets);
     this.chartTasks.update();
   }
 
-  ngOnInit() {
-    const chartColor = "#FFFFFF";
-    const canvas: any = document.getElementById('chartTasks');
-    const ctx = canvas.getContext('2d');
+  generatePlanningsProgressChartData(data: any) {
+    const newData = [];
+    const states = {
+      PE: 0,
+      WP: 0,
+      CP: 0,
+      CA: 0
+    };
+    const progressAverage = {
+      PE: 0,
+      WP: 0,
+      CP: 0,
+      CA: 0
+    };
+    const dateProgressAvg = {};
+    data.forEach(element => {
+        states[element.state]++;
+        progressAverage[element.state] += element.progress;
+        dateProgressAvg[element.period] = dateProgressAvg[element.period] ?
+        dateProgressAvg[element.period] + element.progress : 0;
+    });
+    Object.keys(states).forEach(state => {
+      progressAverage[state] = progressAverage[state] / states[state];
+      newData.push(states[state]);
+    });
+    this.chartPlannings.data.datasets[0].data = newData;
+    this.utilities.log('new plannings data set: ', this.chartPlannings.data.datasets[0]);
+    this.chartPlannings.update();
+  }
 
-    this.chartTasks = new Chart(ctx, {
+  generatePlanningsStatesChartData(data: any) {
+    const colors = [];
+    const planningStates = {
+      PE: {
+          label: 'Pending',
+          fill: false,
+          borderColor: '#6c757d',
+          backgroundColor: '#6c757d',
+          pointBorderColor: '#6c757d',
+          pointRadius: 1,
+          pointHoverRadius: 1,
+          pointBorderWidth: 1,
+          borderWidth: 1,
+          data: []
+      },
+      WP: {
+          label: 'In Progress',
+          fill: false,
+          borderColor: '#007bff',
+          backgroundColor: '#007bff',
+          pointBorderColor: '#007bff',
+          pointRadius: 1,
+          pointHoverRadius: 1,
+          pointBorderWidth: 1,
+          borderWidth: 1,
+          data: []
+      },
+      CP: {
+          label: 'Completed',
+          fill: false,
+          borderColor: '#6610f2',
+          backgroundColor: '#6610f2',
+          pointBorderColor: '#6610f2',
+          pointRadius: 1,
+          pointHoverRadius: 1,
+          pointBorderWidth: 1,
+          borderWidth: 1,
+          data: []
+      },
+      CA: {
+          label: 'Canceled',
+          fill: false,
+          borderColor: '#e83e8c',
+          backgroundColor: '#e83e8c',
+          pointBorderColor: '#e83e8c',
+          pointRadius: 1,
+          pointHoverRadius: 1,
+          pointBorderWidth: 1,
+          borderWidth: 1,
+          data: []
+      }
+    };
+    const dates = {};
+    data.forEach(element => {
+      if (dates[element.period]) {
+        if (dates[element.period][element.state]) {
+          dates[element.period][element.state]++;
+        } else {
+          dates[element.period][element.state] = 1;
+        }
+      } else {
+        dates[element.period] = {};
+        Object.defineProperty(dates[element.period], element.state, {
+          enumerable: true,
+          configurable: true,
+          writable: true,
+          value: 1
+        });
+      }
+    });
+    this.utilities.log('colected dates: ', dates);
+    let value;
+    Object.keys(dates).forEach(key => {
+      Object.keys(planningStates).forEach(state => {
+        value = dates[key][state] ? dates[key][state] : 0;
+        planningStates[state].data.push({ t: new Date(key), y: value});
+      });
+    });
+
+    this.chartProgress.data.datasets = [].concat(planningStates.PE, planningStates.WP,
+      planningStates.CP, planningStates.CA);
+
+    if (data.length <= 750) {
+      this.chartProgress.options.scales.xAxes[0].time.unit = 'year';
+    }
+    if (data.length <= 600) {
+      this.chartProgress.options.scales.xAxes[0].time.unit = 'month';
+    }
+    if (data.length <= 366) {
+      this.chartProgress.options.scales.xAxes[0].time.unit = 'month';
+    }
+    if (data.length <= 90) {
+      this.chartProgress.options.scales.xAxes[0].time.unit = 'day';
+    }
+    this.utilities.log('new datasets chart progress: ', this.chartProgress.data.datasets);
+    this.chartProgress.update();
+  }
+
+  ngOnInit() {
+    // Char tasks-line
+    const canvasTasks: any = document.getElementById('chartTasks');
+    const ctxTasks = canvasTasks.getContext('2d');
+    this.chartTasks = new Chart(ctxTasks, {
       type: 'line',
       data: {
         // labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
         datasets: []
       },
       options: {
+        // responsive: true,
+        // maintainAspectRatio: true,
+        // aspectRatio: 1,
         legend: {
-          display: true
+          display: false
         },
         tooltips: {
           enabled: true
@@ -292,14 +525,14 @@ export class DashboardComponent implements OnInit {
             stepSize: 1,
             bounds: 'data',
             ticks: {
-              fontColor: "#9f9f9f",
+              fontColor: '#9f9f9f',
               beginAtZero: true,
               maxTicksLimit: 5,
-              //padding: 20
+              // padding: 20
             },
             gridLines: {
               drawBorder: false,
-              zeroLineColor: "#ccc",
+              zeroLineColor: '#ccc',
               color: 'rgba(255,255,255,0.05)'
             }
           }],
@@ -313,96 +546,114 @@ export class DashboardComponent implements OnInit {
             gridLines: {
               drawBorder: false,
               color: 'rgba(255,255,255,0.1)',
-              zeroLineColor: "transparent",
+              zeroLineColor: 'transparent',
               display: false,
             },
             ticks: {
               source: 'auto',
               padding: 20,
-              fontColor: "#9f9f9f"
+              fontColor: '#9f9f9f'
             }
           }]
         },
       }
     });
+    // Char picking plannings-pie
+    const canvasPlannings: any = document.getElementById('chartPlannings');
+    const ctxPlannings = canvasPlannings.getContext('2d');
+    this.chartPlannings = new Chart(ctxPlannings, {
+      ready: false,
+      type: 'pie',
+      data: {
+        datasets: [{
+          data: [0, 0, 0, 0],
+          backgroundColor: ['#6c757d', '#007bff', '#6610f2', '#e83e8c']
+        }],
+        labels: ['Pending', 'In progress', 'Completed', 'Canceled']
+      },
+      options: {
+        // responsive: true,
+        // maintainAspectRatio: true,
+        // aspectRatio: 1
+      }
+    });
+    // chart progress with dates-line
+    const canvasProgress: any = document.getElementById('chartProgress');
+    const ctxProgress = canvasProgress.getContext('2d');
+    this.chartProgress = new Chart(ctxProgress, {
+      type: 'line',
+      data: {
+        // labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+        datasets: []
+      },
+      options: {
+        // responsive: true,
+        // maintainAspectRatio: true,
+        // aspectRatio: 1,
+        legend: {
+          display: false
+        },
+        tooltips: {
+          enabled: true
+        },
+        scales: {
+          yAxes: [{
+            stepSize: 1,
+            bounds: 'data',
+            ticks: {
+              fontColor: '#9f9f9f',
+              beginAtZero: true,
+              maxTicksLimit: 5,
+              // padding: 20
+            },
+            gridLines: {
+              drawBorder: false,
+              zeroLineColor: '#ccc',
+              color: 'rgba(255,255,255,0.05)'
+            }
+          }],
+          xAxes: [{
+            type: 'time',
+            distribution: 'series',
+            time: {
+              unit: 'month'
+            },
+            barPercentage: 1.6,
+            gridLines: {
+              drawBorder: false,
+              color: 'rgba(255,255,255,0.1)',
+              zeroLineColor: 'transparent',
+              display: false,
+            },
+            ticks: {
+              source: 'auto',
+              padding: 20,
+              fontColor: '#9f9f9f'
+            }
+          }]
+        },
+      }
+    });
+
+
+    const element = document.getElementById('date-filters');
+    const elementPosition = element.offsetTop;
+    document.querySelector('.mat-sidenav-content').addEventListener('scroll', function(event) {
+      const posTop = this.scrollTop;
+      // this.utilities.log('top distance: ', posTop);
+      if (posTop > 90) {
+        element.style.position = 'fixed';
+        element.style.top = '0';
+        if (!this.isHandSet) {
+          element.style.width = '75%';
+        } else {
+          element.style.width = '90%';
+        }
+      } else {
+        element.style.position = 'relative';
+        element.style.top = 'auto';
+        element.style.width = 'unset';
+      }
+    });
   }
 }
-/**
- * {
-fill: false,
-borderColor: "#6bd098",
-backgroundColor: "#6bd098",
-pointBorderColor: "#6bd098",
-pointRadius: 4,
-pointHoverRadius: 4,
-pointBorderWidth: 8,
-borderWidth: 3,
-data: [
-  {
-  t: new Date('2020-01-01'),
-  y: 25
-  },
-  {
-    t: new Date('2020-01-02'),
-    y: 310
-  },
-  {
-    t: new Date('2020-01-03'),
-    y: 316,
-  },
-  {
-  t: new Date('2020-01-04'),
-  y: 316,
-  },
-  {
-  t: new Date('2020-01-05'),
-  y: 345,
-  },
-  {
-  t: new Date('2020-01-06'),
-  y: 346,
-  },
-  {
-  t: new Date('2020-01-07'),
-  y: 350,
-  }]
-},
-{
-fill: false,
-borderColor: "#f17e5d",
-backgroundColor: "#f17e5d",
-pointBorderColor: "#f17e5d",
-pointRadius: 4,
-pointHoverRadius: 4,
-pointBorderWidth: 8,
-borderWidth: 3,
-data: [
-  {
-  t: new Date('2020-01-01'),
-  y: 36
-  },
-  {
-    t: new Date('2020-01-02'),
-    y: 320
-  },
-  {
-    t: new Date('2020-01-03'),
-    y: 356,
-  },
-  {
-  t: new Date('2020-01-04'),
-  y: 336,
-  },
-  {
-  t: new Date('2020-01-05'),
-  y: 356,
-  },
-  {
-  t: new Date('2020-01-06'),
-  y: 368,
-  },
-  {
-  t: new Date('2020-01-07'),
-  y: 370,
-  }]
- */

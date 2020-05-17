@@ -5,7 +5,9 @@
         [mode]="mobileQuery.matches ? 'over' : 'side'"
         [opened]="!mobileQuery.matches">
       <!--ng-scrollbar-->
-        <mat-toolbar color="primary">Pick Voice</mat-toolbar>
+        <mat-toolbar color="primary">
+          <img src="assets/images/logo-w.png" width="100%">
+        </mat-toolbar>
         <mat-nav-list>
           <span *ngFor="let option of menuOptions">
             <!-- si el item de primer nivel no tiene hijos -->

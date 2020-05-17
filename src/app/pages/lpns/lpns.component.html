@@ -1,0 +1,265 @@
+<div class="content-area">
+    <button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button>
+    <div class="content">
+        <div class="section-wrapper">
+            <div class="header actionbar align-content-top">
+                <div class="title actionbar-section align-content-top">
+                    <h1>Lpns List</h1>
+                </div>
+                <div class="actions actionbar-section right">
+                    <button mat-raised-button color="warn" (click)="export()">
+                        <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                    </button>
+                    <button mat-raised-button color="accent" (click)="addRow()" class="ml-2">
+                        <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="example-loading-shade" *ngIf="isLoadingResults">
+                <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+            </div>
+            
+            <div class="col-sm-12 mb-3">
+                <mat-accordion>
+                    <mat-expansion-panel (opened)="showFilters = true" (closed)="showFilters = false">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <mat-icon>search</mat-icon>
+                                Filters Section
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                Click to {{ !showFilters ? 'show' : 'hide' }} all filter controls
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <div class="filters-panel">
+                            <div class="col-sm-12 filters-controls">
+                                <form [formGroup]="filtersForm" *ngIf="showFilters" class="row" (ngSubmit)="applyFilters()">
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                                        <label>Codigo</label>
+                                        <input formControlName="code" type="text" class="form-control">
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                                        <label>Tipo</label>
+                                        <select [compareWith]="definitions.type.formControl.compareFn"
+                                        formControlName="type" class="form-control">
+                                            <option [value]="">
+                                                Select a value
+                                            </option>
+                                            <option *ngFor="let data of selectsData.type "
+                                            [ngValue]="definitions.type.formControl.valueIndex !== null ?
+                                            data[definitions.type.formControl.valueIndex] : data">
+                                                {{ definitions.type.formControl.displayIndex !== null ?
+                                                    data[definitions.type.formControl.displayIndex] : data }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                                        <label>Estado</label>
+                                        <select [compareWith]="definitions.state.formControl.compareFn"
+                                        formControlName="state" class="form-control">
+                                            <option [value]="">
+                                                Select a value
+                                            </option>
+                                            <option *ngFor="let data of selectsData.state "
+                                            [ngValue]="definitions.state.formControl.valueIndex !== null ?
+                                            data[definitions.state.formControl.valueIndex] : data">
+                                                {{ definitions.state.formControl.displayIndex !== null ?
+                                                    data[definitions.state.formControl.displayIndex] : data }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                                        <label>Interface</label>
+                                        <select [compareWith]="definitions.interface.formControl.compareFn"
+                                        formControlName="interface" class="form-control">
+                                            <option [value]="">
+                                                Select a value
+                                            </option>
+                                            <option *ngFor="let data of selectsData.interface "
+                                            [ngValue]="definitions.interface.formControl.valueIndex !== null ?
+                                            data[definitions.interface.formControl.valueIndex] : data">
+                                                {{ definitions.interface.formControl.displayIndex !== null ?
+                                                    data[definitions.interface.formControl.displayIndex] : data }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                                        <label>Location</label>
+                                        <select [compareWith]="definitions.location.formControl.compareFn"
+                                        formControlName="location" class="form-control">
+                                            <option [value]="">
+                                                Select a value
+                                            </option>
+                                            <option *ngFor="let data of selectsData.location "
+                                            [ngValue]="definitions.location.formControl.valueIndex !== null ?
+                                            data[definitions.location.formControl.valueIndex] : data">
+                                                {{ definitions.location.formControl.displayIndex !== null ?
+                                                    data[definitions.location.formControl.displayIndex] : data }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                                        <input formControlName="labelWithMaterial" hidden>
+                                        <mat-slide-toggle color="primary"
+                                        (change)="filtersForm.get('labelWithMaterial')
+                                        .setValue(!filterForm.get('labelWithMaterial').value)">
+                                            Label with material
+                                        </mat-slide-toggle>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <button mat-raised-button color="accent" class="btn btn-lg" type="submit">
+                                                <mat-icon>search</mat-icon>
+                                                Filter
+                                            </button>
+                                        <button mat-raised-button color="primary" class="btn btn-lg ml-lg-3 ml-md-3" type="reset" (click)="resetFilters()">
+                                                <mat-icon>not_interested</mat-icon>
+                                                Reset Filters
+                                            </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+            <div class="col-sm-6">
+                <mat-card class="lpns-card">
+                    <mat-card-title>
+                        LPNS List
+                    </mat-card-title>
+                    <mat-card-content>
+                        <div class="tree">
+                            <tree-root
+                            [nodes]="nodes"
+                            [options]="options"
+                            (activate)="viewLpnsDetail($event)">
+                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                    <mat-icon *ngIf="node.data.id.includes('IT')" color="accent" style="font-size: 15px;">local_offer</mat-icon>
+                                    <span>{{ node.data.name }}</span>
+                                </ng-template>
+                            </tree-root>
+                        </div>
+                    </mat-card-content>
+                    <mat-card-actions>
+                    </mat-card-actions>
+                    <mat-card-footer>
+                    </mat-card-footer>
+                </mat-card> 
+            </div>
+            <div class="col-sm-6">
+                <mat-card class="lpns-card">
+                    <mat-card-title>
+                        Selected LPNS Details
+                    </mat-card-title>
+                    <mat-card-content>
+                        <div class="example-loading-shade" *ngIf="isLoadingLpnsDetail">
+                            <mat-spinner *ngIf="isLoadingLpnsDetail" class="spinner"></mat-spinner>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.lpnItemId">
+                            <div class="col-sm-4">
+                                <strong>Item ID</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.lpnItemId}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.sku">
+                            <div class="col-sm-4">
+                                <strong>Sku</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.sku}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.skuDescription">
+                            <div class="col-sm-4">
+                                <strong>Sku Description</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.skuDescription}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.itemType">
+                            <div class="col-sm-4">
+                                <strong>Item Type</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.itemType}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.qty">
+                            <div class="col-sm-4">
+                                <strong>Quantity</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.qty}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.qtyAvailable">
+                            <div class="col-sm-4">
+                                <strong>Quantity Available</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.qtyAvailable}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.qtyBooking">
+                            <div class="col-sm-4">
+                                <strong>Quantity Booking</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.qtyBooking}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.serial">
+                            <div class="col-sm-4">
+                                <strong>Serial</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.serial}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.batchNumber">
+                            <div class="col-sm-4">
+                                <strong>Batch Number</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.batchNumber}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.weight">
+                            <div class="col-sm-4">
+                                <strong>Weight</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.weight}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.expiryDate">
+                            <div class="col-sm-4">
+                                <strong>Expiry Date</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.expiryDate}}
+                            </div>
+                        </div>
+                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.createdDate">
+                            <div class="col-sm-4">
+                                <strong>Created Date</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                {{selectedLpns.createdDate}}
+                            </div>
+                        </div>
+                    </mat-card-content>
+                    <mat-card-actions>
+                    </mat-card-actions>
+                    <mat-card-footer>
+                    </mat-card-footer>
+                </mat-card> 
+            </div>
+        </div>
+    </div>
+</div>

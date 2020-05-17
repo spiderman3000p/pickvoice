@@ -14,6 +14,14 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: IMPORTING_TYPES.LPNS,
+    loadChildren: () => import('./lpns/lpns.module').then(m => m.LpnsModule)
+  },
+  {
+    path: IMPORTING_TYPES.INVENTORY,
+    loadChildren: () => import('./inventory/inventory.module').then(m => m.InventoryModule)
+  },
+  {
     path: IMPORTING_TYPES.ITEMS,
     loadChildren: () => import('./items/items.module').then(m => m.ItemsModule)
   },

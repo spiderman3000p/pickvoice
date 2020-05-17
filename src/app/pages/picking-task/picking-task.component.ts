@@ -218,11 +218,11 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
         break;
       }
       case 'viewBySku': {
-        this.generateTaskPdf(element);
+        this.generateTaskPdf(element, action);
         break;
       }
-      case 'viewByCode': {
-        this.generateTaskPdf(element);
+      case 'viewByLine': {
+        this.generateTaskPdf(element, action);
         break;
       }
     }
@@ -291,25 +291,64 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  generateTaskPdf(object?: any) {
-    this.dataProviderService.getAllPickTaskLinesByTask(object.id).
-    subscribe(taskLines => {
-      taskLines = taskLines.map((taskLine: any) =>
-      [
-        { text: taskLine.pickTaskLineId, style: 'tableRow'},
-        { text: taskLine.sku, style: 'tableRow'},
-        { text: taskLine.skuDescription, style: 'tableRow'},
-        { text: taskLine.batchNumber, style: 'tableRow'},
-        { text: taskLine.serial, style: 'tableRow'},
-        { text: taskLine.locationCode, style: 'tableRow'},
-        { text: taskLine.expiryDate, style: 'tableRow'},
-        { text: taskLine.uomCode, style: 'tableRow'},
-        { text: taskLine.lpnCode, style: 'tableRow'},
-        /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
-        { text: taskLine.qtyToPicked, style: 'tableRow'}
-      ]);
-      this.utilities.generateTaskPdfContent(object, taskLines)
-      .subscribe(documentDefinition => pdfMake.createPdf(documentDefinition).open());
+  generateTaskPdf(object?: any, action?: string) {
+    const groupedData = {};
+    const newTableData = [];
+    this.dataProviderService.getAllPickTaskLinesByLines(object.id).subscribe(taskLines => {
+      this.utilities.log('taskLines: ', taskLines);
+      taskLines = taskLines.map((taskLine: any) => {
+        if (action === 'viewBySku') {
+          this.utilities.log(`Agrupar por sku`);
+          if (groupedData[taskLine.sku] !== undefined && groupedData[taskLine.sku] !== null) {
+            this.utilities.log(`el grupo por sku ${taskLine.sku} existe`);
+            groupedData[taskLine.sku][2].text = Number(groupedData[taskLine.sku][2].text) + Number(taskLine.qtyToPicked);
+            groupedData[taskLine.sku][3].text = Number(groupedData[taskLine.sku][3].text) + Number(taskLine.qtyToSelected);
+          } else {
+            this.utilities.log(`el grupo por sku ${taskLine.sku} no existe`);
+            groupedData[taskLine.sku] = [
+              // { text: taskLine.pickTaskLineId, style: 'tableRow' },
+              { text: taskLine.sku, style: 'tableRow' },
+              { text: taskLine.skuDescription, style: 'tableRow' },
+              // { text: taskLine.batchNumber, style: 'tableRow' },
+              // { text: taskLine.serial, style: 'tableRow' },
+              // { text: taskLine.locationCode, style: 'tableRow' },
+              // { text: taskLine.expiryDate, style: 'tableRow' },
+              // { text: taskLine.uomCode, style: 'tableRow' },
+              // { text: taskLine.lpnCode, style: 'tableRow' },
+              /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
+              { text: taskLine.qtyToPicked, style: 'tableRow' },
+              { text: taskLine.qtyToSelected, style: 'tableRow' }
+            ];
+          }
+        } else if (action === 'viewByLine') {
+          this.utilities.log(`Agrupar por line`);
+          newTableData.push([
+            { text: taskLine.pickTaskLineId, style: 'tableRow' },
+            { text: taskLine.sku, style: 'tableRow' },
+            { text: taskLine.skuDescription, style: 'tableRow' },
+            { text: taskLine.batchNumber, style: 'tableRow' },
+            { text: taskLine.serial, style: 'tableRow' },
+            { text: taskLine.locationCode, style: 'tableRow' },
+            { text: taskLine.expiryDate, style: 'tableRow' },
+            { text: taskLine.uomCode, style: 'tableRow' },
+            { text: taskLine.lpnCode, style: 'tableRow' },
+            /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
+            { text: taskLine.qtyToPicked, style: 'tableRow' },
+            { text: taskLine.qtyToSelected, style: 'tableRow' }
+          ]);
+        }
+      });
+      if (action === 'viewBySku') {
+        Object.keys(groupedData).forEach(sku => {
+          newTableData.push(groupedData[sku]);
+        });
+      }
+      this.utilities.log('taskLines newData: ', newTableData);
+      this.utilities.generateTaskPdfContent(object, newTableData, action)
+      .subscribe(documentDefinition => {
+        this.utilities.log('documentDefinition: ', documentDefinition);
+        pdfMake.createPdf(documentDefinition).open();
+      });
     }, error => {
       this.utilities.error('Error al cargar task lines', error);
       if (error && error.error.message) {

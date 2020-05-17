@@ -28,7 +28,7 @@ import {
 })
 export class RowOptionComponent {
   private params: any;
-  private isEditing = false;
+  public isEditing = false;
   @ViewChild('input', { read: ViewContainerRef }) public input;
 
   agInit(params: any): void {

@@ -1,4 +1,6 @@
 export const IMPORTING_TYPES = {
+    INVENTORY: 'inventory',
+    LPNS: 'lpns',
     USERS: 'users',
     ITEMS: 'items',
     ITEM_CLASSIFICATIONS: 'itemClassifications',
@@ -118,6 +120,301 @@ export class ModelMap {
     /*********************************************
     *           Object's for CRUD's
     **********************************************/
+    /* lpns object map for CRUD */
+    public static LpnsMap = {
+        lpn: {
+            name: 'lpn',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        type: {
+            name: 'type',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        state: {
+            name: 'state',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        interface: {
+            name: 'interface',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        location: {
+            name: 'location',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        }
+    };
+    /* inventory object map for CRUD */
+    public static InventoryItemMap = {
+        lpnItemId: {
+            name: 'lpn item id',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnId: {
+            name: 'lpn id',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        inboundDate: {
+            name: 'type',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date'
+            }
+        },
+        lpnCode: {
+            name: 'lpn code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnState: {
+            name: 'state',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        uomName: {
+            name: 'uom name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnType: {
+            name: 'lpn type',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        locationType: {
+            name: 'location type',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        locationId: {
+            name: 'location id',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        itemId: {
+            name: 'item id',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        itemSku: {
+            name: 'item sku',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        itemDescription: {
+            name: 'item description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        itemTypeId: {
+            name: 'item type id',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        itemTypeName: {
+            name: 'item type name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        cost: {
+            name: 'cost',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        qty: {
+            name: 'qty',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        batchNumber: {
+            name: 'batch number',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        createdDate: {
+            name: 'created date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date'
+            }
+        },
+        expiryDate: {
+            name: 'expiry date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date'
+            }
+        },
+        serial: {
+            name: 'serial',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        weight: {
+            name: 'weight',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        classification: {
+            name: 'classification',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        }
+    };
     /* customer object map for CRUD */
     public static CustomerMap = {
         code: {
@@ -1523,6 +1820,171 @@ export class ModelMap {
                 modelType: IMPORTING_TYPES.TASK_TYPES
             }
         },
+    };
+    /* picking task object map for list in edit picking planning */
+    public static PickTaskMapCustom = {
+        description: {
+            name: 'description',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'textarea',
+                type: 'text'
+            }
+        },
+        orderNumber: {
+            name: 'order number',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        customerName: {
+            name: 'customer name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        sku: {
+            name: 'sku',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnCode: {
+            name: 'lpn code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        batchNumber: {
+            name: 'batch number',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationCode: {
+            name: 'location code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        currentLine: {
+            name: 'current line',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        dockId: {
+            name: 'dock Id',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        dockCode: {
+            name: 'dock code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        dockType: {
+            name: 'dock type',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        taskName: {
+            name: 'task name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        taskState: {
+            name: 'task state',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        enableDate: {
+            name: 'enable date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        priority: {
+            name: 'priority',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        userName: {
+            name: 'user name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        numberLines: {
+            name: 'number lines',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        taskProgress: {
+            name: 'progress',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
     };
     /* picking task object map for CRUD */
     public static PickTaskLineMap = {

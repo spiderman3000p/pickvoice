@@ -207,21 +207,21 @@
                   {{ selection.selected.length === 0 ? 'Assign task to user' :
                   'Assign selected tasks to user'}}
           </ng-template>
-          <ng-template contextMenuItem (execute)="executeContext('viewBySku', $event.item)"
+          <ng-template contextMenuItem [subMenu]="viewSubmenu"
           *ngIf="selection.selected.length === 0">
-              View
+              View Report
           </ng-template>
-          <!--context-menu #viewSubmenu>
+          <context-menu #viewSubmenu>
               <ng-template contextMenuItem
               (execute)="executeContext('viewBySku', $event.item)">
                   By Sku
               </ng-template>
               <ng-template contextMenuItem divider="true"></ng-template>
               <ng-template contextMenuItem
-              (execute)="executeContext('viewByCode', $event.item)">
-                  By Code
+              (execute)="executeContext('viewByLine', $event.item)">
+                  By Line
               </ng-template>
-          </context-menu-->
+          </context-menu>
       </context-menu>
     </div>
   </div>

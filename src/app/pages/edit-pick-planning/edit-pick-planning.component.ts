@@ -52,7 +52,8 @@ export class EditPickPlanningComponent implements OnInit {
   cardTitle = '';
   type = IMPORTING_TYPES.PICK_PLANNINGS;
   dataMap = ModelMap.PickPlanningMap;
-  definitions = ModelMap.PickTaskMap;
+  // definitions = ModelMap.PickTaskMap;
+  definitions = ModelMap.PickTaskMapCustom;
   definitionsTransports = ModelMap.TransportMap;
   remoteSync: boolean;
   keys: string[];
@@ -231,11 +232,11 @@ export class EditPickPlanningComponent implements OnInit {
         break;
       }
       case 'viewBySku': {
-        this.generateTaskPdf(element);
+        this.generateTaskPdf(element, action);
         break;
       }
-      case 'viewByCode': {
-        this.generateTaskPdf(element);
+      case 'viewByLine': {
+        this.generateTaskPdf(element, action);
         break;
       }
     }
@@ -304,25 +305,67 @@ export class EditPickPlanningComponent implements OnInit {
     }
   }
 
-  generateTaskPdf(object?: any) {
-    this.dataProviderService.getAllPickTaskLinesByTask(object.id).
-    subscribe(taskLines => {
-      taskLines = taskLines.map((taskLine: any) =>
-      [
-        { text: taskLine.pickTaskLineId, style: 'tableRow'},
-        { text: taskLine.sku, style: 'tableRow'},
-        { text: taskLine.skuDescription, style: 'tableRow'},
-        { text: taskLine.batchNumber, style: 'tableRow'},
-        { text: taskLine.serial, style: 'tableRow'},
-        { text: taskLine.locationCode, style: 'tableRow'},
-        { text: taskLine.expiryDate, style: 'tableRow'},
-        { text: taskLine.uomCode, style: 'tableRow'},
-        { text: taskLine.lpnCode, style: 'tableRow'},
-        /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
-        { text: taskLine.qtyToPicked, style: 'tableRow'}
-      ]);
-      this.utilities.generateTaskPdfContent(object, taskLines)
-      .subscribe(documentDefinition => pdfMake.createPdf(documentDefinition).open());
+  generateTaskPdf(object: any, action: string) {
+    const groupedData = {};
+    const newTableData = [];
+    this.utilities.log('gerating report of task ', object);
+    this.dataProviderService.getAllPickTaskLinesByLines(object.pickTaskId).subscribe((taskLines: any) => {
+      this.utilities.log('taskLines: ', taskLines);
+      if (taskLines && taskLines.content) {
+        taskLines = taskLines.content.map((taskLine: any) => {
+          if (action === 'viewBySku') {
+            this.utilities.log(`Agrupar por sku`);
+            if (groupedData[taskLine.sku] !== undefined && groupedData[taskLine.sku] !== null) {
+              this.utilities.log(`el grupo por sku ${taskLine.sku} existe`);
+              groupedData[taskLine.sku][2].text = Number(groupedData[taskLine.sku][2].text) + Number(taskLine.qtyToPicked);
+              groupedData[taskLine.sku][3].text = Number(groupedData[taskLine.sku][3].text) + Number(taskLine.qtyToSelected);
+            } else {
+              this.utilities.log(`el grupo por sku ${taskLine.sku} no existe`);
+              groupedData[taskLine.sku] = [
+                // { text: taskLine.pickTaskLineId, style: 'tableRow' },
+                { text: taskLine.sku, style: 'tableRow' },
+                { text: taskLine.skuDescription, style: 'tableRow' },
+                // { text: taskLine.batchNumber, style: 'tableRow' },
+                // { text: taskLine.serial, style: 'tableRow' },
+                // { text: taskLine.locationCode, style: 'tableRow' },
+                // { text: taskLine.expiryDate, style: 'tableRow' },
+                // { text: taskLine.uomCode, style: 'tableRow' },
+                // { text: taskLine.lpnCode, style: 'tableRow' },
+                /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
+                { text: taskLine.qtyToPicked, style: 'tableRow' },
+                { text: taskLine.qtyToSelected, style: 'tableRow' }
+              ];
+            }
+          } else if (action === 'viewByLine') {
+            this.utilities.log(`Agrupar por line`);
+            newTableData.push([
+              { text: taskLine.pickTaskLineId, style: 'tableRow' },
+              { text: taskLine.sku, style: 'tableRow' },
+              { text: taskLine.skuDescription, style: 'tableRow' },
+              { text: taskLine.batchNumber, style: 'tableRow' },
+              { text: taskLine.serial, style: 'tableRow' },
+              { text: taskLine.locationCode, style: 'tableRow' },
+              { text: taskLine.expiryDate, style: 'tableRow' },
+              { text: taskLine.uomCode, style: 'tableRow' },
+              { text: taskLine.lpnCode, style: 'tableRow' },
+              /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
+              { text: taskLine.qtyToPicked, style: 'tableRow' },
+              { text: taskLine.qtyToSelected, style: 'tableRow' }
+            ]);
+          }
+        });
+        if (action === 'viewBySku') {
+          Object.keys(groupedData).forEach(sku => {
+            newTableData.push(groupedData[sku]);
+          });
+        }
+        this.utilities.log('taskLines newData: ', newTableData);
+        this.utilities.generateTaskPdfContent(object, newTableData, action)
+        .subscribe(documentDefinition => {
+          this.utilities.log('documentDefinition: ', documentDefinition);
+          pdfMake.createPdf(documentDefinition).open();
+        });
+      }
     }, error => {
       this.utilities.error('Error al cargar task lines', error);
       if (error && error.error.message) {
@@ -781,11 +824,13 @@ export class EditPickPlanningComponent implements OnInit {
   }
 
   getPickTaskList() {
-    this.dataProviderService.getAllPickPlanningTasks(this.row.id).subscribe(results => {
-      this.pickPlanningData.pickTaskList = results;
-      this.dataSource.data = this.pickPlanningData.pickTaskList;
-      this.refreshTable();
-      this.utilities.log('pick task list', this.pickPlanningData.pickTaskList);
+    this.dataProviderService.getAllPickPlanningTasksVO3(this.row.id).subscribe(results => {
+      if (results && results.content) {
+        this.pickPlanningData.pickTaskList = results.content;
+        this.dataSource.data = this.pickPlanningData.pickTaskList;
+        this.refreshTable();
+        this.utilities.log('pick task list', this.pickPlanningData.pickTaskList);
+      }
     });
   }
 

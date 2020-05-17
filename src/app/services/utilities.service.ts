@@ -21,6 +21,8 @@ declare var JsBarcode: any;
 })
 export class UtilitiesService implements OnDestroy {
   public dataTypesModelMaps = {
+    inventory: ModelMap.InventoryItemMap,
+    lpns: ModelMap.LpnsMap,
     items: ModelMap.ItemMap,
     itemsDto: ModelMap.LoadItemDtoMap,
     itemUoms: ModelMap.ItemUomMap,
@@ -67,7 +69,7 @@ export class UtilitiesService implements OnDestroy {
     return base64;
   }
 
-  generateTaskPdfContent(object: any, tableContent: any[]): Observable<any> {
+  generateTaskPdfContent(object: any, tableContent: any[], action: string = 'viewBySku'): Observable<any> {
     let base64Logo;
     let canvas;
     let content;
@@ -101,12 +103,14 @@ export class UtilitiesService implements OnDestroy {
             [
               {
                 margin: [20, 20, 0, 0],
-                text: `TASK # ${object.id} (${object.taskState})`,
+                // text: `TASK # ${object.id} (${object.taskState})`,
+                text: `TASK # ${object.pickTaskId} (${object.taskState})`,
                 style: 'h1'
               },
               {
                 margin: [20, 0, 0, 0],
-                text: `Type: ${object.taskType.name} - Priority: ${STATES[object.priority]}`,
+                // text: `Type: ${object.taskType.name} - Priority: ${STATES[object.priority]}`,
+                text: `Priority: ${object.priority}`,
                 style: 'h3'
               },
               {
@@ -135,32 +139,32 @@ export class UtilitiesService implements OnDestroy {
                 body: [
                   [
                     { text: `Document`, style: 'tableHeader2' },
-                    `${object.document}`
+                    `${object.dockCode}`
                   ],
                   [
                     { text: `Enable Date`, style: 'tableHeader2'},
                     `${object.enableDate}`
                   ],
-                  [
+                  /*[
                     { text: `Date`, style: 'tableHeader2'},
                     `${object.date}`
                   ],
                   [
                     { text: `Assignment Date`, style: 'tableHeader2' },
                     `${object.dateAssignment}`
-                  ],
+                  ],*/
                   [
                     { text: `User`, style: 'tableHeader2' },
                     ` ${object.user ? object.user.firstName : ''} ${object.user ?
-                      object.user.lastName : ''} ${object.user ? '(' + object.user.userName + ')' : ''}`
+                      object.user.lastName : ''} ${object.user ? '(' + object.user.userName + ')' : object.userName}`
                   ],
-                  [
+                  /*[
                     { text: 'Quantity', style: 'tableHeader2' },
                       ` ${object.qty}`
-                  ],
+                  ],*/
                   [
                     { text: 'Lines', style: 'tableHeader2' },
-                    `${object.lines}`
+                    `${object.numberLines}`
                   ]
                 ]
               }
@@ -177,14 +181,14 @@ export class UtilitiesService implements OnDestroy {
                     { text: `Current Line`, style: 'tableHeader2' },
                     `${object.currentLine}`
                   ],
-                  [
+                  /*[
                     { text: `Children Work`, style: 'tableHeader2' },
                     `${object.childrenWork}`
                   ],
                   [
                     { text: `Rule executed`, style: 'tableHeader2' },
                     `${object.ruleExecuted}`
-                  ],
+                  ],*/
                   [
                     { text: `Validate Location`, style: 'tableHeader2' },
                     `${object.validateLocation ? 'Yes' : 'No' }`
@@ -209,23 +213,9 @@ export class UtilitiesService implements OnDestroy {
         {
           table: {
             borderColor: 'darkgrey',
-            widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: [],
             headerRows: 1,
-            body: [
-              [
-                {text: 'Line', style: 'tableHeader', alignment: 'center'},
-                {text: 'Sku', style: 'tableHeader', alignment: 'center'},
-                {text: 'Sku Description', style: 'tableHeader', alignment: 'center'},
-                {text: 'Batch', style: 'tableHeader', alignment: 'center'},
-                {text: 'Serial', style: 'tableHeader', alignment: 'center'},
-                {text: 'Location', style: 'tableHeader', alignment: 'center'},
-                {text: 'Expiry Date', style: 'tableHeader', alignment: 'center'},
-                {text: 'Uom Code', style: 'tableHeader', alignment: 'center'},
-                {text: 'Lpn Code', style: 'tableHeader', alignment: 'center'},
-                /* {text: 'Scanned Verification', style: 'tableHeader', alignment: 'center'},*/
-                {text: 'Qty To Picked', style: 'tableHeader', alignment: 'center'}
-              ]
-            ]
+            body: []
           }
         }
       ],
@@ -277,7 +267,7 @@ export class UtilitiesService implements OnDestroy {
         return {
           alignment: 'right',
           margin: [0, 0, 20, 0],
-          text: 'Page' + currentPage.toString() + ' of ' + pageCount
+          text: 'Page ' + currentPage.toString() + ' of ' + pageCount
         };
       },
       header: function(currentPage, pageCount, pageSize) {
@@ -286,9 +276,46 @@ export class UtilitiesService implements OnDestroy {
           text: 'Date: ' + dateNow.toLocaleDateString(),
           alignment: 'right',
           margin: [0, 20, 20, 0]
-        },];
+        }];
       },
     };
+    if (action === 'viewBySku') {
+      /*content.content[2].table.widths.push(['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto',
+       'auto', 'auto', 'auto']);*/
+      content.content[2].table.widths = ['auto', '*', 'auto', 'auto'];
+      content.content[2].table.body.push([
+        // {text: 'Line', style: 'tableHeader', alignment: 'center'},
+        {text: 'Sku', style: 'tableHeader', alignment: 'center'},
+        {text: 'Sku Description', style: 'tableHeader', alignment: 'center'},
+        // {text: 'Batch', style: 'tableHeader', alignment: 'center'},
+        // {text: 'Serial', style: 'tableHeader', alignment: 'center'},
+        // {text: 'Location', style: 'tableHeader', alignment: 'center'},
+        // {text: 'Expiry Date', style: 'tableHeader', alignment: 'center'},
+        // {text: 'Uom Code', style: 'tableHeader', alignment: 'center'},
+        // {text: 'Lpn Code', style: 'tableHeader', alignment: 'center'},
+        /* {text: 'Scanned Verification', style: 'tableHeader', alignment: 'center'},*/
+        {text: 'Qty To Picked', style: 'tableHeader', alignment: 'center'},
+        {text: 'Qty To Selected', style: 'tableHeader', alignment: 'center'}
+      ]);
+    } else if (action === 'viewByLine') {
+      content.content[2].table.widths = ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto',
+      'auto', 'auto'];
+      content.content[2].table.body.push([
+        {text: 'Line', style: 'tableHeader', alignment: 'center'},
+        {text: 'Sku', style: 'tableHeader', alignment: 'center'},
+        {text: 'Sku Description', style: 'tableHeader', alignment: 'center'},
+        {text: 'Batch', style: 'tableHeader', alignment: 'center'},
+        {text: 'Serial', style: 'tableHeader', alignment: 'center'},
+        {text: 'Location', style: 'tableHeader', alignment: 'center'},
+        {text: 'Expiry Date', style: 'tableHeader', alignment: 'center'},
+        {text: 'Uom Code', style: 'tableHeader', alignment: 'center'},
+        {text: 'Lpn Code', style: 'tableHeader', alignment: 'center'},
+        /* {text: 'Scanned Verification', style: 'tableHeader', alignment: 'center'},*/
+        {text: 'Qty To Picked', style: 'tableHeader', alignment: 'center'},
+        {text: 'Qty To Selected', style: 'tableHeader', alignment: 'center'}
+      ]);
+    }
+
     tableContent.forEach(row => {
       row.style = 'tableRow';
       content.content[2].table.body.push(row);

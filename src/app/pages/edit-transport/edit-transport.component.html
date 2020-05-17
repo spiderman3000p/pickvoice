@@ -79,7 +79,7 @@
                                 <label>Transportation Status</label>
                                 <select [compareWith]="dataMap.transportationStatus.formControl.compareFn"
                                 formControlName="transportationStatus" [class.readonly]="viewMode === 'view'" class="form-control"
-                                [readonly]="viewMode === 'view'">
+                                [disabled]="viewMode === 'view'">
                                     <option *ngFor="let status of transportData.statusList" [ngValue]="status">
                                         {{ status }}
                                     </option>
@@ -110,7 +110,7 @@
                                             <label>Uom Volume</label>
                                             <select [compareWith]="dataMap.uomVolume.formControl.compareFn"
                                             formControlName="uomVolume" [class.readonly]="viewMode === 'view'"
-                                            class="form-control" [readonly]="viewMode === 'view'">
+                                            class="form-control" [disabled]="viewMode === 'view'">
                                                 <option *ngFor="let uom of transportData.uomsList" [ngValue]="uom">
                                                     {{ uom.name }}
                                                 </option>
@@ -120,7 +120,7 @@
                                             <label>Uom Weight</label>
                                             <select [compareWith]="dataMap.uomWeight.formControl.compareFn"
                                             formControlName="uomWeight" [class.readonly]="viewMode === 'view'"
-                                            class="form-control" [readonly]="viewMode === 'view'">
+                                            class="form-control" [disabled]="viewMode === 'view'">
                                                 <option *ngFor="let uom of transportData.uomsList" [ngValue]="uom">
                                                     {{ uom.name }}
                                                 </option>

@@ -73,10 +73,17 @@
                             <input class="form-control" type="text" [formControlName]="key"
                             [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                         </div>
+                        <!-- campos textarea -->
+                        <div  class="form-group"
+                        *ngIf="dataMap[key].formControl.control === 'textarea'">
+                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                            <textarea class="form-control" [formControlName]="key"
+                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </textarea>
+                        </div>
                         <!-- campos boolean -->
                         <div  class="form-group"
                         *ngIf="dataMap[key].formControl.control === 'toggle'">
-                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
                             <input [formControlName]="key"  hidden>
                             <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
                             (change)="form.get(key).setValue(!form.get(key).value)" [checked]="form.get(key).value">

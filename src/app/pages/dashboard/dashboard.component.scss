@@ -114,17 +114,34 @@
   border-bottom: 1px solid rgba(0,0,0,.125);
 }
 
-.card .card-header .form-row .form-group label{
+.card .form-row .form-group label{
   margin-top: 0.7em;
   margin-right: 1em;
 }
-.card .card-header .form-row {
-  position: absolute;
+.card .form-row {
+  /*position: absolute;*/
   top: 1.5em;
   right: 2em;
   /* display: inline-flex; */
   align-self: end;
 }
-.card .card-header .form-row .form-group {
+.card .form-row .form-group {
   display: inline-flex;
+}
+.chart-wrapper{
+  /* height: 500px;*/
+}
+.chartjs-labels{
+  margin-bottom: 20px;
+}
+.square{
+  width: 20px;
+  height: 10px;
+  display: inline-flex;
+  margin-right: 5px;
+}
+@media screen and (max-width:480px){
+  .sticky-top{
+    width: 90%;
+  }
 }

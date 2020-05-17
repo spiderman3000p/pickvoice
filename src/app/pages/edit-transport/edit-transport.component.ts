@@ -19,8 +19,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { NumericEditorComponent } from './numeric-editor.component';
-import { RowOptionComponent } from './row-option.component';
 
 interface TransportData {
   uomsList: UnityOfMeasure[];
