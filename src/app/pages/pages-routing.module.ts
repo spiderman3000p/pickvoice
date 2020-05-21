@@ -70,6 +70,10 @@ const routes: Routes = [
     loadChildren: () => import('./picking-task/picking-task.module').then(m => m.PickingTaskModule)
   },
   {
+    path: IMPORTING_TYPES.TASK_TYPES,
+    loadChildren: () => import('./task-type/task-type.module').then(m => m.TaskTypeModule)
+  },
+  {
     path: IMPORTING_TYPES.DOCKS,
     loadChildren: () => import('./docks/docks.module').then(m => m.DocksModule)
   },

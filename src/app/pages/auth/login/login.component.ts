@@ -32,17 +32,15 @@ export class LoginComponent implements OnInit {
     .subscribe(response => {
       this.isLoadingResults = false;
       this.utilities.log('resultado del login', response);
-      if (response && response.status === 200 && response.ok === true && response.body.status === 'OK') {
+      if (response && response.logged) {
         this.enter();
+        message = `Welcome ${this.username.value}`;
+      } else if (response && !response.logged && response.error === null) {
+        message = response.response.body.message;
+      } else if (response && !response.logged && response.error !== null) {
+        message = 'Error on login';
       }
-      if (response && response.status === 200 && response.body.status === 'INTERNAL_SERVER_ERROR') {
-        if (response.body.message) {
-          message = response.body.message;
-        } else {
-          message = 'Error on login';
-        }
-        this.utilities.showSnackBar(message, 'OK');
-      }
+      this.utilities.showSnackBar(message, 'OK');
     }, error => {
       this.isLoadingResults = false;
       this.utilities.error('Error on login', error);
@@ -58,12 +56,8 @@ export class LoginComponent implements OnInit {
   }
 
   enter() {
-    this.autService.setLoggedIn(true);
     this.autService.setUsername(this.username.value);
-    this.autService.setSessionStart(Date.now());
     this.autService.setRemember(this.remember);
-
-    this.utilities.showSnackBar(`Welcome ${this.username.value}`, '');
     this.router.navigate(['/pages']);
   }
 

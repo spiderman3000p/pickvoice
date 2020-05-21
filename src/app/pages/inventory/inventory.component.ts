@@ -94,17 +94,28 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.utilities.log('filter form values: ', formValues);
     const filtersToUse = [];
     for (const filterKey in this.filters) {
-      if (this.filters[filterKey].controls.value.value !== undefined &&
-          this.filters[filterKey].controls.value.value !== null &&
-          this.filters[filterKey].controls.value.value !== '') {
+      if ((this.filters[filterKey].controls.value.value !== undefined &&
+         this.filters[filterKey].controls.value.value !== null &&
+         this.filters[filterKey].controls.value.value !== '')) {
         filtersToUse.push(this.filters[filterKey]);
       }
     }
-    const stringParams = filtersToUse.length > 0 ? filtersToUse.map(filter =>
-      `${filter.key}-filterType=${filter.type};${filter.key}-type=` +
-      `${this.definitions[filter.key].formControl.control === 'select' ? 'number'
-      : formValues[filter.key].type};${filter.key}-filter=${formValues[filter.key].value.toLowerCase()}`)
-      .join(';') : '';
+    let aux = '';
+    const stringParams = filtersToUse.length > 0 ? filtersToUse.map(filter => {
+      aux = `${filter.key}-filterType=${filter.type};${filter.key}-type=` +
+      `${formValues[filter.key].type};`;
+
+      if (filter.type === 'date' && formValues[filter.key].type === 'inRange') {
+        aux += `${filter.key}-dateFrom=${formValues[filter.key].value};${filter.key}` +
+        `-dateTo=${formValues[filter.key].valueTo}`;
+      } else if (filter.type === 'number' && formValues[filter.key].type === 'inRange') {
+        aux += `${filter.key}-filter=${formValues[filter.key].value};${filter.key}-filterTo=` +
+        `${formValues[filter.key].valueTo}`;
+      } else {
+        aux += `${filter.key}-filter=${formValues[filter.key].value.toLowerCase()}`;
+      }
+      return aux;
+    }).join(';') : '';
     this.utilities.log('filters to use: ', filtersToUse);
     this.utilities.log('filters string params: ', stringParams);
     return stringParams;
@@ -129,7 +140,7 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
     // this.utilities.log('loading data with params', params);
     this.dataSource.loadData(this.type, `${params}`)
     .subscribe((response: any) => {
-        if (response.content) {
+        if (response && response.content) {
             this.dataSource.lastRow = response.pageSize;
             this.dataSource.data = response.content;
             this.dataSource.dataCount = response.totalElements;
@@ -172,7 +183,12 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
-        filter.type = this.definitions[column.name].formControl.type;
+        filter.type = this.definitions[column.name].formControl.control === 'input' ?
+        this.definitions[column.name].formControl.type :
+        (this.definitions[column.name].formControl.control === 'date' ? 'date' :
+        (this.definitions[column.name].formControl.control === 'toggle' ? 'toggle' :
+        (this.definitions[column.name].formControl.control === 'select' ?
+        this.definitions[column.name].formControl.type : undefined)));
         filter.key = column.name;
         if (this.definitions[column.name].formControl.control !== 'select' &&
             this.definitions[column.name].formControl.control !== 'toggle') {
@@ -184,16 +200,41 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
           type: new FormControl(FILTER_TYPES[0].value),
           value: new FormControl('')
         });
+        if (this.definitions[column.name].formControl.type === 'number' ||
+            this.definitions[column.name].formControl.type === 'date') {
+          formControls[column.name].addControl('valueTo', new FormControl(''));
+        }
         filter.controls = formControls[column.name].controls;
         filter.controls.value.valueChanges.pipe(debounceTime(500), distinctUntilChanged(), tap((value) => {
           this.utilities.log(`valor del campo ${column.name} cambiando a: `, value);
-          this.applyFilters();
-        }))
-        .subscribe();
+          if (this.filters[column.name].controls.type.value === 'inRange') {
+            if (this.filters[column.name].controls.valueTo &&
+                this.filters[column.name].controls.valueTo.value.length > 0) {
+              this.applyFilters();
+            }
+          } else {
+            this.applyFilters();
+          }
+        })).subscribe();
+        if (this.definitions[column.name].formControl.type === 'number' ||
+          this.definitions[column.name].formControl.type === 'date') {
+          filter.controls.valueTo.valueChanges.pipe(debounceTime(500), distinctUntilChanged(), tap((value) => {
+            this.utilities.log(`valor del campo ${column.name} cambiando a: `, value);
+            if (this.filters[column.name].controls.type.value === 'inRange') {
+              if (this.filters[column.name].controls.value &&
+                this.filters[column.name].controls.value.value.length > 0) {
+                this.applyFilters();
+              }
+            } else {
+              this.applyFilters();
+            }
+          })).subscribe();
+        }
         filter.controls.type.valueChanges.pipe(debounceTime(500), distinctUntilChanged(), tap((type) => {
           this.utilities.log(`tipo de filtro del campo ${column.name} cambiando a: `, type);
           // TODO: acomodar esto de modo que al cambiar tipo y haber un valor, hacer la busqueda
-          if (false) {
+          this.utilities.log('valor a buscar: ', this.filters[column.name].controls.value.value);
+          if (this.filters[column.name].controls.value.value.length > 0) {
             this.applyFilters();
           }
         }))
@@ -211,6 +252,7 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.filtersForm = new FormGroup(formControls);
+    this.utilities.log('this.filters', this.filters);
     this.utilities.log('formControls', formControls);
     this.utilities.log('form values', this.filtersForm.value);
   }
@@ -545,12 +587,21 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
   export(limit?: number) {
     let dataToExport;
     if (limit === undefined) {
+      this.dataProviderService.getAllInventoryItems().subscribe((results: any) => {
+        if (results && results.content) {
+          dataToExport = results.content.map((row: any) => {
+            return this.utilities.getJsonFromObject(row, this.type);
+          });
+          this.utilities.exportToXlsx(dataToExport, 'Inventory All Items List');
+        }
+        this.utilities.showSnackBar('Nothing to Export', 'OK');
+      });
     } else {
       dataToExport = this.dataSource.data.slice(0, limit).map((row: any) => {
         return this.utilities.getJsonFromObject(row, this.type);
       });
+      this.utilities.exportToXlsx(dataToExport, `Inventory Items List (${limit})`);
     }
-    this.utilities.exportToXlsx(dataToExport, 'Inventory Items List');
   }
   /*
     Esta funcion se encarga de refrescar la tabla cuando el contenido cambia.

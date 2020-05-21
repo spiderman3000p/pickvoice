@@ -24,13 +24,13 @@
                 <mat-tab-group class="tab-orders">
                     <mat-tab label="General">
                         <ng-template matTabContent>
-                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                <mat-label>Target Dock</mat-label>
-                                <mat-select [compareWith]="dataMap.targetDock.formControl.compareFn" formControlName="targetDock"
-                                [class.readonly]="viewMode === 'view'">
-                                    <mat-option *ngFor="let dock of pickPlanningData.dockList" [value]="dock.code">
+                            <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Target Dock</label>
+                                <select [compareWith]="dataMap.targetDock.formControl.compareFn" formControlName="targetDock"
+                                [class.readonly]="viewMode === 'view'" class="form-control">
+                                    <option *ngFor="let dock of pickPlanningData.dockList" [value]="dock.code">
                                         {{ dock.description }}
-                                    </mat-option>
+                                    </option>
                                     <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
                                         <span class="select-footer-content">
                                             <a href="javascript: void(0)"
@@ -40,30 +40,28 @@
                                             </a>
                                         </span>
                                     </div-->
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                <mat-label>Description</mat-label>
-                                <input class="w-100" matInput type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
-                            </mat-form-field>
-                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                <mat-label>Progress</mat-label>
-                                <input class="w-100" matInput type="number" formControlName="progress" [class.readonly]="viewMode === 'view'">
-                            </mat-form-field>
-                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                <mat-label>Process Date</mat-label>
-                                <input matInput formControlName="processDate" [matDatepicker]="processDate"
-                                [class.readonly]="viewMode === 'view'" readonly>
-                                <mat-datepicker-toggle matSuffix [for]="processDate" [class.readonly]="viewMode === 'view'"></mat-datepicker-toggle>
-                                <mat-datepicker #processDate ></mat-datepicker>
-                            </mat-form-field>
-                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                <mat-label>State</mat-label>
-                                <mat-select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
-                                [class.readonly]="viewMode === 'view'">
-                                    <mat-option *ngFor="let state of pickPlanningData.pickPlanningStates" [value]="state">
+                                </select>
+                            </div>
+                            <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Description</label>
+                                <input class="form-control"  type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
+                            </div>
+                            <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Progress</label>
+                                <input class="form-control"  type="number" formControlName="progress" [class.readonly]="viewMode === 'view'">
+                            </div>
+                            <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Process Date</label>
+                                <input  formControlName="processDate" type="date"
+                                [class.readonly]="viewMode === 'view'" class="form-control">
+                            </div>
+                            <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                <label>State</label>
+                                <select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
+                                [class.readonly]="viewMode === 'view'" class="form-control">
+                                    <option *ngFor="let state of pickPlanningData.pickPlanningStates" [ngValue]="state">
                                         {{ state }}
-                                    </mat-option>
+                                    </option>
                                     <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
                                         <span class="select-footer-content">
                                             <a href="javascript: void(0)"
@@ -73,24 +71,24 @@
                                             </a>
                                         </span>
                                     </div-->
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                <mat-label>Root Work</mat-label>
-                                <input class="w-100" matInput type="text" formControlName="rootWork" [class.readonly]="viewMode === 'view'">
-                            </mat-form-field>
+                                </select>
+                            </div>
+                            <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Root Work</label>
+                                <input class="form-control"  type="text" [formControlName]="rootWork" [class.readonly]="viewMode === 'view'">
+                            </div>
                             <!-- TODO: tabla de tasks -->
                         </ng-template>
                     </mat-tab>
                     <mat-tab label="Dock">
                         <ng-template matTabContent>
-                            <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Target Dock</mat-label>
-                                    <mat-select [compareWith]="dataMap.targetDock.formControl.compareFn" formControlName="targetDock"
-                                    [class.readonly]="viewMode === 'view'">
-                                        <mat-option *ngFor="let dock of pickPlanningData.dockList" [value]="dock.code">
+                            <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                    <label>Target Dock</label>
+                                    <select [compareWith]="dataMap.targetDock.formControl.compareFn" formControlName="targetDock"
+                                    [class.readonly]="viewMode === 'view'" class="form-control">
+                                        <option *ngFor="let dock of pickPlanningData.dockList" [value]="dock.code">
                                             {{ dock.description }}
-                                        </mat-option>
+                                        </option>
                                         <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
                                             <span class="select-footer-content">
                                                 <a href="javascript: void(0)"
@@ -100,50 +98,50 @@
                                                 </a>
                                             </span>
                                         </div-->
-                                    </mat-select>
-                                </mat-form-field>
+                                    </select>
+                                </div>
                             <br><br>
                             <h6>Dock Details</h6>
                             <hr>
                             <span *ngIf="form.get('targetDock').value">
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                    <mat-label>Dock Code</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('targetDock').value.code" [class.readonly]="true">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                    <mat-label>Description</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('targetDock').value.name" [class.readonly]="true">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                    <mat-label>Dock Type</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('targetDock').value.dockType" [class.readonly]="true">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Section</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('targetDock').value.section" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'"
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="true">
+                                    <label>Dock Code</label>
+                                    <input class="form-control"  type="text" [value]="form.get('targetDock').value.code" [class.readonly]="true">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="true">
+                                    <label>Description</label>
+                                    <input class="form-control"  type="text" [value]="form.get('targetDock').value.name" [class.readonly]="true">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="true">
+                                    <label>Dock Type</label>
+                                    <input class="form-control"  type="text" [value]="form.get('targetDock').value.dockType" [class.readonly]="true">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                    <label>Section</label>
+                                    <input class="form-control"  type="text" [value]="form.get('targetDock').value.section" [class.readonly]="viewMode === 'view'">
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6 form-group" [class.readonly]="viewMode === 'view'"
                                 appearance="none">
-                                    <mat-label>Status</mat-label>
-                                    <input matInput [formControlName]="key"  hidden>
+                                    <label>Status</label>
+                                    <input  [formControlName]="key"  hidden>
                                     <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
                                     [checked]="form.get('targetDock').value.status"
                                     (change)="form.get('targetDock').setValue(!form.get('targetDock').value)">
                                         Status
                                     </mat-slide-toggle>
-                                </mat-form-field>
+                                </div>
                             </span>
                         </ng-template>
                     </mat-tab>
                     <mat-tab label="Transport">
                         <ng-template matTabContent>
-                            <mat-form-field class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                <mat-label>Transport</mat-label>
-                                <mat-select formControlName="transport">
-                                    <mat-option *ngFor="let transport of pickPlanningData.transportList" [value]="transport">
+                            <div class="col-sm-12 col-md-6 col-lg-6 form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Transport</label>
+                                <select formControlName="transport" class="form-control">
+                                    <option *ngFor="let transport of pickPlanningData.transportList" [ngValue]="transport">
                                         {{ transport.nameRoute }}
-                                    </mat-option>
-                                    <div class="select-footer">
+                                    </option>
+                                    <!--div class="select-footer">
                                         <span class="select-footer-content">
                                             <a href="javascript: void(0)"
                                             (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')">
@@ -151,37 +149,37 @@
                                                 Add new transport
                                             </a>
                                         </span>
-                                    </div>
-                                </mat-select>
-                            </mat-form-field>
+                                    </div-->
+                                </select>
+                            </div>
                             <br><br>
                             <h5>Transport Details</h5>
                             <hr>
                             <span *ngIf="form.get('transport').value">
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Transport Number</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.transportNumber" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Route</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.route" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Name Route</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.nameRoute" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Dispatch Platforms</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.dispatchPlatforms" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Carrier Code</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.carrierCode" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
-                                <mat-form-field class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                    <mat-label>Transport State</mat-label>
-                                    <input class="w-100" matInput type="text" [value]="form.get('transport').value.transportState" [class.readonly]="viewMode === 'view'">
-                                </mat-form-field>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                    <label>Transport Number</label>
+                                    <input class="form-control"  type="text" [value]="form.get('transport').value.transportNumber" [class.readonly]="viewMode === 'view'">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                    <label>Route</label>
+                                    <input class="form-control"  type="text" [value]="form.get('transport').value.route" [class.readonly]="viewMode === 'view'">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                    <label>Name Route</label>
+                                    <input class="form-control"  type="text" [value]="form.get('transport').value.nameRoute" [class.readonly]="viewMode === 'view'">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                    <label>Dispatch Platforms</label>
+                                    <input class="form-control"  type="text" [value]="form.get('transport').value.dispatchPlatforms" [class.readonly]="viewMode === 'view'">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                    <label>Carrier Code</label>
+                                    <input class="form-control"  type="text" [value]="form.get('transport').value.carrierCode" [class.readonly]="viewMode === 'view'">
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                                    <label>Transport State</label>
+                                    <input class="form-control"  type="text" [value]="form.get('transport').value.transportState" [class.readonly]="viewMode === 'view'">
+                                </div>
                             </span>
                         </ng-template>
                     </mat-tab>

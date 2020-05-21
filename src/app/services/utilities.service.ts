@@ -21,6 +21,7 @@ declare var JsBarcode: any;
 })
 export class UtilitiesService implements OnDestroy {
   public dataTypesModelMaps = {
+    taskType: ModelMap.TaskTypeMap,
     inventory: ModelMap.InventoryItemMap,
     lpns: ModelMap.LpnsMap,
     items: ModelMap.ItemMap,

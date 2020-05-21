@@ -4,12 +4,12 @@ import { Transport, Location, Item, UomService, SectionService, OrderService, Or
          LocationsService, TransportService, LoadPickService, ItemTypeService, ItemsService,
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
          DockService, UserService, ItemUomService, QualityStates, QualityStatesService,
-         QualityStateTypeService } from '@pickvoice/pickvoice-api';
+         QualityStateTypeService, TaskTypeService } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
 import { of, Observable } from 'rxjs';
 import { HttpHeaders, HttpParams, HttpClient } from '@angular/common/http';
-import { retry, delay } from 'rxjs/operators';
+import { timeout, retry, delay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +25,7 @@ export class DataProviderService {
     private pickTaskService: PickTaskService, private pickPlanningService: PickPlanningService,
     private docksService: DockService, private userService: UserService,
     private itemUomService: ItemUomService, private qualityStateService: QualityStatesService,
+    private taskTypeService: TaskTypeService,
     private qualityStateTypeService: QualityStateTypeService) {
   }
 
@@ -83,6 +84,10 @@ export class DataProviderService {
 
     if (type === IMPORTING_TYPES.PICK_TASKS) {
       /* return this.createPickTask(toUpload, 'response').pipe(retry(3));*/ 
+    }
+
+    if (type === IMPORTING_TYPES.TASK_TYPES) {
+      return this.createTaskType(toUpload, 'response').pipe(retry(3));
     }
 
     if (type === IMPORTING_TYPES.PICK_TASKLINES) {
@@ -335,7 +340,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.TASK_TYPES: {
         this.utilities.log(`obteniendo pick task types...`);
-        toReturn = this.getAllPickTaskTypes().pipe(retry(3));
+        toReturn = this.getAllTaskTypes().pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.DOCK_TYPE: {
@@ -493,7 +498,8 @@ export class DataProviderService {
    }
  
    public getAllInventoryItems(observe: any = 'body', reportProgress = false): Observable<any[]> {
-     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/console/storage/lpnsVO1`);
+     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/console/storage/lpnItemsVO1/` +
+     `all;startRow=0;endRow=99999999;sort-lpnItemId=asc`).pipe(retry(3), timeout(600000));
    }
  
    public deleteInventoryItem(id: number, observe: any = 'body', reportProgress = false) {
@@ -792,7 +798,7 @@ export class DataProviderService {
   }
 
   public getAllPickTasksByUser(user: string, observe: any = 'body', reportProgress = false) {
-    return this.pickTaskService.retrievePickTaskByUser(user, observe, reportProgress);
+    return this.pickTaskService.retrievePickTaskByUsername(user, observe, reportProgress);
   }
 
   public getAllPickTaskLinesByTask(idTask: number, observe: any = 'body', reportProgress = false): Observable<any[]> {
@@ -817,8 +823,7 @@ export class DataProviderService {
 
   public getAllPickTaskTypes(observe: any = 'body', reportProgress = false): Observable<any[]> {
     console.log('obteniendo task types');
-    // TODO: agregar servcicio real
-    return new Observable(suscriber  => suscriber.next(Object.keys(PickTask.TaskStateEnum)));
+    return this.taskTypeService.retrieveAllTaskType(observe, reportProgress);
   }
 
   public getAllPickTaskStates(observe: any = 'body', reportProgress = false): Observable<string[]> {
@@ -888,5 +893,27 @@ export class DataProviderService {
 
   public getDock(id: number, observe: any = 'body', reportProgress = false) {
     return this.docksService.retrieveDockById(id, observe, reportProgress);
+  }
+  /**********************************************************************************
+    Grupo de metodos para task types
+  ***********************************************************************************/
+  public getAllTaskTypes(observe: any = 'body', reportProgress = false) {
+    return this.taskTypeService.retrieveAllTaskType(observe, reportProgress);
+  }
+
+  public deleteTaskType(id: number, observe: any = 'body', reportProgress = false) {
+    return this.taskTypeService.deleteTaskType(id, observe, reportProgress);
+  }
+
+  public updateTaskType(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.taskTypeService.updateTaskType(data, id, observe, reportProgress);
+  }
+
+  public createTaskType(data: any, observe: any = 'body', reportProgress = false) {
+    return this.taskTypeService.createTaskType(data, observe, reportProgress);
+  }
+
+  public getTaskType(id: number, observe: any = 'body', reportProgress = false) {
+    return this.taskTypeService.retrieveTaskTypeById(id, observe, reportProgress);
   }
 }

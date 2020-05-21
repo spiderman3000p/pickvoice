@@ -4,7 +4,13 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://tau-tech.co:8443/api',
+  keycloak_data: {
+    grant_type: 'password',
+    client_id: 'pickvoice',
+    username: '',
+    password: ''
+  },
+  apiBaseUrl: '/api',
   sessionDuration: 360, // session duration in minutes
   sessionInactivityTime: 30, // session inativity time in minutes
   debug: true,

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -28,7 +28,7 @@
     "@angular/platform-server": "~9.0.0-rc.12",
     "@angular/router": "~9.0.0-rc.12",
     "@angular/service-worker": "~9.0.0-rc.12",
-    "@pickvoice/pickvoice-api": "^0.2.8",
+    "@pickvoice/pickvoice-api": "^0.2.9",
     "ag-grid-angular": "^22.1.1",
     "ag-grid-community": "^22.1.1",
     "ag-grid-enterprise": "^22.1.1",

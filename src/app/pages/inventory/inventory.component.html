@@ -187,7 +187,7 @@
                                 <span class="form-group" *ngIf="definitions[column].formControl.control === 'select'"
                                 (keyup)="$event.stopPropagation()" (click)="$event.stopPropagation()"
                                 (keydow)="$event.stopPropagation()">
-                                    <select class="form-control" [formControl]="filters[column].controls.value"
+                                    <select class="form-control mb-1" [formControl]="filters[column].controls.value"
                                     [name]="column">
                                         <option value="">Select a value</option>
                                         <option *ngFor="let data of selectsData[column]"
@@ -199,16 +199,21 @@
                                         </option>
                                     </select>
                                 </span>
-                                <span class="form-group" *ngIf="definitions[column].formControl.control === 'input' ||
+                                <span class="form-group" *ngIf="definitions[column].formControl.control === 'textarea' || definitions[column].formControl.control === 'input' ||
                                 definitions[column].formControl.control === 'date'" (keyup)="$event.stopPropagation()"
                                 (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
-                                    <input [type]="filters[column].type" class="form-control" [name]="column"
+                                    <input [type]="filters[column].type" class="form-control mb-1" [name]="column"
                                     [formControl]="filters[column].controls.value">
                                 </span>
-                                <span class="form-group" *ngIf="definitions[column].formControl.control === 'toggle'"
+                                <span class="mb-1" *ngIf="definitions[column].formControl.control === 'toggle'"
                                 (keyup)="$event.stopPropagation()" (click)="$event.stopPropagation()"
                                 (keydow)="$event.stopPropagation()">
                                     <mat-slide-toggle color="primary" [formControl]="filters[column].controls.value"></mat-slide-toggle>
+                                </span>
+                                <span class="form-group" *ngIf="filters[column].controls.type.value === 'inRange'" (keyup)="$event.stopPropagation()"
+                                (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                                    <input [type]="filters[column].type" class="form-control mb-1" [name]="column + '-filterTo'"
+                                    [formControl]="filters[column].controls.valueTo">
                                 </span>
                             </mat-menu>
                         </span>

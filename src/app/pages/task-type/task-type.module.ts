@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { UomsRoutingModule } from './uoms-routing.module';
-import { UomsComponent } from './uoms.component';
+import { TaskTypeRoutingModule } from './task-type-routing.module';
+import { TaskTypeComponent } from './task-type.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -23,15 +23,15 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatListModule } from '@angular/material';
+import { MatListModule } from '@angular/material/list';
 
 @NgModule({
   declarations: [
-    UomsComponent
+    TaskTypeComponent
   ],
   imports: [
     CommonModule,
-    UomsRoutingModule,
+    TaskTypeRoutingModule,
 
     FormsModule,
     ReactiveFormsModule,
@@ -51,8 +51,10 @@ import { MatListModule } from '@angular/material';
     MatMenuModule,
     MatSelectModule,
     MatSlideToggleModule,
-    MatExpansionModule,
+    MatExpansionModule
+  ],
+  providers: [
     MatListModule
   ]
 })
-export class UomsModule { }
+export class TaskTypeModule { }

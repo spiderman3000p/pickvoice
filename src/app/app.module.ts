@@ -34,8 +34,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { PagesModule } from './pages/pages.module';
 import { AuthModule } from './pages/auth/auth.module';
-import { ApiModule } from '@pickvoice/pickvoice-api';
+import { ApiModule, Configuration, ConfigurationParameters } from '@pickvoice/pickvoice-api';
 import { BASE_PATH } from '@pickvoice/pickvoice-api';
+
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ApiInterceptor } from './http-interceptors/api-interceptor';
 
 import { EditOrderComponent } from './pages/edit-order/edit-order.component';
 import { EditTaskLineComponent } from './pages/edit-task-line/edit-task-line.component';
@@ -59,10 +62,38 @@ import { HttpClientModule } from '@angular/common/http';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
 import { AgGridModule } from 'ag-grid-angular';
 
+import { AuthService } from './services/auth.service';
+
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
 
+export function apiConfigFactory(): Configuration {
+  const params: ConfigurationParameters = {
+    accessToken: () => {
+      let sessionToken = '';
+      if (localStorage.getItem('access_token')) {
+        sessionToken = localStorage.getItem('access_token');
+      }
+      console.log('check session token: ', sessionToken);
+      return sessionToken;
+    }
+  };
+  return new Configuration(params);
+}
+/*const apiConfigFactory = () => { return new Configuration({
+    // set configuration parameters here.
+    accessToken: () => {
+      let sessionToken = '';
+      if (localStorage.getItem('access_token')) {
+        sessionToken = localStorage.getItem('access_token');
+      }
+      console.log('check session token: ', sessionToken);
+      return sessionToken;
+    },
+    withCredentials: true
+});
+};*/
 @NgModule({
   declarations: [
     AppComponent,
@@ -83,7 +114,7 @@ import { RouterModule } from '@angular/router';
     OrderSelectorDialogComponent
   ],
   imports: [
-    ApiModule,
+    ApiModule.forRoot(apiConfigFactory),
     HttpClientModule,
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
@@ -129,7 +160,8 @@ import { RouterModule } from '@angular/router';
   ],
   providers: [
     { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }},
-    { provide: BASE_PATH, useValue: environment.apiBaseUrl }
+    { provide: BASE_PATH, useValue: environment.apiBaseUrl },
+    { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

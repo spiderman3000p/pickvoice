@@ -364,17 +364,28 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
     this.utilities.log('filter form values: ', formValues);
     const filtersToUse = [];
     for (const filterKey in this.filters) {
-      if (this.filters[filterKey].controls.value.value !== undefined &&
-          this.filters[filterKey].controls.value.value !== null &&
-          this.filters[filterKey].controls.value.value !== '') {
+      if ((this.filters[filterKey].controls.value.value !== undefined &&
+         this.filters[filterKey].controls.value.value !== null &&
+         this.filters[filterKey].controls.value.value !== '')) {
         filtersToUse.push(this.filters[filterKey]);
       }
     }
-    const stringParams = filtersToUse.length > 0 ? filtersToUse.map(filter =>
-      `${filter.key}-filterType=${filter.type};${filter.key}-type=` +
-      `${this.definitions[filter.key].formControl.control === 'select' ? 'number'
-      : formValues[filter.key].type};${filter.key}-filter=${formValues[filter.key].value.toLowerCase()}`)
-      .join(';') : '';
+    let aux = '';
+    const stringParams = filtersToUse.length > 0 ? filtersToUse.map(filter => {
+      aux = `${filter.key}-filterType=${filter.type};${filter.key}-type=` +
+      `${formValues[filter.key].type};`;
+
+      if (filter.type === 'date' && formValues[filter.key].type === 'inRange') {
+        aux += `${filter.key}-dateFrom=${formValues[filter.key].value};${filter.key}` +
+        `-dateTo=${formValues[filter.key].valueTo}`;
+      } else if (filter.type === 'number' && formValues[filter.key].type === 'inRange') {
+        aux += `${filter.key}-filter=${formValues[filter.key].value};${filter.key}-filterTo=` +
+        `${formValues[filter.key].valueTo}`;
+      } else {
+        aux += `${filter.key}-filter=${formValues[filter.key].value.toLowerCase()}`;
+      }
+      return aux;
+    }).join(';') : '';
     this.utilities.log('filters to use: ', filtersToUse);
     this.utilities.log('filters string params: ', stringParams);
     return stringParams;
@@ -403,7 +414,7 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
         this.dataCount = 100;
         this.dataSubject.next(dataResults);*/
         this.utilities.log('response', response);
-        if (response.content.length > 0) {
+        if (response && response.content) {
             this.dataSource.lastRow = response.pageSize;
             this.dataSource.data = response.content.map(this.parserFn);
             this.dataSource.dataCount = response.totalElements;
@@ -466,7 +477,12 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
-        filter.type = this.definitions[column.name].formControl.type;
+        filter.type = this.definitions[column.name].formControl.control === 'input' ?
+        this.definitions[column.name].formControl.type :
+        (this.definitions[column.name].formControl.control === 'date' ? 'date' :
+        (this.definitions[column.name].formControl.control === 'toggle' ? 'toggle' :
+        (this.definitions[column.name].formControl.control === 'select' ?
+        this.definitions[column.name].formControl.type : undefined)));
         filter.key = column.name;
         if (this.definitions[column.name].formControl.control !== 'select' &&
             this.definitions[column.name].formControl.control !== 'toggle' &&
@@ -481,20 +497,45 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
           type: new FormControl(FILTER_TYPES[0].value),
           value: new FormControl('')
         });
+        if (this.definitions[column.name].formControl.type === 'number' ||
+            this.definitions[column.name].formControl.type === 'date') {
+          formControls[column.name].addControl('valueTo', new FormControl(''));
+        }
         filter.controls = formControls[column.name].controls;
-        this.subscriptions.push(filter.controls.value.valueChanges
-          .pipe(debounceTime(500), tap((value) => {
+        filter.controls.value.valueChanges.pipe(debounceTime(500), distinctUntilChanged(), tap((value) => {
           this.utilities.log(`valor del campo ${column.name} cambiando a: `, value);
-          this.applyFilters();
-        })).subscribe());
-        this.subscriptions.push(filter.controls.type.valueChanges
-          .pipe(debounceTime(500), tap((type) => {
-          this.utilities.log(`tipo de filtro del campo ${column.name} cambiando a: `, type);
-          // TODO: acomodar esto de modo que al cambiar tipo y haber un valor, hacer la busqueda
-          if (false) {
+          if (this.filters[column.name].controls.type.value === 'inRange') {
+            if (this.filters[column.name].controls.valueTo &&
+                this.filters[column.name].controls.valueTo.value.length > 0) {
+              this.applyFilters();
+            }
+          } else {
             this.applyFilters();
           }
-        })).subscribe());
+        })).subscribe();
+        if (this.definitions[column.name].formControl.type === 'number' ||
+          this.definitions[column.name].formControl.type === 'date') {
+          filter.controls.valueTo.valueChanges.pipe(debounceTime(500), distinctUntilChanged(), tap((value) => {
+            this.utilities.log(`valor del campo ${column.name} cambiando a: `, value);
+            if (this.filters[column.name].controls.type.value === 'inRange') {
+              if (this.filters[column.name].controls.value &&
+                this.filters[column.name].controls.value.value.length > 0) {
+                this.applyFilters();
+              }
+            } else {
+              this.applyFilters();
+            }
+          })).subscribe();
+        }
+        filter.controls.type.valueChanges.pipe(debounceTime(500), distinctUntilChanged(), tap((type) => {
+          this.utilities.log(`tipo de filtro del campo ${column.name} cambiando a: `, type);
+          // TODO: acomodar esto de modo que al cambiar tipo y haber un valor, hacer la busqueda
+          this.utilities.log('valor a buscar: ', this.filters[column.name].controls.value.value);
+          if (this.filters[column.name].controls.value.value.length > 0) {
+            this.applyFilters();
+          }
+        }))
+        .subscribe();
         // formControls[column.name].get('type').patchValue(FILTER_TYPES[0].value);
         if (this.definitions[column.name].formControl.control === 'select') {
           this.subscriptions.push(

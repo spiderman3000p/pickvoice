@@ -5,7 +5,7 @@ import { DataProviderService } from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { Dock } from '@pickvoice/pickvoice-api/model/dock';
+import { TaskType } from '@pickvoice/pickvoice-api/model/taskType';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -19,14 +19,14 @@ import { merge, Observer, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-docks',
-  templateUrl: './docks.component.html',
-  styleUrls: ['./docks.component.css']
+  selector: 'app-task-type',
+  templateUrl: './task-type.component.html',
+  styleUrls: ['./task-type.component.css']
 })
-export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.DockMap;
-  dataSource: MatTableDataSource<Dock>;
-  dataToSend: Dock[];
+export class TaskTypeComponent implements OnInit, AfterViewInit, OnDestroy {
+  definitions: any = ModelMap.TaskTypeMap;
+  dataSource: MatTableDataSource<TaskType>;
+  dataToSend: TaskType[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
   columnDefs: any[];
@@ -39,7 +39,7 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.DOCKS;
+  type = IMPORTING_TYPES.TASK_TYPES;
   selectsData: any;
   subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -79,8 +79,8 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
     let filter: any;
     const formControls = {} as any;
     let aux;
-    if (localStorage.getItem('displayedColumnsInDocksPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInDocksPage'));
+    if (localStorage.getItem('displayedColumnsInTaskTypePage')) {
+      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInTaskTypePage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
         shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
@@ -110,7 +110,6 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.filtersForm = new FormGroup(formControls);
-    this.utilities.log('filterForms', this.filtersForm);
     this.utilities.log('formControls', formControls);
   }
 
@@ -136,7 +135,7 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
       this.columnDefs.forEach(col => col.show = true);
     }
     // guardamos la eleccion en el local storage
-    localStorage.setItem('displayedColumnsInDocksPage', JSON.stringify(this.columnDefs));
+    localStorage.setItem('displayedColumnsInTaskTypePage', JSON.stringify(this.columnDefs));
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
@@ -215,11 +214,11 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
     if (Array.isArray(rows)) {
       const requests = [];
       rows.forEach(row => {
-        requests.push(this.dataProviderService.deleteDock(row.id, 'response', false));
+        requests.push(this.dataProviderService.deleteTaskType(row.id, 'response', false));
       });
       this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteDock(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deleteTaskType(rows.id, 'response', false)
       .subscribe(observer));
     }
   }
@@ -241,11 +240,6 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  handleError(error: any) {
-    this.utilities.error('error sending data to api', error);
-    this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
-  }
-
   renderColumnData(type: string, data: any) {
     const text = this.utilities.renderColumnData(type, data);
     return typeof text === 'string' ? text.slice(0, 30) : text;
@@ -264,7 +258,7 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
     const filters = this.filters.filter(filter => filter.show &&
                     formValues[filter.key] && formValues[filter.key].length > 0);
     // this.utilities.log('filters: ', filters);
-    this.dataSource.filterPredicate = (data: Dock, filter: string) => {
+    this.dataSource.filterPredicate = (data: TaskType, filter: string) => {
       // this.utilities.log('data', data);
       return filters.every(shownFilter => {
         value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
@@ -292,7 +286,7 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         row: element,
         map: this.definitions,
-        type: IMPORTING_TYPES.DOCKS,
+        type: IMPORTING_TYPES.TASK_TYPES,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -310,11 +304,11 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadData(useCache = true) {
-    this.utilities.log('requesting docks');
+    this.utilities.log('requesting task types');
     this.isLoadingResults = true;
-    this.subscriptions.push(this.dataProviderService.getAllDocks().subscribe(results => {
+    this.subscriptions.push(this.dataProviderService.getAllTaskTypes().subscribe(results => {
       this.isLoadingResults = false;
-      this.utilities.log('docks received', results);
+      this.utilities.log('task types received', results);
       if (results && results.length > 0) {
         this.dataSource.data = results.map((element, i) => {
           return { index: i, ... element};
@@ -335,13 +329,13 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.docks);
+    this.utilities.dataTypesModelMaps.taskType);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.definitions,
-        type: IMPORTING_TYPES.DOCKS,
+        type: IMPORTING_TYPES.TASK_TYPES,
         remoteSync: true, // para mandar los datos a la BD por la API
-        title: 'Add New Dock'
+        title: 'Add New Task Type'
       }
     });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
@@ -361,7 +355,7 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
     const dataToExport = this.dataSource.data.map((row: any) => {
       return this.utilities.getJsonFromObject(row, this.type);
     });
-    this.utilities.exportToXlsx(dataToExport, 'Docks List');
+    this.utilities.exportToXlsx(dataToExport, 'Task List');
   }
 
   /*

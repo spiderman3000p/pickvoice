@@ -1,0 +1,12 @@
+{   
+    "/auth/*": {
+      "target": "https://keycloak.cclauth.com",
+      "secure": false,
+      "changeOrigin": true
+    },
+    "/api/*": {
+        "target": "https://tau-tech.co:8443",
+        "secure": false,
+        "changeOrigin": true
+    }
+}

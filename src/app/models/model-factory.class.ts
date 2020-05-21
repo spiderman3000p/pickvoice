@@ -50,6 +50,9 @@ export class ModelFactory {
         if (type === IMPORTING_TYPES.PICK_TASKS) {
             return this.newEmptyTask();
         }
+        if (type === IMPORTING_TYPES.TASK_TYPES) {
+            return this.newEmptyTaskType();
+        }
         if (type === IMPORTING_TYPES.PICK_TASKLINES) {
             return this.newEmptyTaskLine();
         }
