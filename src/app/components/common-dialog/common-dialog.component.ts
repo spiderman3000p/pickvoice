@@ -4,11 +4,13 @@ import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dial
 @Component({
   selector: 'app-common-dialog',
   templateUrl: './common-dialog.component.html',
-  styleUrls: ['./common-dialog.component.css']
+  styleUrls: ['./common-dialog.component.scss']
 })
 export class CommonDialogComponent implements OnInit {
   title: string;
   message: string;
+  html: string;
+  type = 'text';
   positiveBtnText: string;
   negativeBtnText: string;
   positiveBtnCallback: any;
@@ -28,8 +30,15 @@ export class CommonDialogComponent implements OnInit {
     this.negativeBtnText = 'Cancel';
     this.showPositiveBtn = true;
     this.showNegativeBtn = true;
+    console.log('date', data);
     if (data.title) {
       this.title = data.title;
+    }
+    if (data.type) {
+      this.type = data.type;
+    }
+    if (data.html) {
+      this.html = data.html;
     }
     if (data.message) {
       this.message = data.message;

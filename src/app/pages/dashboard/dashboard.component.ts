@@ -206,7 +206,7 @@ export class DashboardComponent implements OnInit {
   chartsTo = new FormControl('');
   constructor(private breakpointObserver: BreakpointObserver, private authService: AuthService,
               private utilities: UtilitiesService, private dataProviderService: DataProviderService) {
-    this.utilities.log('last url', this.authService.redirectUrl);
+    // this.utilities.log('last url', this.authService.redirectUrl);
     this.chartsFrom.setValue(this.utilities.formatDate(new Date(Date.now() - (30 * 24 * 60 * 60000)), 'YYYY-MM-DD'));
     this.chartsTo.setValue(this.utilities.formatDate(new Date(), 'YYYY-MM-DD'));
     this.utilities.log('this.taskChartTo: ', this.chartsTo.value);

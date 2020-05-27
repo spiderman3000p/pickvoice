@@ -22,6 +22,10 @@ const routes: Routes = [
     loadChildren: () => import('./inventory/inventory.module').then(m => m.InventoryModule)
   },
   {
+    path: 'edit-templates',
+    loadChildren: () => import('./edit-templates/edit-templates.module').then(m => m.EditTemplatesModule)
+  },
+  {
     path: IMPORTING_TYPES.ITEMS,
     loadChildren: () => import('./items/items.module').then(m => m.ItemsModule)
   },

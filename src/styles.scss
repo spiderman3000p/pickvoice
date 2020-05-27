@@ -3,6 +3,7 @@ $primary: #00b19d;
 $accent: #00535e;
 $secondary: #00535e;
 @import "node_modules/bootstrap/scss/bootstrap";
+@import "~@fortawesome/fontawesome-free/css/all.css";
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 @import '~angular-tree-component/dist/angular-tree-component.css';

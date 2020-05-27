@@ -1,6 +1,7 @@
 <h2 mat-dialog-title>{{ title }}</h2>
 <div mat-dialog-content>
-    <p>{{ message }}</p>
+    <p *ngIf="type !== 'html'">{{ message }}</p>
+    <div *ngIf="type === 'html'" [innerHTML]="html" class="html-container printable"></div>
 </div>
 <div mat-dialog-actions align="end">
     <button mat-button (click)="positiveBtnClick()">{{ positiveBtnText }}</button>

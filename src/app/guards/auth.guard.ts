@@ -26,7 +26,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
       return true;
     }
     if (this.authService.isLoggedIn()) {
-      this.authService.redirectUrl = url;
       if (url.includes('/login')) {
         this.router.navigate(['/']);
         return false;
@@ -37,7 +36,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return true;
       }
     }
-    this.authService.redirectUrl = url;
     this.router.navigate(['/login']);
     return false;
   }

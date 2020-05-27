@@ -21,7 +21,6 @@ export class LoginComponent implements OnInit {
   subscriptions: Subscription[] = [];
   constructor(
     private autService: AuthService, private utilities: UtilitiesService, private router: Router) {
-      this.utilities.log('last url', this.autService.redirectUrl);
   }
 
   doLogin() {

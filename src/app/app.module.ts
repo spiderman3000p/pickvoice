@@ -68,6 +68,8 @@ import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
 
+// import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 export function apiConfigFactory(): Configuration {
   const params: ConfigurationParameters = {
     accessToken: () => {
@@ -120,6 +122,8 @@ export function apiConfigFactory(): Configuration {
     AppRoutingModule,
     BrowserAnimationsModule,
     LayoutModule,
+
+    /*FontAwesomeModule,*/
 
     MatSlideToggleModule,
     MatInputModule,

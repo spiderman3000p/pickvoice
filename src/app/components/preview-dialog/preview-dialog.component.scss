@@ -1,0 +1,57 @@
+$primary: #00b19d;
+$accent: #00535e;
+$secondary: #00535e;
+$danger: #9C080B;
+.template{
+  background: #fff;
+  position: relative;
+  -webkit-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.31);
+  -moz-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.31);
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.31);
+  padding: 2px;
+}
+.template-container{
+  
+}
+.template-container .template-container-content{
+  background: #aaa;
+  padding: 15px;
+}
+.template-container .template-controls{
+  width: 100%;
+  display: block;
+  position: relative;
+  text-align: right;
+  background: #D7D7D7;
+}
+.template-row{
+  /*border: #A2A2A2 1px dashed;*/
+  /*margin-bottom: 2px;*/
+  min-height: 48px;
+}
+.template-field{
+  display: grid;
+  padding: 0px 10px 0px 10px;
+  transition: all 0.5s;
+  background: #fff;
+  border: transparent 1px solid;
+  position: relative;
+}
+.template-row .row-content{
+  /*padding: 2px;*/
+  min-height: 48px;
+}
+.template-column{
+  /*margin: 2px;*/
+  /*border: #A2A2A2 1px dashed;*/
+  padding: 0px;
+}
+.template-column .column-content{
+  /*padding: 2px;*/
+}
+.template-field .template-field-label {
+  font-weight: bold;
+}
+.template-field .template-field-label {
+
+}

@@ -1,0 +1,260 @@
+<div class="content-area">
+    <!--button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <button mat-fab class="fab-button" (click)="saveSettings()"><mat-icon>save</mat-icon></button>
+    <div class="content">
+        <div class="section-wrapper">
+            <div class="header actionbar align-content-top">
+                <div class="title actionbar-section align-content-top">
+                    <h1>Lpns Template</h1>
+                </div>º
+                <div class="actions actionbar-section right">
+                    <button mat-raised-button color="warn" (click)="export()">
+                        <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                    </button>
+                    <button mat-raised-button color="accent" (click)="preview2()" class="ml-2">
+                        <mat-icon>remove_red_eye</mat-icon> <span class="btn-label">Preview</span>
+                    </button>
+                    <!--button mat-raised-button color="accent" (click)="addRow()" class="ml-2">
+                        <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                    </button-->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="example-loading-shade" *ngIf="isLoadingResults">
+                <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+            </div>
+            <div class="col-sm-3 template-editor-sidebar">
+                <mat-card>
+                    <mat-card-title>
+                        Template Options
+                    </mat-card-title>
+                    <mat-card-content>
+                        <div class="input-group">
+                            <label>Template</label>
+                            <div class="form-group row w-100">
+                                <label>Paddings</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.paddings.top">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.paddings.left" >
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.paddings.bottom">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.paddings.right">
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Border</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.border.width">
+                                <select [(ngModel)]="templateOptions.border.style" (change)="updateTemplateStyles()">
+                                    <option value="solid">solid</option>
+                                    <option value="dotted">dotted</option>
+                                    <option value="dashed">dashed</option>
+                                    <option value="none">none</option>
+                                </select>
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Size</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="4" type="text" [(ngModel)]="templateOptions.size.width">
+                                x
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="4" type="text" [(ngModel)]="templateOptions.size.height">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Rows</label>
+                            <div class="form-group row w-100">
+                                <label>Paddings</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.paddings.top">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.paddings.left">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.paddings.bottom">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.paddings.right">
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Margins</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.margins.top">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.margins.left">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.margins.bottom">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.margins.right">
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Border</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.row.border.width">
+                                <select [(ngModel)]="templateOptions.row.border.style" (change)="updateTemplateStyles()">
+                                    <option value="solid">solid</option>
+                                    <option value="dotted">dotted</option>
+                                    <option value="dashed">dashed</option>
+                                    <option value="none">none</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Field</label>
+                            <div class="form-group row w-100">
+                                <label>Paddings</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.paddings.top">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.paddings.left">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.paddings.bottom">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.paddings.right">
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Margins</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.margins.top">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.margins.left">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.margins.bottom">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.margins.right">
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Border</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.field.border.width">
+                                <select [(ngModel)]="templateOptions.field.border.style" (change)="updateTemplateStyles()">
+                                    <option value="solid">solid</option>
+                                    <option value="dotted">dotted</option>
+                                    <option value="dashed">dashed</option>
+                                    <option value="none">none</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Date</label>
+                            <div class="form-group row w-100">
+                                <label>Position</label>
+                                <select [(ngModel)]="templateOptions.date.position" (change)="updateTemplateStyles()">
+                                    <option value="top-left">Top Left</option>
+                                    <option value="top-right">Top Right</option>
+                                    <option value="bottom-left">Bottom Left</option>
+                                    <option value="bottom-right">Bottom Right</option>
+                                </select>
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Paddings</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.paddings.top">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.paddings.left">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.paddings.bottom">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.paddings.right">
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Margins</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.margins.top">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.margins.left">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.margins.bottom">
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.margins.right">
+                            </div>
+                            <div class="form-group row w-100">
+                                <label>Border</label>
+                                <input (keydown)="onInputNumber($event)"  (keyup)="updateTemplateStyles()" maxlength="3" type="text" [(ngModel)]="templateOptions.date.border.width">
+                                <select [(ngModel)]="templateOptions.date.border.style" (change)="updateTemplateStyles()">
+                                    <option value="solid">solid</option>
+                                    <option value="dotted">dotted</option>
+                                    <option value="dashed">dashed</option>
+                                    <option value="none">none</option>
+                                </select>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+            <div class="col-sm-9 template-editor-content">
+                <mat-card>
+                    <mat-card-title>
+                        Template
+                    </mat-card-title>
+                    <mat-card-content>
+                        <div class="field-selector-container">
+                            <div class="form-group">
+                                <label>Select a field and push it into the template</label>
+                                <select class="form-control" [formControl]="fieldSelector">
+                                    <option *ngFor="let field of fields" [ngValue]="field">
+                                        {{field.label}}
+                                    </option>
+                                </select>
+                            </div>
+                            <button mat-raised-button color="accent" (click)="pushSelectedField()">Push to template</button>
+                        </div>
+                        <div class="template-container">
+                            <div class="template-controls">
+                                <button mat-icon-button (click)="addNewRow()" color="accent">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div class="template-container-content">
+                                <div class="template" id="template" [ngStyle]="templateStyle">
+                                    <div class="template-content">
+                                        <span class="template-date" [ngStyle]="dateStyle">{{date}}</span>
+                                        <div *ngFor="let row of rows; let rowIndex=index" class="template-row">
+                                            <div class="row-controls">
+                                                <span class="row-controls-title">Row</span>
+                                                <!--i class="control-icon" [matMenuTriggerFor]="rowMenu" [ngClass]="row.selectedColumns.icon"></i>
+                                                <mat-menu #rowMenu="matMenu" class="control-menu tiny">
+                                                    <ng-template matMenuContent>
+                                                        <button mat-menu-item>
+                                                            1 column
+                                                        </button>
+                                                        <button mat-menu-item>
+                                                            2 columns
+                                                        </button>
+                                                        <button mat-menu-item>
+                                                            3 columns
+                                                        </button>
+                                                    </ng-template>
+                                                </mat-menu-->
+                                                <i class="fas fa-plus control-icon accent" (click)="addNewColumn(rowIndex)"></i>
+                                                <i class="fas fa-times-circle control-icon danger pl-2" (click)="removeRow(rowIndex)"></i>
+                                            </div>
+                                            <div class="row-content row" [ngStyle]="rowStyle">
+                                                <div class="template-column" [ngClass]="column.class" *ngFor="let column of row.columns; let columnIndex=index">
+                                                    <div class="column-controls">
+                                                        <span class="column-controls-title">Column</span>
+                                                        <i class="fas fa-arrows-alt-h control-icon accent" [matMenuTriggerFor]="columnMenu"></i>
+                                                        <mat-menu #columnMenu="matMenu" class="menu-tiny">
+                                                            <ng-template matMenuContent>
+                                                                <button mat-menu-item (click)="column.class='col-12'">100%</button>
+                                                                <button mat-menu-item (click)="column.class='col-11'">90%</button>
+                                                                <button mat-menu-item (click)="column.class='col-10'">80%</button>
+                                                                <button mat-menu-item (click)="column.class='col-9'">75%</button>
+                                                                <button mat-menu-item (click)="column.class='col-8'">65%</button>
+                                                                <button mat-menu-item (click)="column.class='col-7'">60%</button>
+                                                                <button mat-menu-item (click)="column.class='col-6'">50%</button>
+                                                                <button mat-menu-item (click)="column.class='col-5'">40%</button>
+                                                                <button mat-menu-item (click)="column.class='col-4'">33%</button>
+                                                                <button mat-menu-item (click)="column.class='col-2'">15%</button>
+                                                                <button mat-menu-item (click)="column.class='col-1'">8%</button>
+                                                            </ng-template>
+                                                        </mat-menu>
+                                                        <i class="fas fa-times-circle control-icon danger pl-2" (click)="removeColumn(rowIndex, columnIndex)"></i>
+                                                    </div>
+                                                    <div class="column-content">
+                                                        <div [id]="column.id" class="dropzone"
+                                                        (drop)="onDropDropzone($event)"
+                                                        (dragover)="onDragOverDropzone($event)"
+                                                        (dragleave)="onDragLeaveDropzone($event)"
+                                                        (dragend)="onDragEndDropzone($event)"
+                                                        [ngStyle]="dropzoneStyle"
+                                                        [attr.data-rowIndex]="rowIndex"
+                                                        [attr.data-columnIndex]="columnIndex">
+                                                            <div *ngIf="column.content != null" [id]="column.content.id" class="template-field draggable"
+                                                            draggable="true"
+                                                            (dragstart)="onFieldDragStart($event)"
+                                                            (dragend)="onFieldDragEnd($event)"
+                                                            [attr.data-rowIndex]="rowIndex"
+                                                            [attr.data-columnIndex]="columnIndex"
+                                                            [ngStyle]="fieldStyle">
+                                                                <span *ngIf="column.content.type !== 'image'" class="template-field-label" [ngStyle]="fieldLabelStyle">
+                                                                    {{column.content.label}}
+                                                                </span>
+                                                                <span *ngIf="column.content.type !== 'image'" class="template-field-value" [ngStyle]="fieldValuetStyle">
+                                                                    {{column.content.value}}
+                                                                </span>
+                                                                <img draggable="false" [src]="column.content.value" *ngIf="column.content.type === 'image'" class="template-field-value" [ngStyle]="fieldValuetStyle">
+                                                            </div>
+                                                            <!--p *ngIf="dropzone.content === null" class="text-center">Empty</p-->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+</div>

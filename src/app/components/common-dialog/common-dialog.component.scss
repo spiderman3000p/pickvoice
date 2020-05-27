@@ -1,0 +1,168 @@
+$primary: #00b19d;
+$accent: #00535e;
+$secondary: #00535e;
+$danger: #9C080B;
+.html-container{
+    background: grey;
+    padding: 20px;
+}
+
+.template{
+    background: #fff;
+    position: relative;
+    -webkit-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.31);
+    -moz-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.31);
+    box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.31);
+    padding: 2px;
+  }
+  .template-container{
+    
+  }
+  .template-container .template-container-content{
+    background: #aaa;
+    padding: 15px;
+  }
+  .template-container .template-controls{
+    width: 100%;
+    display: block;
+    position: relative;
+    text-align: right;
+    background: #D7D7D7;
+  }
+  .template-row{
+    border: #A2A2A2 1px dashed;
+    margin-bottom: 2px;
+  }
+  .template-field{
+    display: grid;
+    padding: 0px 10px 0px 10px;
+    transition: all 0.5s;
+    background: #fff;
+    border: transparent 1px solid;
+    position: relative;
+  }
+  .template-field:hover{
+    cursor: move;
+    border: $primary 1px solid;
+    /*transform: scale(1.05);*/
+  }
+  .template-row .row-controls{
+    position: relative;
+    height: 20px;
+    z-index: 99;
+    background: lightgrey;
+    width: 100%;
+    text-align: right;
+    padding: 2px 8px 2px 8px;
+  }
+  .control-icon.danger{
+    color: $danger;
+  }
+  .control-icon.primary{
+    color: $primary;
+  }
+  .control-icon.accent{
+    color: $accent;
+  }
+  .template-row .row-controls .control-icon{
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  .template-row .row-controls .row-controls-title{
+    float: left;
+  }
+  .template-row:hover .row-controls{
+    display: block;
+  }
+  .template-row .row-content{
+    padding: 2px;
+  }
+  .template-column{
+    /*margin: 2px;*/
+    border: #A2A2A2 1px dashed;
+    padding: 0px;
+  }
+  .template-column .column-content{
+    padding: 2px;
+  }
+  .template-column .column-controls{
+    position: relative;
+    height: 20px;
+    z-index: 99;
+    background: lightgrey;
+    width: 100%;
+    text-align: right;
+    padding: 2px 12px 2px 12px;
+  }
+  .template-column .column-controls .control-icon{
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+  .template-column .column-controls .column-controls-title{
+    float: left;
+  }
+  .template-column .column-controls .mat-icon{
+    font-size: 20px;
+  }
+  .template-column:hover .column-controls{
+    display: block;
+  }
+  .template-field .template-field-label {
+    font-weight: bold;
+  }
+  .template-field .template-field-label {
+  
+  }
+  .drag-field-holding{
+    -webkit-box-shadow: 0px 0px 13px 0px rgba(0,0,0,0.51);
+    -moz-box-shadow: 0px 0px 13px 0px rgba(0,0,0,0.51);
+    box-shadow: 0px 0px 13px 0px rgba(0,0,0,0.51);
+  }
+  .field-selector-container{
+    display: inline-flex;
+    width: 100%;
+  }
+  .field-selector-container button{
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .field-selector-container .form-group{
+    padding-left: 10px;
+    padding-right: 10px;
+    min-width: 80%;
+    width: 80%;
+  }
+  .input-group .form-group{
+    margin-bottom: 0px;
+    display: inline-flex;
+  }
+  .input-group > label{
+    font-weight: 900;
+    width: 100%;
+  }
+  .input-group > .form-group{
+    padding-left: 5px;
+    vertical-align: middle;
+    display: block;
+  }
+  .input-group > .form-group > label{
+    width: 25%;
+    margin: 0;
+  }
+  .input-group > .form-group > input[type=text]{
+    width: 35px;
+    height: 25px;
+    padding: 5px;
+    margin: 2.5px;
+  }
+  
+  .input-group > .form-group > select{
+    height: 25px;
+    padding: 5px;
+    margin: 2.5px;
+  }

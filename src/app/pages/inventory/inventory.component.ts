@@ -130,6 +130,10 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
     return `sort-${this.sort.active}=${this.sort.direction}`;
   }
 
+  editLpnsTemplate() {
+    this.router.navigate([`pages/edit-templates`]);
+  }
+
   loadDataPage() {
     this.paginatorParams = this.getPaginatorParams();
     this.sortParams = this.getSortParams();

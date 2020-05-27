@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<div mat-dialog-content>
+    <div class="template-container">
+        <div class="template-container-content">
+            <div class="template" id="template" [ngStyle]="templateStyle">
+                <div class="template-content">
+                    <span class="template-date" [ngStyle]="dateStyle">{{date}}</span>
+                    <div *ngFor="let row of rows; let rowIndex=index" class="template-row">
+                        <div class="row-content row" [ngStyle]="rowStyle">
+                            <div class="template-column" [ngClass]="column.class" *ngFor="let column of row.columns; let columnIndex=index">
+                                <div class="column-content">
+                                    <div [id]="column.id" class="dropzone"
+                                    [ngStyle]="dropzoneStyle">
+                                        <div *ngIf="column.content != null" [id]="column.content.id" class="template-field draggable"
+                                        [ngStyle]="fieldStyle">
+                                            <span *ngIf="column.content.type !== 'image'" class="template-field-label" [ngStyle]="fieldLabelStyle">
+                                                {{column.content.label}}
+                                            </span>
+                                            <span *ngIf="column.content.type !== 'image'" class="template-field-value" [ngStyle]="fieldValuetStyle">
+                                                {{column.content.value}}
+                                            </span>
+                                            <img draggable="false" [src]="column.content.value" *ngIf="column.content.type === 'image'" class="template-field-value" [ngStyle]="fieldValuetStyle">
+                                        </div>
+                                        <!--p *ngIf="dropzone.content === null" class="text-center">Empty</p-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-button (click)="positiveBtnClick()">{{ positiveBtnText }}</button>
+    <button mat-button (click)="negativeBtnClick()">{{ negativeBtnText }}</button>
+</div>

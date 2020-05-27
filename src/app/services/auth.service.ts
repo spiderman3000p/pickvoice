@@ -23,7 +23,7 @@ export class AuthService {
     refresh_token: null
   };
   isLogged: boolean;
-  redirectUrl: string;
+  // redirectUrl: string;
   username: string;
   rememberUsername: string;
   remember: boolean;
@@ -92,11 +92,12 @@ export class AuthService {
 
   public logout(): Observable<any> {
     this.isLogged = false;
-    this.redirectUrl = null;
+    // this.redirectUrl = null;
     this.username = null;
     this.remember = null;
     this.rememberUsername = null;
     this.sessionStart = null;
+    AuthService.token = null;
     if (this.inactivityInterval !== undefined) {
       clearInterval(this.inactivityInterval);
     }
@@ -108,6 +109,7 @@ export class AuthService {
       refresh_token: null
     };
     localStorage.removeItem('username');
+    localStorage.removeItem('namedp');
     localStorage.removeItem('rememberUsername');
     localStorage.removeItem('remember');
     localStorage.removeItem('isLoggedIn');

@@ -5,7 +5,7 @@ import {
   HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse
 } from '@angular/common/http';
 
-import { throwError, Observable, BehaviorSubject } from 'rxjs';
+import { of, throwError, Observable, BehaviorSubject } from 'rxjs';
 import { catchError, finalize, take, filter, switchMap, tap } from 'rxjs/operators';
 /** Pass untouched request through to the next request handler. */
 @Injectable()
@@ -24,7 +24,6 @@ export class ApiInterceptor implements HttpInterceptor {
                 if (error instanceof HttpErrorResponse && error.status === 401) {
                     return this.handle401Error(req, next);
                 } else {
-                    this.router.navigate(['/login']);
                     return throwError(error);
                 }
             }));
@@ -50,14 +49,17 @@ export class ApiInterceptor implements HttpInterceptor {
                     this.tokenSubject.next(response.access_token);
                     return next.handle(this.setTokenToRequest(req, response.access_token));
                 }
-
                 // If we don't get a new token, we are in trouble so logout.
                 console.error('Error desconocido...haciendo logout');
-                return this.authService.logout();
+                this.authService.logout();
+                this.router.navigate(['/login']);
+                return of(true);
             }), catchError(error => {
                 // If we don't get a new token, we are in trouble so logout.
                 console.error('Error desconocido...haciendo logout', error);
-                return this.authService.logout();
+                this.authService.logout();
+                this.router.navigate(['/login']);
+                return of(true);
             }), finalize(() => {
                 this.isRefreshingToken = false;
             }));

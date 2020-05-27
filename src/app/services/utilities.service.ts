@@ -407,6 +407,8 @@ export class UtilitiesService implements OnDestroy {
     {
       data: {
         title: options.title,
+        type: options.type,
+        html: options.html,
         message: options.message,
         positiveBtnText: options.positiveBtnText,
         negativeBtnText: options.negativeBtnText,
