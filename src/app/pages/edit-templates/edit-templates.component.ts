@@ -14,8 +14,8 @@ import { PreviewDialogComponent } from '../../components/preview-dialog/preview-
 export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy {
   templateOptions = {
     size: {
-      height: 472,
-      width: 591
+      height: 453,
+      width: 567
     },
     paddings: {
       left: 10,
@@ -231,6 +231,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       this.fields.push({
         id: `field-${key}`,
         selected: false,
+        key: key,
         label: this.model[key].name,
         value: 'Lorem ipsum dolor',
         disabled: false,
@@ -244,6 +245,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       id: `field-bar-code`,
       selected: false,
       label: 'bar code',
+      key: 'barCode',
       value: barCode,
       disabled: false,
       model: null,
@@ -251,6 +253,9 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
     });
     this.defaultFields = this.fields.slice();
     this.fieldSelector.patchValue(this.fields[0]);
+    console.log('fields:', this.fields);
+    console.log('default fields:', this.defaultFields);
+    console.log('selected field:', this.fieldSelector.value);
     this.getAllStyles();
   }
 
@@ -291,10 +296,30 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   removeRow(rowIndex: number) {
+    let aux;
+    let indexAux;
+    this.rows[rowIndex].columns.forEach(column => {
+      if (column.content !== null) {
+        aux = Object.assign({}, column.content);
+        indexAux = this.defaultFields.findIndex(field => field.key === aux.key);
+        if (indexAux > -1) {
+          this.fields.push(Object.assign({}, this.defaultFields[indexAux]));
+        }
+      }
+    });
     this.rows.splice(rowIndex, 1);
   }
 
   removeColumn(rowIndex: number, columnIndex: number) {
+    let aux;
+    let indexAux;
+    if (this.rows[rowIndex].columns[columnIndex].content !== null) {
+      aux = Object.assign({}, this.rows[rowIndex].columns[columnIndex].content);
+      indexAux = this.defaultFields.findIndex(field => field.key === aux.key);
+      if (indexAux > -1) {
+        this.fields.push(Object.assign({}, this.defaultFields[indexAux]));
+      }
+    }
     this.rows[rowIndex].columns.splice(columnIndex, 1);
   }
 
@@ -317,6 +342,16 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       border: `${this.templateOptions.border.width}px ${this.templateOptions.border.style}`,
       height: `${this.templateOptions.size.height}px`,
       width: `${this.templateOptions.size.width}px`
+    };
+  }
+
+  getTemplateStyle2() {
+    return {
+      'padding-left': `${this.templateOptions.paddings.left}px`,
+      'padding-right': `${this.templateOptions.paddings.right}px`,
+      'padding-top': `${this.templateOptions.paddings.top}px`,
+      'padding-bottom': `${this.templateOptions.paddings.bottom}px`,
+      border: `${this.templateOptions.border.width}px ${this.templateOptions.border.style}`
     };
   }
 
@@ -413,7 +448,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   pushSelectedField() {
-    // console.log('selected field', this.fieldSelector.value);
+    console.log('selected field', this.fieldSelector.value);
     let indexAux;
     const existentIndex = this.rows.findIndex(row => {
       indexAux = row.columns.findIndex(field => field.content && field.content.id === this.fieldSelector.value.id);
@@ -423,7 +458,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       return false;
     });
     if (existentIndex === -1) {
-      // console.log('inserting field');
+      console.log('inserting field');
       let dropzone;
       // buscamos el primer lugar vacio
       this.rows.findIndex(row => {
@@ -435,10 +470,12 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
         return false;
       });
       if (dropzone) {
+        console.log('drpzone encontrado: ', dropzone);
         dropzone.content = this.fieldSelector.value;
         const index2 = this.fields.findIndex(field => field.id === this.fieldSelector.value.id);
         if (index2 > -1) {
           this.fields.splice(index2, 1);
+          this.fieldSelector.patchValue(this.fields[0]);
         }
       } else {
         console.error('No hay espacios disponibles en el template');
@@ -565,7 +602,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       data: {
         title: 'Template Preview',
         settings: settings,
-        templateStyle: this.templateStyle,
+        templateStyle: this.getTemplateStyle(),
         rowStyle: this.rowStyle,
         dropzoneStyle: this.dropzoneStyle,
         fieldStyle: this.fieldStyle,

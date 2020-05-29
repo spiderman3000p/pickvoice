@@ -53,7 +53,7 @@ export class AuthService {
     .set('username', username)
     .set('password', password);
     return new Observable(suscriber => {
-      this.httpClient.post('/auth/realms/cclrealm/protocol/openid-connect/token',
+      this.httpClient.post(`${environment.apiKeycloak}/realms/cclrealm/protocol/openid-connect/token`,
       payload).subscribe((response: any) => {
         this.utilities.log('login response', response);
         if (response && response.access_token) {
@@ -81,7 +81,7 @@ export class AuthService {
     .set('grant_type', 'refresh_token')
     .set('client_id', parameters.client_id)
     .set('refresh_token', this.getRefreshToken());
-    return  this.httpClient.post('/auth/realms/cclrealm/protocol/openid-connect/token',
+    return  this.httpClient.post(`${environment.apiKeycloak}//realms/cclrealm/protocol/openid-connect/token`,
       payload).pipe(tap((response: any) => {
         if (response && response.access_token) {
           this.setRefreshToken(response.refresh_token);

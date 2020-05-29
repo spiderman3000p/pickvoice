@@ -4,6 +4,9 @@ import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dial
 import { ModelMap } from '../../models/model-maps.model';
 import { UtilitiesService } from '../../services/utilities.service';
 
+import bootstrapStyleCss from 'node_modules/bootstrap/dist/css/bootstrap.css';
+import previewStyleCss from './preview-dialog.component.scss';
+
 @Component({
   selector: 'app-preview-dialog',
   templateUrl: './preview-dialog.component.html',
@@ -18,7 +21,6 @@ export class PreviewDialogComponent implements OnInit {
   negativeBtnCallback: any;
   showPositiveBtn: boolean;
   showNegativeBtn: boolean;
-
   templateOptions = {
     size: {
       height: 472,
@@ -292,10 +294,17 @@ export class PreviewDialogComponent implements OnInit {
   print() {
     const printable = document.createElement('div');
     printable.classList.add('printable');
-    const template = document.getElementById('template').cloneNode(true);
+    const template = document.getElementById('template-preview').cloneNode(true);
     printable.appendChild(template);
+    console.log('bootstrap styles: ', bootstrapStyleCss);
+    console.log('preview styles: ', previewStyleCss);
     const w = window.open();
+    w.document.write('<html><head><title>Template Preview</title>');
+    w.document.write('<style>' +
+    bootstrapStyleCss + previewStyleCss +
+    '</style></head><body>');
     w.document.write(printable.innerHTML);
+    w.document.write('</body></html>');
     w.print();
     w.close();
   }

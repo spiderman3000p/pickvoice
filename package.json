@@ -41,6 +41,7 @@
     "hammerjs": "^2.0.8",
     "interactjs": "^1.9.17",
     "jquery": "^3.4.1",
+    "keycloak-angular": "^7.2.0",
     "moment": "^2.24.0",
     "ngx-contextmenu": "^5.4.0",
     "ngx-print": "^1.2.0-beta.3",

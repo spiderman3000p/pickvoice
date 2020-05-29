@@ -5,7 +5,7 @@
       "changeOrigin": true
     },
     "/api/*": {
-        "target": "https://tau-tech.co:8443",
+        "target": "https://api.dev.pickvoice.com",
         "secure": false,
         "changeOrigin": true
     }

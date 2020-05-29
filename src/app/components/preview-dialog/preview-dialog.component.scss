@@ -2,6 +2,12 @@ $primary: #00b19d;
 $accent: #00535e;
 $secondary: #00535e;
 $danger: #9C080B;
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  overflow-y: hidden;
+  font-size: 12px;
+}
 .template{
   background: #fff;
   position: relative;
@@ -9,6 +15,8 @@ $danger: #9C080B;
   -moz-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.31);
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.31);
   padding: 2px;
+  overflow: hidden;
+  display: table;
 }
 .template-container{
   
@@ -16,13 +24,6 @@ $danger: #9C080B;
 .template-container .template-container-content{
   background: #aaa;
   padding: 15px;
-}
-.template-container .template-controls{
-  width: 100%;
-  display: block;
-  position: relative;
-  text-align: right;
-  background: #D7D7D7;
 }
 .template-row{
   /*border: #A2A2A2 1px dashed;*/
@@ -33,7 +34,6 @@ $danger: #9C080B;
   display: grid;
   padding: 0px 10px 0px 10px;
   transition: all 0.5s;
-  background: #fff;
   border: transparent 1px solid;
   position: relative;
 }
@@ -54,4 +54,30 @@ $danger: #9C080B;
 }
 .template-field .template-field-label {
 
+}
+@media print {
+  @page {
+    size: 378px 302px;
+    margin: 0;
+  }
+  .template{
+    -webkit-box-shadow: unset;
+    -moz-box-shadow: unset;
+    box-shadow: unset;
+    margin-left: 1px !important;
+    min-height: calc(100% - 1px) !important;
+    height: calc(100% - 1px) !important;
+    width: 563px !important;
+    min-width: 563px !important;
+  }
+  .template-row .row-content{
+    /*padding: 2px;*/
+    min-height: 90px;
+  }
+  body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    overflow-y: hidden;
+    font-size: 16px;
+  }
 }

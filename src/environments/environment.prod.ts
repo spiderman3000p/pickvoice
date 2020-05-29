@@ -6,7 +6,9 @@ export const environment = {
     username: '',
     password: ''
   },
-  apiBaseUrl: '/api',
+  // apiBaseUrl: 'https://tau-tech.co:8443/api',
+  apiBaseUrl: 'https://api.dev.pickvoice.com',
+  apiKeycloak: 'https://keycloak.cclauth.com/auth',
   sessionDuration: 360, // session duration in minutes
   sessionInactivityTime: 30, // session inativity time in minutes
   debug: false,
