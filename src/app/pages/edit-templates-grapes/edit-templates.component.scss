@@ -1,0 +1,60 @@
+$primary: #00b19d;
+$accent: #00535e;
+$secondary: #00535e;
+$danger: #9C080B;
+/* We can remove the border we've set at the beginnig */
+::ng-deep #gjs {
+  border: none;
+}
+/* Theming */
+/* Primary color for the background */
+::ng-deep .gjs-one-bg {
+  background-color: $primary;
+}
+/* Secondary color for the text color */
+::ng-deep .gjs-two-color {
+  color: rgba(255, 255, 255, 1);
+}
+/* Tertiary color for the background */
+::ng-deep .gjs-three-bg {
+  background-color: $accent;
+  color: white;
+}
+::ng-deep .gjs-four-color-h:hover {
+  color: $accent;
+}
+/* Quaternary color for the text color */
+::ng-deep .gjs-four-color,
+.gjs-four-color-h:hover {
+  color: $accent;
+}
+/* end theming */
+
+.content{
+  margin: 0;
+  max-width: 100%;
+}
+.section-wrapper {
+  padding: 15px;
+}
+
+/* Reset some default styling */
+.gjs-cv-canvas {
+  top: 0;
+  width: 100mm;
+  height: 80mm;
+}
+
+::ng-deep .gjs-frame-wrapper {
+  width: 100mm;
+  height: 80mm;
+}
+
+::ng-deep .text-block {
+  font-size: 14px;
+}
+
+::ng-deep .icon-block {
+  font-size: 36px;
+  margin-bottom: 10px;
+}

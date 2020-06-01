@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { UtilitiesService } from '../../services/utilities.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-print',
@@ -19,8 +19,7 @@ export class PrintComponent implements OnInit {
   tableHeaders: any[];
   rows: any[];
   keys: string[];
-  constructor(private utilities: UtilitiesService, private activatedRoute: ActivatedRoute,
-              private router: Router) {
+  constructor(private utilities: UtilitiesService, private activatedRoute: ActivatedRoute) {
     // this.init();
   }
 

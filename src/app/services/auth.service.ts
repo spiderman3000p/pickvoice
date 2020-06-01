@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of} from 'rxjs';
-import { switchAll, switchMap, tap, delay } from 'rxjs/operators';
+import { catchError, finalize, switchAll, switchMap, tap, delay } from 'rxjs/operators';
 import { UserService } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { environment } from '../../environments/environment';
@@ -15,6 +15,7 @@ const SESSION_INACTIVITY_TIME = environment.sessionInactivityTime;
 })
 export class AuthService {
   static token;
+  isRefreshingToken = false;
   sessionData = {
     access_token: null,
     expires_in: 0,
@@ -29,6 +30,7 @@ export class AuthService {
   remember: boolean;
   sessionStart: number;
   inactivityInterval: any;
+  tokenRefreshInterval: any;
   constructor(private userService: UserService, private utilities: UtilitiesService,
               private router: Router, private httpClient: HttpClient) { }
   public static checkAccessToken() {
@@ -81,11 +83,13 @@ export class AuthService {
     .set('grant_type', 'refresh_token')
     .set('client_id', parameters.client_id)
     .set('refresh_token', this.getRefreshToken());
-    return  this.httpClient.post(`${environment.apiKeycloak}//realms/cclrealm/protocol/openid-connect/token`,
+    return  this.httpClient.post(`${environment.apiKeycloak}/realms/cclrealm/protocol/openid-connect/token`,
       payload).pipe(tap((response: any) => {
         if (response && response.access_token) {
           this.setRefreshToken(response.refresh_token);
           this.setSessionToken(response.access_token);
+          this.setSessionStart(Date.now());
+          this.utilities.log('Token refreshed');
         }
       }));
   }
@@ -100,6 +104,9 @@ export class AuthService {
     AuthService.token = null;
     if (this.inactivityInterval !== undefined) {
       clearInterval(this.inactivityInterval);
+    }
+    if (this.tokenRefreshInterval !== undefined) {
+      clearInterval(this.tokenRefreshInterval);
     }
     this.sessionData = {
       access_token: null,
@@ -186,9 +193,9 @@ export class AuthService {
     let result = 0;
     if (this.sessionData.expires_in === 0) {
       if (localStorage.getItem('expires_in')) {
-        console.log('recovering duration: ', localStorage.getItem('expires_in'));
+        this.utilities.log('recovering duration: ', localStorage.getItem('expires_in'));
         result = Number(localStorage.getItem('expires_in'));
-        console.log('duration to number: ', result);
+        this.utilities.log('duration to number: ', result);
         this.sessionData.expires_in = result;
       }
     } else {
@@ -224,16 +231,20 @@ export class AuthService {
   }
 
   public isLoggedIn() {
+    if (this.tokenRefreshInterval === undefined) {
+      this.setRefreshTokenInterval();
+    }
     return (this.getSessionToken() !== null &&
-    (this.getSessionStart() - Date.now()) < this.getSessionExpiresIn() * 1000);
+    (Date.now() - this.getSessionStart()) < this.getSessionExpiresIn() * 1000);
   }
 
   public isTokenExpired() {
     const start = this.getSessionStart();
     const now = Date.now();
     const elapsed = now - start;
-    const duration = this.getSessionExpiresIn() * 1000;
-    console.log(`start: ${start}, now: ${now}, elapsed: ${elapsed}, duration: ${duration}`);
+    // le quitamos un minuto para renovarlo antes de que expire
+    const duration = (this.getSessionExpiresIn() - 60) * 1000;
+    this.utilities.log(`start: ${start}, now: ${now}, elapsed: ${elapsed}, duration: ${duration}`);
     return elapsed >= duration;
   }
 
@@ -279,6 +290,46 @@ export class AuthService {
     localStorage.setItem('expires_in', value.expires_in);
     localStorage.setItem('refresh_expires_in', value.refresh_expires_in);
     localStorage.setItem('token_type', value.token_type);
+    this.setRefreshTokenInterval();
+  }
+
+  private setRefreshTokenInterval() {
+    this.tokenRefreshInterval = setInterval(() => {
+      this.utilities.log('Verificando valides del token');
+      if (this.isTokenExpired()) {
+        this.utilities.log('Token expirado');
+        if (!this.isRefreshingToken) {
+          this.utilities.log('Solicitando nuevo token...');
+          this.isRefreshingToken = true;
+          this.refreshToken().pipe(switchMap((response: any) => {
+            this.utilities.log('Respuesta al refrescar token: ', response);
+            if (response && response.access_token) {
+                this.utilities.log('Token regenerado con exito');
+                this.isRefreshingToken = false;
+                this.setRefreshToken(response.access_token);
+            } else {
+              // If we don't get a new token, we are in trouble so logout.
+              this.utilities.error('Error desconocido al refrescar token...haciendo logout');
+              this.logout();
+              this.router.navigate(['/login']);
+            }
+            return of(true);
+          }), catchError(error => {
+              // If we don't get a new token, we are in trouble so logout.
+              this.utilities.error('Error desconocido al refrescar token...haciendo logout', error);
+              this.logout();
+              this.router.navigate(['/login']);
+              return of(true);
+          }), finalize(() => {
+              this.isRefreshingToken = false;
+          })).subscribe();
+        } else {
+            this.utilities.log('Ya se esta refrescando el token...');
+        }
+      } else {
+        this.utilities.log('Token valido');
+      }
+    }, 30000);
   }
 
   public setRemember(value: boolean) {

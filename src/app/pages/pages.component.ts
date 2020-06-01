@@ -19,23 +19,27 @@ export class PagesComponent implements OnInit, OnDestroy  {
       text: 'Dashboard',
       icon: 'home',
       route: '/pages/dashboard',
+      target: '_self',
       children: []
     },
     {
       text: 'Maintenance',
       icon: 'settings',
       route: '',
+      target: '_self',
       children: [
         {
           text: 'Import',
           icon: 'upload',
           route: '/pages/import',
+          target: '_self',
           children: []
         },
         {
           text: 'Recent Origins',
           icon: 'clock',
           route: '/pages/recent-origins',
+          target: '_self',
           children: []
         },
         {
@@ -46,24 +50,28 @@ export class PagesComponent implements OnInit, OnDestroy  {
               text: 'Items',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.ITEMS,
+              target: '_self',
               children: []
             },
             {
               text: 'Item Types',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.ITEM_TYPE,
+              target: '_self',
               children: []
             },
             {
               text: 'Uoms',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.UOMS,
+              target: '_self',
               children: []
             },
             {
               text: 'Quality States',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.QUALITY_STATES,
+              target: '_self',
               children: []
             }
           ]
@@ -76,18 +84,21 @@ export class PagesComponent implements OnInit, OnDestroy  {
               text: 'Locations',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.LOCATIONS,
+              target: '_self',
               children: []
             },
             {
               text: 'Docks',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.DOCKS,
+              target: '_self',
               children: []
             },
             {
               text: 'Sections',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.SECTIONS,
+              target: '_self',
               children: []
             }
           ]
@@ -101,84 +112,103 @@ export class PagesComponent implements OnInit, OnDestroy  {
               text: 'Customers',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.CUSTOMERS,
+              target: '_self',
               children: []
             },
             {
               text: 'Order Types',
               icon: 'home',
               route: '/pages/' + IMPORTING_TYPES.ORDER_TYPE,
+              target: '_self',
               children: []
             },
+            {
+              text: 'Template Designer',
+              icon: 'home',
+              route: '/pages/edit-templates',
+              target: '_blank',
+              children: []
+            },
+            {
+              text: 'Template Designer 2',
+              icon: 'home',
+              route: '../edit-templates',
+              target: '_blank',
+              children: []
+            }
           ]
         }
       ]
     },
     {
-      text: 'Administration',
-      icon: 'supervisor_account',
-      route: '/pages/administration',
+      text: 'Inbound',
+      icon: 'center_focus_strong',
+      route: '/pages/pending-orders',
+      target: '_self',
+      children: []
+    },
+    {
+      text: 'Outbound',
+      icon: 'crop_din',
+      route: '/pages/current-actions',
+      target: '_self',
       children: [
         {
-          text: 'Inbound',
-          icon: '',
-          route: '/pages/pending-orders',
+          text: 'Orders',
+          icon: 'home',
+          route: '/pages/' + IMPORTING_TYPES.ORDERS,
+          target: '_self',
           children: []
         },
         {
-          text: 'Outbound',
-          icon: '',
-          route: '/pages/current-actions',
-          children: [
-            {
-              text: 'Orders',
-              icon: 'home',
-              route: '/pages/' + IMPORTING_TYPES.ORDERS,
-              children: []
-            },
-            {
-              text: 'Transports',
-              icon: 'home',
-              route: '/pages/' + IMPORTING_TYPES.TRANSPORTS,
-              children: []
-            },
-            {
-              text: 'Picking Planning',
-              icon: '',
-              route: '/pages/' + IMPORTING_TYPES.PICK_PLANNINGS,
-              children: []
-            },
-            {
-              text: 'Picking Tasks',
-              icon: '',
-              route: '/pages/' + IMPORTING_TYPES.PICK_TASKS,
-              children: []
-            },
-            {
-              text: 'Task Types',
-              icon: '',
-              route: '/pages/' + IMPORTING_TYPES.TASK_TYPES,
-              children: []
-            }
-          ]
+          text: 'Transports',
+          icon: 'home',
+          route: '/pages/' + IMPORTING_TYPES.TRANSPORTS,
+          target: '_self',
+          children: []
         },
         {
-          text: 'Storage',
+          text: 'Picking Planning',
           icon: '',
-          route: '',
-          children: [
-            {
-              text: 'Lpns',
-              icon: '',
-              route: '/pages/lpns',
-              children: []
-            },
-            {
-              text: 'Inventory',
-              icon: '',
-              route: '/pages/inventory',
-              children: []
-            }
-          ]
+          route: '/pages/' + IMPORTING_TYPES.PICK_PLANNINGS,
+          target: '_self',
+          children: []
+        },
+        {
+          text: 'Picking Tasks',
+          icon: '',
+          route: '/pages/' + IMPORTING_TYPES.PICK_TASKS,
+          target: '_self',
+          children: []
+        },
+        {
+          text: 'Task Types',
+          icon: '',
+          route: '/pages/' + IMPORTING_TYPES.TASK_TYPES,
+          target: '_self',
+          children: []
+        }
+      ]
+    },
+    {
+      text: 'Storage',
+      icon: 'all_inbox',
+      route: '',
+      target: '_self',
+      children: [
+        {
+          text: 'Lpns',
+          icon: '',
+          route: '/pages/lpns',
+          target: '_self',
+          children: []
+        },
+        {
+          text: 'Inventory',
+          icon: '',
+          route: '/pages/inventory',
+          target: '_self',
+          children: []
         }
       ]
     }

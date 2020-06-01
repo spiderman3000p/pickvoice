@@ -83,11 +83,11 @@
                                 <a href="javascript: void(0);" [matMenuTriggerFor]="toggleFiltersMenu">Toggle Filters</a>
                             </span>
                             <mat-menu #toggleFiltersMenu (click)="$event.stopPropagation()" style="position:absolute;right: 0;">
-                                <selection-list (click)="$event.stopPropagation()">
-                                    <mat-list-option *ngFor="let filter of filters" [selected]="filter.show" (click)="filter.show = !filter.show">
-                                        {{filter.name}}
-                                    </mat-list-option>
-                                </selection-list>
+                                <mat-list (click)="$event.stopPropagation()">
+                                    <mat-list-item *ngFor="let filter of filters">
+                                            <mat-icon color="accent" class="mr-2">{{ !filter.show ? 'check_box' : 'check_box_outline_blank'}}</mat-icon> {{filter.name}}
+                                    </mat-list-item>
+                                </mat-list>
                             </mat-menu>
                         </div>
                     </div>

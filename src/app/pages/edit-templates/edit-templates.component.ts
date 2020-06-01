@@ -12,6 +12,7 @@ import { PreviewDialogComponent } from '../../components/preview-dialog/preview-
   styleUrls: ['./edit-templates.component.scss']
 })
 export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy {
+  isLoadingResults = false;
   templateOptions = {
     size: {
       height: 453,
@@ -654,6 +655,10 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       console.log('No hay data de template guardada');
       this.utilities.showSnackBar('No previous template found', 'OK');
     }
+  }
+
+  export() {
+
   }
 
   ngOnInit(): void {

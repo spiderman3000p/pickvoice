@@ -51,10 +51,10 @@ import { MatListModule } from '@angular/material/list';
     MatMenuModule,
     MatSelectModule,
     MatSlideToggleModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatListModule
   ],
   providers: [
-    MatListModule
   ]
 })
 export class TaskTypeModule { }

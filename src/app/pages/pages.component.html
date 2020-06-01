@@ -11,7 +11,7 @@
         <mat-nav-list>
           <span *ngFor="let option of menuOptions">
             <!-- si el item de primer nivel no tiene hijos -->
-            <a *ngIf="option.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="option.route" routerLinkActive="active">
+            <a *ngIf="option.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="option.route" routerLinkActive="active" [target]="option.target">
               <mat-icon *ngIf="option.icon" aria-hidden="true" class="pt-1">{{option.icon}}</mat-icon>
               <span class="pl-2 pt-1 sidenav-item-1">{{option.text | uppercase}}</span>
             </a>
@@ -24,7 +24,7 @@
                 </mat-expansion-panel-header>
                 <span *ngFor="let child2 of option.children">
                     <!-- si el item de segundo nivel no tiene hijos -->
-                    <a *ngIf="child2.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="child2.route" routerLinkActive="active">
+                    <a *ngIf="child2.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="child2.route" routerLinkActive="active" [target]="child2.target">
                       <!--mat-icon *ngIf="child2.icon" aria-hidden="true" class="pt-1">{{child2.icon}}</mat-icon-->
                       <span class="sidenav-item-2">{{child2.text}}</span>
                     </a>
@@ -37,7 +37,7 @@
                         </mat-expansion-panel-header>
                         <span *ngFor="let child3 of child2.children">
                             <!-- hasta el 3er nivel se aceptan hijos -->
-                            <a *ngIf="child3.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="child3.route" routerLinkActive="active">
+                            <a *ngIf="child3.children.length === 0" mat-list-item (click)="mobileQuery.matches ? drawer.close() : null" [routerLink]="child3.route" routerLinkActive="active" [target]="child3.target">
                               <!--mat-icon *ngIf="option.icon" class="pt-1" aria-hidden="true">{{child3.icon}}</mat-icon-->
                               <span class="sidenav-item-3">{{child3.text}}</span>
                             </a>

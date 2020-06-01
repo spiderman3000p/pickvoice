@@ -259,6 +259,13 @@ const routes: Routes = [
         }
     ]
   },
+  {
+    path: 'edit-templates',
+    // outlet: 'print',
+    loadChildren: () => import('./pages/edit-templates-grapes/edit-templates.module')
+    .then(m => m.EditTemplatesModule),
+    canActivateChild: [AuthGuard]
+  },
   { path: '', redirectTo: 'pages', pathMatch: 'full' },
   { path: '**', redirectTo: 'pages/not-found' },
 ];
