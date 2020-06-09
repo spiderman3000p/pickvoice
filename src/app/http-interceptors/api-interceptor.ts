@@ -15,7 +15,7 @@ export class ApiInterceptor implements HttpInterceptor {
     constructor(private authService: AuthService, private router: Router) {}
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<any> {
         // console.log('url', req.url);
-        if (req.url.includes('/api/')) {
+        if (req.url.includes('mi-api')) {
             if (this.authService.getSessionToken() !== null) {
                 req = this.setTokenToRequest(req, this.authService.getSessionToken());
             }
@@ -71,11 +71,28 @@ export class ApiInterceptor implements HttpInterceptor {
         }
     }
 
-  setTokenToRequest(req, token) {
-    return req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
+    setTokenToRequest(req, token) {
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
+        const ownerId = this.authService.getOwnerId();
+        if (ownerId !== null) {
+            headers['owner-id'] = ownerId;
         }
-    });
+        const plantId = this.authService.getPlantId();
+        if (plantId !== null) {
+            headers['plant-id'] = plantId;
+        }
+        const depotId = this.authService.getDepotId();
+        if (depotId !== null) {
+            headers['depot-id'] = depotId;
+        }
+        const cityId = this.authService.getCityId();
+        if (cityId !== null) {
+            headers['city-id'] = cityId;
+        }
+        return req.clone({
+            setHeaders: headers
+        });
   }
 }

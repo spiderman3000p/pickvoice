@@ -83,19 +83,7 @@ export function apiConfigFactory(): Configuration {
   };
   return new Configuration(params);
 }
-/*const apiConfigFactory = () => { return new Configuration({
-    // set configuration parameters here.
-    accessToken: () => {
-      let sessionToken = '';
-      if (localStorage.getItem('access_token')) {
-        sessionToken = localStorage.getItem('access_token');
-      }
-      console.log('check session token: ', sessionToken);
-      return sessionToken;
-    },
-    withCredentials: true
-});
-};*/
+
 @NgModule({
   declarations: [
     AppComponent,

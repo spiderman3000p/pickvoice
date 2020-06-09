@@ -1,8 +1,9 @@
-import {Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, Transport,
-        Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine, LoadOrder,
-        PickTaskLines, Dock, User, Role, TaskType, LoadItem, LoadLocation, ItemUom, QualityStates,
-        QualityStateType
-     } from '@pickvoice/pickvoice-api';
+import {
+    Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, Transport,
+    Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine, LoadOrder,
+    PickTaskLines, Dock, User, /*Role,*/ TaskType, LoadItem, LoadLocation, ItemUom, QualityStates,
+    QualityStateType
+} from '@pickvoice/pickvoice-api';
 import { IMPORTING_TYPES } from './model-maps.model';
 
 export class ModelFactory {
@@ -70,7 +71,7 @@ export class ModelFactory {
         object.code = '';
         object.name = '';
         object.optionalCode = '';
-        object.qualityStateType = this.newEmptyQualityStateType();
+        object.qualityStateTypeId = 0;
         object.state = false;
         return object;
     }
@@ -88,10 +89,10 @@ export class ModelFactory {
         object.eanCode = '';
         object.factor = 0;
         object.height = 0;
-        object.item = this.newEmptyItem();
+        object.itemId = 0;
         object.length = 0;
         object.numerator = 0;
-        object.uom = this.newEmptyUnityOfMeasure();
+        object.uomId = 0;
         object.width = 0;
         return object;
     }
@@ -104,17 +105,22 @@ export class ModelFactory {
         object.cost = 0;
         object.description = '';
         object.expiryDate = false;
-        object.itemType = this.newEmptyItemType();
+        object.itemTypeId = 0;
         object.phonetic = '';
         object.scannedVerification = '';
         object.serial = false;
         object.shelfLife = 0;
         object.spokenVerification = '';
-        object.uom = this.newEmptyUnityOfMeasure();
+        object.uomHandlingId = 0;
+        object.uomInboundId = 0;
+        object.uomOutboundId = 0;
+        object.uomPackingId = 0;
         object.upc = '';
+        object.qualityStateId = 0;
         object.variableWeight = false;
         object.weight = false;
         object.weightTolerance = 0;
+        object.tolerance = 0;
         return object;
     }
 
@@ -155,9 +161,9 @@ export class ModelFactory {
         object.height = '';
         object.heightSize = 0;
         object.lane = '';
-        object.section = this.newEmptySection();
+        object.sectionId = 0;
         object.locationState = Location.LocationStateEnum.DO;
-        object.locationType = Location.LocationTypeEnum.Location;
+        object.locationType = Location.LocationTypeEnum.Dock;
         object.multireference = false;
         object.operationType = Location.OperationTypeEnum.Picking;
         object.pickHeight = false;
@@ -219,12 +225,12 @@ export class ModelFactory {
         object.invoiceNumber = '';
         object.orderDate = '';
         object.deliveryDate = '';
-        object.orderType = this.newEmptyOrderType();
+        object.orderTypeId = 0;
         object.priority = 0;
         object.note = '';
         object.orderDate = '';
-        object.transport = this.newEmptyTransport();
-        object.customer = this.newEmptyCustomer();
+        object.transportId = 0;
+        object.customerId = 0;
         object.orderLines = [] as OrderLines;
         return object;
     }
@@ -248,8 +254,8 @@ export class ModelFactory {
         object.plannedStartLoading = '';
         object.shipmentDate = '';
         object.trailer = '';
-        object.uomVolume = this.newEmptyUnityOfMeasure();
-        object.uomWeight = this.newEmptyUnityOfMeasure();
+        object.uomVolumeId = 0;
+        object.uomWeightId = 0;
         object.vehicle = '';
         object.weight = 0;
         return object;
@@ -357,8 +363,8 @@ export class ModelFactory {
         object.priority = 0;
         object.qyt = 0;
         object.taskState = PickTask.TaskStateEnum.AC;
-        object.taskType = this.newEmptyTaskType();
-        object.user = this.newEmptyUser();
+        object.taskTypeId = 0;
+        object.userId = 0;
         return object;
     }
 
@@ -404,25 +410,25 @@ export class ModelFactory {
         object.password = '';
         object.passwordConfirm = '';
         object.phone = '';
-        object.rol = this.newEmptyRole();
+        // object.rolId = this.newEmptyRole();
         object.userName = '';
-        object.userState = User.UserStateEnum.Active;
+        // object.userState = User.UserStateEnum.Active;
         return object;
     }
 
-    public static newEmptyRole(): Role {
+    /*public static newEmptyRole(): Role {
         const object = new Object() as Role;
         object.code = '';
         object.name = '';
         return object;
-    }
+    }*/
 
     public static newEmptyDock(): Dock {
         const object = new Object() as Dock;
         object.code = '';
         object.description = '';
         object.dockType = Dock.DockTypeEnum.Bivalent;
-        object.section = this.newEmptySection();
+        object.sectionId = 0;
         object.locationState = Dock.LocationStateEnum.A;
         object.locationType = Dock.LocationTypeEnum.Dock;
         return object;
@@ -435,7 +441,7 @@ export class ModelFactory {
         object.progress = 0;
         object.rootWork = '';
         object.state = PickPlanning.StateEnum.CA;
-        object.targetDock = this.newEmptyDock();
+        object.targetDockId = 0;
         return object;
     }
 }

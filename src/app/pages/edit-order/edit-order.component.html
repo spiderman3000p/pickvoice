@@ -63,9 +63,9 @@
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Order Type</label>
-                                        <select [compareWith]="dataMap.orderType.formControl.compareFn" formControlName="orderType"
+                                        <select [compareWith]="dataMap.orderTypeId.formControl.compareFn" formControlName="orderTypeId"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'" class="form-control">
-                                            <option *ngFor="let type of ordersData.orderTypeList" [ngValue]="type">
+                                            <option *ngFor="let type of ordersData.orderTypeList" [value]="type.id">
                                                 {{ type.description }}
                                             </option>
                                             <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
@@ -104,10 +104,9 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label>Customer</label>
-                                    <select [compareWith]="dataMap.customer.formControl.compareFn"
-                                    formControlName="customer" class="form-control">
-                                        <option *ngFor="let customer of ordersData.customerList" [ngValue]="customer">
-                                            {{ customer.name }}
+                                    <select formControlName="customerId" class="form-control" (change)="onChangeCustomer()">
+                                        <option *ngFor="let customer of ordersData.customerList" [value]="customer.customerId">
+                                            {{ customer.customerName }}
                                         </option>
                                         <!--div class="select-footer" *ngIf="dataMap.customer.addNew && viewMode === 'edit'">
                                             <span class="select-footer-content">
@@ -124,12 +123,12 @@
                             <br><br>
                             <h6>Customer Details</h6>
                             <hr>
-                            <span *ngIf="form.get('customer').value" class="row">
+                            <span *ngIf="selectedCustomer.customerId !== undefined" class="row">
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Customer Code</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('customer').value.code ? form.get('customer').value.code : ''"
+                                        [value]="selectedCustomer.code"
                                         [class.readonly]="true" [readonly]="true">
                                     </div>
                                 </div>
@@ -137,7 +136,7 @@
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('customer').value.name ? form.get('customer').value.name : ''"
+                                        [value]="selectedCustomer.name"
                                         [class.readonly]="true" [readonly]="true">
                                     </div>
                                 </div>
@@ -145,7 +144,7 @@
                                     <div class="form-group">
                                         <label>Contact</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('customer').value.contact ? form.get('customer').value.contact : ''"
+                                        [value]="selectedCustomer.contact"
                                         [class.readonly]="true" [readonly]="true">
                                     </div>
                                 </div>
@@ -153,7 +152,7 @@
                                     <div class="form-group">
                                         <label>Phone</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('customer').value.phone ? form.get('customer').value.phone : ''"
+                                        [value]="selectedCustomer.phone"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -161,7 +160,7 @@
                                     <div class="form-group">
                                         <label>Address</label>
                                         <textarea class="form-control"
-                                        [value]="form.get('customer').value.address ? form.get('customer').value.address : ''"
+                                        [value]="selectedCustomer.address"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                         </textarea>
                                     </div>
@@ -173,9 +172,8 @@
                         <ng-template matTabContent>
                             <div class="form-group">
                                 <label>Transport</label>
-                                <select formControlName="transport" class="form-control"
-                                [compareWith]="dataMap.transport.formControl.compareFn">
-                                    <option *ngFor="let trans of ordersData.transportList" [ngValue]="trans">
+                                <select formControlName="transportId" class="form-control" (change)="onChangeTransport()">
+                                    <option *ngFor="let trans of ordersData.transportList" [value]="trans.id">
                                         {{ trans.nameRoute }}
                                     </option>
                                     <!--div class="select-footer" *ngIf="dataMap.transport.addNew && viewMode === 'edit'">
@@ -192,12 +190,12 @@
                             <br><br>
                             <h5>Transport Details</h5>
                             <hr>
-                            <span class="row">
+                            <span class="row" *ngIf="selectedTransport.transportId !== undefined">
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Transport Number</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.transportNumber ? form.get('transport').value.transportNumber : ''"
+                                        [value]="selectedTransport.transportNumber"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -205,7 +203,7 @@
                                     <div class="form-group">
                                         <label>Route</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.route ? form.get('transport').value.route : ''"
+                                        [value]="selectedTransport.route"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -213,7 +211,7 @@
                                     <div class="form-group">
                                         <label>Name Route</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.nameRoute ? form.get('transport').value.nameRoute : ''"
+                                        [value]="selectedTransport.nameRoute"
                                         [class.readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -221,7 +219,7 @@
                                     <div class="form-group">
                                         <label>Carrier Code</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.carrierCode ? form.get('transport').value.carrierCode : ''"
+                                        [value]="selectedTransport.carrierCode"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -229,7 +227,7 @@
                                     <div class="form-group">
                                         <label>Shipment Date</label>
                                         <input class="form-control" type="date"
-                                        [value]="form.get('transport').value.shipmentDate ? form.get('transport').value.shipmentDate : ''"
+                                        [value]="selectedTransport.shipmentDate"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -239,7 +237,7 @@
                                         <select class="form-control"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                             <option *ngFor="let status of ordersData.transportStatus"
-                                            [selected]="form.get('transport').value.transportationStatus === status"
+                                            [selected]="selectedTransport.transportationStatus === status"
                                             [ngValue]="status">
                                                 {{ status }}
                                             </option>
@@ -250,7 +248,7 @@
                                     <div class="form-group">
                                         <label>Vehicle</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.vehicle ? form.get('transport').value.vehicle : ''"
+                                        [value]="selectedTransport.vehicle"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -258,7 +256,7 @@
                                     <div class="form-group">
                                         <label>Container Number</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.containerNumber ? form.get('transport').value.containerNumber : ''"
+                                        [value]="selectedTransport.containerNumber"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -266,7 +264,7 @@
                                     <div class="form-group">
                                         <label>Weight</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.weight ? form.get('transport').value.weight : ''"
+                                        [value]="selectedTransport.weight"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -274,15 +272,7 @@
                                     <div class="form-group">
                                         <label>Trailer</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.trailer ? form.get('transport').value.trailer : ''"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Carrier Code</label>
-                                        <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.carrierCode ? form.get('transport').value.carrierCode : ''"
+                                        [value]="selectedTransport.trailer"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -290,7 +280,7 @@
                                     <div class="form-group">
                                         <label>Description</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.description ? form.get('transport').value.description : ''"
+                                        [value]="selectedTransport.description"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -298,7 +288,7 @@
                                     <div class="form-group">
                                         <label>Planned Checkin</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.plannedCheckin ? form.get('transport').value.plannedCheckin : ''"
+                                        [value]="selectedTransport.plannedCheckin"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -306,7 +296,7 @@
                                     <div class="form-group">
                                         <label>Actual Checkin</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.actualCheckin ? form.get('transport').value.actualCheckin : ''"
+                                        [value]="selectedTransport.actualChecking"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -314,7 +304,7 @@
                                     <div class="form-group">
                                         <label>Planned Start Loading</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.plannedStartLoading ? form.get('transport').value.plannedStartLoading : ''"
+                                        [value]="selectedTransport.plannedStartLoading"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -322,7 +312,7 @@
                                     <div class="form-group">
                                         <label>Current Start Loading</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.currentStartLoading ? form.get('transport').value.currentStartLoading : ''"
+                                        [value]="selectedTransport.currentStartLoading"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -330,7 +320,7 @@
                                     <div class="form-group">
                                         <label>Planned End Loading</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.plannedEndLoading ? form.get('transport').value.plannedEndLoading : ''"
+                                        [value]="selectedTransport.plannedEndLoading"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -338,7 +328,7 @@
                                     <div class="form-group">
                                         <label>Actual End Loading</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.actualEndLoading ? form.get('transport').value.actualEndLoading : ''"
+                                        [value]="selectedTransport.actualEndLoading"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -346,7 +336,7 @@
                                     <div class="form-group">
                                         <label>Planned Shipment Completion</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.plannedShipmentCompletion ? form.get('transport').value.plannedShipmentCompletion : ''"
+                                        [value]="selectedTransport.plannedShipmentCompletion"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -354,7 +344,7 @@
                                     <div class="form-group">
                                         <label>Current Shipment Completion</label>
                                         <input class="form-control" type="text"
-                                        [value]="form.get('transport').value.currentShipmentCompletion ? form.get('transport').value.currentShipmentCompletion : ''"
+                                        [value]="selectedTransport.currentShipmentCompletion"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                     </div>
                                 </div>
@@ -364,7 +354,7 @@
                                         <select class="form-control"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                             <option *ngFor="let uom of ordersData.uomList"
-                                            [selected]="form.get('transport').value.uomWeight ? form.get('transport').value.uomWeight.id === uom.id : 'false'"
+                                            [selected]="selectedTransport.uomWeight === uom"
                                             [ngValue]="uom">
                                                 {{ uom.name }}
                                             </option>
@@ -386,7 +376,7 @@
                                         <select class="form-control"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                             <option *ngFor="let uom of ordersData.uomList"
-                                            [selected]="form.get('transport').value.uomVolume ? form.get('transport').value.uomVolume.id === uom.id : 'false'"
+                                            [selected]="selectedTransport.uomVolume === uom"
                                             [ngValue]="uom">
                                                 {{ uom.name }}
                                             </option>

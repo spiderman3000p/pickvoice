@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./docks.component.css']
 })
 export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.DockMap;
+  definitions: any = ModelMap.DockListMap;
   dataSource: MatTableDataSource<Dock>;
   dataToSend: Dock[];
   displayedDataColumns: string[];
@@ -39,7 +39,7 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.DOCKS;
+  type = IMPORTING_TYPES.DOCKS_LIST;
   selectsData: any;
   subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;

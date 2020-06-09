@@ -21,10 +21,11 @@ declare var JsBarcode: any;
 })
 export class UtilitiesService implements OnDestroy {
   public dataTypesModelMaps = {
-    taskType: ModelMap.TaskTypeMap,
+    taskTypes: ModelMap.TaskTypeMap,
     inventory: ModelMap.InventoryItemMap,
     lpns: ModelMap.LpnsMap,
     items: ModelMap.ItemMap,
+    itemsList: ModelMap.ItemListMap,
     itemsDto: ModelMap.LoadItemDtoMap,
     itemUoms: ModelMap.ItemUomMap,
     itemUomsDto: ModelMap.LoadItemUomDtoMap,
@@ -43,7 +44,8 @@ export class UtilitiesService implements OnDestroy {
     pickPlannings: ModelMap.PickPlanningMap,
     pickTasks: ModelMap.PickTaskMap,
     pickTaskLines: ModelMap.PickTaskLineMap,
-    docks: ModelMap.DockMap
+    docks: ModelMap.DockMap,
+    docksList: ModelMap.DockListMap
   };
   subscriptions: Subscription[];
   constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {

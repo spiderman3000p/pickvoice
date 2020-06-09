@@ -103,7 +103,8 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
-          this.selectsData[key] = this.dataProviderService.getDataFromApi(objectType);
+          // this.dataProviderService.getDataFromApi(objectType).subscribe();
+          this.selectsData[key].push(result);
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');
@@ -135,8 +136,7 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('create response', response);
-          if ((response.status === 204 || response.status === 200 || response.status === 201)
-            && response.statusText === 'OK') {
+          if ((response.status === 204 || response.status === 200 || response.status === 201)) {
             this.utilities.showSnackBar('Create Successfull', 'OK');
           }
           this.dialogRef.close(response.body);

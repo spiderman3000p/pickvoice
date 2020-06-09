@@ -34,43 +34,42 @@
                     <div class="filters-panel">
                         <div class="col-sm-12 filters-controls">
                             <form [formGroup]="filtersForm" *ngIf="showFilters" class="row" (ngSubmit)="applyFilters()">
-                                <div *ngFor="let filter of filters">
-                                    <span *ngIf="filter.show" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-                                        <div *ngIf="definitions[filter.key].formControl.control === 'select'"
-                                        class="form-group ml-1">
-                                            <label>{{filter.name}}</label>
-                                            <select [compareWith]="definitions[filter.key].formControl.compareFn"
-                                            [formControlName]="filter.key" class="form-control">
-                                                <option [value]="">
-                                                    Select a value
-                                                </option>
-                                                <option *ngFor="let data of selectsData[filter.key] | async"
-                                                [ngValue]="definitions[filter.key].formControl.valueIndex !== null ?
-                                                data[definitions[filter.key].formControl.valueIndex] : data">
-                                                    {{ definitions[filter.key].formControl.displayIndex !== null ?
-                                                        data[definitions[filter.key].formControl.displayIndex] : data }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div *ngIf="definitions[filter.key].formControl.control === 'input'" class="form-group ml-1">
-                                            <label>{{filter.name}}</label>
-                                            <input [formControlName]="filter.key" class="form-control"
-                                                [type]="definitions[filter.key].formControl.type">
-                                        </div>
-                                        <div *ngIf="definitions[filter.key].formControl.control === 'date'" class="form-group ml-1">
-                                            <label>{{filter.name}}</label>
-                                            <input  [formControlName]="filter.key" type="date" class="form-control">
-                                        </div>
-                                        <div *ngIf="definitions[filter.key].formControl.control === 'toggle'" class="form-group ml-1">
-                                            <label>{{filter.name}}</label>
-                                            <input  [formControlName]="filter.key" hidden>
-                                            <mat-slide-toggle color="primary"
-                                            (change)="filtersForm.get(filter.key).setValue(!filterForm.get(filter.key).value)"
-                                            [checked]="filtersForm.get(filter.key).value">
-                                                {{definitions[filter.key].name}}
-                                            </mat-slide-toggle>
-                                        </div>
-                                    </span>
+                                <div *ngFor="let filter of filters" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4" [hidden]="!filter.show">
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'select'"
+                                    class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <select [compareWith]="definitions[filter.key].formControl.compareFn"
+                                        [formControlName]="filter.key" class="form-control">
+                                            <option [value]="">
+                                                Select a value
+                                            </option>
+                                            <option *ngFor="let data of selectsData[filter.key] | async"
+                                            [ngValue]="definitions[filter.key].formControl.valueIndex !== null ?
+                                            data[definitions[filter.key].formControl.valueIndex] : data">
+                                                {{ definitions[filter.key].formControl.displayIndex !== null ?
+                                                    data[definitions[filter.key].formControl.displayIndex] : data }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'textarea' ||
+                                    definitions[filter.key].formControl.control === 'input'" class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <input [formControlName]="filter.key" class="form-control"
+                                            [type]="definitions[filter.key].formControl.type">
+                                    </div>
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'date'" class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <input  [formControlName]="filter.key" type="date" class="form-control">
+                                    </div>
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'toggle'" class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <input  [formControlName]="filter.key" hidden>
+                                        <mat-slide-toggle color="primary"
+                                        (change)="filtersForm.get(filter.key).setValue(!filterForm.get(filter.key).value)"
+                                        [checked]="filtersForm.get(filter.key).value">
+                                            {{definitions[filter.key].name}}
+                                        </mat-slide-toggle>
+                                    </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <button mat-raised-button color="accent" class="btn btn-lg" type="submit">

@@ -164,8 +164,8 @@ export class EditItemComponent implements OnInit {
       sku: new FormControl(''),
       upc: new FormControl(''),
       phonetic: new FormControl(''),
-      itemType: new FormControl(''),
-      uom: new FormControl(''),
+      itemTypeId: new FormControl(''),
+      uomId: new FormControl(''),
       weight: new FormControl(''),
       variableWeight: new FormControl(''),
       weightTolerance: new FormControl(''),
@@ -178,7 +178,11 @@ export class EditItemComponent implements OnInit {
       classification: new FormControl(''),
       cost: new FormControl(''),
       tolerance: new FormControl(''),
-      shelfLife: new FormControl('')
+      shelfLife: new FormControl(''),
+      uomHandlingId: new FormControl(''),
+      uomPackingId: new FormControl(''),
+      uomInboundId: new FormControl(''),
+      uomOutboundId: new FormControl('')
     });
     /* para tabla ag-grid */
     this.displayedDataColumns = Object.keys(this.definitions);
@@ -188,24 +192,6 @@ export class EditItemComponent implements OnInit {
       rowOption: RowOptionComponent,
       numericEditor: NumericEditorComponent,
     };
-    /* para tabla de item uom */
-    /*this.dataSource = new MatTableDataSource([]);
-    this.filter = new FormControl('');
-    this.dataToSend = [];
-    this.actionForSelected = new FormControl('');
-    this.displayedDataColumns = Object.keys(this.definitions);
-    this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
-    this.displayedHeadersColumns.push('options');
-
-    this.initColumnsDefs(); // columnas a mostrarse
-    this.utilities.log('filters', this.filters);
-    this.subscriptions.push(this.actionForSelected.valueChanges.subscribe(value => {
-      this.actionForSelectedRows(value);
-    }));
-
-    this.utilities.log('displayed data columns', this.displayedDataColumns);
-    this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
-    */
     this.initColumnsDefs(); // columnas a mostrarse
   }
 
@@ -220,8 +206,8 @@ export class EditItemComponent implements OnInit {
       sku: new FormControl(this.row.sku),
       upc: new FormControl(this.row.upc),
       phonetic: new FormControl(this.row.phonetic),
-      itemType: new FormControl(this.row.itemType),
-      uom: new FormControl(this.row.uom),
+      itemTypeId: new FormControl(this.row.itemTypeId),
+      uomId: new FormControl(this.row.uomId),
       weight: new FormControl(this.row.weight),
       variableWeight: new FormControl(this.row.variableWeight),
       weightTolerance: new FormControl(this.row.weightTolerance),
@@ -234,7 +220,11 @@ export class EditItemComponent implements OnInit {
       classification: new FormControl(this.row.classification),
       cost: new FormControl(this.row.cost),
       tolerance: new FormControl(this.row.tolerance),
-      shelfLife: new FormControl(this.row.shelfLife)
+      shelfLife: new FormControl(this.row.shelfLife),
+      uomHandlingId: new FormControl(this.row.uomHandlingId),
+      uomPackingId: new FormControl(this.row.uomPackingId),
+      uomInboundId: new FormControl(this.row.uomInboundId),
+      uomOutboundId: new FormControl(this.row.uomOutboundId)
     });
     // this.loadData();
     this.itemUomsData = this.dataProviderService.getAllItemUoms(this.row.id);
@@ -267,9 +257,11 @@ export class EditItemComponent implements OnInit {
   }
 
   getItemTypeList() {
-    this.dataProviderService.getAllItemTypes().subscribe(results => {
+    this.dataProviderService.getAllItemTypes().subscribe((results: any) => {
       this.itemData.itemTypeList = results;
       this.utilities.log('item types list', this.itemData.itemTypeList);
+    }, error => {
+      this.utilities.error('Error al obtener lista de items types');
     });
   }
 
@@ -303,8 +295,7 @@ export class EditItemComponent implements OnInit {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          if ((response.status === 204 || response.status === 200 || response.status === 201)
-            && response.statusText === 'OK') {
+          if ((response.status === 204 || response.status === 200 || response.status === 201)) {
             this.utilities.showSnackBar('Update Successfull', 'OK');
           }
           // this.back();
@@ -384,42 +375,6 @@ export class EditItemComponent implements OnInit {
 
   /* Metodos para la tabla de item uom */
   initColumnsDefs() {
-    let shouldShow: boolean;
-    let filter: any;
-    const formControls = {} as any;
-    let aux;
-    /*if (localStorage.getItem('displayedColumnsInEditItemPage')) {
-      this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInEditItemPage'));
-    } else {
-      this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
-        shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
-        return {show: shouldShow, name: columnName};
-      });
-    }*/
-    /*aux = this.columnDefs.slice();
-    aux.pop();
-    aux.shift();
-    this.defaultColumnDefs = aux;
-    this.selectsData = {};
-    this.columnDefs.forEach((column, index) => {
-      // ignoramos la columna 0 y la ultima (select y opciones)
-      if (index > 0 && index < this.columnDefs.length - 1) {
-        filter = new Object();
-        filter.show = column.show;
-        filter.name = this.definitions[column.name].name;
-        filter.key = column.name;
-        formControls[column.name] = new FormControl('');
-        if (this.definitions[column.name].formControl.control === 'select') {
-          this.selectsData[column.name] =
-          this.dataProviderService.getDataFromApi(this.definitions[column.name].type);
-          formControls[column.name].patchValue(-1);
-        }
-        this.filters.push(filter);
-      }
-    });
-    this.filtersForm = new FormGroup(formControls);
-    this.utilities.log('formControls', formControls);
-    */
     this.selectsData = {};
     for (let key in this.definitions) {
       if (this.definitions[key].formControl.control === 'select') {

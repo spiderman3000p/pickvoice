@@ -11,14 +11,21 @@
                 <!-- campos compuestos/objetos -->
                 <div class="form-group"
                 *ngIf="dataMap[key].formControl.control === 'select'">
-                    <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                    <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}
+                        <span class="add-link" *ngIf="dataMap[key].addNew">
+                            <a href="javascript: void(0)"
+                            (click)="addNewObject(key, dataMap[key].addNew.modelType, 'Add new ' + dataMap[key].name)">
+                            {{ dataMap[key].addNew.text }}
+                            </a>
+                        </span>
+                    </label>
                     <select [compareWith]="dataMap[key].formControl.compareFn"
                     [formControlName]="key" class="form-control" [required]="dataMap[key].required">
                         <mat-option [value]="">
                             Select a value
                         </mat-option>
                         <option *ngFor="let data of selectsData[key]"
-                        [ngValue]="data">
+                        [ngValue]="dataMap[key].formControl.valueIndex !== null ? data[dataMap[key].formControl.valueIndex] : data">
                             {{ 
                             dataMap[key].formControl.displayIndex !== null ?
                             data[dataMap[key].formControl.displayIndex] : data

@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Transport, Location, Item, UomService, SectionService, OrderService, OrderTypeService,
-         LocationsService, TransportService, LoadPickService, ItemTypeService, ItemsService,
+         LocationService, TransportService, LoadPickService, ItemTypeService, ItemService,
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
-         DockService, UserService, ItemUomService, QualityStates, QualityStatesService,
+         DockService, UserService, ItemUomService, QualityStates, QualityStateService,
          QualityStateTypeService, TaskTypeService } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
+import { AuthService } from './auth.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
 import { of, Observable } from 'rxjs';
 import { HttpHeaders, HttpParams, HttpClient } from '@angular/common/http';
@@ -17,15 +18,15 @@ import { timeout, retry, delay } from 'rxjs/operators';
 export class DataProviderService {
   constructor(
     private utilities: UtilitiesService, private uomService: UomService,
-    private orderTypeService: OrderTypeService, private locationService: LocationsService,
+    private orderTypeService: OrderTypeService, private locationService: LocationService,
     private loadPickService: LoadPickService, private itemTypeService: ItemTypeService,
-    private itemService: ItemsService, private customerService: CustomerService,
+    private itemService: ItemService, private customerService: CustomerService,
     private sectionService: SectionService, private orderService: OrderService,
     private transportService: TransportService, private httpClient: HttpClient,
     private pickTaskService: PickTaskService, private pickPlanningService: PickPlanningService,
     private docksService: DockService, private userService: UserService,
-    private itemUomService: ItemUomService, private qualityStateService: QualityStatesService,
-    private taskTypeService: TaskTypeService,
+    private itemUomService: ItemUomService, private qualityStateService: QualityStateService,
+    private taskTypeService: TaskTypeService, private authService: AuthService,
     private qualityStateTypeService: QualityStateTypeService) {
   }
 
@@ -83,7 +84,7 @@ export class DataProviderService {
     }
 
     if (type === IMPORTING_TYPES.PICK_TASKS) {
-      /* return this.createPickTask(toUpload, 'response').pipe(retry(3));*/ 
+      /* return this.createPickTask(toUpload, 'response').pipe(retry(3));*/
     }
 
     if (type === IMPORTING_TYPES.TASK_TYPES) {
@@ -95,6 +96,7 @@ export class DataProviderService {
     }
 
     if (type === IMPORTING_TYPES.DOCKS) {
+      // TODO: revisar esto
       return this.createDock(toUpload, 'response').pipe(retry(3));
     }
     return of({});
@@ -156,38 +158,40 @@ export class DataProviderService {
     if (type === IMPORTING_TYPES.QUALITY_STATES) {
       return this.updateQualityState(toUpload, id, 'response').pipe(retry(3));
     }
+
+    if (type === IMPORTING_TYPES.TASK_TYPES) {
+      return this.updateTaskType(toUpload, id, 'response').pipe(retry(3));
+    }
     return of(null);
   }
 
-  getDataFromApi(type: any, params = '', errorHandler?: any, id?: number): Observable<any> {
-    let toReturn: Observable<any>;
+  getDataFromApi(type: any, params = 'startRow=0;endRow=10000', errorHandler?: any, id?: number): Observable<any> {
+    let toReturn: any = of([]);
+    const owner = this.authService.getOwnerId();
+    const httpHeaders = new HttpHeaders();
     switch (type) {
       case IMPORTING_TYPES.INVENTORY: {
-        this.utilities.log(`obteniendo inventory...`);
-        /*toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/storage/lpnItemsVO1')
-        .pipe(retry(3));*/
-        if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/storage/lpnItemsVO1/' + params)
-          .pipe(retry(3));
-        } else {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/storage/lpnItemsVO1')
-          .pipe(retry(3));
+        if (owner !== null) {
+          httpHeaders.append('ownerId', owner.toString());
+          this.utilities.log(`obteniendo inventory...`);
+          /*toReturn = this.httpClient.get(environment.apiBaseUrl + '/storage/lpnItemsVO1')
+          .pipe(retry(3));*/
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/storage/lpnItemsVO1/' + params, {
+            headers: httpHeaders
+          }).pipe(retry(3));
         }
         break;
       }
       case IMPORTING_TYPES.CUSTOMERS: {
-        this.utilities.log(`obteniendo customers...`);
-        if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/customerList/' + params)
-          .pipe(retry(3));
-        } else {
-          toReturn = this.customerService.retrieveAllCustomers().pipe(retry(3));
-        }
+        toReturn = this.getAllCustomers(params);
         break;
       }
       case IMPORTING_TYPES.ITEM_TYPE: {
-        this.utilities.log(`obteniendo item types...`);
-        toReturn = this.itemTypeService.retrieveAllItemTypes().pipe(retry(3));
+        if (owner !== null) {
+          httpHeaders.append('ownerId', owner.toString());
+          this.utilities.log(`obteniendo item types...`);
+          toReturn = this.itemTypeService.retrieveAllItemTypes(owner).pipe(retry(3));
+        }
         break;
       }
       case IMPORTING_TYPES.ITEM_STATE: {
@@ -200,25 +204,23 @@ export class DataProviderService {
         toReturn = this.qualityStateTypeService.retrieveAllQualityStateType().pipe(retry(3));
         break;
       }
-      case IMPORTING_TYPES.ITEMS: {
-        this.utilities.log(`obteniendo items...`);
-        if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/itemList/' + params)
-          .pipe(retry(3));
-        } else {
-          // toReturn = this.itemService.retrieveAllItems().pipe(retry(3));
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/itemList/startRow=0;endRow=1000;sort-sku=asc').pipe(retry(3));
+      case IMPORTING_TYPES.QUALITY_STATES: {
+        if (owner !== null) {
+          this.utilities.log(`obteniendo quality states...`);
+          toReturn = this.qualityStateService.retrieveAllQualityStates(owner).pipe(retry(3));
         }
         break;
       }
+      case IMPORTING_TYPES.ITEMS: {
+        toReturn = this.getAllItems();
+        break;
+      }
+      case IMPORTING_TYPES.ITEMS_LIST: {
+        toReturn = this.getAllItems(params);
+        break;
+      }
       case IMPORTING_TYPES.LOCATIONS: {
-        this.utilities.log(`obteniendo locations...`);
-        if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/settings/locationsList/' + params)
-          .pipe(retry(3));
-        } else {
-          toReturn = this.locationService.retrieveAllLocation().pipe(retry(3));
-        }
+        toReturn = this.getAllLocations(params);
         break;
       }
       case IMPORTING_TYPES.LOCATION_STATE: {
@@ -242,22 +244,15 @@ export class DataProviderService {
         break;
       }
       case IMPORTING_TYPES.ORDERS: {
-        this.utilities.log(`obteniendo orders...`);
-        if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/outbound/orderList/all;' +
-          params).pipe(retry(3));
-        } else {
-          toReturn = this.orderService.retrieveAllOrders().pipe(retry(3));
-        }
+        toReturn = this.getAllOrders(params);
         break;
       }
       case IMPORTING_TYPES.ORDERS_TO_ASSIGN: {
-        this.utilities.log(`obteniendo orders con sin transporte asignado...`);
-        if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/console/outbound/ordersToAssign/all;' +
+        if (owner !== null) {
+          httpHeaders.append('ownerId', owner.toString());
+          this.utilities.log(`obteniendo orders sin transporte asignado...`);
+          toReturn = this.httpClient.get(environment.apiBaseUrl + '/outbound/ordersToAssign/all;' +
           params).pipe(retry(3));
-        } else {
-          toReturn = of([]);
         }
         break;
       }
@@ -265,18 +260,21 @@ export class DataProviderService {
         break;
       }
       case IMPORTING_TYPES.ORDER_TYPE: {
-        this.utilities.log(`obteniendo order types...`);
-        toReturn = this.orderTypeService.retrieveAllOrderType().pipe(retry(3));
+        toReturn = this.getAllOrderTypes();
         break;
       }
       case IMPORTING_TYPES.SECTIONS: {
-        this.utilities.log(`obteniendo sections...`);
-        toReturn = this.sectionService.retrieveAllSections().pipe(retry(3));
+        if (owner !== null) {
+          httpHeaders.append('ownerId', owner.toString());
+          this.utilities.log(`obteniendo sections...`);
+          toReturn = this.sectionService.retrieveAllSections(owner).pipe(retry(3));
+        }
         break;
       }
       case IMPORTING_TYPES.TRANSPORTS: {
+        // TODO: falta owner
         this.utilities.log(`obteniendo transports...`);
-        toReturn = this.transportService.retrieveAllTransport().pipe(retry(3));
+        toReturn = this.getAllTransports();
         break;
       }
       case IMPORTING_TYPES.TRANSPORT_STATE: {
@@ -285,31 +283,36 @@ export class DataProviderService {
         break;
       }
       case IMPORTING_TYPES.UOMS: {
-        this.utilities.log(`obteniendo uoms...`);
-        toReturn = this.uomService.retrieveAllUom().pipe(retry(3));
+        if (owner !== null) {
+          httpHeaders.append('ownerId', owner.toString());
+          this.utilities.log(`obteniendo uoms...`);
+          toReturn = this.uomService.retrieveAllUom(owner).pipe(retry(3));
+        }
         break;
       }
       case IMPORTING_TYPES.PICK_PLANNINGS: {
         this.utilities.log(`obteniendo pick plannings...`);
-        if (params) {
-          toReturn = this.httpClient.get(environment.apiBaseUrl +
-             '/console/outbound/pick/planningList/all;' + params).pipe(retry(3));
-        } else {
-          toReturn = this.pickPlanningService.retrieveAllPickPlanning().pipe(retry(3));
-        }
+        toReturn = this.getAllPickPlannings('startRow=0;endRow=10');
         break;
       }
       case IMPORTING_TYPES.PICK_TASKS: {
         if (id) {
+          // TODO: falta owner
           this.utilities.log(`obteniendo pick tasks de ${id}...`);
           toReturn = this.pickTaskService.taskByPickPlanning(id).pipe(retry(3));
         } else {
-          toReturn = this.httpClient.get(environment.apiBaseUrl +
-            '/console/outbound/pick/taskList/all;' + params).pipe(retry(3));
+          if (owner !== null) {
+            httpHeaders.append('owner-id', owner.toString());
+            toReturn = this.httpClient.get(environment.apiBaseUrl +
+              '/outbound/pick/taskList/all;' + params, {
+              headers: httpHeaders
+            }).pipe(retry(3));
+          }
         }
         break;
       }
       case IMPORTING_TYPES.PICK_TASKLINES: {
+        // TODO: falta owner
         if (id) {
           this.utilities.log(`obteniendo pick tasks lines de ${id}...`);
           toReturn = this.pickTaskService.taskLineByPickTaskId(id).pipe(retry(3));
@@ -319,7 +322,14 @@ export class DataProviderService {
         break;
       }
       case IMPORTING_TYPES.DOCKS: {
-        this.utilities.log(`obteniendo dock...`);
+        // TODO: falta owner
+        this.utilities.log(`obteniendo docks...`);
+        toReturn = this.getAllDocks().pipe(retry(3));
+        break;
+      }
+      case IMPORTING_TYPES.DOCKS_LIST: {
+        // TODO: falta owner
+        this.utilities.log(`obteniendo docks list...`);
         toReturn = this.getAllDocks().pipe(retry(3));
         break;
       }
@@ -329,16 +339,19 @@ export class DataProviderService {
         break;
       }
       case IMPORTING_TYPES.PICK_STATE: {
+        // TODO: falta owner
         this.utilities.log(`obteniendo pick planning states...`);
         toReturn = this.getAllPickPlanningStates().pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.USERS: {
+        // TODO: falta owner
         this.utilities.log(`obteniendo users...`);
         toReturn = this.getAllUsers().pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.TASK_TYPES: {
+        // TODO: falta owner
         this.utilities.log(`obteniendo pick task types...`);
         toReturn = this.getAllTaskTypes().pipe(retry(3));
         break;
@@ -363,30 +376,48 @@ export class DataProviderService {
   }
 
   getDashboardDataHeader(from?: string, to?: string) {
-    from = from ? from : this.utilities.formatDate(new Date(Date.now() - (365 * 24 * 60 * 60000)));
-    to = to ? to : this.utilities.formatDate(new Date());
-    return this.httpClient.get(`${environment.apiBaseUrl}/console/outbound/dashboard/header?` +
-    `initialPeriod=${from}&finalPeriod=${to}`);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      from = from ? from : this.utilities.formatDate(new Date(Date.now() - (365 * 24 * 60 * 60000)));
+      to = to ? to : this.utilities.formatDate(new Date());
+      return this.httpClient.get(`${environment.apiBaseUrl}/outbound/dashboard/header?` +
+      `initialPeriod=${from}&finalPeriod=${to}`, {
+        headers: new HttpHeaders().append('ownerId', owner.toString())
+      });
+    }
+    return of([]);
   }
 
   getDashboardDataBody(from?: string, to?: string) {
-    from = from ? from : this.utilities.formatDate(new Date(Date.now() - (365 * 24 * 60 * 60000)));
-    to = to ? to : this.utilities.formatDate(new Date());
-    return this.httpClient.get(`${environment.apiBaseUrl}/console/outbound/dashboard/body?` +
-    `initialPeriod=${from}&finalPeriod=${to}`);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      from = from ? from : this.utilities.formatDate(new Date(Date.now() - (365 * 24 * 60 * 60000)));
+      to = to ? to : this.utilities.formatDate(new Date());
+      return this.httpClient.get(`${environment.apiBaseUrl}/outbound/dashboard/body?` +
+      `initialPeriod=${from}&finalPeriod=${to}`, {
+        headers: new HttpHeaders().append('ownerId', owner.toString())
+      });
+    }
+    return of([]);
   }
   /**********************************************************************************
-    Grupo de metodos para items
+    Grupo de metodos para users
   ***********************************************************************************/
   public getAllUsers(observe: any = 'body', reportProgress = false): Observable<any[]> {
     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/settings/user`);
     // return of([]);
   }
+
+  public getUserData(username: string, observe: any = 'body', reportProgress = false): Observable<any[]> {
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/settings/userMember?userName=${username}`);
+    // return of([]);
+  }
   /**********************************************************************************
     Grupo de metodos para items
   ***********************************************************************************/
-  public getAllItems(observe: any = 'body', reportProgress = false) {
-    return this.itemService.retrieveAllItems(observe, reportProgress);
+  public getAllItems(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    return this.httpClient.get(environment.apiBaseUrl + '/settings/itemsVo1/' + params)
+    .pipe(retry(3));
   }
 
   public deleteItem(id: number, observe: any = 'body', reportProgress = false) {
@@ -398,21 +429,34 @@ export class DataProviderService {
   }
 
   public createItem(data: any, observe: any = 'body', reportProgress = false) {
+    data.ownerId = this.authService.getOwnerId();
     return this.itemService.createItem(data, observe, reportProgress);
   }
 
   public createItems(data: any[], observe: any = 'body', reportProgress = false) {
-    return this.itemService.createItemsList(data, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.itemService.createItemsList(data, owner, observe, reportProgress);
+    }
+    return of(false);
   }
 
   public getItem(id: number, observe: any = 'body', reportProgress = false) {
-    return this.itemService.retrieveItem(id, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.itemService.retrieveItem(id, owner, observe, reportProgress);
+    }
+    return of(false);
   }
   /**********************************************************************************
     Grupo de metodos para item types
   ***********************************************************************************/
   public getAllItemTypes(observe: any = 'body', reportProgress = false) {
-    return this.itemTypeService.retrieveAllItemTypes(observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.itemTypeService.retrieveAllItemTypes(owner, observe, reportProgress);
+    }
+    return of([]);
   }
 
   public deleteItemType(id: number, observe: any = 'body', reportProgress = false) {
@@ -424,17 +468,26 @@ export class DataProviderService {
   }
 
   public createItemType(data: any, observe: any = 'body', reportProgress = false) {
+    data.ownerId = this.authService.getOwnerId();
     return this.itemTypeService.createItemType(data, observe, reportProgress);
   }
 
   public getItemtype(id: number, observe: any = 'body', reportProgress = false) {
-    return this.itemTypeService.retrieveItemTypeById(id, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.itemTypeService.retrieveItemTypeById(id, owner, observe, reportProgress);
+    }
+    return of(false);
   }
   /**********************************************************************************
     Grupo de metodos para uoms
   ***********************************************************************************/
   public getAllUoms(observe: any = 'body', reportProgress = false) {
-    return this.uomService.retrieveAllUom(observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.uomService.retrieveAllUom(owner, observe, reportProgress);
+    }
+    return of([]);
   }
 
   public deleteUom(id: number, observe: any = 'body', reportProgress = false) {
@@ -446,6 +499,7 @@ export class DataProviderService {
   }
 
   public createUom(data: any, observe: any = 'body', reportProgress = false) {
+    data.ownerId = this.authService.getOwnerId();
     return this.uomService.createUom(data, observe, reportProgress);
   }
 
@@ -456,20 +510,30 @@ export class DataProviderService {
    *  Grupo de metodos para lpns
    *********************************************************************************/
   public getLpns(id: number, observe: any = 'body', reportProgress = false): Observable<any> {
-   /*return of({
-     id: 7868,
-     code: 'jhgj',
-     type: 'kjkj',
-     interface: 'jkjh',
-     state: 'jkjkh',
-     labelWithMaterial: true
-   }).pipe(delay(1000));
-   */
-    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/console/storage/lpnItemsVO2?lpnItemId=${id}`);
+    const params = 'startRow=0;endRow=10000';
+    const owner = this.authService.getOwnerId();
+    const httpHeaders = new HttpHeaders();
+    if (owner !== null) {
+      httpHeaders.append('ownerId', owner.toString());
+      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemsVO2?` +
+      `lpnItemId=${id}`, {
+        headers: httpHeaders
+      });
+    }
+    return of(false);
   }
 
   public getAllLpns(observe: any = 'body', reportProgress = false): Observable<any[]> {
-    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/console/storage/lpnsVO1`);
+    const params = 'startRow=0;endRow=10000';
+    const owner = this.authService.getOwnerId();
+    const httpHeaders = new HttpHeaders();
+    if (owner !== null) {
+      httpHeaders.append('ownerId', owner.toString());
+      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnsVO1`, {
+        headers: httpHeaders
+      });
+    }
+    return of([]);
   }
 
   public deleteLpns(id: number, observe: any = 'body', reportProgress = false) {
@@ -496,20 +560,29 @@ export class DataProviderService {
       labelWithMaterial: true
     }).pipe(delay(1000));
    }
- 
+
    public getAllInventoryItems(observe: any = 'body', reportProgress = false): Observable<any[]> {
-     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/console/storage/lpnItemsVO1/` +
-     `all;startRow=0;endRow=99999999;sort-lpnItemId=asc`).pipe(retry(3), timeout(600000));
+    const params = 'startRow=0;endRow=10000';
+    const owner = this.authService.getOwnerId();
+    const httpHeaders = new HttpHeaders();
+    if (owner !== null) {
+      httpHeaders.append('ownerId', owner.toString());
+      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemsVO1/` +
+      `all;startRow=0;endRow=99999999;sort-lpnItemId=asc`, {
+        headers: httpHeaders
+      }).pipe(retry(3), timeout(600000));
+    }
+    return of([]);
    }
- 
+
    public deleteInventoryItem(id: number, observe: any = 'body', reportProgress = false) {
      return this.uomService.deleteUom(id, observe, reportProgress);
    }
- 
+
    public updateInventoryItem(data: any, id: number, observe: any = 'body', reportProgress = false) {
      return this.uomService.updateUom(data, id, observe, reportProgress);
    }
- 
+
    public createInventoryItem(data: any, observe: any = 'body', reportProgress = false) {
      return this.uomService.createUom(data, observe, reportProgress);
    }
@@ -517,7 +590,12 @@ export class DataProviderService {
     Grupo de metodos para item uoms
   ***********************************************************************************/
   public getAllItemUoms(idItem: number, observe: any = 'body', reportProgress = false) {
-    return this.itemUomService.itemUomByItemId(idItem, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    // TODO: falta el metodo
+    if (owner !== null) {
+      // return this.itemUomService.itemUomByItemId(idItem, owner, observe, reportProgress);
+    }
+    return of([]);
   }
 
   public deleteItemUom(id: number, observe: any = 'body', reportProgress = false) {
@@ -547,19 +625,23 @@ export class DataProviderService {
     Grupo de metodos para quality state
   ***********************************************************************************/
   public getAllQualityStates(observe: any = 'body', reportProgress = false) {
-    return this.qualityStateService.retrieveAllQualityStates(observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.qualityStateService.retrieveAllQualityStates(owner, observe, reportProgress);
+    }
+    return of([]);
   }
 
   public deleteQualityState(id: number, observe: any = 'body', reportProgress = false) {
-    return this.qualityStateService.deleteQualityStates(id, observe, reportProgress);
+    return this.qualityStateService.deleteQualityState(id, observe, reportProgress);
   }
 
   public updateQualityState(data: any, id: number, observe: any = 'body', reportProgress = false) {
-    return this.qualityStateService.updateQualityStates(data, id, observe, reportProgress);
+    return this.qualityStateService.updateQualityState(data, id, observe, reportProgress);
   }
 
   public createQualityState(data: any, observe: any = 'body', reportProgress = false) {
-    return this.qualityStateService.createQualityStates(data, observe, reportProgress);
+    return this.qualityStateService.createQualityState(data, observe, reportProgress);
   }
 
   public getQualityState(id: number, observe: any = 'body', reportProgress = false) {
@@ -581,7 +663,7 @@ export class DataProviderService {
   }
 
   public createQualityStateType(data: any, observe: any = 'body', reportProgress = false) {
-    return this.qualityStateService.createQualityStates(data, observe, reportProgress);
+    return this.qualityStateService.createQualityState(data, observe, reportProgress);
   }
 
   public getQualityStateType(observe: any = 'body', reportProgress = false) {
@@ -590,8 +672,10 @@ export class DataProviderService {
   /**********************************************************************************
     Grupo de metodos para locations
   ***********************************************************************************/
-  public getAllLocations(observe: any = 'body', reportProgress = false) {
-    return this.locationService.retrieveAllLocation(observe, reportProgress);
+  public getAllLocations(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+      this.utilities.log(`obteniendo locations...`);
+      return this.httpClient.get(environment.apiBaseUrl + '/settings/locationsVO1/all;' + params)
+      .pipe(retry(3));
   }
 
   public deleteLocation(id: number, observe: any = 'body', reportProgress = false) {
@@ -607,7 +691,11 @@ export class DataProviderService {
   }
 
   public createLocations(data: any[], observe: any = 'body', reportProgress = false) {
-    return this.locationService.createLocationsList(data, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.locationService.createLocationsList(data, owner, observe, reportProgress);
+    }
+    return of(false);
   }
 
   public getLocation(id: number, observe: any = 'body', reportProgress = false) {
@@ -617,7 +705,11 @@ export class DataProviderService {
     Grupo de metodos para sections
   ***********************************************************************************/
   public getAllSections(observe: any = 'body', reportProgress = false) {
-    return this.sectionService.retrieveAllSections(observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.sectionService.retrieveAllSections(owner, observe, reportProgress);
+    }
+    return of([]);
   }
 
   public deleteSection(id: number, observe: any = 'body', reportProgress = false) {
@@ -629,6 +721,10 @@ export class DataProviderService {
   }
 
   public createSection(data: any, observe: any = 'body', reportProgress = false) {
+    const depo = this.authService.getDepotId();
+    if (depo !== null) {
+      data.depotId = depo;
+    }
     return this.sectionService.createSection(data, observe, reportProgress);
   }
 
@@ -638,8 +734,9 @@ export class DataProviderService {
   /**********************************************************************************
     Grupo de metodos para orders
   ***********************************************************************************/
-  public getAllOrders(observe: any = 'body', reportProgress = false) {
-    return this.orderService.retrieveAllOrders(observe, reportProgress);
+  public getAllOrders(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    return this.httpClient.get(environment.apiBaseUrl + '/outbound/ordersVO1/all;' + params)
+    .pipe(retry(3));
   }
 
   public deleteOrder(id: number, observe: any = 'body', reportProgress = false) {
@@ -647,21 +744,43 @@ export class DataProviderService {
   }
 
   public updateOrder(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    const depot = this.authService.getDepotId();
+    if (owner !== null) {
+      data.ownerId = owner;
+      data.depotId = depot;
+    }
     return this.orderService.updateOrder(data, id, observe, reportProgress);
   }
 
   public updateOrdersTransport(data: any[], idTransport: number, observe: any = 'body', reportProgress = false) {
-    // return this.orderService.updateOrder(data, id, observe, reportProgress);
-    return this.httpClient.post(environment.apiBaseUrl +
-      '/console/outbound/orders/assignmentTransport?idTransport=' + idTransport, data);
+    const params = 'startRow=0;endRow=10000';
+    const owner = this.authService.getOwnerId();
+    const httpHeaders = new HttpHeaders();
+    if (owner !== null) {
+      httpHeaders.append('ownerId', owner.toString());
+      return this.httpClient.post(environment.apiBaseUrl +
+        '/outbound/orders/assignmentTransport?idTransport=' + idTransport, data, {
+          headers: httpHeaders
+        });
+    }
+    return of(false);
   }
 
   public createOrder(data: any, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    const depot = this.authService.getDepotId();
+    if (owner !== null) {
+      data.ownerId = owner;
+      data.depotId = depot;
+    }
     return this.orderService.createOrder(data, observe, reportProgress);
   }
 
   public createOrders(data: any[], observe: any = 'body', reportProgress = false) {
-    return this.orderService.createOrderList(data, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    const depo = this.authService.getDepotId();
+    return this.orderService.createOrderList(data, owner, depo, observe, reportProgress);
   }
 
   public getOrder(id: number, observe: any = 'body', reportProgress = false) {
@@ -670,8 +789,9 @@ export class DataProviderService {
   /**********************************************************************************
     Grupo de metodos para transport
   ***********************************************************************************/
-  public getAllTransports(observe: any = 'body', reportProgress = false) {
-    return this.transportService.retrieveAllTransport(observe, reportProgress);
+  public getAllTransports(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false): Observable<any> {
+    return this.httpClient.get<any>(environment.apiBaseUrl +
+      '/outbound/transportsVO1/all;' + params).pipe(retry(3));
   }
 
   public getTransportsOrders(id: number, observe: any = 'body', reportProgress = false) {
@@ -687,6 +807,12 @@ export class DataProviderService {
   }
 
   public createTransport(data: any, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    const depot = this.authService.getDepotId();
+    if (owner !== null) {
+      data.ownerId = owner;
+      data.depotId = depot;
+    }
     return this.transportService.createTransport(data, observe, reportProgress);
   }
 
@@ -697,7 +823,11 @@ export class DataProviderService {
     Grupo de metodos para order type
   ***********************************************************************************/
   public getAllOrderTypes(observe: any = 'body', reportProgress = false) {
-    return this.orderTypeService.retrieveAllOrderType(observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.orderTypeService.retrieveAllOrderType(owner, observe, reportProgress);
+    }
+    return of([]);
   }
 
   public deleteOrderType(id: number, observe: any = 'body', reportProgress = false) {
@@ -705,10 +835,18 @@ export class DataProviderService {
   }
 
   public updateOrderType(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      data.ownerId = owner;
+    }
     return this.orderTypeService.updateorderType(data, id, observe, reportProgress);
   }
 
   public createOrderType(data: any, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      data.ownerId = owner;
+    }
     return this.orderTypeService.createOrderType(data, observe, reportProgress);
   }
 
@@ -718,8 +856,9 @@ export class DataProviderService {
   /**********************************************************************************
     Grupo de metodos para customers
   ***********************************************************************************/
-  public getAllCustomers(observe: any = 'body', reportProgress = false) {
-    return this.customerService.retrieveAllCustomers(observe, reportProgress);
+  public getAllCustomers(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    return this.httpClient.get<any>(environment.apiBaseUrl + '/settings/customersVO1/all;' + params)
+    .pipe(retry(3));
   }
 
   public deleteCustomer(id: number, observe: any = 'body', reportProgress = false) {
@@ -727,27 +866,46 @@ export class DataProviderService {
   }
 
   public updateCustomer(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      data.ownerId = owner;
+    }
     return this.customerService.updateCustomer(data, id, observe, reportProgress);
   }
 
   public createCustomer(data: any, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      data.ownerId = owner;
+    }
     return this.customerService.createCustomer(data, observe, reportProgress);
   }
 
-  public getCustomer(id: number, observe: any = 'body', reportProgress = false) {
-    return this.customerService.retrieveCustomerById(id, observe, reportProgress);
+  public getCustomer(id: number, observe: any = 'body', reportProgress = false): Observable<any> {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.customerService.retrieveCustomerById(id, owner, observe, reportProgress);
+    }
+    return of(false);
   }
   /**********************************************************************************
     Grupo de metodos para load picks
   ***********************************************************************************/
-  public createLoadPicks(data: any[], observe: any = 'body', reportProgress = false) {
-    return this.loadPickService.createLoadPick(data, observe, reportProgress);
+  public createLoadPicks(data: any[], transportNumber: string, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    const depot = this.authService.userData.depotId;
+    if (owner !== null && depot !== null && transportNumber) {
+      return this.loadPickService.createLoadPick(data, owner, depot, transportNumber, observe, reportProgress);
+    }
+    return of(false);
   }
   /**********************************************************************************
     Grupo de metodos para pick planning
   ***********************************************************************************/
-  public getAllPickPlannings(observe: any = 'body', reportProgress = false) {
-    return this.pickPlanningService.retrieveAllPickPlanning(observe, reportProgress);
+  public getAllPickPlannings(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    // return this.pickPlanningService.retrieveAllPickPlanning(observe, reportProgress);
+    return this.httpClient.get(environment.apiBaseUrl +
+      '/outbound/pick/pickPlanningVO1/all;' + params).pipe(retry(3));
   }
 
   public getAllPickPlanningTasks(pickPlanningId: number, observe: any = 'body', reportProgress = false) {
@@ -756,8 +914,8 @@ export class DataProviderService {
 
   public getAllPickPlanningTasksVO3(pickPlanningId: number, observe: any = 'body', reportProgress = false) {
     // return this.pickTaskService.taskByPickPlanning(pickPlanningId, observe, reportProgress);
-    // return this.httpClient.get<any>(`${environment.apiBaseUrl}/console/outbound/pick/tasksVO3?pickPlanningId=${pickPlanningId}`)
-    return this.httpClient.get<any>(`${environment.apiBaseUrl}/console/outbound/pick/tasksVO3/` +
+    // return this.httpClient.get<any>(`${environment.apiBaseUrl}/outbound/pick/tasksVO3?pickPlanningId=${pickPlanningId}`)
+    return this.httpClient.get<any>(`${environment.apiBaseUrl}/outbound/pick/tasksVO3/` +
     `all;pickPlanningId-type=equals;pickPlanningId-filter=${pickPlanningId};pickPlanningId-filterType` +
     `=number;startRow=0;endRow=200;`);
   }
@@ -767,7 +925,6 @@ export class DataProviderService {
   }
 
   public getPickPlanningTransport(id: number, observe: any = 'body', reportProgress = false) {
-    // TODO: recuperar este metodo
     return this.transportService.findByPickPlanning(id, observe, reportProgress);
   }
 
@@ -780,6 +937,12 @@ export class DataProviderService {
   }
 
   public createPickPlanning(data: any, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    const depot = this.authService.getDepotId();
+    if (owner !== null && depot !== null) {
+      data.depotId = depot;
+      data.ownerId = owner;
+    }
     return this.pickPlanningService.createPickPlanning(data, observe, reportProgress);
   }
 
@@ -798,7 +961,12 @@ export class DataProviderService {
   }
 
   public getAllPickTasksByUser(user: string, observe: any = 'body', reportProgress = false) {
-    return this.pickTaskService.retrievePickTaskByUsername(user, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    const depot = this.authService.getDepotId();
+    if (depot !== null && owner !== null) {
+      return this.pickTaskService.retrievePickTaskByUsername(owner, depot, user, observe, reportProgress);
+    }
+    return of([]);
   }
 
   public getAllPickTaskLinesByTask(idTask: number, observe: any = 'body', reportProgress = false): Observable<any[]> {
@@ -808,17 +976,23 @@ export class DataProviderService {
 
   public getAllPickTaskLinesBySku(idTask: number, observe: any = 'body', reportProgress = false): Observable<any[]> {
     console.log('obteniendo task lines de task by sku: ', idTask);
-    return this.httpClient.get<any>(`${environment.apiBaseUrl}/console/outbound/pick/taskLineVO1?pickTaskId=${idTask}`);
+    return this.httpClient.get<any>(`${environment.apiBaseUrl}/outbound/pick/taskLineVO1?pickTaskId=${idTask}`);
   }
 
   public getAllPickTaskLinesByLines(idTask: number, observe: any = 'body', reportProgress = false): Observable<any[]> {
     console.log('obteniendo task lines de task by lines: ', idTask);
-    // return this.httpClient.get<any>(`${environment.apiBaseUrl}/console/outbound/pick/taskLineVO1?pickTaskId=${idTask}`);
-    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/` +
-    `console/outbound/pick/taskLineVO1/pickTaskId-type=equals;` +
-    `pickTaskId-filter=${idTask};pickTaskId-filterType=number;startRow=0;endRow=1000;`);
-    // `console/outbound/pick/taskLineVO1/all;startRow=0;endRow=25` +
-    // `console/outbound/pick/taskLineVO1?pickTaskId=${idTask}`);
+    const params = 'startRow=0;endRow=10000';
+    const owner = this.authService.getOwnerId();
+    const httpHeaders = new HttpHeaders();
+    if (owner !== null) {
+      httpHeaders.append('ownerId', owner.toString());
+      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/` +
+      `outbound/pick/taskLineVO1/pickTaskId-type=equals;` +
+      `pickTaskId-filter=${idTask};pickTaskId-filterType=number;startRow=0;endRow=1000;`, {
+        headers: httpHeaders
+      });
+    }
+    return of([]);
   }
 
   public getAllPickTaskTypes(observe: any = 'body', reportProgress = false): Observable<any[]> {
@@ -855,7 +1029,7 @@ export class DataProviderService {
   public updateStatePickTaskList(data: any[], state: string, observe: any = 'body', reportProgress = false) {
     // return this.orderService.updateOrder(data, id, observe, reportProgress);
     /*return this.httpClient.put(environment.apiBaseUrl +
-      '/console/outbound/pick/changePickTaskStatus?codeState=' + status, data);*/
+      '/outbound/pick/changePickTaskStatus?codeState=' + status, data);*/
       return this.pickTaskService.changePickTaskStatus(data, state, observe, reportProgress);
   }
 
@@ -866,7 +1040,7 @@ export class DataProviderService {
   public assignUserToPickTaskList(data: any[], user: any, observe: any = 'body', reportProgress = false) {
     // return this.pickTaskService.assignUserPickTask(data, user.userName);
     return this.httpClient.put(environment.apiBaseUrl +
-      '/console/outbound/pick/assignUserPickTask?userName=' + user.userName, data);
+      '/outbound/pick/assignUserPickTask?userName=' + user.userName, data);
   }
 
   public getTasksByPickPlanning(id: number, observe: any = 'body', reportProgress = false) {
@@ -876,23 +1050,39 @@ export class DataProviderService {
     Grupo de metodos para docks
   ***********************************************************************************/
   public getAllDocks(observe: any = 'body', reportProgress = false) {
-    return this.docksService.retrieveAllDocks(observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.docksService.retrieveAllDocks(owner, observe, reportProgress);
+    }
+    return of([]);
   }
 
   public deleteDock(id: number, observe: any = 'body', reportProgress = false) {
-    return this.docksService.deleteDock(id, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.docksService.deleteDock(id, owner, observe, reportProgress);
+    }
+    return of(false);
   }
 
   public updateDock(data: any, id: number, observe: any = 'body', reportProgress = false) {
     return this.docksService.updateDock(data, id, observe, reportProgress);
   }
 
-  public createDock(data: any, observe: any = 'body', reportProgress = false) {
-    return this.docksService.createDock(data, observe, reportProgress);
+  public createDock(data: any, observe: any = 'body', reportProgress = false): Observable<any> {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.docksService.createDock(data, owner, observe, reportProgress);
+    }
+    return of(false);
   }
 
   public getDock(id: number, observe: any = 'body', reportProgress = false) {
-    return this.docksService.retrieveDockById(id, observe, reportProgress);
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.docksService.retrieveDockById(id, owner, observe, reportProgress);
+    }
+    return of(false);
   }
   /**********************************************************************************
     Grupo de metodos para task types

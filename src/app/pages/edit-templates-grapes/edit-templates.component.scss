@@ -6,6 +6,9 @@ $danger: #9C080B;
 ::ng-deep #gjs {
   border: none;
 }
+::ng-deep .gjs-pn-panel {
+  position: fixed;
+}
 /* Theming */
 /* Primary color for the background */
 ::ng-deep .gjs-one-bg {

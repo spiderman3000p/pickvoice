@@ -38,7 +38,7 @@
                                     <div *ngIf="definitions[filter.key].formControl.control === 'select'" class="form-group">
                                         <label>{{filter.name}}</label>
                                         <select [compareWith]="definitions[filter.key].formControl.compareFn"
-                                        [formControlName]="filter.key">
+                                        class="form-control" [formControlName]="filter.key">
                                             <option [value]="">
                                                 Select a value
                                             </option>

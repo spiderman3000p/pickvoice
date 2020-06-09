@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./orders.component.css']
 })
 export class OrdersComponent implements OnInit, AfterViewInit {
-  definitions: any = ModelMap.OrderMap;
+  definitions: any = ModelMap.OrderListMap;
   dataSource: MyDataSource<Order>;
   dataToSend: Order[];
   displayedDataColumns: string[];
@@ -45,7 +45,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.ORDERS;
+  type = IMPORTING_TYPES.ORDERS_LIST;
   selectsData: any;
   subscriptions: Subscription[] = [];
   parserFn: any;
@@ -146,7 +146,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     // this.utilities.log('paramsArray', paramsArray);
     const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
     // this.utilities.log('loading data with params', params);
-    this.dataSource.loadData(this.type, `${params}`)
+    this.dataSource.loadData(IMPORTING_TYPES.ORDERS, `${params}`)
     .subscribe((response: any) => {
         /*this.data = dataResults;
         this.dataCount = 100;
@@ -189,7 +189,8 @@ export class OrdersComponent implements OnInit, AfterViewInit {
         filter.show = column.show;
         this.utilities.log(`this.definitions[${column.name}]`, this.definitions[column.name]);
         filter.name = this.definitions[column.name].name;
-        filter.type = this.definitions[column.name].formControl.control === 'input' ?
+        filter.type = this.definitions[column.name].formControl.control === 'textarea' ||
+        this.definitions[column.name].formControl.control === 'input' ?
         this.definitions[column.name].formControl.type :
         (this.definitions[column.name].formControl.control === 'date' ? 'date' :
         (this.definitions[column.name].formControl.control === 'toggle' ? 'toggle' :
@@ -500,19 +501,5 @@ export class OrdersComponent implements OnInit, AfterViewInit {
   */
   private refreshTable() {
     this.loadDataPage();
-    /*
-    // If there's no data in filter we do update using pagination, next page or previous page
-    if (this.dataSource.filter === '') {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = 'XXX';
-      this.dataSource.filter = aux;
-      // If there's something in filter, we reset it to 0 and then put back old value
-    } else {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = '';
-      this.dataSource.filter = aux;
-    }
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
   }
 }

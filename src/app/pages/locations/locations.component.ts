@@ -6,7 +6,8 @@ import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-ro
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
-import { LocationsService, Location, Section } from '@pickvoice/pickvoice-api';
+import { LocationService, Location, Section } from '@pickvoice/pickvoice-api';
+
 import { MyDataSource } from '../../models/my-data-source';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -25,7 +26,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./locations.component.css']
 })
 export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.LocationMap;
+  definitions: any = ModelMap.LocationListMap;
   dataSource: MyDataSource<Location>;
   dataToSend: Location[];
   displayedDataColumns: string[];
@@ -47,7 +48,7 @@ export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.LOCATIONS;
+  type = IMPORTING_TYPES.LOCATIONS_LIST;
   selectsData: any;
   subscriptions: Subscription[] = [];
   parserFn: any;
@@ -143,7 +144,7 @@ export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
     // this.utilities.log('paramsArray', paramsArray);
     const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
     // this.utilities.log('loading data with params', params);
-    this.dataSource.loadData(this.type, `${params}`)
+    this.dataSource.loadData(IMPORTING_TYPES.LOCATIONS, `${params}`)
     .subscribe((response: any) => {
         /*this.data = dataResults;
         this.dataCount = 100;
@@ -197,7 +198,8 @@ export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
-        filter.type = this.definitions[column.name].formControl.control === 'input' ?
+        filter.type = this.definitions[column.name].formControl.control === 'input' ||
+        this.definitions[column.name].formControl.control === 'textarea' ?
         this.definitions[column.name].formControl.type :
         (this.definitions[column.name].formControl.control === 'date' ? 'date' :
         (this.definitions[column.name].formControl.control === 'toggle' ? 'toggle' :
@@ -414,25 +416,6 @@ export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
   editRowOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
-    /*const dialogRef = this.dialog.open(EditRowComponent, {
-      data: {
-        row: element,
-        map: this.utilities.dataTypesModelMaps.locations,
-        type: IMPORTING_TYPES.LOCATIONS,
-        remoteSync: true // para mandar los datos a la BD por la API
-      }
-    });*/
-    /*dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-            this.dataSource.data[element.index] = result;
-            this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });*/
   }
 
   editRowOnDialog(element: any) {
@@ -495,20 +478,6 @@ export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
   */
   private refreshTable() {
     this.loadDataPage();
-    /*
-    // If there's no data in filter we do update using pagination, next page or previous page
-    if (this.dataSource.filter === '') {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = 'XXX';
-      this.dataSource.filter = aux;
-      // If there's something in filter, we reset it to 0 and then put back old value
-    } else {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = '';
-      this.dataSource.filter = aux;
-    }
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
   }
 
   toggleFilters() {

@@ -19,6 +19,9 @@ body {
   overflow-y: hidden;
   font-size: 12px;
 }
+.form-group{
+  position: relative;
+}
 .form-control{
   font-size: 12px;
 }
@@ -39,6 +42,9 @@ button:focus {
 }
 .ngx-contextmenu .dropdown-menu .dropdown-divider{
   margin: 0;
+}
+.mat-sidenav>.mat-drawer-inner-container{
+  overflow-y: scroll;
 }
 .mat-sidenav>.mat-drawer-inner-container::-webkit-scrollbar {
   width: 8px;
@@ -732,6 +738,11 @@ div.tree>tree-node>div>tree-node-wrapper>.node-wrapper>tree-node-expander>.toggl
 
 div.tree tree-node-expander + div.node-content-wrapper {
   /*margin-left: 30px*/
+}
+
+.add-link{
+  position: absolute;
+  right: 0;
 }
 
 @media screen and (max-width:800px){

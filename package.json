@@ -29,7 +29,7 @@
     "@angular/router": "~9.0.0-rc.12",
     "@angular/service-worker": "~9.0.0-rc.12",
     "@fortawesome/fontawesome-free": "^5.13.0",
-    "@pickvoice/pickvoice-api": "^0.2.9",
+    "@pickvoice/pickvoice-api": "^0.3.3",
     "ag-grid-angular": "^22.1.1",
     "ag-grid-community": "^22.1.1",
     "ag-grid-enterprise": "^22.1.1",

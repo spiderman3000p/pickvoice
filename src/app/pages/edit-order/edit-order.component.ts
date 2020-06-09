@@ -1,6 +1,8 @@
 import { Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
+import { DataProviderService } from '../../services/data-provider.service';
+import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { Order, OrderService, Customer, OrderLine, OrderType, Transport, CustomerService,
          OrderTypeService, TransportService, UomService, UnityOfMeasure } from '@pickvoice/pickvoice-api';
@@ -38,6 +40,8 @@ export class EditOrderComponent implements OnInit {
   form: FormGroup;
   pageTitle = '';
   cardTitle = '';
+  selectedCustomer: any = {};
+  selectedTransport: any = {};
   type = IMPORTING_TYPES.ORDERS;
   dataMap = ModelMap.OrderMap;
   definitions = ModelMap.OrderLineMap;
@@ -74,11 +78,12 @@ export class EditOrderComponent implements OnInit {
     this.setDataSourceAttributes();
   }
   constructor(
-    private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
-    private activatedRoute: ActivatedRoute, private orderService: OrderService,
-    private router: Router, private dialog: MatDialog, private orderTypeService: OrderTypeService,
-    private customerService: CustomerService, private transportService: TransportService,
-    private uomService: UomService
+    private sharedDataService: SharedDataService, private utilities: UtilitiesService,
+    private location: WebLocation, private activatedRoute: ActivatedRoute,
+    private orderService: OrderService, private router: Router, private dialog: MatDialog,
+    private orderTypeService: OrderTypeService, private customerService: CustomerService,
+    private transportService: TransportService, private uomService: UomService,
+    private authService: AuthService, private dataProviderService: DataProviderService
   ) {
     this.dataSource = new MatTableDataSource([]);
     this.ordersData = new Object() as OrdersData;
@@ -94,12 +99,30 @@ export class EditOrderComponent implements OnInit {
       invoiceNumber: new FormControl(''),
       orderDate: new FormControl(''),
       deliveryDate: new FormControl(''),
-      orderType: new FormControl(''),
+      orderTypeId: new FormControl(''),
       priority: new FormControl(''),
       note: new FormControl(''),
-      transport: new FormControl(''),
-      customer: new FormControl('')
+      transportId: new FormControl(''),
+      customerId: new FormControl('')
     });
+    this.form.get('transportId').valueChanges.subscribe(value => {
+      this.row.transportId = value;
+      this.getTransportDetails();
+    });
+    this.form.get('customerId').valueChanges.subscribe(value => {
+      this.row.customerId = value;
+      this.getCustomerDetails();
+    });
+  }
+
+  onChangeCustomer() {
+    this.row.customerId = this.form.get('customerId').value;
+    this.getCustomerDetails();
+  }
+
+  onChangeTransport() {
+    this.row.transportId = this.form.get('transportId').value;
+    this.getTransportDetails();
   }
 
   setDataSourceAttributes() {
@@ -112,9 +135,11 @@ export class EditOrderComponent implements OnInit {
     this.getTransportList();
     this.getCustomerList();
     this.getOrderTypeList();
+    this.getUomList();
     this.getOrderLineList();
     this.getTransportStatusList();
-    this.getUomList();
+    this.getCustomerDetails();
+    this.getTransportDetails();
     // inicializamos todo lo necesario para la tabla
     if (this.row) {
       this.dataSource.data = this.ordersData.orderLineList;
@@ -130,17 +155,13 @@ export class EditOrderComponent implements OnInit {
       invoiceNumber: new FormControl(this.row.invoiceNumber ? this.row.invoiceNumber : ''),
       orderDate: new FormControl(this.row.orderDate ? this.row.orderDate : ''),
       deliveryDate: new FormControl(this.row.deliveryDate ? this.row.deliveryDate : ''),
-      orderType: new FormControl(this.row.orderType ? this.row.orderType : ''),
+      orderTypeId: new FormControl(this.row.orderTypeId ? this.row.orderTypeId : ''),
       priority: new FormControl(this.row.priority ? this.row.priority : ''),
       note: new FormControl(this.row.note ? this.row.note : ''),
       // idTransport: new FormControl(this.row.idTransport),
-      transport: new FormControl(this.row.transport ? this.row.transport : ''),
-      customer: new FormControl(this.row.customer ? this.row.customer : '')
+      transportId: new FormControl(this.row.transportId ? this.row.transportId : ''),
+      customerId: new FormControl(this.row.customerId ? this.row.customerId : '')
     });
-    /*if (this.viewMode === 'view') {
-      this.form.disable();
-    }*/
-    // this.utilities.log('form', this.form);
   }
 
   initColumnsDefs() {
@@ -420,8 +441,28 @@ export class EditOrderComponent implements OnInit {
   applyFilters() {
   }
 
+  getCustomerDetails() {
+    if (this.row.customerId) {
+      this.dataProviderService.getCustomer(this.row.customerId).subscribe(results => {
+        this.selectedCustomer = results;
+        this.form.get('customerId').setValue(this.selectedCustomer.id);
+        this.utilities.log('selected customer details: ', this.selectedCustomer);
+      });
+    }
+  }
+
+  getTransportDetails() {
+    if (this.row.transportId) {
+      this.dataProviderService.getTransport(this.row.transportId).subscribe(results => {
+        this.selectedTransport = results;
+        this.form.get('transportId').setValue(this.selectedTransport.id);
+        this.utilities.log('selected transport details: ', this.selectedTransport);
+      });
+    }
+  }
+
   getOrderTypeList() {
-    this.orderTypeService.retrieveAllOrderType().subscribe(results => {
+    this.dataProviderService.getDataFromApi(IMPORTING_TYPES.ORDER_TYPE).subscribe(results => {
       this.ordersData.orderTypeList = results;
       this.utilities.log('this.ordersData.orderTypeList', this.ordersData.orderTypeList);
     });
@@ -437,28 +478,31 @@ export class EditOrderComponent implements OnInit {
   }
 
   getCustomerList() {
-    this.customerService.retrieveAllCustomers().subscribe(results => {
-      this.ordersData.customerList = results;
+    this.dataProviderService.getDataFromApi(IMPORTING_TYPES.CUSTOMERS).subscribe(results => {
+      this.ordersData.customerList = results.content;
       this.utilities.log('this.ordersData.customerList', this.ordersData.customerList);
     });
   }
 
   getTransportList() {
-    this.transportService.retrieveAllTransport().subscribe(results => {
+    this.dataProviderService.getDataFromApi(IMPORTING_TYPES.TRANSPORTS).subscribe(results => {
       this.ordersData.transportList = results;
       this.utilities.log('this.ordersData.transportList', this.ordersData.transportList);
     });
   }
 
   getUomList() {
-    this.uomService.retrieveAllUom().subscribe(results => {
+    this.dataProviderService.getDataFromApi(IMPORTING_TYPES.UOMS).subscribe(results => {
       this.ordersData.uomList = results;
       this.utilities.log('this.ordersData.uomList', this.ordersData.uomList);
     });
   }
 
   getTransportStatusList() {
-    this.ordersData.transportStatus = Object.keys(Transport.TransportationStatusEnum);
+    this.dataProviderService
+    .getDataFromApi(IMPORTING_TYPES.TRANSPORT_STATE).subscribe(results => {
+      this.ordersData.transportStatus = results;
+    });
   }
 
   print() {

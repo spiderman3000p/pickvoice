@@ -50,7 +50,7 @@ const routes: Routes = [
         },
         data: {
             viewMode: 'view',
-            type: IMPORTING_TYPES.UOMS
+            type: IMPORTING_TYPES.TASK_TYPES
         }
     },
     {

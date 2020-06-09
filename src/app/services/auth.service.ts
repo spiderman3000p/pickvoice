@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of} from 'rxjs';
-import { catchError, finalize, switchAll, switchMap, tap, delay } from 'rxjs/operators';
+import { retry, catchError, finalize, switchAll, switchMap, tap, delay } from 'rxjs/operators';
 import { UserService } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { environment } from '../../environments/environment';
@@ -16,6 +16,16 @@ const SESSION_INACTIVITY_TIME = environment.sessionInactivityTime;
 export class AuthService {
   static token;
   isRefreshingToken = false;
+  userData = {
+    cityId: null,
+    cityName: '',
+    plantId: null,
+    plantName: '',
+    depotId: null,
+    depotName: '',
+    ownerId: null,
+    ownerName: ''
+  };
   sessionData = {
     access_token: null,
     expires_in: 0,
@@ -32,7 +42,9 @@ export class AuthService {
   inactivityInterval: any;
   tokenRefreshInterval: any;
   constructor(private userService: UserService, private utilities: UtilitiesService,
-              private router: Router, private httpClient: HttpClient) { }
+              private router: Router, private httpClient: HttpClient) {
+    this.fillUserData();
+  }
   public static checkAccessToken() {
     let sessionToken = null;
     if (this.token === null) {
@@ -46,6 +58,88 @@ export class AuthService {
     console.log('check session token: ', sessionToken);
     return sessionToken;
   }
+  fillUserData() {
+    this.userData.cityId = this.getCityId();
+    this.userData.ownerId = this.getOwnerId();
+    this.userData.depotId = this.getDepotId();
+    this.userData.plantId = this.getPlantId();
+    this.userData.cityName = this.getCityName();
+    this.userData.depotName = this.getDepotName();
+    this.userData.ownerName = this.getOwnerName();
+    this.userData.plantName = this.getPlantName();
+  }
+  getCityId(): number {
+    let id: number = null;
+    if (this.userData.cityId !== null) {
+      id = this.userData.cityId;
+    } else if (localStorage.getItem('selected-city')) {
+      id = Number(localStorage.getItem('selected-city'));
+    }
+    return id;
+  }
+  getOwnerId(): number {
+    let id: number = null;
+    if (this.userData.ownerId !== null) {
+      id = this.userData.ownerId;
+    } else if (localStorage.getItem('selected-owner')) {
+      id = Number(localStorage.getItem('selected-owner'));
+    }
+    return id;
+  }
+  getPlantId(): number {
+    let id: number = null;
+    if (this.userData.plantId !== null) {
+      id = this.userData.plantId;
+    } else if (localStorage.getItem('selected-plant')) {
+      id = Number(localStorage.getItem('selected-plant'));
+    }
+    return id;
+  }
+  getDepotId(): number {
+    let id: number = null;
+    if (this.userData.depotId !== null) {
+      id = this.userData.depotId;
+    } else if (localStorage.getItem('selected-depot')) {
+      id = Number(localStorage.getItem('selected-depot'));
+    }
+    return id;
+  }
+  getDepotName(): string {
+    let name: string = null;
+    if (this.userData.depotName !== null) {
+      name = this.userData.depotName;
+    } else if (localStorage.getItem('selected-depotName')) {
+      name = localStorage.getItem('selected-depotName');
+    }
+    return name;
+  }
+  getOwnerName(): string {
+    let name: string = null;
+    if (this.userData.ownerName !== null) {
+      name = this.userData.ownerName;
+    } else if (localStorage.getItem('selected-ownerName')) {
+      name = localStorage.getItem('selected-ownerName');
+    }
+    return name;
+  }
+  getCityName(): string {
+    let name: string = null;
+    if (this.userData.cityName !== null) {
+      name = this.userData.cityName;
+    } else if (localStorage.getItem('selected-cityName')) {
+      name = localStorage.getItem('selected-cityName');
+    }
+    return name;
+  }
+  getPlantName(): string {
+    let name: string = null;
+    if (this.userData.plantName !== null) {
+      name = this.userData.plantName;
+    } else if (localStorage.getItem('selected-plantName')) {
+      name = localStorage.getItem('selected-plantName');
+    }
+    return name;
+  }
   // Dummy login function
   public login(username: string, password: string): Observable<any> {
     const parameters = environment.keycloak_data;
@@ -56,25 +150,61 @@ export class AuthService {
     .set('password', password);
     return new Observable(suscriber => {
       this.httpClient.post(`${environment.apiKeycloak}/realms/cclrealm/protocol/openid-connect/token`,
-      payload).subscribe((response: any) => {
-        this.utilities.log('login response', response);
-        if (response && response.access_token) {
+      payload).subscribe((respons: any) => {
+        this.utilities.log('login response', respons);
+        if (respons && respons.access_token) {
           this.setLoggedIn(true);
-          this.setSessionData(response);
+          this.setSessionData(respons);
           this.setSessionStart(Date.now());
           this.setUsername(username);
           this.setUnamed(password);
-          suscriber.next({ logged: true, response: response, error: null});
+          this.fetchUserMemberData(username).subscribe(resp => {
+            if (resp && Array.isArray(resp) && resp.length > 0 && resp[0].id) {
+              this.userData = resp[0];
+              this.utilities.log('userData', resp[0]);
+              this.setUserMemberData(resp[0]);
+              suscriber.next({ logged: true, response: respons, error: null});
+              suscriber.complete();
+            }
+          });
         } else {
-          suscriber.next({ logged: false, response: response, error: null});
+          suscriber.next({ logged: false, response: respons, error: null});
         }
-      }, error => {
-        this.utilities.error('login error response', error);
-        suscriber.next({ logged: false, response: null, error: error});
+      }, err => {
+        this.utilities.error('login error response', err);
+        suscriber.next({ logged: false, response: null, error: err});
       }, () => {
-        suscriber.complete();
+        // suscriber.complete();
       });
     });
+  }
+
+  public fetchUserMemberData(username: string, observe: any = 'body', reportProgress = false) {
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/settings/userMember?userName=${username}`);
+  }
+
+  setUserMemberData(data: any): void {
+    localStorage.setItem('selected-city', data.cityId);
+    localStorage.setItem('selected-cityName', data.cityName);
+    localStorage.setItem('selected-plant', data.plantId);
+    localStorage.setItem('selected-plantName', data.plantName);
+    localStorage.setItem('selected-depot', data.depotId);
+    localStorage.setItem('selected-depotName', data.depotName);
+    localStorage.setItem('selected-owner', data.ownerId);
+    localStorage.setItem('selected-ownerName', data.ownerName);
+  }
+
+  getUserMemberData(): any {
+    return this.userData.cityId !== null ? this.userData : this.userData = {
+      cityId: Number(localStorage.getItem('selected-city')),
+      cityName: localStorage.getItem('selected-cityName'),
+      plantId: Number(localStorage.getItem('selected-plant')),
+      plantName: localStorage.getItem('selected-plantName'),
+      depotId: Number(localStorage.getItem('selected-depot')),
+      depotName: localStorage.getItem('selected-depotName'),
+      ownerId: Number(localStorage.getItem('selected-owner')),
+      ownerName: localStorage.getItem('selected-ownerName')
+    };
   }
 
   refreshToken(): Observable<any> {
@@ -84,14 +214,15 @@ export class AuthService {
     .set('client_id', parameters.client_id)
     .set('refresh_token', this.getRefreshToken());
     return  this.httpClient.post(`${environment.apiKeycloak}/realms/cclrealm/protocol/openid-connect/token`,
-      payload).pipe(tap((response: any) => {
+      payload).pipe(switchMap((response: any) => {
         if (response && response.access_token) {
           this.setRefreshToken(response.refresh_token);
           this.setSessionToken(response.access_token);
           this.setSessionStart(Date.now());
           this.utilities.log('Token refreshed');
         }
-      }));
+        return of(response);
+    }), retry(3));
   }
 
   public logout(): Observable<any> {
@@ -231,11 +362,12 @@ export class AuthService {
   }
 
   public isLoggedIn() {
-    if (this.tokenRefreshInterval === undefined) {
+    const isLogged = (this.getSessionToken() !== null && this.getSessionToken() !== undefined &&
+    (Date.now() - this.getSessionStart()) < this.getSessionExpiresIn() * 1000);
+    if (isLogged && this.tokenRefreshInterval === undefined) {
       this.setRefreshTokenInterval();
     }
-    return (this.getSessionToken() !== null &&
-    (Date.now() - this.getSessionStart()) < this.getSessionExpiresIn() * 1000);
+    return isLogged;
   }
 
   public isTokenExpired() {
@@ -298,34 +430,30 @@ export class AuthService {
       this.utilities.log('Verificando valides del token');
       if (this.isTokenExpired()) {
         this.utilities.log('Token expirado');
-        if (!this.isRefreshingToken) {
-          this.utilities.log('Solicitando nuevo token...');
-          this.isRefreshingToken = true;
-          this.refreshToken().pipe(switchMap((response: any) => {
-            this.utilities.log('Respuesta al refrescar token: ', response);
-            if (response && response.access_token) {
-                this.utilities.log('Token regenerado con exito');
-                this.isRefreshingToken = false;
-                this.setRefreshToken(response.access_token);
-            } else {
-              // If we don't get a new token, we are in trouble so logout.
-              this.utilities.error('Error desconocido al refrescar token...haciendo logout');
-              this.logout();
-              this.router.navigate(['/login']);
-            }
-            return of(true);
-          }), catchError(error => {
-              // If we don't get a new token, we are in trouble so logout.
-              this.utilities.error('Error desconocido al refrescar token...haciendo logout', error);
-              this.logout();
-              this.router.navigate(['/login']);
-              return of(true);
-          }), finalize(() => {
-              this.isRefreshingToken = false;
-          })).subscribe();
-        } else {
-            this.utilities.log('Ya se esta refrescando el token...');
-        }
+        this.utilities.log('Solicitando nuevo token...');
+        this.isRefreshingToken = true;
+        this.refreshToken().pipe(tap((response: any) => {
+          this.isRefreshingToken = false;
+          this.utilities.log('Respuesta al refrescar token: ', response);
+          if (response && response.refresh_token) {
+              this.utilities.log('Token regenerado con exito');
+              this.setRefreshToken(response.refresh_token);
+          } else {
+            // If we don't get a new token, we are in trouble so logout.
+            this.utilities.error('Error desconocido al refrescar token...haciendo logout');
+            this.logout();
+            this.router.navigate(['/login']);
+          }
+        }), catchError(error => {
+            // If we don't get a new token, we are in trouble so logout.
+            this.isRefreshingToken = false;
+            this.utilities.error('Error desconocido al refrescar token...', error);
+            /*this.logout();
+            this.router.navigate(['/login']);*/
+            return of(error);
+        }), finalize(() => {
+            this.isRefreshingToken = false;
+        })).subscribe();
       } else {
         this.utilities.log('Token valido');
       }

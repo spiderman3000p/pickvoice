@@ -5,7 +5,7 @@ import { DataProviderService} from '../../services/data-provider.service';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { ItemsService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+import { ItemService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { MyDataSource } from '../../models/my-data-source';
 
@@ -27,7 +27,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./items.component.css']
 })
 export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.ItemMap;
+  definitions: any = ModelMap.ItemListMap;
   dataSource: MyDataSource<Item>;
   dataToSend: Item[];
   displayedDataColumns: string[];
@@ -46,7 +46,7 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.ITEMS;
+  type = IMPORTING_TYPES.ITEMS_LIST;
   selectsData: any[] = [];
   subscriptions: Subscription[] = [];
   agGridOptions: GridOptions;
@@ -180,13 +180,16 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
     aux.shift();
     this.defaultColumnDefs = aux;
     this.selectsData = [];
+    console.log('definitions: ', this.definitions);
     this.columnDefs.slice().forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
+        console.log(`definitions: this.definitions[${column.name}]: `, this.definitions[column.name]);
         filter.name = this.definitions[column.name].name;
-        filter.type = this.definitions[column.name].formControl.control === 'input' ?
+        filter.type = this.definitions[column.name].formControl.control === 'input' ||
+        this.definitions[column.name].formControl.control === 'textarea' ?
         this.definitions[column.name].formControl.type :
         (this.definitions[column.name].formControl.control === 'date' ? 'date' :
         (this.definitions[column.name].formControl.control === 'toggle' ? 'toggle' :
@@ -244,6 +247,7 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe();
         // formControls[column.name].get('type').patchValue(FILTER_TYPES[0].value);
         if (this.definitions[column.name].formControl.control === 'select') {
+          console.log(`prueba this.definitions[${column.name}]`, this.definitions[column.name]);
           this.dataProviderService.getDataFromApi(this.definitions[column.name].type).subscribe(results => {
             this.selectsData[column.name] = results;
             this.utilities.log('selectsData', this.selectsData);
@@ -376,11 +380,11 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.subscriptions.push(this.dataProviderService.deleteItem(row.id, 'response', false)
+        this.subscriptions.push(this.dataProviderService.deleteItem(row.itemId, 'response', false)
         .subscribe(observer));
       });
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteItem(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deleteItem(rows.itemId, 'response', false)
       .subscribe(observer));
     }
   }

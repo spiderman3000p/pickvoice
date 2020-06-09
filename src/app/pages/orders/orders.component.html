@@ -138,22 +138,16 @@
                         </mat-menu>
                     </th>
                     <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                        <!--button mat-icon-button (click)="editRowOnDialog(element)">
-                            <img src="assets/icons/zoom.png">
-                        </button-->
-                        <!--button mat-icon-button (click)="editRowOnPage(element)">
-                            <img src="assets/icons/zoom.png">
-                        </button-->
-                        <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
+                        <button mat-icon-button [routerLink]="['/pages/orders/view', element.orderId]">
                             <img src="assets/icons/zoom.png">
                         </button>
-                        <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
+                        <button mat-icon-button [routerLink]="['/pages/orders/edit', element.orderId]">
                             <img src="assets/icons/page_edit.png">
                         </button>
                         <!--button mat-icon-button (click)="printRow(element)">
                             <img src="assets/icons/printer.png">
                         </button-->
-                        <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
+                        <a mat-icon-button [href]="'/print/orders/' + element.orderId" target="_blank">
                             <img src="assets/icons/printer.png">
                         </a>
                         <button mat-icon-button (click)="deletePrompt(element)">

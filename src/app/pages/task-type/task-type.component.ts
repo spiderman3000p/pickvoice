@@ -329,7 +329,7 @@ export class TaskTypeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.taskType);
+    this.utilities.dataTypesModelMaps.taskTypes);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.definitions,

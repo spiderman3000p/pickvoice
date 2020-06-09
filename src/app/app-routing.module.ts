@@ -21,6 +21,7 @@ import { UomsResolverService } from './pages/uoms/uoms-resolver.service';
 import { TransportResolverService } from './pages/transports/transport-resolver.service';
 import { PickingPlanningResolverService } from './pages/picking-planning/picking-planning-resolver.service';
 import { PickTaskResolverService } from './pages/picking-planning/pick-task-resolver.service';
+import { TaskTypeResolverService } from './pages/task-type/task-type-resolver.service';
 import { PickTaskLineResolverService } from './pages/picking-planning/pick-task-line-resolver.service';
 import { IMPORTING_TYPES } from './models/model-maps.model';
 
@@ -123,6 +124,18 @@ const routes: Routes = [
             type: IMPORTING_TYPES.ITEM_TYPE,
             format: 'single',
             title: 'Print Item Type'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.TASK_TYPES + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: TaskTypeResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.TASK_TYPES,
+            format: 'single',
+            title: 'Print Task Type'
           }
         },
         {

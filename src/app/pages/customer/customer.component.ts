@@ -25,7 +25,7 @@ import { MyDataSource } from '../../models/my-data-source';
   styleUrls: ['./customer.component.css']
 })
 export class CustomerComponent implements OnInit, AfterViewInit {
-  definitions: any = ModelMap.CustomerMap;
+  definitions: any = ModelMap.CustomerListMap;
   dataSource: MyDataSource<Customer>;
   dataToSend: Customer[];
   displayedDataColumns: string[];
@@ -46,7 +46,7 @@ export class CustomerComponent implements OnInit, AfterViewInit {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.CUSTOMERS;
+  type = IMPORTING_TYPES.CUSTOMERS_LIST;
   selectsData: any;
   subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -69,13 +69,17 @@ export class CustomerComponent implements OnInit, AfterViewInit {
         this.utilities.log('new selection', selected);
       });
       this.searchForm = new FormGroup({
-        process: new FormControl(''),
-        order: new FormControl(''),
-        transport: new FormControl(''),
-        description: new FormControl(''),
-        state: new FormControl(''),
-        startOrder: new FormControl(''),
-        purchaseOrder: new FormControl('')
+        customerCode: new FormControl(''),
+        customerName: new FormControl(''),
+        customerContact: new FormControl(''),
+        customerPhone: new FormControl(''),
+        cityCode: new FormControl(''),
+        cityName: new FormControl(''),
+        customerZone: new FormControl(''),
+        customerNeighborhood: new FormControl(''),
+        customerPostalCode: new FormControl(''),
+        customerLatitude: new FormControl(''),
+        customerLongitude: new FormControl('')
       });
       this.utilities.log('displayed data columns', this.displayedDataColumns);
       this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
@@ -146,7 +150,7 @@ export class CustomerComponent implements OnInit, AfterViewInit {
     this.utilities.log('paramsArray', paramsArray);
     const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
     this.utilities.log('loading data with params', params);
-    this.subscriptions.push(this.dataSource.loadData(this.type, `${params}`)
+    this.subscriptions.push(this.dataSource.loadData(IMPORTING_TYPES.CUSTOMERS, `${params}`)
     .subscribe((response: any) => {
         /*this.data = dataResults;
         this.dataCount = 100;
@@ -216,7 +220,8 @@ export class CustomerComponent implements OnInit, AfterViewInit {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
-        filter.type = this.definitions[column.name].formControl.control === 'input' ?
+        filter.type = this.definitions[column.name].formControl.control === 'textarea' ||
+        this.definitions[column.name].formControl.control === 'input' ?
         this.definitions[column.name].formControl.type :
         (this.definitions[column.name].formControl.control === 'date' ? 'date' :
         (this.definitions[column.name].formControl.control === 'toggle' ? 'toggle' :
@@ -432,37 +437,6 @@ export class CustomerComponent implements OnInit, AfterViewInit {
     const text = this.utilities.renderColumnData(type, data);
     return typeof text === 'string' ? text.slice(0, 30) : text;
   }
-/*
-  resetFilters() {
-    this.filtersForm.reset();
-    this.dataSource.filter = '';
-  }
-
-  applyFilters_old() {
-    const formValues = this.filtersForm.value;
-    let value;
-    let value2;
-    // this.utilities.log('filter form values: ', formValues);
-    const filters = this.filters.filter(filter => filter.show &&
-                    formValues[filter.key] && formValues[filter.key].length > 0);
-    // this.utilities.log('filters: ', filters);
-    this.dataSource.filterPredicate = (data: Customer, filter: string) => {
-      // this.utilities.log('data', data);
-      return filters.every(shownFilter => {
-        value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
-        value2 = formValues[shownFilter.key].toString();
-        /*
-        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
-        this.utilities.log('shownFilter.key', shownFilter.key);
-        this.utilities.log('value', value);
-        this.utilities.log('value2', value2);
-        this.utilities.log('--------------------------------------------');
-        return value !== undefined && value !== null && value.toString().toLowerCase().includes(value2.toLowerCase());
-      });
-    };
-    this.dataSource.filter = 'filtred';
-  }
-*/
   editRowOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
@@ -548,20 +522,6 @@ export class CustomerComponent implements OnInit, AfterViewInit {
   */
   private refreshTable() {
     this.loadDataPage();
-    /*
-    // If there's no data in filter we do update using pagination, next page or previous page
-    if (this.dataSource.filter === '') {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = 'XXX';
-      this.dataSource.filter = aux;
-      // If there's something in filter, we reset it to 0 and then put back old value
-    } else {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = '';
-      this.dataSource.filter = aux;
-    }
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
   }
 
   toggleFilters() {

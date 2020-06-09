@@ -4,7 +4,10 @@
       "secure": false,
       "changeOrigin": true
     },
-    "/api/*": {
+    "/mi-api": {
+        "pathRewrite": {
+            "^/mi-api": ""
+        },
         "target": "https://api.dev.pickvoice.com",
         "secure": false,
         "changeOrigin": true

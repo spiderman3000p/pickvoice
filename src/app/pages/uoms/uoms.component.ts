@@ -121,12 +121,12 @@ export class UomsComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.defaultColumnDefs;
   }
 
-  toggleColumn(column?) {
+  toggleColumbn(column?) {
     this.utilities.log('displayed column until now', this.displayedDataColumns);
 
     const selectedCol = column ? this.columnDefs.find(col => col.name === column.name) : null;
     const selectedDefaultCol = column ? this.defaultColumnDefs.find(col => col.name === column.name) : null;
-    if (selectedCol) {
+    if (selectedCol !== null) {
       column.show = !column.show;
       selectedCol.show = !selectedCol.show;
       selectedDefaultCol.show = !selectedDefaultCol.show;

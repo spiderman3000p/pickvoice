@@ -34,8 +34,9 @@
                     <div class="filters-panel">
                         <div class="col-sm-12 filters-controls">
                             <form [formGroup]="filtersForm" *ngIf="showFilters" class="row" (ngSubmit)="applyFilters()">
-                                <div *ngFor="let filter of filters" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4" [hidden]="filter.show">
-                                    <div *ngIf="definitions[filter.key].formControl.control === 'select'" class="form-group">
+                                <div *ngFor="let filter of filters" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4" [hidden]="!filter.show">
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'select'"
+                                    class="form-group ml-1">
                                         <label>{{filter.name}}</label>
                                         <select [compareWith]="definitions[filter.key].formControl.compareFn"
                                         [formControlName]="filter.key" class="form-control">
@@ -50,19 +51,21 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div *ngIf="definitions[filter.key].formControl.control === 'textarea' || definitions[filter.key].formControl.control === 'input'" class="form-group">
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'textarea' ||
+                                    definitions[filter.key].formControl.control === 'input'" class="form-group ml-1">
                                         <label>{{filter.name}}</label>
                                         <input [formControlName]="filter.key" class="form-control"
-                                            type="definitions[filter.key].formControl.type">
+                                            [type]="definitions[filter.key].formControl.type">
                                     </div>
-                                    <div *ngIf="definitions[filter.key].formControl.control === 'date'" class="form-group">
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'date'" class="form-group ml-1">
                                         <label>{{filter.name}}</label>
-                                        <input [formControlName]="filter.key" type="date" class="form-control">
+                                        <input  [formControlName]="filter.key" type="date" class="form-control">
                                     </div>
-                                    <div *ngIf="definitions[filter.key].formControl.control === 'toggle'" [appearance]="'none'">
-                                        <input [formControlName]="filter.key" hidden>
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'toggle'" class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <input  [formControlName]="filter.key" hidden>
                                         <mat-slide-toggle color="primary"
-                                        (change)="filtersForm.get(filter.key).setValue(!filtersForm.get(filter.key).value)"
+                                        (change)="filtersForm.get(filter.key).setValue(!filterForm.get(filter.key).value)"
                                         [checked]="filtersForm.get(filter.key).value">
                                             {{definitions[filter.key].name}}
                                         </mat-slide-toggle>
@@ -73,7 +76,7 @@
                                             <mat-icon>search</mat-icon>
                                             Filter
                                         </button>
-                                    <button mat-raised-button color="primary" class="btn btn-lg ml-lg-3 ml-md-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
+                                    <button mat-raised-button color="primary" class="btn btn-lg ml-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
                                             <mat-icon>not_interested</mat-icon>
                                             Reset Filters
                                         </button>
@@ -83,12 +86,11 @@
                                 <a href="javascript: void(0);" [matMenuTriggerFor]="toggleFiltersMenu">Toggle Filters</a>
                             </span>
                             <mat-menu #toggleFiltersMenu (click)="$event.stopPropagation()" style="position:absolute;right: 0;">
-                                <mat-list (click)="$event.stopPropagation()" role="list">
-                                    <mat-list-item *ngFor="let filter of filters" role="listitem"
-                                    (click)="filter.show = !filter.show" style="cursor: pointer">
-                                        <mat-icon color="accent" class="mr-2">{{ !filter.show ? 'check_box' : 'check_box_outline_blank'}}</mat-icon> {{filter.name}}
-                                    </mat-list-item>
-                                </mat-list>
+                                <mat-selection-list (click)="$event.stopPropagation()">
+                                    <mat-list-option *ngFor="let filter of filters" [selected]="filter.show" (click)="filter.show = !filter.show">
+                                        {{filter.name}}
+                                    </mat-list-option>
+                                </mat-selection-list>
                             </mat-menu>
                         </div>
                     </div>

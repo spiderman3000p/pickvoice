@@ -530,8 +530,7 @@ export class EditRowComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          if (response && (response.status === 204 || response.status === 200 || response.status === 201)
-            && response.statusText === 'OK') {
+          if (response && (response.status === 204 || response.status === 200 || response.status === 201)) {
             this.utilities.showSnackBar('Update Successfull', 'OK');
           } else {
             this.utilities.showSnackBar('Unknown Error', 'OK');
@@ -649,6 +648,11 @@ export class EditRowComponent implements OnInit, OnDestroy {
               this.row = row as Dock;
               this.cardTitle = 'Quality State #' + this.row.code;
               this.pageTitle = this.viewMode === 'edit' ? 'Edit Quality State' : 'View Quality State';
+            } else if (this.type === IMPORTING_TYPES.TASK_TYPES) {
+              this.utilities.log('object is a quality task type');
+              this.row = row as TaskType;
+              this.cardTitle = 'Task Type #' + this.row.code;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Task Type' : 'View Task Type';
             } else {
               this.cardTitle = 'Unknown object type';
               console.error('object is unknown');

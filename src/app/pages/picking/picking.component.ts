@@ -1,6 +1,7 @@
 import { OnDestroy, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
+import { AuthService } from '../../services/auth.service';
 import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
 import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
@@ -11,7 +12,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
 import { retry } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { ItemsService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+import { ItemService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+import { DataProviderService } from '../../services/data-provider.service';
 import { ModuleRegistry, AllModules } from '@ag-grid-enterprise/all-modules';
 import { LicenseManager } from '@ag-grid-enterprise/core';
 import { Module } from '@ag-grid-community/core';
@@ -51,7 +53,8 @@ export class PickingComponent implements OnDestroy {
   windows: GridWindow[];
   agGridModules: Module[] = AllModules;
   subscriptions: Subscription[] = [];
-  constructor(private apiService: ItemsService, private utilities: UtilitiesService) {
+  constructor(private dataProviderService: DataProviderService, private utilities: UtilitiesService,
+              private authService: AuthService) {
       this.initWindows();
       this.initPeriods();
       console.log('periods', this.periods);
@@ -63,107 +66,112 @@ export class PickingComponent implements OnDestroy {
     this.getData();
   }
 
-  getData(window?: GridWindow){
+  getData(window?: GridWindow) {
     this.utilities.log('requesting data');
+    const owner = this.authService.userData.ownerId;
     if (!window) {
-      this.windows.forEach(loader => loader.isLoading = true);
-      this.subscriptions.push(this.apiService.retrieveAllItems('response', false)
-      .pipe(retry(3)/*, catchError(this.handleError)*/)
-      .subscribe(response => {
-        this.windows.forEach(loader => loader.isLoading = false);
-        this.utilities.log('items received', response.body);
-        if (response.body.length > 0) {
-          const colDefs = Object.keys(response.body[0]).map(col => {
-            return {
-              enableRowGroup: true,
-              enablePivot: true,
-              enableValue: true,
-              sortable: true,
-              resizable: true,
-              filter: true,
-              field: col,
-              editable: true,
-              show: true
-            };
-          });
-          this.utilities.log('columnDefs sortable', colDefs);
-          const sideBar = {
-            toolPanels: [
-              'filters',
-              {
-                id: 'columns',
-                labelDefault: 'Columns',
-                labelKey: 'columns',
-                iconKey: 'columns',
-                toolPanel: 'agColumnsToolPanel',
-                toolPanelParams: { suppressSyncLayoutWithGrid: true }
-              }
-            ]
-          };
-          const statusBar = {
-            statusPanels: [
-              {
-                statusPanel: 'agTotalRowCountComponent',
-                align: 'left',
-                key: 'totalRowComponent'
-              },
-              {
-                statusPanel: 'agFilteredRowCountComponent',
-                align: 'left'
-              },
-              {
-                statusPanel: 'agSelectedRowCountComponent',
-                align: 'center'
-              },
-              {
-                statusPanel: 'agAggregationComponent',
-                align: 'right'
-              }
-            ]
-          };
-          this.windows.forEach(_window => {
-            _window.isLoading = false;
-            _window.data.rowData = JSON.parse(JSON.stringify(response.body));
-            _window.data.colDefs = JSON.parse(JSON.stringify(colDefs));
-            _window.data.defaultColDef = JSON.parse(JSON.stringify(colDefs));
-            _window.data.sideBar = Object.assign(sideBar);
-            _window.data.statusBar = Object.assign(statusBar);
-          });
-          console.log('all windows', this.windows);
-        }
-      }, error => {
-        this.windows.forEach(loader => loader.isLoading = false);
-        this.utilities.error('error on requesting data');
-        this.utilities.showSnackBar('Error requesting data', 'OK');
-      }));
-    } else {
-      window.isLoading = true;
-      this.subscriptions.push(this.apiService.retrieveAllItems('response', false)
-      .pipe(retry(3)/*, catchError(this.handleError)*/)
-        .subscribe(response => {
-          window.isLoading = true;
+      if (owner !== null) {
+        this.windows.forEach(loader => loader.isLoading = true);
+        this.subscriptions.push(this.dataProviderService.getAllItems('response', false)
+        .pipe(retry(3)/*, catchError(this.handleError)*/)
+        .subscribe((response: any) => {
+          this.windows.forEach(loader => loader.isLoading = false);
           this.utilities.log('items received', response.body);
           if (response.body.length > 0) {
-            window.data.rowData = response.body;
+            const colDefs = Object.keys(response.body[0]).map(col => {
+              return {
+                enableRowGroup: true,
+                enablePivot: true,
+                enableValue: true,
+                sortable: true,
+                resizable: true,
+                filter: true,
+                field: col,
+                editable: true,
+                show: true
+              };
+            });
+            this.utilities.log('columnDefs sortable', colDefs);
+            const sideBar = {
+              toolPanels: [
+                'filters',
+                {
+                  id: 'columns',
+                  labelDefault: 'Columns',
+                  labelKey: 'columns',
+                  iconKey: 'columns',
+                  toolPanel: 'agColumnsToolPanel',
+                  toolPanelParams: { suppressSyncLayoutWithGrid: true }
+                }
+              ]
+            };
+            const statusBar = {
+              statusPanels: [
+                {
+                  statusPanel: 'agTotalRowCountComponent',
+                  align: 'left',
+                  key: 'totalRowComponent'
+                },
+                {
+                  statusPanel: 'agFilteredRowCountComponent',
+                  align: 'left'
+                },
+                {
+                  statusPanel: 'agSelectedRowCountComponent',
+                  align: 'center'
+                },
+                {
+                  statusPanel: 'agAggregationComponent',
+                  align: 'right'
+                }
+              ]
+            };
+            this.windows.forEach(_window => {
+              _window.isLoading = false;
+              _window.data.rowData = JSON.parse(JSON.stringify(response.body));
+              _window.data.colDefs = JSON.parse(JSON.stringify(colDefs));
+              _window.data.defaultColDef = JSON.parse(JSON.stringify(colDefs));
+              _window.data.sideBar = Object.assign(sideBar);
+              _window.data.statusBar = Object.assign(statusBar);
+            });
+            console.log('all windows', this.windows);
           }
         }, error => {
-          window.isLoading = false;
+          this.windows.forEach(loader => loader.isLoading = false);
           this.utilities.error('error on requesting data');
           this.utilities.showSnackBar('Error requesting data', 'OK');
-        })
-      );
+        }));
+      }
+    } else {
+      if (owner !== null) {
+        window.isLoading = true;
+        this.subscriptions.push(this.dataProviderService.getAllItems('response', false)
+        .pipe(retry(3)/*, catchError(this.handleError)*/)
+          .subscribe((response: any) => {
+            window.isLoading = true;
+            this.utilities.log('items received', response.body);
+            if (response.body.length > 0) {
+              window.data.rowData = response.body;
+            }
+          }, error => {
+            window.isLoading = false;
+            this.utilities.error('error on requesting data');
+            this.utilities.showSnackBar('Error requesting data', 'OK');
+          })
+        );
+      }
     }
   }
 
-  initPeriods(){
+  initPeriods() {
     this.periods = [];
     const periods = [7, 15, 30, 90, 180, 365];
     let periodAux: TimePeriod;
     let periodText: string;
-    for (let period of periods) {
+    for (const period of periods) {
       periodAux = new Object() as TimePeriod;
       periodAux.value = period;
-      switch( period ) {
+      switch (period ) {
         case 30: periodText = 'Last month'; break;
         case 90: periodText = 'Last 3 months'; break;
         case 180: periodText = 'Last 6 months'; break;
@@ -201,10 +209,9 @@ export class PickingComponent implements OnDestroy {
   }
 
   editRow(index: number) {
-    
   }
 
-  expandWindow(window: any){
+  expandWindow(window: any) {
     const sortFunc = (a, b) => {
       if (a.position < b.position) {
         return -1;
@@ -255,8 +262,7 @@ export class PickingComponent implements OnDestroy {
     this.getData(window);
   }
 
-  reloadData(){
-    
+  reloadData() {
   }
 
   toggleColumn(window: GridWindow, column?: any){

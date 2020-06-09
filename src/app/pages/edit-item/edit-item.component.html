@@ -36,28 +36,27 @@
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Type</label>
-                                <select [compareWith]="dataMap.itemType.formControl.compareFn" formControlName="itemType"
+                                <label>
+                                    Type
+                                    <span class="add-link" *ngIf="viewMode === 'edit'">
+                                        <a href="javascript: void(0)"
+                                        (click)="addNewObject(importingTypes.ITEM_TYPE, 'Add new item type')">
+                                            new type
+                                        </a>
+                                    </span>
+                                </label>
+                                <select [compareWith]="dataMap.itemTypeId.formControl.compareFn" formControlName="itemTypeId"
                                 [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                    <option *ngFor="let type of itemData.itemTypeList" [ngValue]="type">
+                                    <option *ngFor="let type of itemData.itemTypeList" [value]="type.id">
                                         {{ type.description }}
                                     </option>
-                                    <!--div class="select-footer" *ngIf="dataMap.itemType.addNew && viewMode === 'edit'">
-                                        <span class="select-footer-content">
-                                            <a href="javascript: void(0)"
-                                            (click)="addNewObject(importingTypes.ITEM_TYPE, 'Add new item type')">
-                                                <mat-icon *ngIf="dataMap.itemType.addNew.icon">{{ dataMap.itemType.addNew.icon }}</mat-icon>
-                                                <span>{{ dataMap.itemType.addNew.text }}</span>
-                                            </a>
-                                        </span>
-                                    </div-->
                                 </select>
                             </div>
                             <div class="form-group" [class.readonly]="viewMode === 'view'">
                                 <label>Classification</label>
                                 <select [compareWith]="dataMap.classification.formControl.compareFn" formControlName="classification"
                                 [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                    <option *ngFor="let classification of itemData.classificationsList" [ngValue]="classification">
+                                    <option *ngFor="let classification of itemData.classificationsList" [value]="classification">
                                         {{ classification }}
                                     </option>
                                 </select>
@@ -73,7 +72,7 @@
                                 <label>State</label>
                                 <select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
                                 [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                    <option *ngFor="let state of itemData.statesList" [ngValue]="state">
+                                    <option *ngFor="let state of itemData.statesList" [value]="state">
                                         {{ state }}
                                     </option>
                                 </select>
@@ -143,28 +142,88 @@
                                         <div class="row">
                                             <div class="col-sm-4 pt-3">
                                                 <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>Unity Of Measure</label>
-                                                    <select [compareWith]="dataMap.uom.formControl.compareFn" formControlName="uom"
+                                                    <label>
+                                                        Uom Handling
+                                                        <span class="add-link" *ngIf="viewMode === 'edit'">
+                                                            <a href="javascript: void(0)"
+                                                            (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
+                                                                <span>new uom</span>
+                                                            </a>
+                                                        </span>
+                                                    </label>
+                                                    <select [compareWith]="dataMap.uomHandlingId.formControl.compareFn" formControlName="uomHandlingId"
                                                     [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                                        <option *ngFor="let uom of itemData.uomsList" [ngValue]="uom">
+                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom.id">
                                                             {{ uom.name }}
                                                         </option>
-                                                        <!--div class="select-footer" *ngIf="dataMap.uom.addNew && viewMode === 'edit'">
-                                                            <span class="select-footer-content">
-                                                                <a href="javascript: void(0)"
-                                                                (click)="addNewObject(importingTypes.UOMS, 'Add new Unity of measure')">
-                                                                    <mat-icon *ngIf="dataMap.uom.addNew.icon">{{ dataMap.uom.addNew.icon }}</mat-icon>
-                                                                    <span>{{ dataMap.uom.addNew.text }}</span>
-                                                                </a>
-                                                            </span>
-                                                        </div-->
                                                     </select>
                                                 </div>
+                                            </div>
+                                            <div class="col-sm-4 pt-3">
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>
+                                                        Uom Packing
+                                                        <span class="add-link" *ngIf="viewMode === 'edit'">
+                                                            <a href="javascript: void(0)"
+                                                            (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
+                                                                new uom
+                                                            </a>
+                                                        </span>
+                                                    </label>
+                                                    <select [compareWith]="dataMap.uomPackingId.formControl.compareFn" formControlName="uomPackingId"
+                                                    [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
+                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom.id">
+                                                            {{ uom.name }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 pt-3">
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>
+                                                        Uom Outbound
+                                                        <span class="add-link" *ngIf="viewMode === 'edit'">
+                                                            <a href="javascript: void(0)"
+                                                            (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
+                                                            new uom
+                                                            </a>
+                                                        </span>
+                                                    </label>
+                                                    <select [compareWith]="dataMap.uomOutboundId.formControl.compareFn" formControlName="uomOutboundId"
+                                                    [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
+                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom.id">
+                                                            {{ uom.name }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 pt-3">
+                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                                    <label>
+                                                        Uom Inbound
+                                                        <span class="add-link" *ngIf="viewMode === 'edit'">
+                                                            <a href="javascript: void(0)"
+                                                            (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
+                                                            new uom
+                                                            </a>
+                                                        </span>
+                                                    </label>
+                                                    <select [compareWith]="dataMap.uomInboundId.formControl.compareFn" formControlName="uomInboundId"
+                                                    [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
+                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom.id">
+                                                            {{ uom.name }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 pt-3">
                                                 <div class="form-group" [class.readonly]="viewMode === 'view'">
                                                     <label>Weight Tolerance</label>
                                                     <input class="form-control"  type="number" formControlName="weightTolerance"
                                                     [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                                 </div>
+                                            </div>
+                                            <div class="col-sm-4 pt-3">
                                                 <div class="form-group" [class.readonly]="viewMode === 'view'">
                                                     <label>Tolerance</label>
                                                     <input class="form-control"  type="number" formControlName="tolerance"
@@ -224,90 +283,19 @@
                                             <button type="button" class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
                                         </div>
                                     </div>
-                                    <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8"-->
-                                    <!--table mat-table [dataSource]="dataSource" matSort>
-                                        <!-- Checkbox Column -->
-                                        <!--ng-container matColumnDef="select">
-                                            <th mat-header-cell *matHeaderCellDef>
-                                                <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
-                                                    [aria-label]="checkboxLabel()">
-                                                </mat-checkbox>
-                                            </th>
-                                            <td mat-cell *matCellDef="let row">
-                                                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
-                                                    [aria-label]="checkboxLabel(row)">
-                                                </mat-checkbox>
-                                            </td>
-                                        </ng-container>
-                                        <!-- Data Columns ->
-                                        <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
-                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
-                                            <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
-                                        </ng-container>
-                                        <!-- Options Sticky Column ->
-                                        <ng-container matColumnDef="options" stickyEnd>
-                                            <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
-                                                {{'Options' | uppercase}}
-                                                <button type="button" mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
-                                                    <mat-icon>more_vert</mat-icon>
-                                                </button>
-                    
-                                                <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
-                                                    <span>
-                                                        <button type="button" mat-menu-item (click)="toggleColumn()">Show all</button>
-                                                        <button type="button" mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
-                                                        (click)="toggleColumn(column)">
-                                                            <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                                            {{column.name}}
-                                                        </button>
-                                                    </span>
-                                                </mat-menu>
-                                            </th>
-                                            <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                                                <!--button mat-icon-button (click)="editRowOnDialog(element)">
-                                                    <img src="assets/icons/zoom.png">
-                                                </button-->
-                                                <!--button mat-icon-button (click)="editRowOnPage(element)">
-                                                    <img src="assets/icons/zoom.png">
-                                                </button->
-                                                <button type="button" mat-icon-button (click)="editRowOnDialog(element, 'view')">
-                                                    <img src="assets/icons/zoom.png">
-                                                </button>
-                                                <button type="button" mat-icon-button (click)="editRowOnDialog(element, 'edit')">
-                                                    <img src="assets/icons/page_edit.png">
-                                                </button>
-                                                <!--button mat-icon-button (click)="printRow(element)">
-                                                    <img src="assets/icons/printer.png">
-                                                </button->
-                                                <a mat-icon-button [href]="'/print/' + importingTypes.ITEMUOMS + '/' + element.id" target="_blank">
-                                                    <img src="assets/icons/printer.png">
-                                                </a>
-                                                <button type="button" mat-icon-button (click)="deletePrompt(element)">
-                                                    <img src="assets/icons/delete.png">
-                                                </button>
-                                            </td>
-                                        </ng-container>
-                    
-                                        <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
-                                        <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                                        [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr->
-                                        <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
-                                            [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
-                                    </table>
-                                    <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator-->
-                                        <ag-grid-angular
-                                        style="width: 100%; height: 300px;"
-                                        class="ag-theme-balham"
-                                        [frameworkComponents]="frameworkComponents"
-                                        [rowData]="itemUomsData | async"
-                                        [columnDefs]="itemUomsColDefs"
-                                        [suppressClickEdit]="true"
-                                        editType="fullRow"
-                                        (keydown)="checkKeyPressed($event)"
-                                        (keypress)="checkKeyPressed($event)"
-                                        (gridReady)="onGridReady($event)"
-                                        (rowValueChanged)="updateItemUom($event)">
-                                        </ag-grid-angular>
+                                    <ag-grid-angular
+                                    style="width: 100%; height: 300px;"
+                                    class="ag-theme-balham"
+                                    [frameworkComponents]="frameworkComponents"
+                                    [rowData]="itemUomsData | async"
+                                    [columnDefs]="itemUomsColDefs"
+                                    [suppressClickEdit]="true"
+                                    editType="fullRow"
+                                    (keydown)="checkKeyPressed($event)"
+                                    (keypress)="checkKeyPressed($event)"
+                                    (gridReady)="onGridReady($event)"
+                                    (rowValueChanged)="updateItemUom($event)">
+                                    </ag-grid-angular>
                                 </div>
                             </ng-template>
                         </mat-tab>

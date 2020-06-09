@@ -85,6 +85,7 @@ const BODY_DUMMY_DATA = [
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+  userData: any;
   chartTasks: any;
   chartPlannings: any;
   chartProgress: any;
@@ -211,6 +212,9 @@ export class DashboardComponent implements OnInit {
     this.chartsTo.setValue(this.utilities.formatDate(new Date(), 'YYYY-MM-DD'));
     this.utilities.log('this.taskChartTo: ', this.chartsTo.value);
     this.utilities.log('this.taskChartFrom: ', this.chartsFrom.value);
+  }
+
+  initCharts() {
     this.calculateTasksChart();
     this.calculatePlanningsChart();
     this.chartsFrom.valueChanges.pipe(debounceTime(1000)).subscribe(date => {
@@ -634,8 +638,6 @@ export class DashboardComponent implements OnInit {
         },
       }
     });
-
-
     const element = document.getElementById('date-filters');
     const elementPosition = element.offsetTop;
     document.querySelector('.mat-sidenav-content').addEventListener('scroll', function(event) {
@@ -655,5 +657,6 @@ export class DashboardComponent implements OnInit {
         element.style.width = 'unset';
       }
     });
+    this.initCharts();
   }
 }

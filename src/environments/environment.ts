@@ -6,8 +6,10 @@ export const environment = {
     username: '',
     password: ''
   },
-  apiBaseUrl: '/api',
+  apiBaseUrl: '/mi-api',
   apiKeycloak: '/auth',
+  /*apiBaseUrl: 'https://api.dev.pickvoice.com/api/',
+  apiKeycloak: 'https://keycloak.cclauth.com/auth/',*/
   sessionDuration: 360, // session duration in minutes
   sessionInactivityTime: 30, // session inativity time in minutes
   debug: true,
