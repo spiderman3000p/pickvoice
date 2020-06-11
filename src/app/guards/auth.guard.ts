@@ -20,19 +20,23 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     return this.canActivate(route, state);
   }
 
+  canLoad(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    return this.checkLogin(state.url);
+  }
+
   checkLogin(url: string): boolean {
     if (this.authService.getRemember() && this.authService.getUsername() &&
         this.authService.getRememberUsername() === this.authService.getUsername()) {
       return true;
     }
     if (this.authService.isLoggedIn()) {
-      if (url.includes('/login')) {
+      if (url && url.includes('/login')) {
         this.router.navigate(['/']);
         return false;
       }
       return true;
     } else {
-      if (url.includes('/login')) {
+      if (url && url.includes('/login')) {
         return true;
       }
     }

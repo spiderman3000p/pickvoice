@@ -1,7 +1,4 @@
 <div class="content-area">
-    <!--div class="example-loading-shade" *ngIf="isLoadingResults">
-        <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
-    </div-->
     <button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button>
     <div class="content">
       <div class="section-wrapper">
@@ -31,96 +28,6 @@
           </div>
       </div>
       <div>
-        <!--mat-accordion>
-            <mat-expansion-panel (opened)="showFilters = true" (closed)="showFilters = false">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <mat-icon>search</mat-icon>
-                        Filters Section
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        Click to {{ !showFilters ? 'show' : 'hide' }} all filter controls
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                <div class="filters-panel">
-                    <div class="filters-controls">
-                        <form [formGroup]="filtersForm" *ngIf="showFilters" class="row" (ngSubmit)="applyFilters()">
-                            <span *ngFor="let filter of filters" [formGroupName]="filter.key" class="filter-group-container"
-                            [style.display]="filter.show ? '' : 'none'">
-                                <label *ngIf="filter.show && filter.type !== 'toggle'" class="text-secondary">{{filter.name}} filter</label><br>
-                                <mat-form-field class="select-filtertype"
-                                *ngIf="definitions[filter.key].formControl.control !== 'select' && 
-                                definitions[filter.key].formControl.control !== 'toggle' && filter.show">
-                                    <mat-select formControlName="type">
-                                        <mat-option *ngFor="let type of filter.availableTypes"
-                                        [value]="type.value">
-                                            {{ type.name }}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-form-field class="select-input"
-                                *ngIf="definitions[filter.key].formControl.control === 'select' && filter.show">
-                                        <mat-label>Select a value</mat-label>
-                                        <mat-select [compareWith]="definitions[filter.key].formControl.compareFn"
-                                        formControlName="value">
-                                            <mat-option value="-1">Select a value</mat-option>
-                                            <mat-option *ngFor="let data of selectsData[filter.key] | async"
-                                            [value]="data.id !== undefined && data.id !== null ? data.id : 
-                                            (definitions[filter.key].formControl.valueIndex !== null ?
-                                            data[definitions[filter.key].formControl.valueIndex] : data)">
-                                                {{ definitions[filter.key].formControl.displayIndex !== null ?
-                                                    data[definitions[filter.key].formControl.displayIndex] : data }}
-                                            </mat-option>
-                                        </mat-select>
-                                </mat-form-field>
-                                <mat-form-field class="input-text"
-                                *ngIf="definitions[filter.key].formControl.control === 'input' && filter.show">
-                                    <mat-label>{{filter.name}}</mat-label>
-                                    <input matInput formControlName="value"
-                                        [type]="filter.type">
-                                </mat-form-field>
-                                <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'date' && filter.show"
-                                class="input-text">
-                                    <mat-label>{{filter.name}}</mat-label>
-                                    <input matInput formControlName="value" [matDatepicker]="pickerDate" readonly>
-                                    <mat-datepicker-toggle matSuffix [for]="pickerDate">
-                                    </mat-datepicker-toggle>
-                                    <mat-datepicker #pickerDate ></mat-datepicker>
-                                </mat-form-field>
-                                <mat-form-field [appearance]="'none'" 
-                                *ngIf="definitions[filter.key].formControl.control === 'toggle' && filter.show">
-                                    <mat-label>{{filter.name}}</mat-label>
-                                    <input matInput formControlName="value" hidden>
-                                    <mat-slide-toggle color="primary"
-                                    (change)="filtersForm.get(filter.key).setValue(!filterForm.get(filter.key).value)"
-                                    [checked]="filtersForm.get(filter.key).value">
-                                        {{definitions[filter.key].name}}
-                                    </mat-slide-toggle>
-                                </mat-form-field>
-                            </span>
-                            <div class="col-sm-12 text-right">
-                                <button mat-raised-button color="accent" class="btn btn-lg" type="submit">
-                                    <mat-icon>search</mat-icon>
-                                    Filter
-                                </button>
-                                <button mat-raised-button color="primary" class="btn btn-lg ml-3" type="reset"
-                                (click)="resetFilters()" *ngIf="filteredDone">
-                                    <mat-icon>not_interested</mat-icon>
-                                    Reset Filters
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <!--div class="col-sm-3 filters-list">
-                        <mat-selection-list>
-                            <mat-list-option *ngFor="let filter of filters" [selected]="filter.show" (click)="filter.show = !filter.show">
-                                {{filter.name}}
-                            </mat-list-option>
-                        </mat-selection-list>
-                    </div->
-                </div>
-            </mat-expansion-panel>
-        </mat-accordion-->
         <div>
             <div class="example-loading-shade" *ngIf="dataSource.loading$ | async">
                 <mat-spinner class="spinner"></mat-spinner>

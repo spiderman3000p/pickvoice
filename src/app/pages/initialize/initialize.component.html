@@ -1,0 +1,91 @@
+<div class="content-area">
+    <div class="content">
+        <div class="section-wrapper">
+            <div class="header actionbar align-content-top">
+                <div class="title actionbar-section align-content-top">
+                    <h1>Welcome, please set the organizational data before continue</h1>
+                </div>
+            </div>
+        </div>
+        <mat-card>    
+            <mat-card-header>
+                <mat-card-title>Initialization Wizard</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="example-loading-shade" *ngIf="isLoadingResults">
+                    <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+                </div>
+                <mat-horizontal-stepper [linear]="isLinear" #stepper>
+                    <mat-step>
+                        <ng-template matStepLabel>Select a city</ng-template>
+                        <div class="form-group">
+                            <label>City</label>
+                            <select [formControl]="selectedCity" required class="form-control">
+                                <option *ngFor="let opt of cities; let i = index" [value]="i">{{ opt.name }}</option>
+                            </select>
+                        </div>
+                        <div class="step-buttons">
+                            <button mat-raised-button matStepperNext>Next</button>
+                        </div>
+                    </mat-step>
+                    <mat-step>
+                        <ng-template matStepLabel>Select a plant</ng-template>
+                        <div class="form-group">
+                            <label>Plant</label>
+                            <select [formControl]="selectedPlant" required class="form-control">
+                                <option *ngFor="let opt of getPlants(); let i = index" [value]="i">{{ opt.name }}</option>
+                            </select>
+                        </div>
+                        <div class="step-buttons">
+                            <button mat-raised-button matStepperNext color="primary">Next</button>
+                        </div>
+                    </mat-step>
+                    <mat-step>
+                        <ng-template matStepLabel>Select a depot</ng-template>
+                        <div class="form-group">
+                            <label>Depot</label>
+                            <select [formControl]="selectedDepot" required class="form-control">
+                                <option *ngFor="let opt of getDepots(); let i = index" [value]="i">
+                                    {{ opt.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="step-buttons">
+                            <button mat-raised-button matStepperPrevious>Back</button>
+                            <button mat-raised-button matStepperNext color="primary">Next</button>
+                        </div>
+                    </mat-step>
+                    <mat-step>
+                        <ng-template matStepLabel>Select an owner</ng-template>
+                        <div class="form-group">
+                            <label>Owner</label>
+                            <select [formControl]="selectedOwner" required class="form-control">
+                                <option *ngFor="let opt of getOwners()">
+                                    {{ opt.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="step-buttons">
+                            <button mat-raised-button matStepperPrevious>Back</button>
+                            <button mat-raised-button matStepperNext color="primary" (click)="setUserData()">Next</button>
+                        </div>
+                    </mat-step>
+                    <mat-step>
+                        <ng-template matStepLabel>Done</ng-template>
+                        <p>You are now done. Please verify your selection.</p>
+                        <ul>
+                            <li><strong>City: </strong>{{ userData.cityName}}</li>
+                            <li><strong>Plant: </strong>{{ userData.plantName}}</li>
+                            <li><strong>Depot: </strong>{{ userData.depotName}}</li>
+                            <li><strong>Owner: </strong>{{ userData.ownerName}}</li>
+                        </ul>
+                        <div class="step-buttons">
+                            <button mat-raised-button matStepperPrevious>Back</button>
+                            <button mat-raised-button (click)="enter()" color="primary">Enter</button>
+                        </div>
+                    </mat-step>
+                </mat-horizontal-stepper>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

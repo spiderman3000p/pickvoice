@@ -68,6 +68,7 @@ import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
 
+import { NgSelectModule } from '@ng-select/ng-select';
 // import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 export function apiConfigFactory(): Configuration {
@@ -111,6 +112,7 @@ export function apiConfigFactory(): Configuration {
     BrowserAnimationsModule,
     LayoutModule,
 
+    NgSelectModule,
     /*FontAwesomeModule,*/
 
     MatSlideToggleModule,

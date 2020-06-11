@@ -123,45 +123,45 @@
                             <br><br>
                             <h6>Customer Details</h6>
                             <hr>
-                            <span *ngIf="selectedCustomer.customerId !== undefined" class="row">
+                            <span *ngIf="selectedCustomer.id !== undefined" class="row">
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Customer Code</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedCustomer.code"
-                                        [class.readonly]="true" [readonly]="true">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Name</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedCustomer.name"
-                                        [class.readonly]="true" [readonly]="true">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Contact</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedCustomer.contact"
-                                        [class.readonly]="true" [readonly]="true">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Phone</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedCustomer.phone"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Address</label>
-                                        <textarea class="form-control"
+                                        <textarea class="form-control readonly"
                                         [value]="selectedCustomer.address"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                         </textarea>
                                     </div>
                                 </div>
@@ -194,48 +194,48 @@
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Transport Number</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.transportNumber"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        [readonly]="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Route</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.route"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Name Route</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.nameRoute"
-                                        [class.readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Carrier Code</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.carrierCode"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Shipment Date</label>
-                                        <input class="form-control" type="date"
+                                        <input class="form-control readonly" type="date"
                                         [value]="selectedTransport.shipmentDate"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Transportation Status</label>
-                                        <select class="form-control"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        <select class="form-control readonly"
+                                        readonly="true">
                                             <option *ngFor="let status of ordersData.transportStatus"
                                             [selected]="selectedTransport.transportationStatus === status"
                                             [ngValue]="status">
@@ -247,112 +247,112 @@
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Vehicle</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.vehicle"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Container Number</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.containerNumber"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Weight</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.weight"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Trailer</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.trailer"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Description</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.description"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Planned Checkin</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.plannedCheckin"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Actual Checkin</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.actualChecking"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Planned Start Loading</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.plannedStartLoading"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Current Start Loading</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.currentStartLoading"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Planned End Loading</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.plannedEndLoading"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Actual End Loading</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.actualEndLoading"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
+                                    <div class="form-group readonly">
                                         <label>Planned Shipment Completion</label>
                                         <input class="form-control" type="text"
                                         [value]="selectedTransport.plannedShipmentCompletion"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
+                                    <div class="form-group readonly">
                                         <label>Current Shipment Completion</label>
-                                        <input class="form-control" type="text"
+                                        <input class="form-control readonly" type="text"
                                         [value]="selectedTransport.currentShipmentCompletion"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        readonly="true">
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Uom Weight</label>
-                                        <select class="form-control"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        <select class="form-control readonly"
+                                        readonly="true">
                                             <option *ngFor="let uom of ordersData.uomList"
                                             [selected]="selectedTransport.uomWeight === uom"
                                             [ngValue]="uom">
@@ -373,8 +373,8 @@
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Uom Volume</label>
-                                        <select class="form-control"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        <select class="form-control readonly"
+                                        readonly="true">
                                             <option *ngFor="let uom of ordersData.uomList"
                                             [selected]="selectedTransport.uomVolume === uom"
                                             [ngValue]="uom">

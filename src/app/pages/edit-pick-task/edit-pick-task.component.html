@@ -72,9 +72,9 @@
                     </div>
                     <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
                         <label>Type</label>
-                        <select [compareWith]="dataMap.taskType.formControl.compareFn" formControlName="taskType"
+                        <select [compareWith]="dataMap.taskTypeId.formControl.compareFn" formControlName="taskTypeId"
                         [class.readonly]="viewMode === 'view'" [disabled]="viewMode === 'view'" class="form-control">
-                            <option *ngFor="let type of pickTaskData.taskTypesList" [ngValue]="type">
+                            <option *ngFor="let type of pickTaskData.taskTypesList" [ngValue]="type.id">
                                 {{ type.name }}
                             </option>
                         </select>
@@ -175,9 +175,9 @@
                             <ng-template matTabContent>
                                 <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                                         <label>User</label>
-                                        <select [compareWith]="dataMap.user.formControl.compareFn" formControlName="user"
+                                        <select [compareWith]="dataMap.userId.formControl.compareFn" formControlName="userId"
                                         [class.readonly]="viewMode === 'view'">
-                                            <option *ngFor="let user of pickTaskData.userList" [value]="user">
+                                            <option *ngFor="let user of pickTaskData.userList" [value]="user.id">
                                                 {{ user.firstName }} {{ user.lastName }}
                                             </option>
                                         </select>

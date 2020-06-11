@@ -95,8 +95,8 @@ export class EditPickTaskComponent implements OnInit {
       qty: new FormControl(''),
       document: new FormControl(''),
       taskState: new FormControl(''),
-      user: new FormControl(''),
-      taskType: new FormControl(''),
+      userId: new FormControl(''),
+      taskTypeId: new FormControl(''),
       currentLine: new FormControl(''),
       childrenWork: new FormControl('')
     });
@@ -131,8 +131,8 @@ export class EditPickTaskComponent implements OnInit {
       qty: new FormControl(this.row.qty),
       document: new FormControl(this.row.document),
       taskState: new FormControl(this.row.taskState),
-      user: new FormControl(this.row.user),
-      taskType: new FormControl(this.row.taskType),
+      user: new FormControl(this.row.userId),
+      taskType: new FormControl(this.row.taskTypeId),
       currentLine: new FormControl(this.row.currentLine),
       childrenWork: new FormControl(this.row.childrenWork)
     });

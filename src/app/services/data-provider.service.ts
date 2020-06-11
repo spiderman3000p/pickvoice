@@ -375,6 +375,11 @@ export class DataProviderService {
     return toReturn;
   }
 
+  public getMemberData(username: string, observe: any = 'body', reportProgress = false) {
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/settings/` +
+    `userMember?userName=${username}`).pipe(retry(3));
+  }
+
   getDashboardDataHeader(from?: string, to?: string) {
     const owner = this.authService.getOwnerId();
     if (owner !== null) {
@@ -590,12 +595,7 @@ export class DataProviderService {
     Grupo de metodos para item uoms
   ***********************************************************************************/
   public getAllItemUoms(idItem: number, observe: any = 'body', reportProgress = false) {
-    const owner = this.authService.getOwnerId();
-    // TODO: falta el metodo
-    if (owner !== null) {
-      // return this.itemUomService.itemUomByItemId(idItem, owner, observe, reportProgress);
-    }
-    return of([]);
+    return this.itemUomService.itemUomByItemId(idItem, observe, reportProgress);
   }
 
   public deleteItemUom(id: number, observe: any = 'body', reportProgress = false) {
@@ -1078,11 +1078,9 @@ export class DataProviderService {
   }
 
   public getDock(id: number, observe: any = 'body', reportProgress = false) {
-    const owner = this.authService.getOwnerId();
-    if (owner !== null) {
-      return this.docksService.retrieveDockById(id, owner, observe, reportProgress);
-    }
-    return of(false);
+    // return this.docksService.retrieveDockById(id, owner, observe, reportProgress);
+    return this.httpClient.get<any>(environment.apiBaseUrl +
+      '/outbound/DockVO1/' + id).pipe(retry(3));
   }
   /**********************************************************************************
     Grupo de metodos para task types

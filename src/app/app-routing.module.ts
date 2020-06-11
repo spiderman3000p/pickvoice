@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { InitializeGuard } from './guards/initialize.guard';
 
 import { PagesComponent } from './pages/pages.component';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
@@ -31,7 +32,8 @@ const routes: Routes = [
     component: PagesComponent,
     loadChildren: () => import('./pages/pages.module')
       .then(m => m.PagesModule),
-    canActivateChild: [AuthGuard]
+    canLoad: [AuthGuard],
+    canActivateChild: [InitializeGuard]
   },
   {
     path: 'login',
@@ -40,9 +42,15 @@ const routes: Routes = [
     canActivateChild: [AuthGuard]
   },
   {
+    path: 'initialize',
+    // component: LoginComponent,
+    loadChildren: () => import('./pages/initialize/initialize.module').then(m => m.InitializeModule),
+    canActivateChild: [AuthGuard, InitializeGuard]
+  },
+  {
     path: 'importing',
     outlet: 'importing',
-    canActivateChild: [AuthGuard],
+    canLoad: [AuthGuard],
     children: [
       {
         path: 'import-type-selection',
@@ -270,16 +278,17 @@ const routes: Routes = [
             title: 'Print Quality State'
           }
         }
-    ]
+    ],
+    canLoad: [AuthGuard]
   },
   {
     path: 'edit-templates',
     // outlet: 'print',
     loadChildren: () => import('./pages/edit-templates-grapes/edit-templates.module')
     .then(m => m.EditTemplatesModule),
-    canActivateChild: [AuthGuard]
+    canLoad: [AuthGuard]
   },
-  { path: '', redirectTo: 'pages', pathMatch: 'full' },
+  { path: '', redirectTo: 'initialize', pathMatch: 'full' },
   { path: '**', redirectTo: 'pages/not-found' },
 ];
 

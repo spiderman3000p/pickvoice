@@ -87,6 +87,12 @@
                                         <option value="false">false</option>
                                     </select>
                                 </span>
+                                <span class="form-group" *ngIf="definitions[column].formControl.control === 'textarea' || definitions[column].formControl.control === 'input' ||
+                                definitions[column].formControl.control === 'date'" (keyup)="$event.stopPropagation()"
+                                (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
+                                    <input [type]="filters[column].type" class="form-control mb-1" [name]="column"
+                                    [formControl]="filters[column].controls.value">
+                                </span>
                                 <span class="form-group" *ngIf="filters[column].controls.type.value === 'inRange'" (keyup)="$event.stopPropagation()"
                                 (click)="$event.stopPropagation()" (keydow)="$event.stopPropagation()">
                                     <input [type]="filters[column].type" class="form-control mb-1" [name]="column + '-filterTo'"

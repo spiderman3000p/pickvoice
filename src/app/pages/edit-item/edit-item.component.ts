@@ -379,7 +379,11 @@ export class EditItemComponent implements OnInit {
     for (let key in this.definitions) {
       if (this.definitions[key].formControl.control === 'select') {
         this.dataProviderService.getDataFromApi(this.definitions[key].type).subscribe(result => {
-          this.selectsData[key] = result;
+          if (result && result.content && result.pageSize) {
+            this.selectsData[key] = result.content;
+          } else {
+            this.selectsData[key] = result;
+          }
         });
       }
     }

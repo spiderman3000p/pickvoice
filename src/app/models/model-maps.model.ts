@@ -1269,7 +1269,7 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        uom: {
+        uomId: {
             name: 'uom',
             required: false,
             type: IMPORTING_TYPES.UOMS,
@@ -1288,10 +1288,10 @@ export class ModelMap {
                 modelType: IMPORTING_TYPES.UOMS
             }
         },
-        item: {
-            name: 'item',
+        dimensionUomId: {
+            name: 'dimension uom',
             required: false,
-            type: IMPORTING_TYPES.ITEMS,
+            type: IMPORTING_TYPES.UOMS,
             formControl: {
                 control: 'select',
                 type: 'number',
@@ -1299,6 +1299,63 @@ export class ModelMap {
                 displayIndex: 'name',
                 compareFn: (c1, c2) => {
                     return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new uom',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.UOMS
+            }
+        },
+        volumenUomId: {
+            name: 'volumen uom',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new uom',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.UOMS
+            }
+        },
+        weightUomId: {
+            name: 'weight uom',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new uom',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.UOMS
+            }
+        },
+        itemId: {
+            name: 'item',
+            required: false,
+            type: IMPORTING_TYPES.ITEMS,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'itemId',
+                displayIndex: 'itemDescription',
+                compareFn: (c1, c2) => {
+                    return c1.itemId === c2.itemId;
                 }
             },
             addNew: {

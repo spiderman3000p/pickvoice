@@ -158,15 +158,9 @@ export class AuthService {
           this.setSessionStart(Date.now());
           this.setUsername(username);
           this.setUnamed(password);
-          this.fetchUserMemberData(username).subscribe(resp => {
-            if (resp && Array.isArray(resp) && resp.length > 0 && resp[0].id) {
-              this.userData = resp[0];
-              this.utilities.log('userData', resp[0]);
-              this.setUserMemberData(resp[0]);
-              suscriber.next({ logged: true, response: respons, error: null});
-              suscriber.complete();
-            }
-          });
+          this.removeMemberData();
+          suscriber.next({ logged: true, response: respons, error: null});
+          suscriber.complete();
         } else {
           suscriber.next({ logged: false, response: respons, error: null});
         }
@@ -179,8 +173,15 @@ export class AuthService {
     });
   }
 
-  public fetchUserMemberData(username: string, observe: any = 'body', reportProgress = false) {
-    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/settings/userMember?userName=${username}`);
+  removeMemberData() {
+    localStorage.removeItem('selected-city');
+    localStorage.removeItem('selected-cityName');
+    localStorage.removeItem('selected-plant');
+    localStorage.removeItem('selected-plantName');
+    localStorage.removeItem('selected-depot');
+    localStorage.removeItem('selected-depotName');
+    localStorage.removeItem('selected-owner');
+    localStorage.removeItem('selected-ownerName');
   }
 
   setUserMemberData(data: any): void {
@@ -195,16 +196,36 @@ export class AuthService {
   }
 
   getUserMemberData(): any {
-    return this.userData.cityId !== null ? this.userData : this.userData = {
-      cityId: Number(localStorage.getItem('selected-city')),
-      cityName: localStorage.getItem('selected-cityName'),
-      plantId: Number(localStorage.getItem('selected-plant')),
-      plantName: localStorage.getItem('selected-plantName'),
-      depotId: Number(localStorage.getItem('selected-depot')),
-      depotName: localStorage.getItem('selected-depotName'),
-      ownerId: Number(localStorage.getItem('selected-owner')),
-      ownerName: localStorage.getItem('selected-ownerName')
-    };
+    let userData = new Object() as any;
+    if (this.userData.cityId !== null) {
+      userData = this.userData;
+    } else {
+      if (localStorage.getItem('selected-city')) {
+        userData.cityId = Number(localStorage.getItem('selected-city'));
+      }
+      if (localStorage.getItem('selected-cityname')) {
+        userData.cityName = localStorage.getItem('selected-cityName');
+      }
+      if (localStorage.getItem('selected-plant')) {
+        userData.plantId = Number(localStorage.getItem('selected-plant'));
+      }
+      if (localStorage.getItem('selected-plantName')) {
+        userData.plantName = localStorage.getItem('selected-plantName');
+      }
+      if (localStorage.getItem('selected-depot')) {
+        userData.depotId = Number(localStorage.getItem('selected-depot'));
+      }
+      if (localStorage.getItem('selected-depotName')) {
+        userData.depotName = localStorage.getItem('selected-depotName');
+      }
+      if (localStorage.getItem('selected-owner')) {
+        userData.ownerId = Number(localStorage.getItem('selected-owner'));
+      }
+      if (localStorage.getItem('selected-ownerName')) {
+        userData.ownerName = localStorage.getItem('selected-ownerName');
+      }
+    }
+    return userData;
   }
 
   refreshToken(): Observable<any> {
@@ -255,6 +276,7 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('expires_in');
     localStorage.removeItem('refresh_token');
+    this.removeMemberData();
     this.utilities.log('logout ready');
     return of(true);
   }

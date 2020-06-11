@@ -20,82 +20,6 @@
             <div class="example-loading-shade" *ngIf="dataSource.loading$ | async">
                 <mat-spinner class="spinner"></mat-spinner>
             </div>
-            <!--mat-accordion>
-                <mat-expansion-panel (opened)="showFilters = true" (closed)="showFilters = false">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            <mat-icon>search</mat-icon>
-                            Filters Section
-                        </mat-panel-title>
-                        <mat-panel-description>
-                            Click to {{ !showFilters ? 'show' : 'hide' }} all filter controls
-                        </mat-panel-description>
-                    </mat-expansion-panel-header>
-                    <div class="filters-panel">
-                        <div class="col-sm-9 filters-controls">
-                            <form [formGroup]="filtersForm" *ngIf="showFilters" class="row" (ngSubmit)="applyFilters()">
-                                <div *ngFor="let filter of filters">
-                                    <span *ngIf="filter.show" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-                                            <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'select'">
-                                                <mat-label>{{filter.name}}</mat-label>
-                                                <mat-select [compareWith]="definitions[filter.key].formControl.compareFn"
-                                                [formControlName]="filter.key">
-                                                    <mat-option [value]="">
-                                                        Select a value
-                                                    </mat-option>
-                                                    <mat-option *ngFor="let data of selectsData[filter.key] | async"
-                                                    [value]="definitions[filter.key].formControl.valueIndex !== null ?
-                                                    data[definitions[filter.key].formControl.valueIndex] : data">
-                                                        {{ definitions[filter.key].formControl.displayIndex !== null ?
-                                                            data[definitions[filter.key].formControl.displayIndex] : data }}
-                                                    </mat-option>
-                                                </mat-select>
-                                            </mat-form-field>
-                                            <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'input'">
-                                                <mat-label>{{filter.name}}</mat-label>
-                                                <input matInput [formControlName]="filter.key"
-                                                    type="definitions[filter.key].formControl.type">
-                                            </mat-form-field>
-                                            <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'date'">
-                                                <mat-label>{{filter.name}}</mat-label>
-                                                <input matInput [formControlName]="filter.key" [matDatepicker]="pickerDate" readonly>
-                                                <mat-datepicker-toggle matSuffix [for]="pickerDate">    
-                                                </mat-datepicker-toggle>
-                                                <mat-datepicker #pickerDate ></mat-datepicker>
-                                            </mat-form-field>
-                                            <mat-form-field *ngIf="definitions[filter.key].formControl.control === 'toggle'" [appearance]="'none'">
-                                                <mat-label>{{filter.name}}</mat-label>
-                                                <input matInput [formControlName]="filter.key" hidden>
-                                                <mat-slide-toggle color="primary"
-                                                (change)="filtersForm.get(filter.key).setValue(!filterForm.get(filter.key).value)"
-                                                [checked]="filtersForm.get(filter.key).value">
-                                                    {{definitions[filter.key].name}}
-                                                </mat-slide-toggle>
-                                            </mat-form-field>
-                                        </span>
-                                </div>
-                                <div class="col-sm-12">
-                                    <button mat-raised-button color="accent" class="btn btn-lg" type="submit">
-                                            <mat-icon>search</mat-icon>
-                                            Filter
-                                        </button>
-                                    <button mat-raised-button color="primary" class="btn btn-lg ml-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
-                                            <mat-icon>not_interested</mat-icon>
-                                            Reset Filters
-                                        </button>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-sm-3 filters-list">
-                            <mat-selection-list>
-                                <mat-list-option *ngFor="let filter of filters" [selected]="filter.show" (click)="filter.show = !filter.show">
-                                    {{filter.name}}
-                                </mat-list-option>
-                            </mat-selection-list>
-                        </div>
-                    </div>
-                </mat-expansion-panel>
-            </mat-accordion-->
             <div>
                 <!--strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong-->
                 <div class="table-toolbar" *ngIf="selection.selected.length > 0">
@@ -213,10 +137,10 @@
                             <!--button mat-icon-button (click)="editRowOnPage(element)">
                                 <img src="assets/icons/zoom.png">
                             </button-->
-                            <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.customerId]">
+                            <button mat-icon-button [routerLink]="['/pages/customers/view', element.customerId]">
                                 <img src="assets/icons/zoom.png">
                             </button>
-                            <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.customerId]">
+                            <button mat-icon-button [routerLink]="['/pages/customers/edit', element.customerId]">
                                 <img src="assets/icons/page_edit.png">
                             </button>
                             <!--button mat-icon-button (click)="printRow(element)">

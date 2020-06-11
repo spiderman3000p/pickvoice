@@ -4,7 +4,7 @@ import { AuthService } from '../services/auth.service';
 import {
   HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse
 } from '@angular/common/http';
-
+import { environment } from '../../environments/environment';
 import { of, throwError, Observable, BehaviorSubject } from 'rxjs';
 import { catchError, finalize, take, filter, switchMap, tap } from 'rxjs/operators';
 /** Pass untouched request through to the next request handler. */
@@ -15,7 +15,7 @@ export class ApiInterceptor implements HttpInterceptor {
     constructor(private authService: AuthService, private router: Router) {}
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<any> {
         // console.log('url', req.url);
-        if (req.url.includes('mi-api')) {
+        if (req.url.includes(environment.apiBaseUrl)) {
             if (this.authService.getSessionToken() !== null) {
                 req = this.setTokenToRequest(req, this.authService.getSessionToken());
             }

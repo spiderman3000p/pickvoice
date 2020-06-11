@@ -1,0 +1,25 @@
+$primary: #00b19d;
+$accent: #00535e;
+$secondary: #00535e;
+.content-area{
+    background-color: $accent;
+    height: 100%;
+    color: white;
+}
+
+.content .header h1{
+    color: white;
+    background: unset;
+    padding-left: 0px;
+}
+
+.step-buttons{
+    margin-top: 50px;
+    text-align: center;
+}
+
+::ng-deep .mat-horizontal-stepper-content{
+    max-width: 400px;
+    margin: auto;
+    height: 100%;
+}
