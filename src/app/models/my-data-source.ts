@@ -8,7 +8,7 @@ import { MatSort } from '@angular/material/sort';
 
 export class MyDataSource<T> implements DataSource<T> {
     public dataSubject = new BehaviorSubject<T[]>([]);
-    private loadingSubject = new BehaviorSubject<boolean>(false);
+    public loadingSubject = new BehaviorSubject<boolean>(false);
     public loading$ = this.loadingSubject.asObservable();
     public data: T[] = [];
     public dataCount = 100;

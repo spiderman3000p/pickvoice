@@ -162,6 +162,10 @@ export class DataProviderService {
     if (type === IMPORTING_TYPES.TASK_TYPES) {
       return this.updateTaskType(toUpload, id, 'response').pipe(retry(3));
     }
+
+    if (type === IMPORTING_TYPES.LPN) {
+      return this.updateLpn(toUpload, id, 'response').pipe(retry(3));
+    }
     return of(null);
   }
 
@@ -171,15 +175,7 @@ export class DataProviderService {
     const httpHeaders = new HttpHeaders();
     switch (type) {
       case IMPORTING_TYPES.INVENTORY: {
-        if (owner !== null) {
-          httpHeaders.append('ownerId', owner.toString());
-          this.utilities.log(`obteniendo inventory...`);
-          /*toReturn = this.httpClient.get(environment.apiBaseUrl + '/storage/lpnItemsVO1')
-          .pipe(retry(3));*/
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/storage/lpnItemsVO1/' + params, {
-            headers: httpHeaders
-          }).pipe(retry(3));
-        }
+        toReturn = this.getAllInventoryItems(params);
         break;
       }
       case IMPORTING_TYPES.CUSTOMERS: {
@@ -248,12 +244,9 @@ export class DataProviderService {
         break;
       }
       case IMPORTING_TYPES.ORDERS_TO_ASSIGN: {
-        if (owner !== null) {
-          httpHeaders.append('ownerId', owner.toString());
-          this.utilities.log(`obteniendo orders sin transporte asignado...`);
-          toReturn = this.httpClient.get(environment.apiBaseUrl + '/outbound/ordersToAssign/all;' +
-          params).pipe(retry(3));
-        }
+        this.utilities.log(`obteniendo orders sin transporte asignado...`);
+        toReturn = this.httpClient.get(environment.apiBaseUrl + '/outbound/orderToAssign/' +
+        params).pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.ORDER_LINE: {
@@ -292,7 +285,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.PICK_PLANNINGS: {
         this.utilities.log(`obteniendo pick plannings...`);
-        toReturn = this.getAllPickPlannings('startRow=0;endRow=10');
+        toReturn = this.getAllPickPlannings(params);
         break;
       }
       case IMPORTING_TYPES.PICK_TASKS: {
@@ -514,39 +507,22 @@ export class DataProviderService {
   /*********************************************************************************
    *  Grupo de metodos para lpns
    *********************************************************************************/
-  public getLpns(id: number, observe: any = 'body', reportProgress = false): Observable<any> {
-    const params = 'startRow=0;endRow=10000';
-    const owner = this.authService.getOwnerId();
-    const httpHeaders = new HttpHeaders();
-    if (owner !== null) {
-      httpHeaders.append('ownerId', owner.toString());
-      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemsVO2?` +
-      `lpnItemId=${id}`, {
-        headers: httpHeaders
-      });
-    }
+  public getLpn(id: number, params = 'startRow=0;endRow=1', observe: any = 'body', reportProgress = false): Observable<any> {
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemVO2/all;` + params +
+    `;lpnItemId-filterType=number;lpnItemId-type=equals;lpnItemId-filter=${id}`);
+  }
+
+  public getAllLpns(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false): Observable<any[]> {
+      // return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnsVO1`);
+      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnVO1/all;` + params);
+  }
+
+  public deleteLpn(id: number, observe: any = 'body', reportProgress = false) {
     return of(false);
   }
 
-  public getAllLpns(observe: any = 'body', reportProgress = false): Observable<any[]> {
-    const params = 'startRow=0;endRow=10000';
-    const owner = this.authService.getOwnerId();
-    const httpHeaders = new HttpHeaders();
-    if (owner !== null) {
-      httpHeaders.append('ownerId', owner.toString());
-      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnsVO1`, {
-        headers: httpHeaders
-      });
-    }
-    return of([]);
-  }
-
-  public deleteLpns(id: number, observe: any = 'body', reportProgress = false) {
-    return this.uomService.deleteUom(id, observe, reportProgress);
-  }
-
-  public updateLpns(data: any, id: number, observe: any = 'body', reportProgress = false) {
-    return this.uomService.updateUom(data, id, observe, reportProgress);
+  public updateLpn(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return of(false);
   }
 
   public createLpns(data: any, observe: any = 'body', reportProgress = false) {
@@ -555,29 +531,17 @@ export class DataProviderService {
   /*********************************************************************************
    *  Grupo de metodos para inventory
    *********************************************************************************/
-  public getInventoryItem(id: number, observe: any = 'body', reportProgress = false): Observable<any> {
-    return of({
-      id: 7868,
-      code: 'jhgj',
-      type: 'kjkj',
-      interface: 'jkjh',
-      state: 'jkjkh',
-      labelWithMaterial: true
-    }).pipe(delay(1000));
+  public getInventoryItem(id: number, params = 'startRow=0;endRow=99999999;sort-lpnItemId=asc',
+                          observe: any = 'body', reportProgress = false): Observable<any> {
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemVO1/all;` +
+           `lpnId-type=equals;lpnId-filter=${id};lpnId-filterType` +
+           `=number;startRow=0;endRow=200;`).pipe(retry(3), timeout(600000));
    }
 
-   public getAllInventoryItems(observe: any = 'body', reportProgress = false): Observable<any[]> {
-    const params = 'startRow=0;endRow=10000';
-    const owner = this.authService.getOwnerId();
-    const httpHeaders = new HttpHeaders();
-    if (owner !== null) {
-      httpHeaders.append('ownerId', owner.toString());
-      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemsVO1/` +
-      `all;startRow=0;endRow=99999999;sort-lpnItemId=asc`, {
-        headers: httpHeaders
-      }).pipe(retry(3), timeout(600000));
-    }
-    return of([]);
+   public getAllInventoryItems(params = 'startRow=0;endRow=99999999;sort-lpnItemId=asc',
+                               observe: any = 'body', reportProgress = false): Observable<any[]> {
+      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemVO1/` +
+      `all;${params}`).pipe(retry(3), timeout(600000));
    }
 
    public deleteInventoryItem(id: number, observe: any = 'body', reportProgress = false) {
@@ -595,7 +559,7 @@ export class DataProviderService {
     Grupo de metodos para item uoms
   ***********************************************************************************/
   public getAllItemUoms(idItem: number, observe: any = 'body', reportProgress = false) {
-    return this.itemUomService.itemUomByItemId(idItem, observe, reportProgress);
+    return this.itemUomService.itemUomByItemId(idItem, observe, reportProgress).pipe(retry(3));
   }
 
   public deleteItemUom(id: number, observe: any = 'body', reportProgress = false) {
@@ -754,17 +718,8 @@ export class DataProviderService {
   }
 
   public updateOrdersTransport(data: any[], idTransport: number, observe: any = 'body', reportProgress = false) {
-    const params = 'startRow=0;endRow=10000';
-    const owner = this.authService.getOwnerId();
-    const httpHeaders = new HttpHeaders();
-    if (owner !== null) {
-      httpHeaders.append('ownerId', owner.toString());
-      return this.httpClient.post(environment.apiBaseUrl +
-        '/outbound/orders/assignmentTransport?idTransport=' + idTransport, data, {
-          headers: httpHeaders
-        });
-    }
-    return of(false);
+    return this.httpClient.post(environment.apiBaseUrl +
+      '/outbound/order/assignmentTransport?idTransport=' + idTransport, data);
   }
 
   public createOrder(data: any, observe: any = 'body', reportProgress = false) {
@@ -795,7 +750,9 @@ export class DataProviderService {
   }
 
   public getTransportsOrders(id: number, observe: any = 'body', reportProgress = false) {
-    return this.orderService.orderByTransport(id, observe, reportProgress);
+    // return this.orderService.orderByTransport(id, observe, reportProgress);
+    return this.httpClient.get<any>(environment.apiBaseUrl +
+      '/outbound/order/orderByTransport/' + id).pipe(retry(3));
   }
 
   public deleteTransport(id: number, observe: any = 'body', reportProgress = false) {
@@ -915,7 +872,7 @@ export class DataProviderService {
   public getAllPickPlanningTasksVO3(pickPlanningId: number, observe: any = 'body', reportProgress = false) {
     // return this.pickTaskService.taskByPickPlanning(pickPlanningId, observe, reportProgress);
     // return this.httpClient.get<any>(`${environment.apiBaseUrl}/outbound/pick/tasksVO3?pickPlanningId=${pickPlanningId}`)
-    return this.httpClient.get<any>(`${environment.apiBaseUrl}/outbound/pick/tasksVO3/` +
+    return this.httpClient.get<any>(`${environment.apiBaseUrl}/outbound/pick/taskVO3/` +
     `all;pickPlanningId-type=equals;pickPlanningId-filter=${pickPlanningId};pickPlanningId-filterType` +
     `=number;startRow=0;endRow=200;`);
   }
@@ -1078,9 +1035,13 @@ export class DataProviderService {
   }
 
   public getDock(id: number, observe: any = 'body', reportProgress = false) {
-    // return this.docksService.retrieveDockById(id, owner, observe, reportProgress);
-    return this.httpClient.get<any>(environment.apiBaseUrl +
-      '/outbound/DockVO1/' + id).pipe(retry(3));
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.docksService.retrieveDockById(id, owner, observe, reportProgress);
+    }
+    /*return this.httpClient.get<any>(environment.apiBaseUrl +
+      '/outbound/DockVO1/' + id).pipe(retry(3));*/
+    return of(false);
   }
   /**********************************************************************************
     Grupo de metodos para task types

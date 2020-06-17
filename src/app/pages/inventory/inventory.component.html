@@ -20,10 +20,10 @@
                 </mat-menu>
                 <!--button mat-raised-button color="accent" (click)="addRow()" class="ml-2">
                     <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
-                </button-->
+                </button>
                 <button mat-raised-button color="accent" (click)="editLpnsTemplate()" class="ml-2">
                     <mat-icon>edit</mat-icon> <span class="btn-label">Edit Lpns Template</span>
-                </button>
+                </button-->
               </div>
           </div>
       </div>
@@ -144,7 +144,7 @@
                                 <button mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
                                 (click)="toggleColumn(column)">
                                     <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                    {{column.name}}
+                                    {{definitions[column.name].name}}
                                 </button>
                             </span>
                         </mat-menu>
@@ -156,21 +156,21 @@
                         <!--button mat-icon-button (click)="editRowOnPage(element)">
                             <img src="assets/icons/zoom.png">
                         </button-->
-                        <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
+                        <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.lpnId]">
                             <img src="assets/icons/zoom.png">
                         </button>
-                        <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
+                        <!--button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.lpnId]">
                             <img src="assets/icons/page_edit.png">
-                        </button>
+                        </button-->
                         <!--button mat-icon-button (click)="printRow(element)">
                             <img src="assets/icons/printer.png">
                         </button-->
-                        <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
+                        <a mat-icon-button [href]="'/print/' + type + '/' + element.lpnId" target="_blank">
                             <img src="assets/icons/printer.png">
                         </a>
-                        <button mat-icon-button (click)="deletePrompt(element)">
+                        <!--button mat-icon-button (click)="deletePrompt(element)">
                             <img src="assets/icons/delete.png">
-                        </button>
+                        </button-->
                     </td>
                 </ng-container>
 

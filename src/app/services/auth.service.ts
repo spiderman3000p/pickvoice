@@ -55,7 +55,7 @@ export class AuthService {
     } else {
       sessionToken = this.token;
     }
-    console.log('check session token: ', sessionToken);
+    // console.log('check session token: ', sessionToken);
     return sessionToken;
   }
   fillUserData() {
@@ -277,6 +277,16 @@ export class AuthService {
     localStorage.removeItem('expires_in');
     localStorage.removeItem('refresh_token');
     this.removeMemberData();
+    this.userData = {
+      cityId: null,
+      cityName: '',
+      plantId: null,
+      plantName: '',
+      depotId: null,
+      depotName: '',
+      ownerId: null,
+      ownerName: ''
+    };
     this.utilities.log('logout ready');
     return of(true);
   }

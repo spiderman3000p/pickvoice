@@ -23,7 +23,7 @@ export class UtilitiesService implements OnDestroy {
   public dataTypesModelMaps = {
     taskTypes: ModelMap.TaskTypeMap,
     inventory: ModelMap.InventoryItemMap,
-    lpns: ModelMap.LpnsMap,
+    lpn: ModelMap.LpnMap,
     items: ModelMap.ItemMap,
     itemsList: ModelMap.ItemListMap,
     itemsDto: ModelMap.LoadItemDtoMap,
@@ -40,6 +40,7 @@ export class UtilitiesService implements OnDestroy {
     orderTypes: ModelMap.OrderTypeMap,
     sections: ModelMap.SectionMap,
     transports: ModelMap.TransportMap,
+    transportsList: ModelMap.TransportListMap,
     loadPicksDto: ModelMap.LoadPickDtoMap,
     pickPlannings: ModelMap.PickPlanningMap,
     pickTasks: ModelMap.PickTaskMap,

@@ -122,18 +122,25 @@ export class PagesComponent implements OnInit, OnDestroy  {
               target: '_self',
               children: []
             },
-            {
+            /*{
               text: 'Template Designer',
               icon: 'home',
               route: '/pages/edit-templates',
               target: '_blank',
               children: []
-            },
+            },*/
             {
-              text: 'Template Designer 2',
+              text: 'Template Designer',
               icon: 'home',
               route: '../edit-templates',
               target: '_blank',
+              children: []
+            },
+            {
+              text: 'Task Types',
+              icon: '',
+              route: '/pages/' + IMPORTING_TYPES.TASK_TYPES,
+              target: '_self',
               children: []
             }
           ]
@@ -180,13 +187,6 @@ export class PagesComponent implements OnInit, OnDestroy  {
           route: '/pages/' + IMPORTING_TYPES.PICK_TASKS,
           target: '_self',
           children: []
-        },
-        {
-          text: 'Task Types',
-          icon: '',
-          route: '/pages/' + IMPORTING_TYPES.TASK_TYPES,
-          target: '_self',
-          children: []
         }
       ]
     },
@@ -199,7 +199,7 @@ export class PagesComponent implements OnInit, OnDestroy  {
         {
           text: 'Lpns',
           icon: '',
-          route: '/pages/lpns',
+          route: '/pages/lpn',
           target: '_self',
           children: []
         },

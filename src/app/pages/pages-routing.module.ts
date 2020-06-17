@@ -14,7 +14,7 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: IMPORTING_TYPES.LPNS,
+    path: IMPORTING_TYPES.LPN,
     loadChildren: () => import('./lpns/lpns.module').then(m => m.LpnsModule)
   },
   {

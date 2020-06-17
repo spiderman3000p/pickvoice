@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, CanActivateChild, ActivatedRouteSnapshot,
-         Route, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+         Route, RouterStateSnapshot, UrlTree, Router, UrlSegment } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
@@ -21,8 +21,8 @@ export class InitializeGuard implements CanActivate, CanActivateChild {
     return this.canActivate(route, state);
   }
 
-  canLoad(route: Route): boolean {
-    return this.checkMemberData(route.path);
+  canLoad(route: Route, segments: UrlSegment[]): boolean {
+    return this.checkMemberData(segments.join('/'));
   }
 
   checkMemberData(url: string) {

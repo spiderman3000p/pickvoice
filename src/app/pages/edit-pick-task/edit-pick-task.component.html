@@ -72,9 +72,9 @@
                     </div>
                     <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
                         <label>Type</label>
-                        <select [compareWith]="dataMap.taskTypeId.formControl.compareFn" formControlName="taskTypeId"
+                        <select formControlName="taskTypeId"
                         [class.readonly]="viewMode === 'view'" [disabled]="viewMode === 'view'" class="form-control">
-                            <option *ngFor="let type of pickTaskData.taskTypesList" [ngValue]="type.id">
+                            <option *ngFor="let type of pickTaskData.taskTypesList" [value]="type.id">
                                 {{ type.name }}
                             </option>
                         </select>
@@ -131,7 +131,7 @@
                                                         <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
                                                         (click)="toggleColumn(column)">
                                                             <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                                            {{column.name}}
+                                                            {{definitions[column.name].name}}
                                                         </a>
                                                     </span>
                                                 </mat-menu>
@@ -176,7 +176,7 @@
                                 <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                                         <label>User</label>
                                         <select [compareWith]="dataMap.userId.formControl.compareFn" formControlName="userId"
-                                        [class.readonly]="viewMode === 'view'">
+                                        [class.readonly]="viewMode === 'view'" class="form-control">
                                             <option *ngFor="let user of pickTaskData.userList" [value]="user.id">
                                                 {{ user.firstName }} {{ user.lastName }}
                                             </option>
@@ -185,36 +185,36 @@
                                 <br><br>
                                 <h6>User Details</h6>
                                 <hr>
-                                <span *ngIf="form.get('user').value">
+                                <span *ngIf="selectedUser" class="row">
                                     <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
                                         <label>Username</label>
-                                        <input class="w-100"  type="text" [value]="form.get('user').value.userName" [class.readonly]="true">
+                                        <input class="form-control"  type="text" [value]="selectedUser.userName" [class.readonly]="true">
                                     </div>
                                     <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
                                         <label>First Name</label>
-                                        <input class="w-100"  type="text" [value]="form.get('user').value.firstName" [class.readonly]="true">
+                                        <input class="form-control"  type="text" [value]="selectedUser.firstName" [class.readonly]="true">
                                     </div>
                                     <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
                                         <label>Last Name</label>
-                                        <input class="w-100"  type="text" [value]="form.get('user').value.lastName" [class.readonly]="true">
+                                        <input class="form-control"  type="text" [value]="selectedUser.lastName" [class.readonly]="true">
                                     </div>
                                     <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
                                         <label>Email</label>
-                                        <input class="w-100"  type="text" [value]="form.get('user').value.email" [class.readonly]="viewMode === 'view'">
+                                        <input class="form-control"  type="text" [value]="selectedUser.email" [class.readonly]="viewMode === 'view'">
                                     </div>
                                     <div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
                                         <label>Phone</label>
-                                        <input class="w-100"  type="text" [value]="form.get('user').value.phone" [class.readonly]="viewMode === 'view'">
+                                        <input class="form-control"  type="text" [value]="selectedUser.phone" [class.readonly]="viewMode === 'view'">
                                     </div>
                                     <!--div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
                                         <label>Rol</label>
-                                        <input class="w-100"  type="text" [value]="form.get('user').value.rol.name" [class.readonly]="viewMode === 'view'">
-                                    </div-->
+                                        <input class="form-control"  type="text" [value]="selectedUser.rol.name" [class.readonly]="viewMode === 'view'">
+                                    </div>
                                     <div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
                                         <label>Status</label>
                                         <input   hidden>
-                                        <input class="w-100"  type="text" [value]="form.get('user').value.status" [class.readonly]="viewMode === 'view'">
-                                    </div>
+                                        <input class="form-control"  type="text" [value]="selectedUser.status" [class.readonly]="viewMode === 'view'">
+                                    </div-->
                                 </span>
                             </ng-template>
                         </mat-tab>

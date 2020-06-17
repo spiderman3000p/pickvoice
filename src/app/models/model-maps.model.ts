@@ -1,13 +1,12 @@
 export const IMPORTING_TYPES = {
     INVENTORY_CLASSIFICATION: 'inventoryClassification',
     LPN_STATE: 'lpnState',
-    LPNS_INTERFACE: 'lpnInterface',
-    LPNS_LOCATION: 'lpnsLocation',
-    LPNS_STATE: 'lpnsState',
-    LPNS_TYPE: 'lpnsType',
+    LPN_INTERFACE: 'lpnInterface',
+    LPN_LOCATION: 'lpnLocation',
     LPN_TYPE: 'lpnType',
     INVENTORY: 'inventory',
-    LPNS: 'lpns',
+    LPN: 'lpn',
+    LPN_LIST: 'lpnList',
     USERS: 'users',
     ITEMS: 'items',
     ITEMS_LIST: 'itemsList',
@@ -35,6 +34,7 @@ export const IMPORTING_TYPES = {
     ORDER_TYPE: 'orderTypes',
     SECTIONS: 'sections',
     TRANSPORTS: 'transports',
+    TRANSPORTS_LIST: 'transportsList',
     PICK_PLANNINGS: 'pickPlannings',
     PICK_PLANNINGS_LIST: 'pickPlanningsList',
     PICK_TASKS: 'pickTasks',
@@ -164,7 +164,89 @@ export class ModelMap {
         }
     };
     /* lpns object map for CRUD */
-    public static LpnsMap = {
+    public static LpnMap = {
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnType: {
+            name: 'type',
+            required: false,
+            type: IMPORTING_TYPES.LPN_TYPE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        lpnState: {
+            name: 'state',
+            required: false,
+            type: IMPORTING_TYPES.LPN_STATE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        lpnInterface: {
+            name: 'interface',
+            required: false,
+            type: IMPORTING_TYPES.LPN_INTERFACE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        locationId: {
+            name: 'location',
+            required: false,
+            type: IMPORTING_TYPES.LPN_LOCATION,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'description',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            }
+        },
+        location: {
+            name: 'location',
+            required: false,
+            type: IMPORTING_TYPES.LPN_LOCATION,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        }
+    };
+    /* lpns object map for CRUD */
+    public static LpnListMap = {
         lpn: {
             name: 'lpn',
             required: false,
@@ -183,20 +265,6 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        /*type: {
-            name: 'type',
-            required: false,
-            type: IMPORTING_TYPES.LPNS_TYPE,
-            formControl: {
-                control: 'select',
-                type: 'text',
-                valueIndex: null,
-                displayIndex: null,
-                compareFn: (c1, c2) => {
-                    return c1 === c2;
-                }
-            }
-        },*/
         type: {
             name: 'type',
             required: false,
@@ -206,20 +274,6 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        /*state: {
-            name: 'state',
-            required: false,
-            type: IMPORTING_TYPES.LPNS_STATE,
-            formControl: {
-                control: 'select',
-                type: 'text',
-                valueIndex: null,
-                displayIndex: null,
-                compareFn: (c1, c2) => {
-                    return c1 === c2;
-                }
-            }
-        },*/
         state: {
             name: 'state',
             required: false,
@@ -229,20 +283,6 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        /*interface: {
-            name: 'interface',
-            required: false,
-            type: IMPORTING_TYPES.LPNS_INTERFACE,
-            formControl: {
-                control: 'select',
-                type: 'text',
-                valueIndex: null,
-                displayIndex: null,
-                compareFn: (c1, c2) => {
-                    return c1 === c2;
-                }
-            }
-        },*/
         interface: {
             name: 'interface',
             required: false,
@@ -252,20 +292,6 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        /*location: {
-            name: 'location',
-            required: false,
-            type: IMPORTING_TYPES.LPNS_LOCATION,
-            formControl: {
-                control: 'select',
-                type: 'text',
-                valueIndex: null,
-                displayIndex: null,
-                compareFn: (c1, c2) => {
-                    return c1 === c2;
-                }
-            }
-        }*/
         location: {
             name: 'location',
             required: false,
@@ -314,20 +340,6 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        /*lpnState: {
-            name: 'state',
-            required: false,
-            type: IMPORTING_TYPES.LPN_STATE,
-            formControl: {
-                control: 'select',
-                type: 'text',
-                valueIndex: null,
-                displayIndex: null,
-                compareFn: (c1, c2) => {
-                    return c1 === c2;
-                }
-            }
-        },*/
         lpnState: {
             name: 'state',
             required: false,
@@ -346,20 +358,6 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        /*lpnType: {
-            name: 'lpn type',
-            required: false,
-            type: IMPORTING_TYPES.LPN_TYPE,
-            formControl: {
-                control: 'select',
-                type: 'text',
-                valueIndex: null,
-                displayIndex: null,
-                compareFn: (c1, c2) => {
-                    return c1 === c2;
-                }
-            }
-        },*/
         lpnType: {
             name: 'lpn type',
             required: false,
@@ -369,20 +367,6 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        /*locationType: {
-            name: 'location type',
-            required: false,
-            type: IMPORTING_TYPES.LOCATION_TYPE,
-            formControl: {
-                control: 'select',
-                type: 'text',
-                valueIndex: null,
-                displayIndex: null,
-                compareFn: (c1, c2) => {
-                    return c1 === c2;
-                }
-            }
-        },*/
         locationType: {
             name: 'location type',
             required: false,
@@ -507,20 +491,6 @@ export class ModelMap {
                 type: 'number'
             }
         },
-        /*classification: {
-            name: 'classification',
-            required: false,
-            type: IMPORTING_TYPES.INVENTORY_CLASSIFICATION,
-            formControl: {
-                control: 'select',
-                type: 'text',
-                valueIndex: null,
-                displayIndex: null,
-                compareFn: (c1, c2) => {
-                    return c1 === c2;
-                }
-            }
-        }*/
         classification: {
             name: 'classification',
             required: false,
@@ -594,6 +564,51 @@ export class ModelMap {
             formControl: {
                 control: 'input',
                 type: 'text'
+            }
+        },
+        longitude: {
+            name: 'longitude',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        latitude: {
+            name: 'latitude',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        zone: {
+            name: 'zone',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        neighborhood: {
+            name: 'neighborhood',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        cityId: {
+            name: 'city id',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
             }
         }
     };
@@ -1124,7 +1139,7 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        itmWeight: {
+        itemWeight: {
             name: 'weight',
             required: true,
             type: 'boolean',
@@ -1138,7 +1153,8 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
-                control: 'select'
+                control: 'select',
+                type: 'text'
             }
         },
         itmVariableWeight: {
@@ -1146,7 +1162,8 @@ export class ModelMap {
             required: true,
             type: 'boolean',
             formControl: {
-                control: 'select'
+                control: 'select',
+                type: 'text'
             }
         },
         itemExpiryDate: {
@@ -1154,7 +1171,8 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
-                control: 'select'
+                control: 'select',
+                type: 'text'
             }
         },
         itemCreateDate: {
@@ -1162,7 +1180,8 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
-                control: 'select'
+                control: 'select',
+                type: 'text'
             }
         },
         itemSerial: {
@@ -1170,7 +1189,8 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
-                control: 'select'
+                control: 'select',
+                type: 'text'
             }
         }
     };
@@ -1244,6 +1264,15 @@ export class ModelMap {
         },
         width: {
             name: 'width',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        unitsPallet: {
+            name: 'units pallet',
             required: false,
             type: 'number',
             formControl: {
@@ -1906,10 +1935,10 @@ export class ModelMap {
             formControl: {
                 control: 'select',
                 type: 'number',
-                valueIndex: 'id',
+                valueIndex: 'transportId',
                 displayIndex: 'transportNumber',
                 compareFn: (c1, c2) => {
-                    return c1.id === c2.id;
+                    return c1.transportId === c2.transportId;
                 }
             },
             addNew: {
@@ -1925,10 +1954,10 @@ export class ModelMap {
             formControl: {
                 control: 'select',
                 type: 'number',
-                valueIndex: 'id',
-                displayIndex: 'name',
+                valueIndex: 'customerId',
+                displayIndex: 'customerName',
                 compareFn: (c1, c2) => {
-                    return c1.id === c2.id;
+                    return c1.customerId === c2.customerId;
                 }
             },
             addNew: {
@@ -2241,73 +2270,199 @@ export class ModelMap {
         plannedCheckin: {
             name: 'planned checkin',
             required: false,
-            type: 'string',
+            type: 'date',
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'date',
+                type: 'date'
             }
         },
         actualCheckin: {
             name: 'actual checkin',
             required: false,
-            type: 'string',
+            type: 'date',
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'date',
+                type: 'date'
             }
         },
         plannedStartLoading: {
             name: 'planned start loading',
             required: false,
-            type: 'string',
+            type: 'date',
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'date',
+                type: 'date'
             }
         },
         currentStartLoading: {
             name: 'current start loading',
             required: false,
-            type: 'string',
+            type: 'date',
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'date',
+                type: 'date'
             }
         },
         plannedEndLoading: {
             name: 'planned end loading',
             required: false,
-            type: 'string',
+            type: 'date',
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'date',
+                type: 'date'
             }
         },
         actualEndLoading: {
             name: 'actual end loading',
             required: false,
-            type: 'string',
+            type: 'date',
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'date',
+                type: 'date'
             }
         },
         plannedShipmentCompletion: {
             name: 'planned shipment completion',
             required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        currentShipmentCompletion: {
+            name: 'current shipment completion',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        }
+    };
+    /* transport object map for LIST */
+    public static TransportListMap = {
+        transportNumber: {
+            name: 'number',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        transportRoute: {
+            name: 'route',
+            required: false,
             type: 'string',
             formControl: {
                 control: 'input',
                 type: 'text'
             }
         },
-        currentShipmentCompletion: {
-            name: 'current shipment completion',
+        carrierCode: {
+            name: 'carrier code',
             required: false,
             type: 'string',
             formControl: {
                 control: 'input',
                 type: 'text'
+            }
+        },
+        transportShipmentDate: {
+            name: 'shipment date',
+            required: false,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'date'
+            }
+        },
+        transportContainerNumber: {
+            name: 'container number',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        transportVehicle: {
+            name: 'vehicle',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        weight: {
+            name: 'weight',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        uomWeightCode: {
+            name: 'uom weight code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        uomWeightName: {
+            name: 'uom weight name',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        uomVolumeCode: {
+            name: 'uom volume code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        transportDescription: {
+            name: 'description',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'textarea',
+                type: 'text'
+            }
+        },
+        volume: {
+            name: 'volume',
+            required: false,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        transportationState: {
+            name: 'state',
+            required: false,
+            type: IMPORTING_TYPES.TRANSPORT_STATE,
+            validate: true,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
             }
         }
     };
@@ -2317,14 +2472,14 @@ export class ModelMap {
             name: 'item',
             required: true,
             unique: true,
-            type: IMPORTING_TYPES.ITEMS,
+            type: IMPORTING_TYPES.ITEMS_LIST,
             formControl: {
                 control: 'select',
                 type: 'text',
-                valueIndex: 'sku',
-                displayIndex: 'description',
+                valueIndex: 'itemId',
+                displayIndex: 'itemDescription',
                 compareFn: (c1, c2) => {
-                    return c1.sku === c2.sku;
+                    return c1.itemId === c2.itemId;
                 }
             },
             addNew: {
@@ -2422,12 +2577,12 @@ export class ModelMap {
         targetDockId: {
             name: 'dock',
             required: true,
-            type: IMPORTING_TYPES.DOCKS_LIST,
+            type: IMPORTING_TYPES.DOCKS,
             formControl: {
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
-                displayIndex: 'dockDescription',
+                displayIndex: 'description',
                 compareFn: (c1, c2) => {
                     return c1.id === c2.id;
                 }
@@ -3119,7 +3274,7 @@ export class ModelMap {
     };
     /* dock object map for LIST */
     public static DockListMap = {
-        dockCode: {
+        code: {
             name: 'code',
             required: false,
             type: 'string',
@@ -3129,7 +3284,7 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        dockDescription: {
+        description: {
             name: 'description',
             required: false,
             type: 'string',
@@ -3147,6 +3302,33 @@ export class ModelMap {
                 type: 'text'
             }
         },
+        locationType: {
+            name: 'location type',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationState: {
+            name: 'location state',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        sectionCode: {
+            name: 'section code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        } /*
         depotName: {
             name: 'depot',
             required: false,
@@ -3175,7 +3357,7 @@ export class ModelMap {
                 control: 'input',
                 type: 'text'
             }
-        }
+        }*/
     };
     /*********************************************
     *                   DTO's

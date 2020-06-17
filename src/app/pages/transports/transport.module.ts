@@ -79,7 +79,8 @@ export const MY_FORMATS = {
     MatSlideToggleModule,
     MatExpansionModule,
     MatListModule,
-    MatTabsModule
+    MatTabsModule,
+    MatTooltipModule
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]},

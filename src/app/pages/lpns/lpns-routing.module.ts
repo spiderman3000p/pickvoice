@@ -39,7 +39,7 @@ const routes: Routes = [
         },
         data: {
             viewMode: 'edit',
-            type: IMPORTING_TYPES.LPNS
+            type: IMPORTING_TYPES.LPN
         }
     },
     {
@@ -50,7 +50,7 @@ const routes: Routes = [
         },
         data: {
             viewMode: 'view',
-            type: IMPORTING_TYPES.LPNS
+            type: IMPORTING_TYPES.LPN
         }
     },
     {

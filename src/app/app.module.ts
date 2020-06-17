@@ -78,7 +78,7 @@ export function apiConfigFactory(): Configuration {
       if (localStorage.getItem('access_token')) {
         sessionToken = localStorage.getItem('access_token');
       }
-      console.log('check session token: ', sessionToken);
+      // console.log('check session token: ', sessionToken);
       return sessionToken;
     }
   };

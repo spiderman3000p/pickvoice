@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UtilitiesService } from '../../services/utilities.service';
+import { AuthService } from '../../services/auth.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
@@ -14,8 +15,8 @@ import { MatSort } from '@angular/material/sort';
 import { FormGroup, FormControl } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
-import { merge, Observer, Subscription } from 'rxjs';
+import { takeLast, take, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { Observable, Subject, merge, Observer, Subscription } from 'rxjs';
 
 import { MyDataSource } from '../../models/my-data-source';
 
@@ -53,7 +54,7 @@ export class CustomerComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(
     private dialog: MatDialog, private dataProviderService: DataProviderService, private router: Router,
-    private utilities: UtilitiesService) {
+    private utilities: UtilitiesService, private authService: AuthService) {
       this.dataToSend = [];
       this.actionForSelected = new FormControl('');
       this.displayedDataColumns = Object.keys(this.definitions);
@@ -371,43 +372,94 @@ export class CustomerComponent implements OnInit, AfterViewInit {
   }
 
   deleteRow(row: any) {
+    this.utilities.log('row o delete: ', row);
     if (this.selection.isSelected(row)) {
       this.selection.deselect(row);
     }
-    const index = this.dataSource.data.findIndex(_row => _row === row);
-    this.utilities.log('index to delete', index);
-    this.dataSource.data.splice(index, 1);
-    this.refreshTable();
+    const index = this.dataSource.data.findIndex((r: any) => r.customerId === row.customerId);
+    if (index > -1) {
+      this.utilities.log('index to delete', index);
+      this.dataSource.data.splice(index, 1);
+      this.refreshTable();
+    } else {
+      this.utilities.error('index not found', index);
+    }
     return true;
   }
 
   deleteRows(rows: any) {
     let deletedCounter = 0;
+    let errorsCounter = 0;
+    let constraintErrors = false;
+    const observables: Observable<any>[] = [];
+    const allOperationsSubject = new Subject();
+    this.dataSource.loadingSubject.next(true);
+    allOperationsSubject.subscribe((operation: any) => {
+      if (operation.type === 'success') {
+        deletedCounter++;
+      }
+      if (operation.type === 'error') {
+        errorsCounter++;
+      }
+      if (deletedCounter === (Array.isArray(rows) ? rows.length : 1)) {
+        this.dataSource.loadingSubject.next(false);
+        this.utilities.showSnackBar((Array.isArray(rows) ? 'Rows' : 'Row') + ' deleted successfully', 'OK');
+      } else {
+        if (deletedCounter === 0 && errorsCounter === (Array.isArray(rows) ? rows.length : 1)) {
+          this.dataSource.loadingSubject.next(false);
+          this.utilities.showSnackBar(constraintErrors ? 'Error on delete selected rows because there are' +
+          ' in use' : 'Error on delete rows, check Internet conection', 'OK');
+        } else if (deletedCounter > 0 && errorsCounter > 0 &&
+                   deletedCounter + errorsCounter >= (Array.isArray(rows) ? rows.length : 1)) {
+          if (constraintErrors) {
+            this.dataSource.loadingSubject.next(false);
+            this.utilities.showSnackBar('Some rows could not be deleted cause there are in use', 'OK');
+          } else {
+            this.dataSource.loadingSubject.next(false);
+            this.utilities.showSnackBar('Some rows could not be deleted', 'OK');
+          }
+        }
+      }
+    }, error => null,
+    () => {
+    });
     const observer = {
       next: (result) => {
-        if (result) {
-          this.deleteRow(rows);
+        this.utilities.log('Row deleted: ', result);
+        if (result && result.rowToDelete) {
+          this.deleteRow(result.rowToDelete);
           this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
+          allOperationsSubject.next({type: 'success'});
         }
       },
       error: (error) => {
         this.utilities.error('Error on delete rows', error);
-        if (deletedCounter === 0) {
-          this.utilities.showSnackBar('Error on delete rows', 'OK');
+        if (error) {
+          if (error.error.message.includes('constraint') ||
+              (error.error.errors && error.error.errors[0].includes('foreign'))) {
+            constraintErrors = true;
+          }
+          allOperationsSubject.next({type: 'error'});
         }
-        deletedCounter++;
+      },
+      complete: () => {
+        // allOperationsSubject.complete();
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.dataProviderService.deleteCustomer(row.id, 'response', false).subscribe(observer);
+        this.subscriptions.push(this.dataProviderService.deleteCustomer(row.customerId, 'response', false).pipe(take(1))
+        .pipe(tap(result => result.rowToDelete = row)).subscribe(observer));
+        if (this.selection.isSelected(row)) {
+          this.selection.deselect(row);
+        }
       });
     } else {
-      this.dataProviderService.deleteCustomer(rows.id, 'response', false).subscribe(observer);
+      this.subscriptions.push(this.dataProviderService.deleteCustomer(rows.customerId, 'response', false).pipe(take(1))
+      .pipe(tap(result => result.rowToDelete = rows)).subscribe(observer));
+      if (this.selection.isSelected(rows)) {
+        this.selection.deselect(rows);
+      }
     }
   }
 
@@ -489,10 +541,13 @@ export class CustomerComponent implements OnInit, AfterViewInit {
     this.utilities.dataTypesModelMaps.customers);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.definitions,
+        map: this.utilities.dataTypesModelMaps.customers,
         type: IMPORTING_TYPES.CUSTOMERS,
         remoteSync: true, // para mandar los datos a la BD por la API
-        title: 'Add New Customer'
+        title: 'Add New Customer',
+        defaultValues: {
+          cityId: this.authService.getCityId()
+        }
       }
     });
     dialogRef.afterClosed().subscribe(result => {

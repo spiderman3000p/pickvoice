@@ -9,7 +9,7 @@ import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-d
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { SharedDataService } from '../../services/shared-data.service';
 import { from, Observable, Observer } from 'rxjs';
-import { retry, switchMap } from 'rxjs/operators';
+import { take, retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
 import { ModelMap, IMPORTING_TYPES, STATES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
@@ -47,6 +47,7 @@ export class EditPickTaskComponent implements OnInit {
   printElement = {};
   viewMode: string;
   pickTaskData: PickTaskData;
+  selectedUser: User;
 
   columnDefs: any[] = [];
   dataSource: MatTableDataSource<PickTaskLine>;
@@ -100,6 +101,10 @@ export class EditPickTaskComponent implements OnInit {
       currentLine: new FormControl(''),
       childrenWork: new FormControl('')
     });
+    this.form.get('userId').valueChanges.subscribe(userId => {
+      this.selectedUser = this.pickTaskData.userList.find((user: any) => user.id === userId);
+    });
+    this.selectedUser = new Object() as User;
   }
 
   setDataSourceAttributes() {
@@ -111,6 +116,7 @@ export class EditPickTaskComponent implements OnInit {
     this.utilities.log('pick task', this.row);
     this.getTaskStateList();
     this.getTaskLineList();
+    this.getTaskTypesList();
     this.getUserList();
     // inicializamos todo lo necesario para la tabla
     if (this.row) {
@@ -131,10 +137,13 @@ export class EditPickTaskComponent implements OnInit {
       qty: new FormControl(this.row.qty),
       document: new FormControl(this.row.document),
       taskState: new FormControl(this.row.taskState),
-      user: new FormControl(this.row.userId),
-      taskType: new FormControl(this.row.taskTypeId),
+      userId: new FormControl(this.row.userId),
+      taskTypeId: new FormControl(this.row.taskTypeId),
       currentLine: new FormControl(this.row.currentLine),
       childrenWork: new FormControl(this.row.childrenWork)
+    });
+    this.form.get('userId').valueChanges.subscribe(userId => {
+      this.selectedUser = this.pickTaskData.userList.find((user: any) => user.id === userId);
     });
   }
 
@@ -426,6 +435,7 @@ export class EditPickTaskComponent implements OnInit {
   getUserList() {
     this.dataProviderService.getAllUsers().subscribe(results => {
       this.pickTaskData.userList = results;
+      this.selectedUser = this.pickTaskData.userList.find((user: any) => user.id === this.row.userId);
     });
   }
 
@@ -468,8 +478,7 @@ export class EditPickTaskComponent implements OnInit {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          if ((response.status === 204 || response.status === 200 || response.status === 201)
-            && response.statusText === 'OK') {
+          if ((response.status === 204 || response.status === 200 || response.status === 201)) {
             this.utilities.showSnackBar('Update Successfull', 'OK');
           }
           // this.back();

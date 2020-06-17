@@ -10,9 +10,9 @@ import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
 import { FormGroup, FormControl } from '@angular/forms';
-import { retry, takeLast } from 'rxjs/operators';
+import { retry, takeLast, take } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { merge, Observer, Subscription } from 'rxjs';
+import { Subject, Observable, merge, Observer, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -21,7 +21,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./lpns.component.css']
 })
 export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.LpnsMap;
+  definitions: any = ModelMap.LpnListMap;
   dataToSend: Lpns[];
   filter: FormControl;
   filtersForm: FormGroup;
@@ -31,7 +31,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoadingResults = false;
   isLoadingLpnsDetail = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.LPNS;
+  type = IMPORTING_TYPES.LPN_LIST;
   selectsData: any;
   subscriptions: Subscription[] = [];
   selectedLpns: any;
@@ -79,11 +79,11 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (lpns.id && lpns.id.includes('IT')) {
       this.isLoadingLpnsDetail = true;
       const id = lpns.id.replace('IT', '');
-      this.dataProviderService.getLpns(id).subscribe(result => {
+      this.dataProviderService.getLpn(id).subscribe(result => {
         this.isLoadingLpnsDetail = false;
         this.utilities.log('lpns details: ', result);
-        if (result && result.length > 0 && result[0].lpnItemId) {
-          this.selectedLpns = result[0];
+        if (result && result.content && result.content.length > 0 && result.content[0].lpnItemId) {
+          this.selectedLpns = result.content[0];
         }
       });
     }
@@ -133,37 +133,60 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   deleteRows(rows: any) {
     let deletedCounter = 0;
+    let errorsCounter = 0;
+    let constraintErrors = false;
+    const observables: Observable<any>[] = [];
+    const allOperationsSubject = new Subject();
+    allOperationsSubject.subscribe((operation: any) => {
+      if (operation.type === 'success') {
+        deletedCounter++;
+      }
+      if (operation.type === 'error') {
+        errorsCounter++;
+      }
+      if (deletedCounter === (Array.isArray(rows) ? rows.length : 1)) {
+        this.utilities.showSnackBar((Array.isArray(rows) ? 'Rows' : 'Row') + ' deleted successfully 1', 'OK');
+      } else {
+        if (deletedCounter === 0 && errorsCounter === (Array.isArray(rows) ? rows.length : 1)) {
+          this.utilities.showSnackBar(constraintErrors ? 'Error on delete selected rows because there are' +
+          ' in use' : 'Error on delete rows, check Internet conection', 'OK');
+        } else if (deletedCounter > 0 && errorsCounter > 0 &&
+                   deletedCounter + errorsCounter >= (Array.isArray(rows) ? rows.length : 1)) {
+          this.utilities.showSnackBar('Some rows could not be deleted', 'OK');
+        }
+      }
+    }, error => null,
+    () => {
+    });
     const observer = {
       next: (result) => {
+        this.utilities.log('Row deleted: ', result);
         if (result) {
           this.deleteRow(rows);
           this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
+          allOperationsSubject.next({type: 'success'});
         }
       },
-      error: (response) => {
-        this.utilities.error('Error on delete rows', response);
-        if (deletedCounter === 0) {
-          if (response.error && response.error.errors && response.error.errors[0].includes('foreign')) {
-            this.utilities.showSnackBar('This record cant be deleted because it is in use', 'OK');
-          } else {
-            this.utilities.showSnackBar('Error on delete row', 'OK');
+      error: (error) => {
+        this.utilities.error('Error on delete rows', error);
+        if (error) {
+          if (error.error.message.includes('constraint')) {
+            constraintErrors = true;
           }
+          allOperationsSubject.next({type: 'error'});
         }
-        deletedCounter++;
+      },
+      complete: () => {
+        // allOperationsSubject.complete();
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
-      const requests = [];
       rows.forEach(row => {
-        requests.push(this.dataProviderService.deleteLpns(row.id, 'response', false));
+        this.subscriptions.push(this.dataProviderService.deleteLpn(row.id, 'response', false).pipe(take(1))
+        .subscribe(observer));
       });
-      this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteLpns(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deleteLpn(rows.id, 'response', false).pipe(take(1))
       .subscribe(observer));
     }
   }
@@ -207,8 +230,8 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(EditRowDialogComponent, {
       data: {
         row: element,
-        map: this.definitions,
-        type: IMPORTING_TYPES.LPNS,
+        map: ModelMap.LpnMap,
+        type: IMPORTING_TYPES.LPN,
         remoteSync: true // para mandar los datos a la BD por la API
       }
     });
@@ -229,39 +252,43 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.utilities.log('requesting Lpns');
     this.isLoadingResults = true;
     const newData = [];
-    this.subscriptions.push(this.dataProviderService.getAllLpns().subscribe(results => {
+    let results = [];
+    this.subscriptions.push(this.dataProviderService.getAllLpns().subscribe((res: any) => {
       this.isLoadingResults = false;
       this.utilities.log('lpns received', results);
-      if (results && results.length > 0) {
-        results.slice().forEach((element, index) => {
-          if (element.root == null) {
-            newData.push({
+      if (res && res.content && res.content.length > 0) {
+        results = res.content;
+      } else if (res) {
+        results = res;
+      }
+      results.slice().forEach((element, index) => {
+        if (element.root == null) {
+          newData.push({
+            id: element.id,
+            name: element.description,
+            children: []
+          });
+          results.splice(index, 1);
+        }
+      });
+      let aux;
+      let auxIndex;
+      results.slice().forEach((element, index) => {
+        if (element.root != null) {
+          auxIndex = newData.findIndex(el => el.id === element.root);
+          if (auxIndex > -1) {
+            aux = newData[auxIndex];
+            aux.children.push({
               id: element.id,
               name: element.description,
               children: []
             });
             results.splice(index, 1);
           }
-        });
-        let aux;
-        let auxIndex;
-        results.slice().forEach((element, index) => {
-          if (element.root != null) {
-            auxIndex = newData.findIndex(el => el.id === element.root);
-            if (auxIndex > -1) {
-              aux = newData[auxIndex];
-              aux.children.push({
-                id: element.id,
-                name: element.description,
-                children: []
-              });
-              results.splice(index, 1);
-            }
-          }
-        });
-        this.utilities.log('newData: ', newData);
-        this.nodes = newData;
-      }
+        }
+      });
+      this.utilities.log('newData: ', newData);
+      this.nodes = newData;
     }, error => {
       this.isLoadingResults = false;
       this.utilities.error('error on requesting data');
@@ -276,11 +303,11 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addRow() {
     this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.lpns);
+    this.utilities.dataTypesModelMaps.lpn);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.definitions,
-        type: IMPORTING_TYPES.LPNS,
+        map: ModelMap.LpnMap,
+        type: IMPORTING_TYPES.LPN,
         remoteSync: true, // para mandar los datos a la BD por la API
         title: 'Add New LPNS'
       }

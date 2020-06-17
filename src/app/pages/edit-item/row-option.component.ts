@@ -43,7 +43,8 @@ export class RowOptionComponent {
   deleteRow(event) {
     if (this.params.deleteItemUom instanceof Function) {
       console.log('event', event);
-      console.log('paramas', this.params);
+      console.log('params', this.params);
+      console.log('paramas.node.data', this.params.node.data);
       const params = {
         rowData: this.params.node.data
       };
@@ -55,11 +56,11 @@ export class RowOptionComponent {
     this.isEditing = true;
     if (this.params.startEditItemUom instanceof Function) {
       console.log('event', event);
-      console.log('paramas', this.params);
+      console.log('paramas.node', this.params.node);
       const params = {
         rowData: this.params.node.data
       };
-      this.params.startEditItemUom(params);
+      this.params.startEditItemUom(params, this.params.node.rowIndex, 'denominator');
     }
   }
 
@@ -68,6 +69,7 @@ export class RowOptionComponent {
     if (this.params.finishEditItemUom instanceof Function) {
       console.log('event', event);
       console.log('paramas', this.params);
+      console.log('paramas.node.data', this.params.node.data);
       const params = {
         rowData: this.params.node.data
       };

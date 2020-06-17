@@ -13,9 +13,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { retry, takeLast } from 'rxjs/operators';
+import { tap, take, retry, takeLast } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Subscription, Observable, Observer, merge } from 'rxjs';
+import { Subject, Subscription, Observable, Observer, merge } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -179,50 +179,94 @@ export class SectionsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   deleteRow(row: any) {
+    this.utilities.log('row o delete: ', row);
     if (this.selection.isSelected(row)) {
       this.selection.deselect(row);
     }
-    const index = this.dataSource.data.findIndex(_row => _row === row);
-    this.utilities.log('index to delete', index);
-    this.dataSource.data.splice(index, 1);
-    this.refreshTable();
+    const index = this.dataSource.data.findIndex((r: any) => r.id === row.id);
+    if (index > -1) {
+      this.utilities.log('index to delete', index);
+      this.dataSource.data.splice(index, 1);
+      this.refreshTable();
+    } else {
+      this.utilities.error('index not found', index);
+    }
     return true;
   }
 
   deleteRows(rows: any) {
     let deletedCounter = 0;
+    let errorsCounter = 0;
+    let constraintErrors = false;
+    const observables: Observable<any>[] = [];
+    const allOperationsSubject = new Subject();
+    this.isLoadingResults = true;
+    allOperationsSubject.subscribe((operation: any) => {
+      if (operation.type === 'success') {
+        deletedCounter++;
+      }
+      if (operation.type === 'error') {
+        errorsCounter++;
+      }
+      if (deletedCounter === (Array.isArray(rows) ? rows.length : 1)) {
+        this.isLoadingResults = false;
+        this.utilities.showSnackBar((Array.isArray(rows) ? 'Rows' : 'Row') + ' deleted successfully', 'OK');
+      } else {
+        if (deletedCounter === 0 && errorsCounter === (Array.isArray(rows) ? rows.length : 1)) {
+          this.isLoadingResults = false;
+          this.utilities.showSnackBar(constraintErrors ? 'Error on delete selected rows because there are' +
+          ' in use' : 'Error on delete rows, check Internet conection', 'OK');
+        } else if (deletedCounter > 0 && errorsCounter > 0 &&
+                   deletedCounter + errorsCounter >= (Array.isArray(rows) ? rows.length : 1)) {
+          if (constraintErrors) {
+            this.isLoadingResults = false;
+            this.utilities.showSnackBar('Some rows could not be deleted cause there are in use', 'OK');
+          } else {
+            this.isLoadingResults = false;
+            this.utilities.showSnackBar('Some rows could not be deleted', 'OK');
+          }
+        }
+      }
+    }, error => null,
+    () => {
+    });
     const observer = {
       next: (result) => {
-        if (result) {
-          this.deleteRow(rows);
+        this.utilities.log('Row deleted: ', result);
+        if (result && result.rowToDelete) {
+          this.deleteRow(result.rowToDelete);
           this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
+          allOperationsSubject.next({type: 'success'});
         }
       },
-      error: (response) => {
-        this.utilities.error('Error on delete rows', response);
-        if (deletedCounter === 0) {
-          if (response.error && response.error.errors && response.error.errors[0].includes('foreign')) {
-            this.utilities.showSnackBar('This record cant be deleted because it is in use', 'OK');
-          } else {
-            this.utilities.showSnackBar('Error on delete row', 'OK');
+      error: (error) => {
+        this.utilities.error('Error on delete rows', error);
+        if (error) {
+          if (error.error.message.includes('constraint') ||
+              (error.error.errors && error.error.errors[0].includes('foreign'))) {
+            constraintErrors = true;
           }
+          allOperationsSubject.next({type: 'error'});
         }
-        deletedCounter++;
+      },
+      complete: () => {
+        // allOperationsSubject.complete();
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
-      const requests = [];
       rows.forEach(row => {
-        requests.push(this.dataProviderService.deleteSection(row.id, 'response', false));
+        this.subscriptions.push(this.dataProviderService.deleteSection(row.id, 'response', false).pipe(take(1))
+        .pipe(tap(result => result.rowToDelete = row)).subscribe(observer));
+        if (this.selection.isSelected(row)) {
+          this.selection.deselect(row);
+        }
       });
-      this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteSection(rows.id, 'response', false)
-      .subscribe(observer));
+      this.subscriptions.push(this.dataProviderService.deleteSection(rows.id, 'response', false).pipe(take(1))
+      .pipe(tap(result => result.rowToDelete = rows)).subscribe(observer));
+      if (this.selection.isSelected(rows)) {
+        this.selection.deselect(rows);
+      }
     }
   }
 

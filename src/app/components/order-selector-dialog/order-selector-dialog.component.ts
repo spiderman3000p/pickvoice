@@ -20,7 +20,7 @@ import { merge, Observable, Observer, Subscription } from 'rxjs';
 export class OrderSelectorDialogComponent implements OnInit, AfterViewInit {
   title: string;
   message: string;
-  definitions: any = ModelMap.OrderMap;
+  definitions: any = ModelMap.OrderListMap;
   dataSource: MyDataSource<Order>;
   dataToSend: Order[];
   displayedDataColumns: string[];
@@ -42,10 +42,9 @@ export class OrderSelectorDialogComponent implements OnInit, AfterViewInit {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.ORDERS;
+  type = IMPORTING_TYPES.ORDERS_LIST;
   selectsData: any;
   subscriptions: Subscription[] = [];
-  parserFn: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   constructor(public dialogRef: MatDialogRef<OrderSelectorDialogComponent>,
@@ -59,18 +58,12 @@ export class OrderSelectorDialogComponent implements OnInit, AfterViewInit {
 
     this.initColumnsDefs(); // columnas a mostrarse
     this.utilities.log('filters', this.filters);
-    this.parserFn = (element: any, index) => {
-      element.transport = element.transport ? element.transport.name : '';
-      element.orderType = element.orderType ? element.orderType.name : '';
-      element.customer = element.customer ? element.customer.name : '';
-      return element;
-    };
     this.utilities.log('displayed data columns', this.displayedDataColumns);
     this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
   }
 
   setSelectedElement() {
-    this.dialogRef.close(this.selection.selected);
+    this.dialogRef.close(this.selection.selected.map((el: any) => new Object({id: el.orderId})));
   }
 
   ngOnInit(): void {

@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, OrderLine, Section, OrderType,
-         Transport, PickPlanning, PickTask, Dock } from '@pickvoice/pickvoice-api';
+         Transport, PickPlanning, PickTask, Dock, Lpn } from '@pickvoice/pickvoice-api';
 import { DataProviderService} from '../../services/data-provider.service';
 import { PrintComponent } from '../../components/print/print.component';
 import { OrderSelectorDialogComponent } from '../../components/order-selector-dialog/order-selector-dialog.component';
@@ -34,7 +34,7 @@ export class EditRowComponent implements OnInit, OnDestroy {
   pageTitle = '';
   cardTitle = '';
   type: string;
-  dataMap: any; // paramapear datos de la entidad recibida a editar
+  dataMap: any; // para mapear datos de la entidad recibida a editar
   remoteSync: boolean;
   keys: string[];
   row: any;
@@ -81,6 +81,11 @@ export class EditRowComponent implements OnInit, OnDestroy {
     if (this.type === IMPORTING_TYPES.ORDERS) {
       this.utilities.log('order', this.row);
       this.definitions = ModelMap.OrderLineMap;
+    }
+
+    if (this.type === IMPORTING_TYPES.INVENTORY) {
+      this.utilities.log('inventory item', this.row);
+      this.definitions = ModelMap.InventoryItemMap;
     }
 
     if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
@@ -580,6 +585,9 @@ export class EditRowComponent implements OnInit, OnDestroy {
         data.row.subscribe(row => {
           this.utilities.log('row', row);
           if (row) {
+            if (row.content) {
+              row = row.content[0];
+            }
             this.isLoadingResults = false;
             const keys = Object.keys(row).filter(key => key !== 'id');
             const keysForItem = keys.filter(key => key !== 'state');
@@ -653,6 +661,11 @@ export class EditRowComponent implements OnInit, OnDestroy {
               this.row = row as TaskType;
               this.cardTitle = 'Task Type #' + this.row.code;
               this.pageTitle = this.viewMode === 'edit' ? 'Edit Task Type' : 'View Task Type';
+            }  else if (this.type === IMPORTING_TYPES.INVENTORY) {
+              this.utilities.log('object is a inventory item type');
+              this.row = row as Lpn;
+              this.cardTitle = 'Inventory Item #' + this.row.lpnId;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Inventory Item' : 'View Inventory Item';
             } else {
               this.cardTitle = 'Unknown object type';
               console.error('object is unknown');

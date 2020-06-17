@@ -2,7 +2,7 @@ import {
     Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, Transport,
     Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine, LoadOrder,
     PickTaskLines, Dock, User, /*Role,*/ TaskType, LoadItem, LoadLocation, ItemUom, QualityStates,
-    QualityStateType
+    QualityStateType, Lpn
 } from '@pickvoice/pickvoice-api';
 import { IMPORTING_TYPES } from './model-maps.model';
 
@@ -63,6 +63,9 @@ export class ModelFactory {
         if (type === IMPORTING_TYPES.QUALITY_STATES) {
             return this.newEmptyQualityState();
         }
+        if (type === IMPORTING_TYPES.LPN) {
+            return this.newEmptyLpn();
+        }
         return null;
     }
 
@@ -73,6 +76,19 @@ export class ModelFactory {
         object.optionalCode = '';
         object.qualityStateTypeId = 0;
         object.state = false;
+        return object;
+    }
+
+    public static newEmptyLpn(): Lpn {
+        const object = new Object() as Lpn;
+        object.activationDate = '';
+        object.closingDate = '';
+        object.code = '';
+        object.locationId = 0;
+        object.lpnInterface = Lpn.LpnInterfaceEnum.CI;
+        object.lpnState = Lpn.LpnStateEnum.IT;
+        object.lpnType = Lpn.LpnTypeEnum.Carton;
+        object.openingDate = '';
         return object;
     }
 
@@ -90,6 +106,9 @@ export class ModelFactory {
         object.factor = 0;
         object.height = 0;
         object.itemId = 0;
+        object.dimensionUomId = 0;
+        object.volumenUomId = 0;
+        object.unitsPallet = 0;
         object.length = 0;
         object.numerator = 0;
         object.uomId = 0;
@@ -311,6 +330,13 @@ export class ModelFactory {
         object.contact = '';
         object.phone = '';
         object.address = '';
+        object.gln = '';
+        object.postalCode = '';
+        object.longitude = '';
+        object.latitude = '';
+        object.zone = '';
+        object.neighborhood = '';
+        object.cityId = 0;
         return object;
     }
 

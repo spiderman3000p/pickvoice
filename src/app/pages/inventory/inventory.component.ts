@@ -17,8 +17,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
 import { timeout, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { merge, Subscription, Observable, Observer } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Subject, merge, Subscription, Observable, Observer } from 'rxjs';
+import { catchError, take } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Component({
@@ -344,7 +344,7 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.selection.isSelected(row)) {
       this.selection.deselect(row);
     }
-    const index = this.dataSource.data.findIndex(_row => _row.itemId === row.itemId);
+    const index = this.dataSource.data.findIndex(_row => _row.lpnId === row.lpnId);
     this.utilities.log('index to delete', index);
     if (index > -1) {
       this.dataSource.data.splice(index, 1);
@@ -357,32 +357,60 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   deleteRows(rows: any) {
     let deletedCounter = 0;
+    let errorsCounter = 0;
+    let constraintErrors = false;
+    const observables: Observable<any>[] = [];
+    const allOperationsSubject = new Subject();
+    allOperationsSubject.subscribe((operation: any) => {
+      if (operation.type === 'success') {
+        deletedCounter++;
+      }
+      if (operation.type === 'error') {
+        errorsCounter++;
+      }
+      if (deletedCounter === (Array.isArray(rows) ? rows.length : 1)) {
+        this.utilities.showSnackBar((Array.isArray(rows) ? 'Rows' : 'Row') + ' deleted successfully 1', 'OK');
+      } else {
+        if (deletedCounter === 0 && errorsCounter === (Array.isArray(rows) ? rows.length : 1)) {
+          this.utilities.showSnackBar(constraintErrors ? 'Error on delete selected rows because there are' +
+          ' in use' : 'Error on delete rows, check Internet conection', 'OK');
+        } else if (deletedCounter > 0 && errorsCounter > 0 &&
+                   deletedCounter + errorsCounter >= (Array.isArray(rows) ? rows.length : 1)) {
+          this.utilities.showSnackBar('Some rows could not be deleted', 'OK');
+        }
+      }
+    }, error => null,
+    () => {
+    });
     const observer = {
       next: (result) => {
+        this.utilities.log('Row deleted: ', result);
         if (result) {
           this.deleteRow(rows);
           this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
+          allOperationsSubject.next({type: 'success'});
         }
       },
       error: (error) => {
         this.utilities.error('Error on delete rows', error);
-        if (deletedCounter === 0) {
-          this.utilities.showSnackBar('Error on delete rows', 'OK');
+        if (error) {
+          if (error.error.message.includes('constraint')) {
+            constraintErrors = true;
+          }
+          allOperationsSubject.next({type: 'error'});
         }
-        deletedCounter++;
+      },
+      complete: () => {
+        // allOperationsSubject.complete();
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
-        this.subscriptions.push(this.dataProviderService.deleteInventoryItem(row.id, 'response', false)
+        this.subscriptions.push(this.dataProviderService.deleteInventoryItem(row.lpnId, 'response', false).pipe(take(1))
         .subscribe(observer));
       });
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteInventoryItem(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deleteInventoryItem(rows.lpnId, 'response', false).pipe(take(1))
       .subscribe(observer));
     }
   }

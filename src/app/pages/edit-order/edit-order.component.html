@@ -172,9 +172,9 @@
                         <ng-template matTabContent>
                             <div class="form-group">
                                 <label>Transport</label>
-                                <select formControlName="transportId" class="form-control" (change)="onChangeTransport()">
-                                    <option *ngFor="let trans of ordersData.transportList" [value]="trans.id">
-                                        {{ trans.nameRoute }}
+                                <select formControlName="transportId" class="form-control">
+                                    <option *ngFor="let trans of ordersData.transportList" [value]="trans.transportId">
+                                        {{ trans.transportNumber }}
                                     </option>
                                     <!--div class="select-footer" *ngIf="dataMap.transport.addNew && viewMode === 'edit'">
                                         <span class="select-footer-content">
@@ -190,7 +190,7 @@
                             <br><br>
                             <h5>Transport Details</h5>
                             <hr>
-                            <span class="row" *ngIf="selectedTransport.transportId !== undefined">
+                            <span class="row" *ngIf="selectedTransport.id !== undefined">
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
                                         <label>Transport Number</label>
@@ -445,7 +445,7 @@
                                         <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
                                         (click)="toggleColumn(column)">
                                             <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                            {{column.name}}
+                                            {{definitions[column.name].name}}
                                         </a>
                                     </span>
                                 </mat-menu>

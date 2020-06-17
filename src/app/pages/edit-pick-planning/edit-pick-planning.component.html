@@ -29,9 +29,9 @@
                     <hr>
                     <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
                         <label>Target Dock</label>
-                        <select [compareWith]="dataMap.targetDock.formControl.compareFn" formControlName="targetDock"
+                        <select formControlName="targetDockId"
                         [class.readonly]="viewMode === 'view'" class="form-control">
-                            <option *ngFor="let dock of pickPlanningData.dockList" [ngValue]="dock">
+                            <option *ngFor="let dock of pickPlanningData.dockList" [ngValue]="dock.id">
                                 {{ dock.description }}
                             </option>
                             <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
@@ -52,9 +52,9 @@
                     </div>
                     <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
                         <label>State</label>
-                        <select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
+                        <select formControlName="state"
                         [class.readonly]="viewMode === 'view'" class="form-control">
-                            <option *ngFor="let state of pickPlanningData.pickPlanningStates" [ngValue]="state">
+                            <option *ngFor="let state of pickPlanningData.pickPlanningStates" [value]="state">
                                 {{ states[state] }}
                             </option>
                             <!--div class="select-footer" *ngIf="dataMap.orderType.addNew && viewMode === 'edit'">
@@ -132,7 +132,7 @@
                                                             <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
                                                             (click)="toggleColumn(column)">
                                                                 <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                                                {{column.name}}
+                                                                {{definitions[column.name]}}
                                                             </a>
                                                         </span>
                                                     </mat-menu>
@@ -292,8 +292,8 @@
                                                                     <td>{{order.orderDate}}</td>
                                                                     <td>{{order.deliveryDate}}</td>
                                                                     <td>{{order.priority}}</td>
-                                                                    <td>{{order.orderType.name}}</td>
-                                                                    <td>{{order.customer.name}}</td>
+                                                                    <td>{{order.orderTypeName}}</td>
+                                                                    <td>{{order.customerName}}</td>
                                                                 </tr>
                                                             </tbody>
                                                             <tfoot>
@@ -317,7 +317,7 @@
                                                             <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumnsTransports();"
                                                             (click)="toggleColumnTransports(column)">
                                                                 <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                                                {{column.name}}
+                                                                {{definitionsTransports[column.name].name}}
                                                             </a>
                                                         </span>
                                                     </mat-menu>

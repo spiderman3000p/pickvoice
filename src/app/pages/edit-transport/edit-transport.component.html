@@ -78,8 +78,7 @@
                             <div class="form-group" [class.readonly]="viewMode === 'view'">
                                 <label>Transportation Status</label>
                                 <select [compareWith]="dataMap.transportationStatus.formControl.compareFn"
-                                formControlName="transportationStatus" [class.readonly]="viewMode === 'view'" class="form-control"
-                                [disabled]="viewMode === 'view'">
+                                formControlName="transportationStatus" [class.readonly]="viewMode === 'view'" class="form-control">
                                     <option *ngFor="let status of transportData.statusList" [ngValue]="status">
                                         {{ status }}
                                     </option>
@@ -108,20 +107,18 @@
                                         </div>
                                         <div class="form-group" [class.readonly]="viewMode === 'view'">
                                             <label>Uom Volume</label>
-                                            <select [compareWith]="dataMap.uomVolume.formControl.compareFn"
-                                            formControlName="uomVolume" [class.readonly]="viewMode === 'view'"
-                                            class="form-control" [disabled]="viewMode === 'view'">
-                                                <option *ngFor="let uom of transportData.uomsList" [ngValue]="uom">
+                                            <select formControlName="uomVolumeId" [class.readonly]="viewMode === 'view'"
+                                            class="form-control">
+                                                <option *ngFor="let uom of transportData.uomsList" [value]="uom.id">
                                                     {{ uom.name }}
                                                 </option>
                                             </select>
                                         </div>
                                         <div class="form-group" [class.readonly]="viewMode === 'view'">
                                             <label>Uom Weight</label>
-                                            <select [compareWith]="dataMap.uomWeight.formControl.compareFn"
-                                            formControlName="uomWeight" [class.readonly]="viewMode === 'view'"
-                                            class="form-control" [disabled]="viewMode === 'view'">
-                                                <option *ngFor="let uom of transportData.uomsList" [ngValue]="uom">
+                                            <select formControlName="uomWeightId" [class.readonly]="viewMode === 'view'"
+                                            class="form-control">
+                                                <option *ngFor="let uom of transportData.uomsList" [value]="uom.id">
                                                     {{ uom.name }}
                                                 </option>
                                             </select>
@@ -189,24 +186,7 @@
                                         </a-->
                                     </div>
                                     <table mat-table [dataSource]="dataSource" matSort 
-                                    [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 12">
-                                        <!-- Checkbox Column -->
-                                        <ng-container matColumnDef="select">
-                                            <th mat-header-cell *matHeaderCellDef>
-                                                <mat-checkbox (change)="$event ? masterToggle() : null"
-                                                    [checked]="selection.hasValue() && isAllSelected()"
-                                                    [indeterminate]="selection.hasValue() && !isAllSelected()"
-                                                    [aria-label]="checkboxLabel()">
-                                                </mat-checkbox>
-                                            </th>
-                                            <td mat-cell *matCellDef="let row">
-                                                <mat-checkbox (click)="$event.stopPropagation()"
-                                                    (change)="$event ? selection.toggle(row) : null"
-                                                    [checked]="selection.isSelected(row)"
-                                                    [aria-label]="checkboxLabel(row)">
-                                                </mat-checkbox>
-                                            </td>
-                                        </ng-container>
+                                    [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 7">
                                         <!-- Data Columns -->
                                         <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
                                             <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
@@ -226,7 +206,7 @@
                                                         <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
                                                         (click)="toggleColumn(column)">
                                                             <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                                            {{column.name}}
+                                                            {{definitions[column.name].name}}
                                                         </a>
                                                     </span>
                                                 </mat-menu>

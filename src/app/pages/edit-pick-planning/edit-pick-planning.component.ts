@@ -404,7 +404,7 @@ export class EditPickPlanningComponent implements OnInit {
       this.initColumnsDefsTransports(); // columnas a mostrarse en la tabla de transports
     }
     this.form = new FormGroup({
-      targetDock: new FormControl(this.row.targetDock),
+      targetDockId: new FormControl(this.row.targetDockId),
       description: new FormControl(this.row.description),
       state: new FormControl(this.row.state),
       progress: new FormControl(this.row.progress),
@@ -891,8 +891,7 @@ export class EditPickPlanningComponent implements OnInit {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          if ((response.status === 204 || response.status === 200 || response.status === 201)
-            && response.statusText === 'OK') {
+          if ((response.status === 204 || response.status === 200 || response.status === 201)) {
             this.utilities.showSnackBar('Update Successfull', 'OK');
           }
           // this.back();
@@ -963,6 +962,7 @@ export class EditPickPlanningComponent implements OnInit {
     }) => {
       this.viewMode = data.viewMode;
       this.type = data.type;
+      this.remoteSync = true;
       this.utilities.log('viewMode', this.viewMode);
       data.row.subscribe(element => {
         this.isLoadingResults = false;
@@ -971,7 +971,6 @@ export class EditPickPlanningComponent implements OnInit {
         this.cardTitle = 'Pick Planning # ' + this.row.id;
         this.init();
       });
-      this.remoteSync = true;
     });
   }
 }

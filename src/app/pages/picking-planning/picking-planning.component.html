@@ -21,7 +21,7 @@
         <mat-spinner class="spinner"></mat-spinner>
       </div>
       <div>
-        <!--strong *ngIf="filteredDone">Filtred results: {{dataSource.dataCount}}</strong-->
+        <!--strong *ngIf="filteredDone">Filtred results: {{dataSource.dataCount}}</strong->
         <div class="table-toolbar" *ngIf="selection.selected.length > 0">
           <div class="col-sm-3 text-left toolbar-label">
             <label>Selected rows: {{selection.selected.length}}</label>
@@ -33,12 +33,12 @@
             <button class="" (click)="orderingProcess(selection.selected)">Ordering process</button>
             <button class="" (click)="export(selection.selected)">Export</button>
             <button class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
-          </div-->
+          </div->
         </div>
         <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 10"-->
-        <table mat-table [dataSource]="dataSource" matSort matSortActive="targetDock" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8">
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="pickPlanningId" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 5">
           <!-- Checkbox Column -->
-          <ng-container matColumnDef="select">
+          <!--ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
               <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
                 [aria-label]="checkboxLabel()">
@@ -49,7 +49,7 @@
                 [aria-label]="checkboxLabel(row)">
               </mat-checkbox>
             </td>
-          </ng-container>
+          </ng-container-->
           <!-- Data Columns -->
           <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}}
@@ -135,7 +135,7 @@
                   <button mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
                   (click)="toggleColumn(column)">
                       <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                      {{column.name}}
+                      {{definitions[column.name].name}}
                   </button>
                 </span>
               </mat-menu>
@@ -147,16 +147,16 @@
               <!--button mat-icon-button (click)="editRowOnPage(element)">
                   <img src="assets/icons/zoom.png">
               </button-->
-              <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
+              <button mat-icon-button [routerLink]="['/pages/pickPlannings/view', element.pickPlanningId]">
                   <img src="assets/icons/zoom.png">
               </button>
-              <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
+              <button mat-icon-button [routerLink]="['/pages/pickPlannings/edit', element.pickPlanningId]">
                   <img src="assets/icons/page_edit.png">
               </button>
               <!--button mat-icon-button (click)="printRow(element)">
                   <img src="assets/icons/printer.png">
               </button-->
-              <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
+              <a mat-icon-button [href]="'/print/pickPlannings/' + element.pickPlanningId" target="_blank">
                   <img src="assets/icons/printer.png">
               </a>
               <button mat-icon-button (click)="deletePrompt(element)">
@@ -169,7 +169,7 @@
           <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
                     [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
           <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
-            [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
+            [routerLink]="['/pages/pickPlannings/view', row.pickPlanningId]"></tr>
         </table>
         <mat-paginator [length]="dataSource.dataCount" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
       </div>

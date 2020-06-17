@@ -125,7 +125,7 @@
                                     <button mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
                                     (click)="toggleColumn(column)">
                                         <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                        {{column.name}}
+                                        {{definitions[column.name].name}}
                                     </button>
                                 </span>
                             </mat-menu>

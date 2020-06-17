@@ -115,16 +115,6 @@ export class EditOrderComponent implements OnInit {
     });
   }
 
-  onChangeCustomer() {
-    this.row.customerId = this.form.get('customerId').value;
-    this.getCustomerDetails();
-  }
-
-  onChangeTransport() {
-    this.row.transportId = this.form.get('transportId').value;
-    this.getTransportDetails();
-  }
-
   setDataSourceAttributes() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -138,8 +128,8 @@ export class EditOrderComponent implements OnInit {
     this.getUomList();
     this.getOrderLineList();
     this.getTransportStatusList();
-    this.getCustomerDetails();
-    this.getTransportDetails();
+    this.form.get('transportId').patchValue(this.row.transportId);
+    this.form.get('customerId').patchValue(this.row.customerId);
     // inicializamos todo lo necesario para la tabla
     if (this.row) {
       this.dataSource.data = this.ordersData.orderLineList;
@@ -161,6 +151,14 @@ export class EditOrderComponent implements OnInit {
       // idTransport: new FormControl(this.row.idTransport),
       transportId: new FormControl(this.row.transportId ? this.row.transportId : ''),
       customerId: new FormControl(this.row.customerId ? this.row.customerId : '')
+    });
+    this.form.get('transportId').valueChanges.subscribe(value => {
+      this.row.transportId = value;
+      this.getTransportDetails();
+    });
+    this.form.get('customerId').valueChanges.subscribe(value => {
+      this.row.customerId = value;
+      this.getCustomerDetails();
     });
   }
 
@@ -383,6 +381,7 @@ export class EditOrderComponent implements OnInit {
       data: {
         map: this.definitions,
         type: IMPORTING_TYPES.ORDER_LINE,
+        title: 'Add Order Line',
         remoteSync: false // para mandar los datos a la BD por la API
       }
     });
@@ -445,7 +444,6 @@ export class EditOrderComponent implements OnInit {
     if (this.row.customerId) {
       this.dataProviderService.getCustomer(this.row.customerId).subscribe(results => {
         this.selectedCustomer = results;
-        this.form.get('customerId').setValue(this.selectedCustomer.id);
         this.utilities.log('selected customer details: ', this.selectedCustomer);
       });
     }
@@ -455,7 +453,6 @@ export class EditOrderComponent implements OnInit {
     if (this.row.transportId) {
       this.dataProviderService.getTransport(this.row.transportId).subscribe(results => {
         this.selectedTransport = results;
-        this.form.get('transportId').setValue(this.selectedTransport.id);
         this.utilities.log('selected transport details: ', this.selectedTransport);
       });
     }
@@ -479,21 +476,33 @@ export class EditOrderComponent implements OnInit {
 
   getCustomerList() {
     this.dataProviderService.getDataFromApi(IMPORTING_TYPES.CUSTOMERS).subscribe(results => {
-      this.ordersData.customerList = results.content;
+      if (results && results.content && Array.isArray(results.content)) {
+        this.ordersData.customerList = results.content;
+      } else if (results && Array.isArray(results)) {
+        this.ordersData.customerList = results;
+      }
       this.utilities.log('this.ordersData.customerList', this.ordersData.customerList);
     });
   }
 
   getTransportList() {
     this.dataProviderService.getDataFromApi(IMPORTING_TYPES.TRANSPORTS).subscribe(results => {
-      this.ordersData.transportList = results;
+      if (results && results.content && Array.isArray(results.content)) {
+        this.ordersData.transportList = results.content;
+      } else if (results && Array.isArray(results)) {
+        this.ordersData.transportList = results;
+      }
       this.utilities.log('this.ordersData.transportList', this.ordersData.transportList);
     });
   }
 
   getUomList() {
     this.dataProviderService.getDataFromApi(IMPORTING_TYPES.UOMS).subscribe(results => {
-      this.ordersData.uomList = results;
+      if (results && results.content && Array.isArray(results.content)) {
+        this.ordersData.uomList = results.content;
+      } else if (results && Array.isArray(results)) {
+        this.ordersData.uomList = results;
+      }
       this.utilities.log('this.ordersData.uomList', this.ordersData.uomList);
     });
   }

@@ -23,6 +23,8 @@ export class ApiInterceptor implements HttpInterceptor {
                 console.error('Error al hacer peticion', error);
                 if (error instanceof HttpErrorResponse && error.status === 401) {
                     return this.handle401Error(req, next);
+                } else if (error instanceof HttpErrorResponse && error.status === 400 && error.statusText !== 'Bad Request') {
+                    return this.handle400Error(req, next);
                 } else {
                     return throwError(error);
                 }
@@ -32,8 +34,11 @@ export class ApiInterceptor implements HttpInterceptor {
         }
     }
 
-    handle400Error(error: any) {
-
+    handle400Error(req: HttpRequest<any>, next: HttpHandler) {
+        this.isRefreshingToken = false;
+        this.authService.logout();
+        this.router.navigate(['/login']);
+        return of(true);
     }
 
     handle401Error(req: HttpRequest<any>, next: HttpHandler) {

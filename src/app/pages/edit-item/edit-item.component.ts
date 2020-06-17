@@ -8,8 +8,8 @@ import { PrintComponent } from '../../components/print/print.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { SharedDataService } from '../../services/shared-data.service';
-import { merge, Subscription, from, Observable, Observer } from 'rxjs';
-import { takeLast, retry, switchMap } from 'rxjs/operators';
+import { Subject, merge, Subscription, from, Observable, Observer } from 'rxjs';
+import { take, takeLast, retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
@@ -52,23 +52,19 @@ export class EditItemComponent implements OnInit {
   gridApi;
   gridColumnApi;
   frameworkComponents: any;
+  /*valueFormatter: any;
+  valueParser: any;
+  volumenUomIdSetter: any;
+  weightUomIdSetter: any;
+  dimensionUomIdSetter: any;
+  uomIdSetter: any;
+  uomIdGetter: any;
+  weightUomIdGetter: any;
+  volumenUomIdGetter: any;
+  dimensionUomIdGetter: any;*/
+  uomGetter: any;
+  uomSetter: any;
   itemUomsColDefs: any[] = [
-    {
-      headerName: 'UOM',
-      field: 'uom',
-      valueFormatter: uomFormatter,
-      valueParser: uomParser,
-      /*valueGetter: uomGetter,
-      valueSetter: uomSetter,*/
-      cellEditor: 'agSelectCellEditor',
-      cellEditorParams: (params) => {
-        return {
-          values: this.selectsData.uom.map(uom => uom.code)
-        };
-      },
-      width: 150,
-      editable: true
-    },
     {
       headerName: 'DENOMINATOR',
       field: 'denominator',
@@ -112,17 +108,95 @@ export class EditItemComponent implements OnInit {
       editable: true
     },
     {
+      headerName: 'UNITS PALLET',
+      field: 'unitsPallet',
+      width: 100,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
       headerName: 'EAN CODE',
       field: 'eanCode',
       editable: true,
       width: 100,
     },
     {
+      headerName: 'UOM',
+      key: 'uomId',
+      field: 'uomId',
+      // valueFormatter: null,
+      // valueParser: null,
+      valueGetter: null,
+      valueSetter: null,
+      cellEditor: 'agSelectCellEditor',
+      cellEditorParams: (params) => {
+        return {
+          values: this.itemData.uomsList.map(el => el.name)
+        };
+      },
+      width: 150,
+      editable: true
+    },
+    {
+      headerName: 'DIMENSION UOM',
+      key: 'dimensionUomId',
+      field: 'dimensionUomId',
+      // valueFormatter: null,
+      // valueParser: null,
+      valueGetter: null,
+      valueSetter: null,
+      cellEditor: 'agSelectCellEditor',
+      cellEditorParams: (params) => {
+        return {
+          values: this.itemData.uomsList.map(el => el.name)
+        };
+      },
+      width: 150,
+      editable: true
+    },
+    {
+      headerName: 'VOLUME UOM',
+      key: 'volumeUomId',
+      field: 'volumeUomId',
+      // valueFormatter: null,
+      // valueParser: null,
+      valueGetter: null,
+      valueSetter: null,
+      cellEditor: 'agSelectCellEditor',
+      cellEditorParams: (params) => {
+        return {
+          values: this.itemData.uomsList.map(el => el.name)
+        };
+      },
+      width: 150,
+      editable: true
+    },
+    {
+      headerName: 'WEIGHT UOM',
+      key: 'weightUomId',
+      field: 'weightUomId',
+      // valueFormatter: null,
+      // valueParser: null,
+      valueGetter: null,
+      valueSetter: null,
+      cellEditor: 'agSelectCellEditor',
+      cellEditorParams: (params) => {
+        return {
+          values: this.itemData.uomsList.map(el => el.name),
+          formatValue: (param) => {
+            console.log('formatValue: ', param);
+            return param.name;
+          }
+        };
+      },
+      width: 150,
+      editable: true
+    },
+    {
       headerName: 'OPTIONS',
       field: 'options',
       cellRenderer: 'rowOption',
       cellRendererParams: {
-        that: this,
         deleteItemUom: this.deletePrompt.bind(this),
         startEditItemUom: this.startEditItemUom.bind(this),
         finishEditItemUom: this.finishEditItemUom.bind(this),
@@ -350,41 +424,22 @@ export class EditItemComponent implements OnInit {
     this.location.back();
   }
 
-  ngOnInit(): void {
-    this.activatedRoute.data.subscribe((data: {
-      row: any,
-      viewMode: string,
-      type: string
-    }) => {
-      this.viewMode = data.viewMode;
-      this.type = data.type;
-      this.utilities.log('viewMode', this.viewMode);
-      data.row.subscribe(element => {
-        this.isLoadingResults = false;
-        this.utilities.log('ngOnInit => row received', element);
-        this.row = element;
-        this.cardTitle = 'Item # ' + this.row.id;
-        this.init();
-      });
-      this.remoteSync = true;
-    });
-    /* para la tabla de item uom */
-    /*this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
-  }
-
   /* Metodos para la tabla de item uom */
   initColumnsDefs() {
     this.selectsData = {};
     for (let key in this.definitions) {
       if (this.definitions[key].formControl.control === 'select') {
-        this.dataProviderService.getDataFromApi(this.definitions[key].type).subscribe(result => {
-          if (result && result.content && result.pageSize) {
-            this.selectsData[key] = result.content;
-          } else {
-            this.selectsData[key] = result;
-          }
-        });
+        if (this.definitions[key].type !== IMPORTING_TYPES.UOMS) {
+          this.dataProviderService.getDataFromApi(this.definitions[key].type).subscribe(result => {
+            if (result && result.content && result.pageSize) {
+              this.selectsData[key] = result.content;
+            } else {
+              this.selectsData[key] = result;
+            }
+          });
+        } else {
+          this.selectsData[key] = this.itemData.uomsList;
+        }
       }
     }
   }
@@ -450,37 +505,60 @@ export class EditItemComponent implements OnInit {
 
   deleteRows(rows: any) {
     let deletedCounter = 0;
+    let errorsCounter = 0;
+    let constraintErrors = false;
+    const observables: Observable<any>[] = [];
+    const allOperationsSubject = new Subject();
+    allOperationsSubject.subscribe((operation: any) => {
+      if (operation.type === 'success') {
+        deletedCounter++;
+      }
+      if (operation.type === 'error') {
+        errorsCounter++;
+      }
+      if (deletedCounter === (Array.isArray(rows) ? rows.length : 1)) {
+        this.utilities.showSnackBar((Array.isArray(rows) ? 'Rows' : 'Row') + ' deleted successfully 1', 'OK');
+      } else {
+        if (deletedCounter === 0 && errorsCounter === (Array.isArray(rows) ? rows.length : 1)) {
+          this.utilities.showSnackBar(constraintErrors ? 'Error on delete selected rows because there are' +
+          ' in use' : 'Error on delete rows, check Internet conection', 'OK');
+        } else if (deletedCounter > 0 && errorsCounter > 0 &&
+                   deletedCounter + errorsCounter >= (Array.isArray(rows) ? rows.length : 1)) {
+          this.utilities.showSnackBar('Some rows could not be deleted', 'OK');
+        }
+      }
+    }, error => null,
+    () => {
+    });
     const observer = {
       next: (result) => {
+        this.utilities.log('Row deleted: ', result);
         if (result) {
           this.deleteRow(rows);
           this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
+          allOperationsSubject.next({type: 'success'});
         }
       },
-      error: (response) => {
-        this.utilities.error('Error on delete rows', response);
-        if (deletedCounter === 0) {
-          if (response.error && response.error.errors && response.error.errors[0].includes('foreign')) {
-            this.utilities.showSnackBar('This record cant be deleted because it is in use', 'OK');
-          } else {
-            this.utilities.showSnackBar('Error on delete row', 'OK');
+      error: (error) => {
+        this.utilities.error('Error on delete rows', error);
+        if (error) {
+          if (error.error.message.includes('constraint')) {
+            constraintErrors = true;
           }
+          allOperationsSubject.next({type: 'error'});
         }
-        deletedCounter++;
+      },
+      complete: () => {
+        // allOperationsSubject.complete();
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
-      const requests = [];
       rows.forEach(row => {
-        requests.push(this.dataProviderService.deleteItemUom(row.id, 'response', false));
+        this.subscriptions.push(this.dataProviderService.deleteItemUom(row.id, 'response', false).pipe(take(1))
+        .subscribe(observer));
       });
-      this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteItemUom(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deleteItemUom(rows.id, 'response', false).pipe(take(1))
       .subscribe(observer));
     }
   }
@@ -604,7 +682,7 @@ export class EditItemComponent implements OnInit {
         remoteSync: true, // para mandar los datos a la BD por la API
         title: 'Add New Item Uom',
         defaultValues: {
-          item: this.row
+          itemId: this.row.id
         }
       }
     });
@@ -655,8 +733,8 @@ export class EditItemComponent implements OnInit {
   updateItemUom(event) {
     console.log(event);
     const itemUom = event.data;
-    console.log('updateItemUom', event);
-    itemUom.uom = this.selectsData.uom.find(uom => uom.code === itemUom.uom);
+    console.log('updateItemUom', itemUom);
+    itemUom.uom = this.itemData.uomsList.find((uom: any) => uom.id === itemUom.id);
     this.dataProviderService.updateItemUom(itemUom, itemUom.id).subscribe(result => {
       this.utilities.log('item uom update result', result);
       if (result) {
@@ -682,9 +760,11 @@ export class EditItemComponent implements OnInit {
     });
   }
 
-  startEditItemUom(params: any) {
-    this.utilities.log('edit-item. startEditItemUom params', params);
-    this.gridApi.startEditingCell({rowIndex: 0, colKey: 'uom'});
+  startEditItemUom(params: any, rIndex: number, cKey: string) {
+    this.utilities.log('startEditItemUom params', params);
+    this.utilities.log('startEditItemUom rowIndex', rIndex);
+    this.utilities.log('startEditItemUom colKey', cKey);
+    this.gridApi.startEditingCell({rowIndex: rIndex, colKey: 'uomId'});
   }
 
   finishEditItemUom(params: any) {
@@ -709,25 +789,130 @@ export class EditItemComponent implements OnInit {
     // this.utilities.log('sdsd');
   }
   /* fin de metodos para la tabla de item uoms */
-}
+  ngOnInit(): void {
+    this.activatedRoute.data.subscribe((data: {
+      row: any,
+      viewMode: string,
+      type: string
+    }) => {
+      this.viewMode = data.viewMode;
+      this.type = data.type;
+      this.utilities.log('viewMode', this.viewMode);
+      data.row.subscribe(element => {
+        this.isLoadingResults = false;
+        this.utilities.log('ngOnInit => row received', element);
+        this.row = element;
+        this.cardTitle = 'Item # ' + this.row.id;
+        /*this.valueFormatter = (params) => {
+          console.log('uomFormatter', params.value);
+          const val = params.value && params.value.id ? params.value.id : params.value;
+          const found = this.itemData.uomsList.find((uom: any) => uom.id === val);
+          return found && found.name ? found.name : '-';
+        };
+        this.valueParser = (params) => {
+          console.log('uomParser', params);
+          return params.newValue.id;
+        };*/
+        this.uomGetter = (params) => {
+          console.log('uomGetter', params);
+          const key = params.colDef.key;
+          console.log('key', key);
+          const value = params.data[key];
+          let found;
+          if (typeof value === 'number') {
+            found = this.itemData.uomsList.find((uom: any) => uom.id === value);
+          }
+          if (typeof value === 'string') {
+            found = this.itemData.uomsList.find((uom: any) => uom.name === value);
+          }
+          console.log('found', found);
+          return found && found.name ? found.name : '-';
+        };
+        /*this.weightUomIdGetter = (params) => {
+          console.log('weightUomGetter', params);
+          return params.data.uom.name;
+        };
+        this.volumenUomIdGetter = (params) => {
+          console.log('volumenUomGetter', params);
+          return params.data.uom.name;
+        };
+        this.dimensionUomIdGetter = (params) => {
+          console.log('dimensionUomGetter', params);
+          return params.data.uom.name;
+        };*/
+        this.uomSetter = (params) => {
+          console.log('uomSetter', params);
+          const key = params.colDef.key;
+          const value = params.newValue;
+          console.log('key', key);
+          console.log('newValue', value);
+          let found;
+          if (typeof value === 'number') {
+            found = this.itemData.uomsList.find((uom: any) => uom.id === value);
+          }
+          if (typeof value === 'string') {
+            found = this.itemData.uomsList.find((uom: any) => uom.name === value);
+          }
+          params.data[key] = found && found.id ? found.id : null;
+          return true;
+        }; /*
+        this.weightUomIdSetter = (params) => {
+          console.log('weightUomIdSetter', params);
+          params.data.weightUomId = params.newValue;
+          return true;
+        };
+        this.volumenUomIdSetter = (params) => {
+          console.log('volumenUomIdSetter', params);
+          params.data.volumenUomId = params.newValue;
+          return true;
+        };
+        this.dimensionUomIdSetter = (params) => {
+          console.log('uomDimensionSetter', params);
+          params.data.dimensionUomId = params.newValue;
+          return true;
+        };
+        /*
+        this.itemUomsColDefs[8].valueParser = this.valueParser;
+        this.itemUomsColDefs[8].valueFormatter = this.valueFormatter;
+        this.itemUomsColDefs[8].volumenUomIdSetter = this.volumenUomIdSetter;
+        this.itemUomsColDefs[8].weightUomIdSetter = this.weightUomIdSetter;
+        this.itemUomsColDefs[8].dimensionUomIdSetter = this.dimensionUomIdSetter;
+        */
+        this.itemUomsColDefs[8].valueSetter = this.uomSetter;
+        this.itemUomsColDefs[8].valueGetter = this.uomGetter;
 
-function uomFormatter(params) {
-  console.log('uomFormatter', params.value);
-  return params.value.code;
-}
+        /*this.itemUomsColDefs[9].valueParser = this.valueParser;
+        this.itemUomsColDefs[9].valueFormatter = this.valueFormatter;
+        this.itemUomsColDefs[9].uomIdSetter = this.uomIdSetter;
+        this.itemUomsColDefs[9].volumenUomIdSetter = this.volumenUomIdSetter;
+        this.itemUomsColDefs[9].weightUomIdSetter = this.weightUomIdSetter;
+        this.itemUomsColDefs[9].dimensionUomIdSetter = this.dimensionUomIdSetter;*/
+        this.itemUomsColDefs[9].valueGetter = this.uomGetter;
+        this.itemUomsColDefs[9].valueSetter = this.uomSetter;
 
-function uomParser(params) {
-  console.log('uomParser', params);
-  return params.newValue.code;
-}
+        /*this.itemUomsColDefs[10].valueParser = this.valueParser;
+        this.itemUomsColDefs[10].valueFormatter = this.valueFormatter;
+        this.itemUomsColDefs[10].uomIdSetter = this.uomIdSetter;
+        this.itemUomsColDefs[10].volumenUomIdSetter = this.volumenUomIdSetter;
+        this.itemUomsColDefs[10].weightUomIdSetter = this.weightUomIdSetter;
+        this.itemUomsColDefs[10].dimensionUomIdSetter = this.dimensionUomIdSetter;*/
+        this.itemUomsColDefs[10].valueGetter = this.uomGetter;
+        this.itemUomsColDefs[10].valueSetter = this.uomSetter;
 
-function uomGetter(params) {
-  console.log('uomGetter', params);
-  return params.data.uom.name;
-}
-
-function uomSetter(params) {
-  console.log('uomSetter', params);
-  params.data.uom = params.newValue;
-  return true;
+        /*this.itemUomsColDefs[11].valueParser = this.valueParser;
+        this.itemUomsColDefs[11].valueFormatter = this.valueFormatter;
+        this.itemUomsColDefs[11].uomIdSetter = this.uomIdSetter;
+        this.itemUomsColDefs[11].volumenUomIdSetter = this.volumenUomIdSetter;
+        this.itemUomsColDefs[11].weightUomIdSetter = this.weightUomIdSetter;
+        this.itemUomsColDefs[11].dimensionUomIdSetter = this.dimensionUomIdSetter;*/
+        this.itemUomsColDefs[11].valueGetter = this.uomGetter;
+        this.itemUomsColDefs[11].valueSetter = this.uomSetter;
+        this.init();
+      });
+      this.remoteSync = true;
+    });
+    /* para la tabla de item uom */
+    /*this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;*/
+  }
 }

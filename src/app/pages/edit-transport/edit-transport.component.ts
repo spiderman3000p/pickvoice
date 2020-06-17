@@ -56,10 +56,8 @@ export class EditTransportComponent implements OnInit {
   filtersForm: FormGroup;
   showFilters: boolean;
   filters: any[] = [];
-  actionForSelected: FormControl;
-  selection = new SelectionModel<any>(true, []);
-  selectsData: any;
   subscriptions: Subscription[] = [];
+  selectsData: any;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatSort) set matSort(ms: MatSort) {
@@ -87,9 +85,9 @@ export class EditTransportComponent implements OnInit {
       vehicle: new FormControl(''),
       trailer: new FormControl(''),
       containerNumber: new FormControl(''),
-      uomWeight: new FormControl(''),
+      uomWeightId: new FormControl(''),
       weight: new FormControl(''),
-      uomVolume: new FormControl(''),
+      uomVolumeId: new FormControl(''),
       transportationStatus: new FormControl(''),
       description: new FormControl(''),
       plannedCheckin: new FormControl(''),
@@ -107,16 +105,12 @@ export class EditTransportComponent implements OnInit {
     /* para tabla de orders */
     this.dataSource = new MatTableDataSource([]);
     this.filter = new FormControl('');
-    this.actionForSelected = new FormControl('');
     this.displayedDataColumns = Object.keys(this.definitions);
-    this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
+    this.displayedHeadersColumns = Object.keys(this.definitions);
     this.displayedHeadersColumns.push('options');
 
     this.initColumnsDefs(); // columnas a mostrarse
     this.utilities.log('filters', this.filters);
-    this.subscriptions.push(this.actionForSelected.valueChanges.subscribe(value => {
-      this.actionForSelectedRows(value);
-    }));
 
     this.utilities.log('displayed data columns', this.displayedDataColumns);
     this.utilities.log('displayed headers columns', this.getDisplayedHeadersColumns());
@@ -141,9 +135,9 @@ export class EditTransportComponent implements OnInit {
       vehicle: new FormControl(this.row.vehicle),
       trailer: new FormControl(this.row.trailer),
       containerNumber: new FormControl(this.row.containerNumber),
-      uomWeight: new FormControl(this.row.uomWeight),
+      uomWeightId: new FormControl(this.row.uomWeightId),
       weight: new FormControl(this.row.weight),
-      uomVolume: new FormControl(this.row.uomVolume),
+      uomVolumeId: new FormControl(this.row.uomVolumeId),
       transportationStatus: new FormControl(this.row.transportationStatus),
       description: new FormControl(this.row.description),
       plannedCheckin: new FormControl(this.row.plannedCheckin),
@@ -204,8 +198,7 @@ export class EditTransportComponent implements OnInit {
         next: (response) => {
           this.isLoadingResults = false;
           this.utilities.log('update response', response);
-          if ((response.status === 204 || response.status === 200 || response.status === 201)
-            && response.statusText === 'OK') {
+          if ((response.status === 204 || response.status === 200 || response.status === 201)) {
             this.utilities.showSnackBar('Update Successfull', 'OK');
           }
           // this.back();
@@ -299,7 +292,7 @@ export class EditTransportComponent implements OnInit {
       this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInEditTransportPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
-        shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
+        shouldShow = index === this.displayedHeadersColumns.length - 1 || index < this.displayedHeadersColumns.length;
         return {show: shouldShow, name: columnName};
       });
     }
@@ -362,46 +355,7 @@ export class EditTransportComponent implements OnInit {
     this.utilities.log('displayed column after', this.columnDefs);
   }
 
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-        this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
-  }
-
-  /** The label for the checkbox on the passed row */
-  checkboxLabel(row?: any): string {
-    if (!row) {
-      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
-    }
-    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.index + 1}`;
-  }
-
-  actionForSelectedRows(action) {
-    this.utilities.log('action selected', action);
-    switch (action) {
-      case 'delete':
-        if (this.selection.selected.length > 0) {
-          this.deletePrompt(this.selection.selected);
-        } else {
-          this.utilities.showSnackBar('You have no selected records', 'OK');
-        }
-        break;
-      default: break;
-    }
-  }
-
   deleteRow(row: any) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
-    }
     const index = this.dataSource.data.findIndex(_row => _row === row);
     this.utilities.log('index to delete', index);
     this.dataSource.data.splice(index, 1);
@@ -548,7 +502,6 @@ export class EditTransportComponent implements OnInit {
   }
 
   reloadData() {
-    this.selection.clear();
     this.loadData(false);
   }
 

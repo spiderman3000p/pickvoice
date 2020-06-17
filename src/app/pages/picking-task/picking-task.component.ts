@@ -15,8 +15,8 @@ import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-ro
 import { ModelMap, STATES, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { PickTask, PickTaskLine, PickTaskLines, LoadPick } from '@pickvoice/pickvoice-api';
 
-import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
-import { merge, Observable, Observer, Subscription } from 'rxjs';
+import { take, takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { Subject, merge, Observable, Observer, Subscription } from 'rxjs';
 
 import { MyDataSource } from '../../models/my-data-source';
 
@@ -634,37 +634,60 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
 
   deleteRows(rows: any) {
     let deletedCounter = 0;
+    let errorsCounter = 0;
+    let constraintErrors = false;
+    const observables: Observable<any>[] = [];
+    const allOperationsSubject = new Subject();
+    allOperationsSubject.subscribe((operation: any) => {
+      if (operation.type === 'success') {
+        deletedCounter++;
+      }
+      if (operation.type === 'error') {
+        errorsCounter++;
+      }
+      if (deletedCounter === (Array.isArray(rows) ? rows.length : 1)) {
+        this.utilities.showSnackBar((Array.isArray(rows) ? 'Rows' : 'Row') + ' deleted successfully 1', 'OK');
+      } else {
+        if (deletedCounter === 0 && errorsCounter === (Array.isArray(rows) ? rows.length : 1)) {
+          this.utilities.showSnackBar(constraintErrors ? 'Error on delete selected rows because there are' +
+          ' in use' : 'Error on delete rows, check Internet conection', 'OK');
+        } else if (deletedCounter > 0 && errorsCounter > 0 &&
+                   deletedCounter + errorsCounter >= (Array.isArray(rows) ? rows.length : 1)) {
+          this.utilities.showSnackBar('Some rows could not be deleted', 'OK');
+        }
+      }
+    }, error => null,
+    () => {
+    });
     const observer = {
       next: (result) => {
+        this.utilities.log('Row deleted: ', result);
         if (result) {
           this.deleteRow(rows);
           this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
+          allOperationsSubject.next({type: 'success'});
         }
       },
-      error: (response) => {
-        this.utilities.error('Error on delete rows', response);
-        if (deletedCounter === 0) {
-          if (response.error && response.error.errors && response.error.errors[0].includes('foreign')) {
-            this.utilities.showSnackBar('This record cant be deleted because it is in use', 'OK');
-          } else {
-            this.utilities.showSnackBar('Error on delete row', 'OK');
+      error: (error) => {
+        this.utilities.error('Error on delete rows', error);
+        if (error) {
+          if (error.error.message.includes('constraint')) {
+            constraintErrors = true;
           }
+          allOperationsSubject.next({type: 'error'});
         }
-        deletedCounter++;
+      },
+      complete: () => {
+        // allOperationsSubject.complete();
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
-      const requests = [];
       rows.forEach(row => {
-        requests.push(this.dataProviderService.deletePickTask(row.id, 'response', false));
+        this.subscriptions.push(this.dataProviderService.deletePickTask(row.id, 'response', false).pipe(take(1))
+        .subscribe(observer));
       });
-      this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deletePickTask(rows.id, 'response', false)
+      this.subscriptions.push(this.dataProviderService.deletePickTask(rows.id, 'response', false).pipe(take(1))
       .subscribe(observer));
     }
   }

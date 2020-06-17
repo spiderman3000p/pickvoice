@@ -14,9 +14,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { retry, takeLast, mergeMap } from 'rxjs/operators';
+import { tap, take, retry, takeLast, mergeMap } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { forkJoin, Observable, Observer, Subscription, merge } from 'rxjs';
+import { Subject, forkJoin, Observable, Observer, Subscription, merge } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -25,7 +25,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./transport.component.css']
 })
 export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.TransportMap;
+  definitions: any = ModelMap.TransportListMap;
   dataSource: MatTableDataSource<Transport>;
   dataToSend: Transport[];
   displayedDataColumns: string[];
@@ -40,7 +40,7 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
   actionForSelected: FormControl;
   isLoadingResults = false;
   selection = new SelectionModel<any>(true, []);
-  type = IMPORTING_TYPES.TRANSPORTS;
+  type = IMPORTING_TYPES.TRANSPORTS_LIST;
   selectsData: any;
   subscriptions: Subscription[] = [];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -180,50 +180,94 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   deleteRow(row: any) {
+    this.utilities.log('row o delete: ', row);
     if (this.selection.isSelected(row)) {
       this.selection.deselect(row);
     }
-    const index = this.dataSource.data.findIndex(_row => _row === row);
-    this.utilities.log('index to delete', index);
-    this.dataSource.data.splice(index, 1);
-    this.refreshTable();
+    const index = this.dataSource.data.findIndex((r: any) => r.transportId === row.transportId);
+    if (index > -1) {
+      this.utilities.log('index to delete', index);
+      this.dataSource.data.splice(index, 1);
+      this.refreshTable();
+    } else {
+      this.utilities.error('index not found', index);
+    }
     return true;
   }
 
   deleteRows(rows: any) {
     let deletedCounter = 0;
+    let errorsCounter = 0;
+    let constraintErrors = false;
+    const observables: Observable<any>[] = [];
+    const allOperationsSubject = new Subject();
+    this.isLoadingResults = true;
+    allOperationsSubject.subscribe((operation: any) => {
+      if (operation.type === 'success') {
+        deletedCounter++;
+      }
+      if (operation.type === 'error') {
+        errorsCounter++;
+      }
+      if (deletedCounter === (Array.isArray(rows) ? rows.length : 1)) {
+        this.isLoadingResults = false;
+        this.utilities.showSnackBar((Array.isArray(rows) ? 'Rows' : 'Row') + ' deleted successfully', 'OK');
+      } else {
+        if (deletedCounter === 0 && errorsCounter === (Array.isArray(rows) ? rows.length : 1)) {
+          this.isLoadingResults = false;
+          this.utilities.showSnackBar(constraintErrors ? 'Error on delete selected rows because there are' +
+          ' in use' : 'Error on delete rows, check Internet conection', 'OK');
+        } else if (deletedCounter > 0 && errorsCounter > 0 &&
+                   deletedCounter + errorsCounter >= (Array.isArray(rows) ? rows.length : 1)) {
+          if (constraintErrors) {
+            this.isLoadingResults = false;
+            this.utilities.showSnackBar('Some rows could not be deleted cause there are in use', 'OK');
+          } else {
+            this.isLoadingResults = false;
+            this.utilities.showSnackBar('Some rows could not be deleted', 'OK');
+          }
+        }
+      }
+    }, error => null,
+    () => {
+    });
     const observer = {
       next: (result) => {
-        if (result) {
-          this.deleteRow(rows);
+        this.utilities.log('Row deleted: ', result);
+        if (result && result.rowToDelete) {
+          this.deleteRow(result.rowToDelete);
           this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
+          allOperationsSubject.next({type: 'success'});
         }
       },
-      error: (response) => {
-        this.utilities.error('Error on delete rows', response);
-        if (deletedCounter === 0) {
-          if (response.error && response.error.errors && response.error.errors[0].includes('foreign')) {
-            this.utilities.showSnackBar('This record cant be deleted because it is in use', 'OK');
-          } else {
-            this.utilities.showSnackBar('Error on delete row', 'OK');
+      error: (error) => {
+        this.utilities.error('Error on delete rows', error);
+        if (error) {
+          if (error.error.message.includes('constraint') ||
+              (error.error.errors && error.error.errors[0].includes('foreign'))) {
+            constraintErrors = true;
           }
+          allOperationsSubject.next({type: 'error'});
         }
-        deletedCounter++;
+      },
+      complete: () => {
+        // allOperationsSubject.complete();
       }
     } as Observer<any>;
     if (Array.isArray(rows)) {
-      const requests = [];
       rows.forEach(row => {
-        requests.push(this.dataProviderService.deleteTransport(row.id, 'response', false));
+        this.subscriptions.push(this.dataProviderService.deleteTransport(row.transportId, 'response', false).pipe(take(1))
+        .pipe(tap(result => result.rowToDelete = row)).subscribe(observer));
+        if (this.selection.isSelected(row)) {
+          this.selection.deselect(row);
+        }
       });
-      this.subscriptions.push(merge(requests).pipe(takeLast(1)).subscribe(observer));
     } else {
-      this.subscriptions.push(this.dataProviderService.deleteTransport(rows.id, 'response', false)
-      .subscribe(observer));
+      this.subscriptions.push(this.dataProviderService.deleteTransport(rows.transportId, 'response', false).pipe(take(1))
+      .pipe(tap(result => result.rowToDelete = rows)).subscribe(observer));
+      if (this.selection.isSelected(rows)) {
+        this.selection.deselect(rows);
+      }
     }
   }
 
@@ -282,11 +326,6 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
           value = this.utilities.renderColumnData(this.definitions[shownFilter.key].type, data[shownFilter.key]);
         }
         value2 = this.utilities.renderColumnData(this.definitions[shownFilter.key].type, formValues[shownFilter.key]);
-        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
-        this.utilities.log('shownFilter.key', shownFilter.key);
-        this.utilities.log('value', value);
-        this.utilities.log('value2', value2);
-        this.utilities.log('--------------------------------------------');
         return value !== undefined && value !== null && String(value).toString().toLowerCase().includes(String(value2).toLowerCase());
       });
     };
@@ -327,8 +366,8 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.push(this.dataProviderService.getAllTransports().subscribe(results => {
       this.isLoadingResults = false;
       this.utilities.log('transports received', results);
-      if (results && results.length > 0) {
-        this.dataSource.data = results.map((element, i) => {
+      if (results && results.content.length > 0) {
+        this.dataSource.data = results.content.map((element, i) => {
           return { index: i, ... element};
         });
         this.refreshTable();
@@ -350,7 +389,7 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
     this.utilities.dataTypesModelMaps.transports);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.definitions,
+        map: ModelMap.TransportMap,
         type: IMPORTING_TYPES.TRANSPORTS,
         remoteSync: true, // para mandar los datos a la BD por la API
         title: 'Add New Transport'
@@ -405,7 +444,7 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
             this.dataProviderService.updateOrder(order, order.id, 'response', false).subscribe(observer)
           );
         });*/
-        this.dataProviderService.updateOrdersTransport(result, transport.id).subscribe(observer);
+        this.dataProviderService.updateOrdersTransport(result, transport.transportId).subscribe(observer);
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');

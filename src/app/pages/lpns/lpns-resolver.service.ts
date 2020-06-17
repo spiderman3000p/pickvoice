@@ -13,7 +13,7 @@ export class LpnsResolverService implements Resolve<any> {
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
     const id = Number(route.paramMap.get('id'));
     return Observable.create((observer) => {
-      observer.next(this.dataProviderService.getLpns(id));
+      observer.next(this.dataProviderService.getLpn(id));
       observer.complete();
     });
   }
