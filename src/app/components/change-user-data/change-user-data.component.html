@@ -1,0 +1,46 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h2 mat-dialog-title>Change user data</h2>
+    <div style="position: relative">
+        <div class="example-loading-shade" *ngIf="isLoadingResults">
+            <mat-spinner class="spinner"></mat-spinner>
+        </div>
+        <div mat-dialog-content>
+            <div class="form-group">
+                <label>City</label>
+                <select formControlName="selectedCity" required class="form-control">
+                    <option *ngFor="let opt of cities; let i = index" [value]="i">
+                        {{ opt.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Plant</label>
+                <select formControlName="selectedPlant" required class="form-control">
+                    <option *ngFor="let opt of plants; let i = index" [value]="i">
+                        {{ opt.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Depot</label>
+                <select formControlName="selectedDepot" required class="form-control">
+                    <option *ngFor="let opt of depots; let i = index" [value]="i">
+                        {{ opt.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Owner</label>
+                <select formControlName="selectedOwner" required class="form-control">
+                    <option *ngFor="let opt of owners; let i = index" [value]="i">
+                        {{ opt.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close (click)="close()" type="button">CANCEL</button>
+            <button mat-raised-button mat-dialog-close color="primary" type="submit">CHANGE</button>
+        </div>
+    </div>
+</form>

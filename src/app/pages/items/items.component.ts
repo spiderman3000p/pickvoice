@@ -23,8 +23,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-items',
-  templateUrl: './items.component.html',
-  styleUrls: ['./items.component.css']
+  templateUrl: './items.component.html',styleUrls: ['./items.component.css']
 })
 export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
   definitions: any = ModelMap.ItemListMap;
@@ -472,54 +471,10 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filterParams = '';
     this.loadDataPage();
   }
-  /*
-  applyFilters() {
-    const formValues = this.filtersForm.value;
-    let value;
-    let value2;
-    // this.utilities.log('filter form values: ', formValues);
-    const filters = this.filters.filter(filter => filter.show &&
-                    formValues[filter.key] && formValues[filter.key].length > 0);
-    // this.utilities.log('filters: ', filters);
-    this.dataSource.filterPredicate = (data: Item, filter: string) => {
-      // this.utilities.log('data', data);
-      return filters.every(shownFilter => {
-        value = this.utilities.getSelectIndexValue(this.definitions, data[shownFilter.key], shownFilter.key);
-        value2 = formValues[shownFilter.key].toString();
-        /*
-        this.utilities.log('data[shownFilter.key]', data[shownFilter.key]);
-        this.utilities.log('shownFilter.key', shownFilter.key);
-        this.utilities.log('value', value);
-        this.utilities.log('value2', value2);
-        this.utilities.log('--------------------------------------------');*
-        return value !== undefined && value !== null && value.toString().toLowerCase().includes(value2.toLowerCase());
-      });
-    };
-    this.dataSource.filter = 'filtred';
-  }*/
 
   editRowOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
-    /*const dialogRef = this.dialog.open(EditRowComponent, {
-      data: {
-        row: element,
-        map: this.utilities.dataTypesModelMaps.items,
-        type: IMPORTING_TYPES.ITEMS,
-        remoteSync: true // para mandar los datos a la BD por la API
-      }
-    });*/
-    /*dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-            this.dataSource.data[element.index] = result;
-            this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });*/
   }
 
   editRowOnDialog(element: any) {
@@ -641,25 +596,9 @@ export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.utilities.exportToXlsx(dataToExport, 'Items List');
   }
-  /*
-    Esta funcion se encarga de refrescar la tabla cuando el contenido cambia.
-    TODO: mejorar esta funcion usando this.dataSource y no el filtro
-  */
+  
   private refreshTable() {
     this.loadDataPage();
-    // If there's no data in filter we do update using pagination, next page or previous page
-    /*if (this.dataSource.filter === '') {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = 'XXX';
-      this.dataSource.filter = aux;
-      // If there's something in filter, we reset it to 0 and then put back old value
-    } else {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = '';
-      this.dataSource.filter = aux;
-    }
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
   }
 
   toggleFilters() {

@@ -3,7 +3,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { environment } from '../../../environments/environment';
 import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, OrderLine, Section, OrderType,
-         Transport, PickPlanning, PickTask, Dock, Lpn } from '@pickvoice/pickvoice-api';
+         Transport, PickPlanning, PickTask, Dock, Lpn, Owner, Depot, Plant
+       } from '@pickvoice/pickvoice-api';
 import { DataProviderService} from '../../services/data-provider.service';
 import { PrintComponent } from '../../components/print/print.component';
 import { OrderSelectorDialogComponent } from '../../components/order-selector-dialog/order-selector-dialog.component';
@@ -77,6 +78,21 @@ export class EditRowComponent implements OnInit, OnDestroy {
     this.utilities.log('dataMap', this.dataMap);
     const formControls = {};
     this.keys = Object.keys(this.dataMap);
+
+    if (this.type === IMPORTING_TYPES.PLANTS) {
+      this.utilities.log('plant', this.row);
+      this.definitions = ModelMap.PlantsMap;
+    }
+
+    if (this.type === IMPORTING_TYPES.DEPOTS) {
+      this.utilities.log('depot', this.row);
+      this.definitions = ModelMap.DepotsMap;
+    }
+
+    if (this.type === IMPORTING_TYPES.OWNERS) {
+      this.utilities.log('owner', this.row);
+      this.definitions = ModelMap.OwnersMap;
+    }
 
     if (this.type === IMPORTING_TYPES.ORDERS) {
       this.utilities.log('order', this.row);
@@ -592,7 +608,22 @@ export class EditRowComponent implements OnInit, OnDestroy {
             const keys = Object.keys(row).filter(key => key !== 'id');
             const keysForItem = keys.filter(key => key !== 'state');
             this.utilities.log('ngOnInit => row received', row);
-            if (this.type === IMPORTING_TYPES.ITEMS) {
+            if (this.type === IMPORTING_TYPES.PLANTS) {
+              this.utilities.log('object is a plant');
+              this.row = row as Plant;
+              this.cardTitle = 'Plant # ' + this.row.code;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Plant' : 'View Plant';
+            } else if (this.type === IMPORTING_TYPES.DEPOTS) {
+              this.utilities.log('object is a depot');
+              this.row = row as Depot;
+              this.cardTitle = 'Depot # ' + this.row.code;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Depot' : 'View Depot';
+            } else if (this.type === IMPORTING_TYPES.OWNERS) {
+              this.utilities.log('object is an owner');
+              this.row = row as Owner;
+              this.cardTitle = 'Owner # ' + this.row.code;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Owner' : 'View Owner';
+            } else if (this.type === IMPORTING_TYPES.ITEMS) {
               this.utilities.log('object is an item');
               this.row = row as Item;
               this.cardTitle = 'Item sku # ' + this.row.sku;

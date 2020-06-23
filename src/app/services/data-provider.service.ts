@@ -4,7 +4,8 @@ import { Transport, Location, Item, UomService, SectionService, OrderService, Or
          LocationService, TransportService, LoadPickService, ItemTypeService, ItemService,
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
          DockService, UserService, ItemUomService, QualityStates, QualityStateService,
-         QualityStateTypeService, TaskTypeService } from '@pickvoice/pickvoice-api';
+         QualityStateTypeService, TaskTypeService, PlantService, Plant, OwnerService, Owner,
+         DepotService, Depot } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { AuthService } from './auth.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
@@ -27,10 +28,23 @@ export class DataProviderService {
     private docksService: DockService, private userService: UserService,
     private itemUomService: ItemUomService, private qualityStateService: QualityStateService,
     private taskTypeService: TaskTypeService, private authService: AuthService,
-    private qualityStateTypeService: QualityStateTypeService) {
+    private qualityStateTypeService: QualityStateTypeService, private plantService: PlantService,
+    private ownerService: OwnerService, private depotService: DepotService) {
   }
 
   createObject(type: string, toUpload: any, observe: string = 'body', reportProgress: boolean = false) {
+    if (type === IMPORTING_TYPES.PLANTS) {
+      return this.createPlant(toUpload, 'response', false);
+    }
+
+    if (type === IMPORTING_TYPES.DEPOTS) {
+      return this.createDepot(toUpload, 'response', false);
+    }
+
+    if (type === IMPORTING_TYPES.OWNERS) {
+      return this.createOwner(toUpload, 'response', false);
+    }
+
     if (type === IMPORTING_TYPES.ITEMS) {
       return this.createItem(toUpload, 'response', false);
     }
@@ -103,6 +117,18 @@ export class DataProviderService {
   }
 
   updateObject(type: string, toUpload: any, id: number): Observable<any> {
+    if (type === IMPORTING_TYPES.PLANTS) {
+      return this.updatePlant(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.DEPOTS) {
+      return this.updateDepot(toUpload, id, 'response').pipe(retry(3));
+    }
+
+    if (type === IMPORTING_TYPES.OWNERS) {
+      return this.updateOwner(toUpload, id, 'response').pipe(retry(3));
+    }
+
     if (type === IMPORTING_TYPES.ITEMS) {
       return this.updateItem(toUpload, id, 'response').pipe(retry(3));
     }
@@ -174,6 +200,19 @@ export class DataProviderService {
     const owner = this.authService.getOwnerId();
     const httpHeaders = new HttpHeaders();
     switch (type) {
+      case IMPORTING_TYPES.PLANTS: {
+        toReturn = this.getAllPlants(params);
+        break;
+      }
+      case IMPORTING_TYPES.DEPOTS: {
+        const plantId = this.authService.getPlantId();
+        toReturn = this.getAllDepots(plantId, params);
+        break;
+      }
+      case IMPORTING_TYPES.OWNERS: {
+        toReturn = this.getAllOwners(params);
+        break;
+      }
       case IMPORTING_TYPES.INVENTORY: {
         toReturn = this.getAllInventoryItems(params);
         break;
@@ -409,6 +448,89 @@ export class DataProviderService {
   public getUserData(username: string, observe: any = 'body', reportProgress = false): Observable<any[]> {
     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/settings/userMember?userName=${username}`);
     // return of([]);
+  }
+  /**********************************************************************************
+    Grupo de metodos para plants
+  ***********************************************************************************/
+  public getAllPlants(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    return this.plantService.retrieveAllPlant(observe, reportProgress).pipe(retry(3));
+  }
+
+  public deletePlant(id: number, observe: any = 'body', reportProgress = false) {
+    return this.plantService.deletePlant(id, observe, reportProgress);
+  }
+
+  public updatePlant(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.plantService.updatePlant(data, id, observe, reportProgress);
+  }
+
+  public createPlant(data: any, observe: any = 'body', reportProgress = false) {
+    return this.plantService.createPlant(data, observe, reportProgress);
+  }
+
+  public getPlant(id: number, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      // TODO: agregar metodo getPlant
+      // return this.plantService.retrievePlant(id, owner, observe, reportProgress);
+    }
+    return of(false);
+  }
+  /**********************************************************************************
+    Grupo de metodos para depots
+  ***********************************************************************************/
+  public getAllDepots(id, params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    return this.depotService.retrieveAllDepotByPlant(id, observe, reportProgress).pipe(retry(3));
+  }
+
+  public deleteDepot(id: number, observe: any = 'body', reportProgress = false) {
+    return this.depotService.deleteDepot(id, observe, reportProgress);
+  }
+
+  public updateDepot(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.depotService.updateDepot(data, id, observe, reportProgress);
+  }
+
+  public createDepot(data: any, observe: any = 'body', reportProgress = false) {
+    data.ownerId = this.authService.getOwnerId();
+    return this.depotService.createDepot(data, observe, reportProgress);
+  }
+
+  public getDepot(id: number, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      // TODO: agregar metodo getPlant
+      // return this.plantService.retrievePlant(id, owner, observe, reportProgress);
+    }
+    return of(false);
+  }
+  /**********************************************************************************
+    Grupo de metodos para owners
+  ***********************************************************************************/
+  public getAllOwners(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    return this.ownerService.retrieveAllOwner(observe, reportProgress).pipe(retry(3));
+  }
+
+  public deleteOwner(id: number, observe: any = 'body', reportProgress = false) {
+    return this.ownerService.deleteOwner(id, observe, reportProgress);
+  }
+
+  public updateOwner(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.ownerService.updateOwner(data, id, observe, reportProgress);
+  }
+
+  public createOwner(data: any, observe: any = 'body', reportProgress = false) {
+    data.ownerId = this.authService.getOwnerId();
+    return this.ownerService.createOwner(data, observe, reportProgress);
+  }
+
+  public getOwner(id: number, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      // TODO: agregar metodo getPlant
+      // return this.ownerService.retrieveOwner(id, owner, observe, reportProgress);
+    }
+    return of(false);
   }
   /**********************************************************************************
     Grupo de metodos para items
@@ -851,8 +973,8 @@ export class DataProviderService {
   public createLoadPicks(data: any[], transportNumber: string, observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
     const depot = this.authService.userData.depotId;
-    if (owner !== null && depot !== null && transportNumber) {
-      return this.loadPickService.createLoadPick(data, owner, depot, transportNumber, observe, reportProgress);
+    if (owner !== null && depot !== null) {
+      return this.loadPickService.createLoadPick(data, owner, depot, observe, reportProgress);
     }
     return of(false);
   }
@@ -909,8 +1031,11 @@ export class DataProviderService {
   /**********************************************************************************
     Grupo de metodos para pick task
   ***********************************************************************************/
-  public getAllPickTasks(observe: any = 'body', reportProgress = false) {
-    return this.pickTaskService.retrieveAllPickTask(observe, reportProgress);
+  public getAllPickTasks(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    // TODO: corregir esto
+    // return this.pickTaskService.retrieveAllPickTasksVO3(params, owner, observe, reportProgress);
+    return of([]);
   }
 
   public getAllPickTasksByPickPlanning(pickPlanningId: number, observe: any = 'body', reportProgress = false) {

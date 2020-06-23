@@ -1,4 +1,8 @@
 export const IMPORTING_TYPES = {
+    STORES: 'stores',
+    DEPOTS: 'depots',
+    OWNERS: 'owners',
+    PLANTS: 'plants',
     INVENTORY_CLASSIFICATION: 'inventoryClassification',
     LPN_STATE: 'lpnState',
     LPN_INTERFACE: 'lpnInterface',
@@ -133,6 +137,270 @@ export class ModelMap {
     /*********************************************
     *           Object's for CRUD's
     **********************************************/
+    /* plant object map for CRUD */
+    public static PlantsMap = {
+        name: {
+            name: 'name',
+            required: true,
+            type: 'string',
+            validate: true,
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        address: {
+            name: 'address',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'textarea',
+                type: 'text'
+            }
+        },
+        contact: {
+            name: 'contact',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        email: {
+            name: 'email',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        phone1: {
+            name: 'phone 1',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        phone2: {
+            name: 'phone 2',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
+    /* depot object map for CRUD */
+    public static DepotsMap = {
+        name: {
+            name: 'name',
+            required: true,
+            type: 'string',
+            validate: true,
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
+    /* owner object map for CRUD */
+    public static OwnersMap = {
+        name: {
+            name: 'name',
+            required: true,
+            type: 'string',
+            validate: true,
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        address: {
+            name: 'address',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'textarea',
+                type: 'text'
+            }
+        },
+        contact: {
+            name: 'contact',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        email: {
+            name: 'email',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        ean13: {
+            name: 'ean13',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        phone1: {
+            name: 'phone 1',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        phone2: {
+            name: 'phone 2',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        pcl: {
+            name: 'pcl',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        }
+    };
+    /* store object map for CRUD */
+    public static StoresMap = {
+        name: {
+            name: 'name',
+            required: true,
+            type: 'string',
+            validate: true,
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        code: {
+            name: 'code',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        address: {
+            name: 'address',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'textarea',
+                type: 'text'
+            }
+        },
+        contact: {
+            name: 'contact',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        email: {
+            name: 'email',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        ean13: {
+            name: 'ean13',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        phone1: {
+            name: 'phone 1',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        phone2: {
+            name: 'phone 2',
+            required: false,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        customerId: {
+            name: 'customer',
+            required: false,
+            type: IMPORTING_TYPES.CUSTOMERS_LIST,
+            formControl: {
+                control: 'select',
+                type: 'number',
+                valueIndex: 'customerId',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            }
+        }
+    };
     /* task type map for CRUD */
     public static TaskTypeMap = {
         code: {
@@ -2468,7 +2736,7 @@ export class ModelMap {
     };
     /* order line object map for CRUD */
     public static OrderLineMap = {
-        item:  {
+        itemId:  {
             name: 'item',
             required: true,
             unique: true,
@@ -2767,7 +3035,7 @@ export class ModelMap {
                 type: 'number'
             }
         },
-        qyt: {
+        qty: {
             name: 'qty',
             required: false,
             type: 'number',

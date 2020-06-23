@@ -101,6 +101,21 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'plants',
+    loadChildren: () => import('./plants/plants.module').then(m => m.PlantsModule),
+    pathMatch: 'full'
+  },
+  {
+    path: 'depots',
+    loadChildren: () => import('./depots/depots.module').then(m => m.DepotsModule),
+    pathMatch: 'full'
+  },
+  {
+    path: 'owners',
+    loadChildren: () => import('./owners/owners.module').then(m => m.OwnersModule),
+    pathMatch: 'full'
+  },
+  {
     path: 'dashboard',
     loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
     pathMatch: 'full'

@@ -69,6 +69,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
 
 import { NgSelectModule } from '@ng-select/ng-select';
+// import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
 // import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 export function apiConfigFactory(): Configuration {
@@ -113,6 +114,7 @@ export function apiConfigFactory(): Configuration {
     LayoutModule,
 
     NgSelectModule,
+    // NgOptionHighlightModule,
     /*FontAwesomeModule,*/
 
     MatSlideToggleModule,

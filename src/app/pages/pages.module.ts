@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { PagesRoutingModule } from './pages-routing.module';
 import { AdministrationModule } from './administration/administration.module';
 import { PendingOrdersModule } from './pending-orders/pending-orders.module';
@@ -17,8 +19,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { PagesComponent } from './pages.component';
+import { ChangeUserDataComponent } from '../components/change-user-data/change-user-data.component';
 
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
@@ -46,10 +50,13 @@ export const MY_FORMATS = {
 
 @NgModule({
   declarations: [
-    PagesComponent
+    PagesComponent,
+    ChangeUserDataComponent
   ],
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
 
     PagesRoutingModule,
     AdministrationModule,
@@ -67,7 +74,8 @@ export const MY_FORMATS = {
     MatIconModule,
     MatListModule,
     MatMenuModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]},

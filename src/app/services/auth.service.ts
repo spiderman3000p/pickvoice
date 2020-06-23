@@ -196,34 +196,30 @@ export class AuthService {
   }
 
   getUserMemberData(): any {
-    let userData = new Object() as any;
-    if (this.userData.cityId !== null) {
-      userData = this.userData;
-    } else {
-      if (localStorage.getItem('selected-city')) {
-        userData.cityId = Number(localStorage.getItem('selected-city'));
-      }
-      if (localStorage.getItem('selected-cityname')) {
-        userData.cityName = localStorage.getItem('selected-cityName');
-      }
-      if (localStorage.getItem('selected-plant')) {
-        userData.plantId = Number(localStorage.getItem('selected-plant'));
-      }
-      if (localStorage.getItem('selected-plantName')) {
-        userData.plantName = localStorage.getItem('selected-plantName');
-      }
-      if (localStorage.getItem('selected-depot')) {
-        userData.depotId = Number(localStorage.getItem('selected-depot'));
-      }
-      if (localStorage.getItem('selected-depotName')) {
-        userData.depotName = localStorage.getItem('selected-depotName');
-      }
-      if (localStorage.getItem('selected-owner')) {
-        userData.ownerId = Number(localStorage.getItem('selected-owner'));
-      }
-      if (localStorage.getItem('selected-ownerName')) {
-        userData.ownerName = localStorage.getItem('selected-ownerName');
-      }
+    const userData = new Object() as any;
+    if (localStorage.getItem('selected-city')) {
+      userData.cityId = Number(localStorage.getItem('selected-city'));
+    }
+    if (localStorage.getItem('selected-cityName')) {
+      userData.cityName = localStorage.getItem('selected-cityName');
+    }
+    if (localStorage.getItem('selected-plant')) {
+      userData.plantId = Number(localStorage.getItem('selected-plant'));
+    }
+    if (localStorage.getItem('selected-plantName')) {
+      userData.plantName = localStorage.getItem('selected-plantName');
+    }
+    if (localStorage.getItem('selected-depot')) {
+      userData.depotId = Number(localStorage.getItem('selected-depot'));
+    }
+    if (localStorage.getItem('selected-depotName')) {
+      userData.depotName = localStorage.getItem('selected-depotName');
+    }
+    if (localStorage.getItem('selected-owner')) {
+      userData.ownerId = Number(localStorage.getItem('selected-owner'));
+    }
+    if (localStorage.getItem('selected-ownerName')) {
+      userData.ownerName = localStorage.getItem('selected-ownerName');
     }
     return userData;
   }

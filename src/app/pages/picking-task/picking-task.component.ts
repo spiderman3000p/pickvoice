@@ -306,16 +306,8 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
           } else {
             this.utilities.log(`el grupo por sku ${taskLine.sku} no existe`);
             groupedData[taskLine.sku] = [
-              // { text: taskLine.pickTaskLineId, style: 'tableRow' },
               { text: taskLine.sku, style: 'tableRow' },
               { text: taskLine.skuDescription, style: 'tableRow' },
-              // { text: taskLine.batchNumber, style: 'tableRow' },
-              // { text: taskLine.serial, style: 'tableRow' },
-              // { text: taskLine.locationCode, style: 'tableRow' },
-              // { text: taskLine.expiryDate, style: 'tableRow' },
-              // { text: taskLine.uomCode, style: 'tableRow' },
-              // { text: taskLine.lpnCode, style: 'tableRow' },
-              /*{ text: taskLine.scannedVerification, style: 'tableRow'},*/
               { text: taskLine.qtyToPicked, style: 'tableRow' },
               { text: taskLine.qtyToSelected, style: 'tableRow' }
             ];
@@ -717,25 +709,6 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
   editRowOnPage(element: any) {
     this.utilities.log('row to send to edit page', element);
     this.router.navigate([`${element.id}`]);
-    /*const dialogRef = this.dialog.open(EditRowComponent, {
-      data: {
-        row: element,
-        map: this.utilities.dataTypesModelMaps.locations,
-        type: IMPORTING_TYPES.LOCATIONS,
-        remoteSync: true // para mandar los datos a la BD por la API
-      }
-    });*/
-    /*dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-            this.dataSource.data[element.index] = result;
-            this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });*/
   }
 
   editRowOnDialog(element: any) {
@@ -798,20 +771,6 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
   */
   private refreshTable() {
     this.loadDataPage();
-    /*
-    // If there's no data in filter we do update using pagination, next page or previous page
-    if (this.dataSource.filter === '') {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = 'XXX';
-      this.dataSource.filter = aux;
-      // If there's something in filter, we reset it to 0 and then put back old value
-    } else {
-      const aux = this.dataSource.filter;
-      this.dataSource.filter = '';
-      this.dataSource.filter = aux;
-    }
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;*/
   }
 
   toggleFilters() {

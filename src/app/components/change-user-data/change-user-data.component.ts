@@ -1,14 +1,11 @@
-import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-
+import { Inject, AfterViewInit, Component, OnInit } from '@angular/core';
+import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
+import { debounceTime, takeLast } from 'rxjs/operators';
+import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { AuthService } from '../../services/auth.service';
 import { DataProviderService } from '../../services/data-provider.service';
-
-import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
-import { retry, takeLast } from 'rxjs/operators';
-import { SelectionModel } from '@angular/cdk/collections';
-import { merge, Observer, Subscription } from 'rxjs';
-import { Router, ActivatedRoute } from '@angular/router';
 
 interface City {
   id: number;
@@ -40,11 +37,11 @@ interface UserData {
   ownerName: string;
 }
 @Component({
-  selector: 'app-initialize',
-  templateUrl: './initialize.component.html',
-  styleUrls: ['./initialize.component.scss']
+  selector: 'app-change-user-data',
+  templateUrl: './change-user-data.component.html',
+  styleUrls: ['./change-user-data.component.css']
 })
-export class InitializeComponent implements OnInit {
+export class ChangeUserDataComponent implements OnInit {
   isLoadingResults = true;
   cities: City[] = [];
   plants = [];
@@ -52,47 +49,46 @@ export class InitializeComponent implements OnInit {
   owners = [];
   userData: UserData;
   form: FormGroup;
-  constructor(private activatedRoute: ActivatedRoute, private utilities: UtilitiesService,
-              private authService: AuthService, private router: Router) {
+  constructor(public dialogRef: MatDialogRef<ChangeUserDataComponent>, private utilities: UtilitiesService,
+              private authService: AuthService, private dataProvider: DataProviderService) {
     this.userData = new Object() as UserData;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.form = new FormGroup({
       selectedCity: new FormControl(0, [Validators.required]),
       selectedPlant: new FormControl(0, [Validators.required]),
       selectedDepot: new FormControl(0, [Validators.required]),
       selectedOwner: new FormControl(0, [Validators.required])
     });
-    this.activatedRoute.data.subscribe((data: {
-      data: any
-    }) => {
-      if (data) {
-        data.data.subscribe(resp => {
-          this.utilities.log('member data response: ', resp);
-          if (resp && Array.isArray(resp) && resp.length > 0 && resp[0].id) {
-            this.isLoadingResults = false;
-            this.utilities.log('member data: ', resp);
-            this.fillUserData(resp);
-            this.form.get('selectedCity').valueChanges.subscribe(value => {
-              this.plants = this.cities[value].plants;
-            });
-            this.form.get('selectedPlant').valueChanges.subscribe(value => {
-              const city = this.form.get('selectedCity').value;
-              this.depots = this.cities[city].plants[value].depots;
-            });
-            this.form.get('selectedDepot').valueChanges.subscribe(value => {
-              const city = this.form.get('selectedCity').value;
-              const plant = this.form.get('selectedPlant').value;
-              this.owners = this.cities[city].plants[plant].depots[value].owners;
-            });
-            this.form.get('selectedCity').patchValue(0);
-            this.form.get('selectedPlant').patchValue(0);
-            this.form.get('selectedDepot').patchValue(0);
-            this.form.get('selectedOwner').patchValue(0);
-          }
+    const username = this.authService.getUsername();
+    this.isLoadingResults = true;
+    this.dataProvider.getMemberData(username).subscribe(resp => {
+      this.utilities.log('member data response: ', resp);
+      if (resp && Array.isArray(resp) && resp.length > 0 && resp[0].id) {
+        this.isLoadingResults = false;
+        this.utilities.log('member data: ', resp);
+        this.fillUserData(resp);
+        this.isLoadingResults = false;
+        this.form.get('selectedCity').valueChanges.subscribe(value => {
+          this.plants = this.cities[value].plants;
         });
+        this.form.get('selectedPlant').valueChanges.subscribe(value => {
+          const city = this.form.get('selectedCity').value;
+          this.depots = this.cities[city].plants[value].depots;
+        });
+        this.form.get('selectedDepot').valueChanges.subscribe(value => {
+          const city = this.form.get('selectedCity').value;
+          const plant = this.form.get('selectedPlant').value;
+          this.owners = this.cities[city].plants[plant].depots[value].owners;
+        });
+        this.form.get('selectedCity').patchValue(0);
+        this.form.get('selectedPlant').patchValue(0);
+        this.form.get('selectedDepot').patchValue(0);
+        this.form.get('selectedOwner').patchValue(0);
       }
+    }, error => {
+      this.utilities.error('Ocurrio un error al obtener datos de usuarios desde el servidor: ', error);
     });
   }
 
@@ -222,6 +218,11 @@ export class InitializeComponent implements OnInit {
     this.setUserData();
     this.utilities.log('userData: ', this.userData);
     this.authService.setUserMemberData(this.userData);
-    this.router.navigate(['/pages/dashboard']);
+    this.close(this.userData);
   }
+
+  close(resp: any) {
+    this.dialogRef.close(resp);
+  }
+
 }

@@ -1,0 +1,185 @@
+<div class="content-area">
+    <button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button>
+    <div class="content">
+        <div class="section-wrapper">
+            <div class="header actionbar align-content-top">
+                <div class="title actionbar-section align-content-top">
+                    <h1>Plants List</h1>
+                </div>
+                <div class="actions actionbar-section right">
+                    <button mat-raised-button color="warn" (click)="export()">
+                        <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                    </button>
+                    <button mat-raised-button color="accent" (click)="addRow()" class="ml-2">
+                        <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="example-loading-shade" *ngIf="isLoadingResults">
+                <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+            </div>
+            <mat-accordion>
+                <mat-expansion-panel (opened)="showFilters = true" (closed)="showFilters = false">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon>search</mat-icon>
+                            Filters Section
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            Click to {{ !showFilters ? 'show' : 'hide' }} all filter controls
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div class="filters-panel">
+                        <div class="col-sm-12 filters-controls">
+                            <form [formGroup]="filtersForm" *ngIf="showFilters" class="row" (ngSubmit)="applyFilters()">
+                                <div *ngFor="let filter of filters" class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4" [hidden]="!filter.show">
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'select'"
+                                    class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <select [compareWith]="definitions[filter.key].formControl.compareFn"
+                                        [formControlName]="filter.key" class="form-control">
+                                            <option [value]="">
+                                                Select a value
+                                            </option>
+                                            <option *ngFor="let data of selectsData[filter.key] | async"
+                                            [ngValue]="definitions[filter.key].formControl.valueIndex !== null ?
+                                            data[definitions[filter.key].formControl.valueIndex] : data">
+                                                {{ definitions[filter.key].formControl.displayIndex !== null ?
+                                                    data[definitions[filter.key].formControl.displayIndex] : data }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'textarea' ||
+                                    definitions[filter.key].formControl.control === 'input'" class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <input [formControlName]="filter.key" class="form-control"
+                                            [type]="definitions[filter.key].formControl.type">
+                                    </div>
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'date'" class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <input  [formControlName]="filter.key" type="date" class="form-control">
+                                    </div>
+                                    <div *ngIf="definitions[filter.key].formControl.control === 'toggle'" class="form-group ml-1">
+                                        <label>{{filter.name}}</label>
+                                        <input  [formControlName]="filter.key" hidden>
+                                        <mat-slide-toggle color="primary"
+                                        (change)="filtersForm.get(filter.key).setValue(!filterForm.get(filter.key).value)"
+                                        [checked]="filtersForm.get(filter.key).value">
+                                            {{definitions[filter.key].name}}
+                                        </mat-slide-toggle>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <button mat-raised-button color="accent" class="btn btn-lg" type="submit">
+                                            <mat-icon>search</mat-icon>
+                                            Filter
+                                        </button>
+                                    <button mat-raised-button color="primary" class="btn btn-lg ml-3" type="reset" (click)="resetFilters()" *ngIf="dataSource.filter.length > 0">
+                                            <mat-icon>not_interested</mat-icon>
+                                            Reset Filters
+                                        </button>
+                                </div>
+                            </form>
+                            <span class="toggle-filters-btn">
+                                <a href="javascript: void(0);" [matMenuTriggerFor]="toggleFiltersMenu">Toggle Filters</a>
+                            </span>
+                            <mat-menu #toggleFiltersMenu (click)="$event.stopPropagation()" style="position:absolute;right: 0;">
+                                <mat-selection-list (click)="$event.stopPropagation()">
+                                    <mat-list-option *ngFor="let filter of filters" [selected]="filter.show" (click)="filter.show = !filter.show">
+                                        {{filter.name}}
+                                    </mat-list-option>
+                                </mat-selection-list>
+                            </mat-menu>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+            <div>
+                <strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong>
+                <div class="table-toolbar" *ngIf="selection.selected.length > 0">
+                    <div class="col-sm-6 text-left toolbar-label">
+                        <label>Selected rows: {{selection.selected.length}}</label>
+                    </div>
+                    <div class="col-sm-6 text-right toolbar-buttons">
+                        <!--button class="print-button" (click)="printRows(selection.selected)">Print</button-->
+                        <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button-->
+                        <button class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
+                    </div>
+                </div>
+                <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8"-->
+                <table mat-table [dataSource]="dataSource" matSort>
+                    <!-- Checkbox Column -->
+                    <ng-container matColumnDef="select">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
+                                [aria-label]="checkboxLabel(row)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+                    <!-- Data Columns -->
+                    <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
+                        <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
+                    </ng-container>
+                    <!-- Options Sticky Column -->
+                    <ng-container matColumnDef="options" stickyEnd>
+                        <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+                            {{'Options' | uppercase}}
+                            <button mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+
+                            <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                                <span>
+                                    <button mat-menu-item (click)="toggleColumn()">Show all</button>
+                                    <button mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
+                                    (click)="toggleColumn(column)">
+                                        <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                                        {{definitions[column.name].name}}
+                                    </button>
+                                </span>
+                            </mat-menu>
+                        </th>
+                        <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                            <!--button mat-icon-button (click)="editRowOnDialog(element)">
+                                <img src="assets/icons/zoom.png">
+                            </button-->
+                            <!--button mat-icon-button (click)="editRowOnPage(element)">
+                                <img src="assets/icons/zoom.png">
+                            </button-->
+                            <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
+                                <img src="assets/icons/zoom.png">
+                            </button>
+                            <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
+                                <img src="assets/icons/page_edit.png">
+                            </button>
+                            <!--button mat-icon-button (click)="printRow(element)">
+                                <img src="assets/icons/printer.png">
+                            </button-->
+                            <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
+                                <img src="assets/icons/printer.png">
+                            </a>
+                            <button mat-icon-button (click)="deletePrompt(element)">
+                                <img src="assets/icons/delete.png">
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
+                    <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
+                    [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
+                    <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();" [ngClass]="{'alert alert-danger': row.invalid}"
+                        [routerLink]="['/pages/' + type + '/view', row.id]"></tr>
+                </table>
+                <mat-paginator [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

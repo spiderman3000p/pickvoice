@@ -63,13 +63,21 @@
       <button/-->
       <button mat-mini-fab color="primary" [matMenuTriggerFor]="userMenu" class="logout-button">{{ (username ? username[0] : '') | uppercase}}</button>
       <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
-        <p class="p-3">Choose an option</p>
-        <button mat-menu-item>Option 1</button>
-        <button mat-menu-item>Option 2</button>
         <button mat-menu-item (click)="logout()">Logout</button>
       </mat-menu>
     </mat-toolbar>
     <router-outlet></router-outlet>
+    <div class="status-bar">
+      <ul class="user-data">
+        <li><strong class="text-accent">City:</strong> {{memberData.cityName}}</li>
+        <li><strong class="text-accent">Plant:</strong> {{memberData.plantName}}</li>
+        <li><strong class="text-accent">Depot:</strong> {{memberData.depotName}}</li>
+        <li><strong class="text-accent">Owner:</strong> {{memberData.ownerName}}</li>
+      </ul>
+      <span class="tools">
+        <a href="javascript: void(0);" (click)="changeUserData()">Change user data</a>
+      </span>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
 <div [class]="'internet-status ' + internetStatus" *ngIf="showInternetStatus">{{ internetStatusMessage }}</div>

@@ -1,0 +1,10 @@
+.fiters-panel{
+  display: flex!important;
+}
+.fiters-panel .filters-list .mat-selection-list .mat-list-option{
+  height: auto !important;
+  font-size: 11px !important;
+}
+/*table{
+  overflow: 'auto';
+}*/

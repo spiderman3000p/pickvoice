@@ -2,7 +2,7 @@ import {
     Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, Transport,
     Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine, LoadOrder,
     PickTaskLines, Dock, User, /*Role,*/ TaskType, LoadItem, LoadLocation, ItemUom, QualityStates,
-    QualityStateType, Lpn
+    QualityStateType, Lpn, Plant, Owner, Depot
 } from '@pickvoice/pickvoice-api';
 import { IMPORTING_TYPES } from './model-maps.model';
 
@@ -12,6 +12,15 @@ export class ModelFactory {
     }
 
     public static newEmptyObject(type: string) {
+        if (type === IMPORTING_TYPES.PLANTS) {
+            return this.newEmptyPlant();
+        }
+        if (type === IMPORTING_TYPES.DEPOTS) {
+            return this.newEmptyDepot();
+        }
+        if (type === IMPORTING_TYPES.OWNERS) {
+            return this.newEmptyOwner();
+        }
         if (type === IMPORTING_TYPES.ITEMS) {
             return this.newEmptyItem();
         }
@@ -67,6 +76,42 @@ export class ModelFactory {
             return this.newEmptyLpn();
         }
         return null;
+    }
+
+    public static newEmptyPlant(): Plant {
+        const object = new Object() as Plant;
+        object.code = '';
+        object.name = '';
+        object.address = '';
+        object.cityId = 0;
+        object.contact = '';
+        object.email = '';
+        object.phone1 = '';
+        object.phone2 = '';
+        return object;
+    }
+
+    public static newEmptyDepot(): Depot {
+        const object = new Object() as Depot;
+        object.code = '';
+        object.name = '';
+        object.plantId = 0;
+        return object;
+    }
+
+    public static newEmptyOwner(): Owner {
+        const object = new Object() as Owner;
+        object.code = '';
+        object.name = '';
+        object.address = '';
+        object.cityId = 0;
+        object.contact = '';
+        object.email = '';
+        object.phone1 = '';
+        object.phone2 = '';
+        object.ean13 = '';
+        object.pcl = '';
+        return object;
     }
 
     public static newEmptyQualityState(): QualityStates {
@@ -313,7 +358,7 @@ export class ModelFactory {
     public static newEmptyOrderLine(): OrderLine {
         const object = new Object() as OrderLine;
         object.idOrder = null;
-        object.item = {} as Item;
+        object.itemId = 0;
         object.qtyRequired = 0;
         object.batchNumber = '';
         object.createDate = '';
@@ -387,7 +432,7 @@ export class ModelFactory {
         object.id = 0;
         object.lines = 0;
         object.priority = 0;
-        object.qyt = 0;
+        object.qty = 0;
         object.taskState = PickTask.TaskStateEnum.AC;
         object.taskTypeId = 0;
         object.userId = 0;

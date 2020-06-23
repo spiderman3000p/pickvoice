@@ -21,6 +21,10 @@ declare var JsBarcode: any;
 })
 export class UtilitiesService implements OnDestroy {
   public dataTypesModelMaps = {
+    stores: ModelMap.StoresMap,
+    owners: ModelMap.OwnersMap,
+    depots: ModelMap.DepotsMap,
+    plants: ModelMap.PlantsMap,
     taskTypes: ModelMap.TaskTypeMap,
     inventory: ModelMap.InventoryItemMap,
     lpn: ModelMap.LpnMap,

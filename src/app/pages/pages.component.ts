@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { AuthService } from '../services/auth.service';
 import { UtilitiesService } from '../services/utilities.service';
@@ -6,6 +7,7 @@ import { Observer } from 'rxjs';
 import { Router } from '@angular/router';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
 import { timer, Subscription } from 'rxjs';
+import { ChangeUserDataComponent } from '../components/change-user-data/change-user-data.component';
 @Component({
   selector: 'app-pages',
   templateUrl: './pages.component.html',
@@ -209,6 +211,27 @@ export class PagesComponent implements OnInit, OnDestroy  {
           route: '/pages/inventory',
           target: '_self',
           children: []
+        },
+        {
+          text: 'Plants',
+          icon: '',
+          route: '/pages/plants',
+          target: '_self',
+          children: []
+        },
+        {
+          text: 'Depots',
+          icon: '',
+          route: '/pages/depots',
+          target: '_self',
+          children: []
+        },
+        {
+          text: 'Owners',
+          icon: '',
+          route: '/pages/owners',
+          target: '_self',
+          children: []
         }
       ]
     }
@@ -217,11 +240,12 @@ export class PagesComponent implements OnInit, OnDestroy  {
   internetStatus = 'online';
   internetStatusMessage = '';
   showInternetStatus = false;
+  memberData: any;
   private _mobileQueryListener: () => void;
   
   constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
               private authService: AuthService, private utilities: UtilitiesService,
-              private router: Router) {
+              private router: Router, private dialog: MatDialog) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -251,6 +275,8 @@ export class PagesComponent implements OnInit, OnDestroy  {
         }
       }
     }));
+    this.memberData = this.authService.getUserMemberData();
+    this.utilities.log('member data: ', this.memberData);
   }
 
   logout() {
@@ -279,6 +305,24 @@ export class PagesComponent implements OnInit, OnDestroy  {
       title: 'Logout',
       message: 'Are you sure to logout?'
     });
+  }
+
+  changeUserData() {
+    const dialogRef = this.dialog.open(ChangeUserDataComponent, {
+      data: {
+        remoteSync: true, // para mandar los datos a la BD por la API
+      }
+    });
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result !== undefined && result !== null) {
+        this.authService.setUserMemberData(result);
+        location.reload();
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+    }));
   }
 
   ngOnInit() {

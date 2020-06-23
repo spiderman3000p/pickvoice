@@ -30,7 +30,7 @@
     "@angular/service-worker": "~9.0.0-rc.12",
     "@fortawesome/fontawesome-free": "^5.13.0",
     "@ng-select/ng-select": "^4.0.0",
-    "@pickvoice/pickvoice-api": "^0.3.3",
+    "@pickvoice/pickvoice-api": "^0.3.5",
     "ag-grid-angular": "^22.1.1",
     "ag-grid-community": "^22.1.1",
     "ag-grid-enterprise": "^22.1.1",
