@@ -1,0 +1,15 @@
+.mat-input-element:disabled, .mat-form-field-type-mat-native-select.mat-form-field-disabled .mat-form-field-infix::after {
+    color: unset!important;
+}
+.readonly {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+}
+.mat-tab-body-content {
+    margin-top: 3% !important;
+    overflow-x: hidden !important;
+    overflow: hidden !important;
+}
+.form-control {
+    font-size: 12px;
+}

@@ -3,9 +3,9 @@ import { environment } from '../../environments/environment';
 import { Transport, Location, Item, UomService, SectionService, OrderService, OrderTypeService,
          LocationService, TransportService, LoadPickService, ItemTypeService, ItemService,
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
-         DockService, UserService, ItemUomService, QualityStates, QualityStateService,
-         QualityStateTypeService, TaskTypeService, PlantService, Plant, OwnerService, Owner,
-         DepotService, Depot } from '@pickvoice/pickvoice-api';
+         DockService, UserService, ItemUomService, QualityStates, QualityStateService, StoreService,
+         QualityStateTypeService, TaskTypeService, PlantService, OwnerService, DepotService,
+       } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { AuthService } from './auth.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
@@ -29,10 +29,15 @@ export class DataProviderService {
     private itemUomService: ItemUomService, private qualityStateService: QualityStateService,
     private taskTypeService: TaskTypeService, private authService: AuthService,
     private qualityStateTypeService: QualityStateTypeService, private plantService: PlantService,
-    private ownerService: OwnerService, private depotService: DepotService) {
+    private ownerService: OwnerService, private depotService: DepotService,
+    private storeService: StoreService) {
   }
 
   createObject(type: string, toUpload: any, observe: string = 'body', reportProgress: boolean = false) {
+    if (type === IMPORTING_TYPES.STORES) {
+      return this.createStore(toUpload, 'response', false);
+    }
+
     if (type === IMPORTING_TYPES.PLANTS) {
       return this.createPlant(toUpload, 'response', false);
     }
@@ -117,6 +122,10 @@ export class DataProviderService {
   }
 
   updateObject(type: string, toUpload: any, id: number): Observable<any> {
+    if (type === IMPORTING_TYPES.STORES) {
+      return this.updateStore(toUpload, id, 'response').pipe(retry(3));
+    }
+
     if (type === IMPORTING_TYPES.PLANTS) {
       return this.updatePlant(toUpload, id, 'response').pipe(retry(3));
     }
@@ -200,6 +209,10 @@ export class DataProviderService {
     const owner = this.authService.getOwnerId();
     const httpHeaders = new HttpHeaders();
     switch (type) {
+      case IMPORTING_TYPES.STORES: {
+        toReturn = this.getAllStores(id);
+        break;
+      }
       case IMPORTING_TYPES.PLANTS: {
         toReturn = this.getAllPlants(params);
         break;
@@ -940,6 +953,10 @@ export class DataProviderService {
     .pipe(retry(3));
   }
 
+  public getAllCustomerStores(id: number, params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    return this.storeService.retrieveStoresByCustomer(id, observe, reportProgress).pipe(retry(3));
+  }
+
   public deleteCustomer(id: number, observe: any = 'body', reportProgress = false) {
     return this.customerService.deleteCustomer(id, observe, reportProgress);
   }
@@ -964,6 +981,40 @@ export class DataProviderService {
     const owner = this.authService.getOwnerId();
     if (owner !== null) {
       return this.customerService.retrieveCustomerById(id, owner, observe, reportProgress);
+    }
+    return of(false);
+  }
+  /**********************************************************************************
+    Grupo de metodos para stores
+  ***********************************************************************************/
+  public getAllStores(id: number, params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+    return this.storeService.retrieveStoresByCustomer(id, observe, reportProgress).pipe(retry(3));
+  }
+
+  public deleteStore(id: number, observe: any = 'body', reportProgress = false) {
+    return this.storeService.deleteStore(id, observe, reportProgress);
+  }
+
+  public updateStore(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      data.ownerId = owner;
+    }
+    return this.storeService.updateStore(data, id, observe, reportProgress);
+  }
+
+  public createStore(data: any, observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      data.ownerId = owner;
+    }
+    return this.storeService.createStore(data, observe, reportProgress);
+  }
+
+  public getStoreByCode(code: string, observe: any = 'body', reportProgress = false): Observable<any> {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.storeService.retrieveStoreByCode(code, owner, observe, reportProgress);
     }
     return of(false);
   }

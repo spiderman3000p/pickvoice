@@ -168,6 +168,7 @@ export class AddRowDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
   }
+
   ngOnDestroy() {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }

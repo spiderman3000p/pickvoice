@@ -82,7 +82,7 @@ export const MY_FORMATS = {
     MatExpansionModule,
     MatListModule,
     MatTabsModule,
-    AgGridModule.withComponents([]),
+    AgGridModule.withComponents([])
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]},

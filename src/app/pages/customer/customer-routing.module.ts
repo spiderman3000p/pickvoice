@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { CustomerComponent } from './customer.component';
-import { EditRowComponent } from '../edit-row/edit-row.component';
+import { EditCustomerComponent } from '../edit-customer/edit-customer.component';
 import { CustomerResolverService } from './customer-resolver.service';
 import { NotFoundComponent } from '../not-found/not-found.component';
 import { IMPORTING_TYPES } from '../../models/model-maps.model';
@@ -10,7 +10,7 @@ import { IMPORTING_TYPES } from '../../models/model-maps.model';
 const routes: Routes = [
     {
         path: 'edit/:id',
-        component: EditRowComponent,
+        component: EditCustomerComponent,
         resolve: {
             row: CustomerResolverService,
         },
@@ -21,7 +21,7 @@ const routes: Routes = [
     },
     {
         path: 'view/:id',
-        component: EditRowComponent,
+        component: EditCustomerComponent,
         resolve: {
             row: CustomerResolverService,
         },

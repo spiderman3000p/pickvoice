@@ -1,0 +1,153 @@
+<div class="content-area">
+    <div class="content">
+        <div class="section-wrapper">
+            <div class="header actionbar align-content-top">
+                <div class="title actionbar-section align-content-top">
+                    <h1>{{ pageTitle }}</h1>
+                </div>
+                <div class="actions actionbar-section right">
+                    <button type="button" mat-raised-button color="accent" (click)="print()">
+                        <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
+                    </button>
+                    <button type="button" mat-raised-button color="warn" (click)="export()">
+                        <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                    </button>
+                </div>
+            </div>
+      </div>
+      <mat-card>
+            <div class="example-loading-shade" *ngIf="isLoadingResults">
+                <mat-spinner class="spinner"></mat-spinner>
+            </div>
+            <mat-card-content>
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Code</label>
+                                <input class="form-control"  type="text" formControlName="code"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Name</label>
+                                <input class="form-control"  type="text" formControlName="name"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Contact</label>
+                                <input class="form-control"  type="text" formControlName="contact"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Phone</label>
+                                <input class="form-control"  type="text" formControlName="phone"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Postal Code</label>
+                                <input class="form-control"  type="text" formControlName="postalCode"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Zone</label>
+                                <input class="form-control"  type="text" formControlName="zone"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Longitude</label>
+                                <input class="form-control"  type="text" formControlName="longitude"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Latitude</label>
+                                <input class="form-control"  type="text" formControlName="latitude"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Neighborhood</label>
+                                <input class="form-control"  type="text" formControlName="neighborhood"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Gln</label>
+                                <input class="form-control"  type="text" formControlName="gln"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                <label>Address</label>
+                                <input class="form-control" type="text" formControlName="address"
+                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            </div>
+                        </div>
+                    </div>
+                    <mat-tab-group class="tab-specific-information">
+                        <mat-tab label="Stores" class="tab-example0">
+                            <ng-template matTabContent class="tab-example">
+                                <div class="tab-example1">
+                                    <div class="w-100 text-right">
+                                        <a href="javascript:void(0)" mat-raised-button color="warn" (click)="export()">
+                                            <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                                        </a>
+                                        <a href="javascript:void(0)" mat-raised-button color="accent" (click)="addRow()"
+                                        class="ml-2" *ngIf="viewMode === 'edit'">
+                                            <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                                        </a>
+                                        <br><br>
+                                    </div>
+                                    <!--strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong-->
+                                    <div class="table-toolbar" *ngIf="selection.selected.length > 0">
+                                        <div class="col-sm-6 text-left toolbar-label">
+                                            <label class="col-sm-2 col-form-label">Selected rows: {{selection.selected.length}}</label>
+                                        </div>
+                                        <div class="col-sm-6 text-right toolbar-buttons">
+                                            <!--button class="print-button" (click)="printRows(selection.selected)">Print</button-->
+                                            <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button-->
+                                            <button type="button" class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
+                                        </div>
+                                    </div>
+                                    <ag-grid-angular
+                                    style="width: 100%; height: 300px;"
+                                    class="ag-theme-balham"
+                                    [frameworkComponents]="frameworkComponents"
+                                    [suppressClickEdit]="true"
+                                    [rowData]="storesData | async"
+                                    [columnDefs]="storesColDefs"
+                                    editType="fullRow"
+                                    (keydown)="checkKeyPressed($event)"
+                                    (keypress)="checkKeyPressed($event)"
+                                    (rowValueChanged)="updateStore($event)"
+                                    (gridReady)="onGridReady($event)">
+                                    </ag-grid-angular>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="col-sm-12 text-right">
+                        <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
+                        <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                    </div>
+                </form>
+            </mat-card-content>
+      </mat-card>
+    </div>
+</div>

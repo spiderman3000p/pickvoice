@@ -2,7 +2,7 @@ import {
     Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, Transport,
     Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine, LoadOrder,
     PickTaskLines, Dock, User, /*Role,*/ TaskType, LoadItem, LoadLocation, ItemUom, QualityStates,
-    QualityStateType, Lpn, Plant, Owner, Depot
+    QualityStateType, Lpn, Plant, Owner, Depot, Store
 } from '@pickvoice/pickvoice-api';
 import { IMPORTING_TYPES } from './model-maps.model';
 
@@ -12,6 +12,9 @@ export class ModelFactory {
     }
 
     public static newEmptyObject(type: string) {
+        if (type === IMPORTING_TYPES.STORES) {
+            return this.newEmptyStore();
+        }
         if (type === IMPORTING_TYPES.PLANTS) {
             return this.newEmptyPlant();
         }
@@ -76,6 +79,21 @@ export class ModelFactory {
             return this.newEmptyLpn();
         }
         return null;
+    }
+
+    public static newEmptyStore(): Store {
+        const object = new Object() as Store;
+        object.code = '';
+        object.name = '';
+        object.address = '';
+        object.cityId = 0;
+        object.contact = '';
+        object.email = '';
+        object.phone1 = '';
+        object.phone2 = '';
+        object.customerId = 0;
+        object.ean13  = '';
+        return object;
     }
 
     public static newEmptyPlant(): Plant {

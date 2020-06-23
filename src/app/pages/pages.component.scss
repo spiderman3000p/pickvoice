@@ -8,7 +8,11 @@ mat-sidenav-container{
     height: 100%;
 }
 mat-sidenav{
-    background-color: $primary;
+    background: rgb(0,83,94);
+    background: -moz-linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
+    background: linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00535e",endColorstr="#00b19d",GradientType=1);
     width: 220px;
     max-width: 220px;
 }
@@ -64,8 +68,9 @@ mat-sidenav{
 .mat-nav-list .mat-list-item, .mat-expansion-panel{
     transition: background 0.5s;
 }
-.mat-sidenav-content .mat-toolbar{
-    background-color: white;
+.mat-toolbar.mat-primary {
+    background: transparent;
+    color: white;
 }
 mat-form-field.fluid{
     width: 100%;
@@ -121,6 +126,7 @@ mat-sidenav mat-toolbar{
     height: unset;
 }
 .status-bar {
+    z-index: 9998;
     position: fixed;
     bottom: 0;
     width: 100%;
@@ -141,6 +147,7 @@ mat-sidenav mat-toolbar{
     list-style-type: none;
 }
 .status-bar .tools{
+    z-index: 9999;
     right: 100px;
     position: fixed;
 }

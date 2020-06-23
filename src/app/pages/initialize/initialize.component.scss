@@ -2,7 +2,11 @@ $primary: #00b19d;
 $accent: #00535e;
 $secondary: #00535e;
 .content-area{
-    background-color: $accent;
+    background: rgb(0,83,94);
+    background: -moz-linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
+    background: linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00535e",endColorstr="#00b19d",GradientType=1);
     height: 100%;
     color: white;
 }

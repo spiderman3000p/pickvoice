@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 
 import { CustomerRoutingModule } from './customer-routing.module';
 import { CustomerComponent } from './customer.component';
-
+import { EditCustomerComponent } from '../edit-customer/edit-customer.component';
+import { RowOptionComponent } from '../edit-customer/row-option.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -24,6 +26,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
+
+import { AgGridModule } from 'ag-grid-angular';
 
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
@@ -50,7 +54,7 @@ export const MY_FORMATS = {
 };
 @NgModule({
   declarations: [
-    CustomerComponent
+    CustomerComponent, EditCustomerComponent, RowOptionComponent
   ],
   imports: [
     CommonModule,
@@ -75,7 +79,9 @@ export const MY_FORMATS = {
     MatSelectModule,
     MatSlideToggleModule,
     MatExpansionModule,
-    MatListModule
+    MatListModule,
+    MatTabsModule,
+    AgGridModule.withComponents([])
   ],
   providers: [
     {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]},
