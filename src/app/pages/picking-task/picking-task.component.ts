@@ -677,10 +677,16 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
       rows.forEach(row => {
         this.subscriptions.push(this.dataProviderService.deletePickTask(row.id, 'response', false).pipe(take(1))
         .subscribe(observer));
+        if (this.selection.isSelected(row)) {
+          this.selection.deselect(row);
+        }
       });
     } else {
       this.subscriptions.push(this.dataProviderService.deletePickTask(rows.id, 'response', false).pipe(take(1))
       .subscribe(observer));
+      if (this.selection.isSelected(rows)) {
+        this.selection.deselect(rows);
+      }
     }
   }
 

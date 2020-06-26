@@ -430,6 +430,7 @@ export class ItemTypesComponent implements OnInit, AfterViewInit, OnDestroy {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
+      delete row.ownerId;
       return row;
     });
     this.utilities.exportToXlsx(dataToExport, 'Item Types List');

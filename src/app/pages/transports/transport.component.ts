@@ -457,6 +457,9 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
+      delete row.transportId;
+      delete row.ownerId;
+      return row;
     });
     this.utilities.exportToXlsx(dataToExport, 'Transports List');
   }

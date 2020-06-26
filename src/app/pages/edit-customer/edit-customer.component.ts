@@ -174,7 +174,9 @@ export class EditCustomerComponent implements OnInit {
 
   export() {
     // TODO: hacer la exportacion de la orden completa
-    const dataToExport = this.row;
+    const dataToExport = Object.assign({}, this.row);
+    delete dataToExport.ownerId;
+    delete dataToExport.cityId;
     this.utilities.exportToXlsx(dataToExport, 'Customer # ' + this.row.code);
   }
 

@@ -564,10 +564,10 @@ export class CustomerComponent implements OnInit, AfterViewInit {
   }
 
   export() {
-    const dataToExport = this.dataSource.data.slice().map((row: any) => {
-      delete row.id;
-      delete row.index;
+    const dataToExport = this.dataSource.data.map((row: any) => {
+      return this.utilities.getJsonFromObject(row, this.type);
     });
+    this.utilities.log('customers to export: ', dataToExport);
     this.utilities.exportToXlsx(dataToExport, 'Customers List');
   }
 

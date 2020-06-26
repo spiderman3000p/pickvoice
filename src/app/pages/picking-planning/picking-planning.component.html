@@ -21,24 +21,24 @@
         <mat-spinner class="spinner"></mat-spinner>
       </div>
       <div>
-        <!--strong *ngIf="filteredDone">Filtred results: {{dataSource.dataCount}}</strong->
+        <!--strong *ngIf="filteredDone">Filtred results: {{dataSource.dataCount}}</strong-->
         <div class="table-toolbar" *ngIf="selection.selected.length > 0">
           <div class="col-sm-3 text-left toolbar-label">
             <label>Selected rows: {{selection.selected.length}}</label>
           </div>
-          <!--div class="col-sm-9 text-right toolbar-buttons">
-            <button class="" (click)="advancedOptions()">Advanced options</button>
+          <div class="col-sm-9 text-right toolbar-buttons">
+            <!--button class="" (click)="advancedOptions()">Advanced options</button>
             <button class="" (click)="chechTasks(selection.selected)">Check tasks</button>
             <button class="" (click)="cancelTasks(selection.selected)">Cancel tasks</button>
             <button class="" (click)="orderingProcess(selection.selected)">Ordering process</button>
-            <button class="" (click)="export(selection.selected)">Export</button>
+            <button class="" (click)="export(selection.selected)">Export</button-->
             <button class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
-          </div->
+          </div>
         </div>
         <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 10"-->
         <table mat-table [dataSource]="dataSource" matSort matSortActive="pickPlanningId" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 5">
           <!-- Checkbox Column -->
-          <!--ng-container matColumnDef="select">
+          <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
               <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
                 [aria-label]="checkboxLabel()">
@@ -49,7 +49,7 @@
                 [aria-label]="checkboxLabel(row)">
               </mat-checkbox>
             </td>
-          </ng-container-->
+          </ng-container>
           <!-- Data Columns -->
           <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}}

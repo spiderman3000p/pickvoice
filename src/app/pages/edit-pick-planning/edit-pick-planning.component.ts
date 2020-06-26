@@ -387,7 +387,7 @@ export class EditPickPlanningComponent implements OnInit {
       this.dataSource.data = this.pickPlanningData.pickTaskList;
       // inicializar tabla mat-table
       this.displayedDataColumns = Object.keys(this.definitions);
-      this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
+      this.displayedHeadersColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns.push('options');
       this.initColumnsDefs(); // columnas a mostrarse en la tabla de pick task
     }
@@ -421,13 +421,12 @@ export class EditPickPlanningComponent implements OnInit {
       this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInPickPlanningPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
-        shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
+        shouldShow = index === this.displayedHeadersColumns.length - 1 || index < 7;
         return {show: shouldShow, name: columnName};
       });
     }
     aux = this.columnDefs.slice();
     aux.pop();
-    aux.shift();
     this.defaultColumnDefs = aux;
   }
 
@@ -439,13 +438,12 @@ export class EditPickPlanningComponent implements OnInit {
       this.columnDefsTransports = JSON.parse(localStorage.getItem('displayedColumnsInPickPlanningPageT'));
     } else {
       this.columnDefsTransports = this.displayedHeadersColumnsTransports.map((columnName, index) => {
-        shouldShow = index === 0 || index === this.displayedHeadersColumnsTransports.length - 1 || index < 7;
+        shouldShow = index === this.displayedHeadersColumnsTransports.length - 1 || index < 7;
         return {show: shouldShow, name: columnName};
       });
     }
     aux = this.columnDefsTransports.slice();
     aux.pop();
-    aux.shift();
     this.defaultColumnDefsTransports = aux;
   }
 
@@ -656,14 +654,14 @@ export class EditPickPlanningComponent implements OnInit {
 
   deletePickTask(row: any) {
     const index = this.pickPlanningData.pickTaskList.findIndex(_row => _row.id === row.id);
-    if (index > 1) {
+    if (index > -1) {
       this.pickPlanningData.pickTaskList.splice(index, 1);
     }
   }
 
   deleteTransport(row: any) {
     const index = this.pickPlanningData.transportList.findIndex((_row: any) => _row.id === row.id);
-    if (index > 1) {
+    if (index > -1) {
       this.pickPlanningData.transportList.splice(index, 1);
     }
   }
@@ -774,17 +772,29 @@ export class EditPickPlanningComponent implements OnInit {
 
   export() {
     // TODO: hacer la exportacion de la orden completa
-    const dataToExport = this.row;
+    const dataToExport = Object.assign({}, this.row);
+    delete dataToExport.id;
+    delete dataToExport.ownerId;
     this.utilities.exportToXlsx(dataToExport, 'Pick Planning ' + this.row.id);
   }
 
   exportPickTasks() {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
+      delete row.pickTaskId;
       delete row.index;
       return row;
     });
-    this.utilities.exportToXlsx(dataToExport, 'Pick Task List');
+    this.utilities.exportToXlsx(dataToExport, 'Pick Planning Tasks List');
+  }
+
+  exportTransports() {
+    const dataToExport = this.dataSourceTransports.data.slice().map((row: any) => {
+      delete row.id;
+      delete row.index;
+      return row;
+    });
+    this.utilities.exportToXlsx(dataToExport, 'Pick Planning Transports List');
   }
 
   /*

@@ -104,7 +104,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label>Customer</label>
-                                    <select formControlName="customerId" class="form-control" (change)="onChangeCustomer()">
+                                    <select formControlName="customerId" class="form-control">
                                         <option *ngFor="let customer of ordersData.customerList" [value]="customer.customerId">
                                             {{ customer.customerName }}
                                         </option>

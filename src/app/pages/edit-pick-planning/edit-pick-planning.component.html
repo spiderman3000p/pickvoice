@@ -96,23 +96,6 @@
                                         </div>
                                         <table mat-table [dataSource]="dataSource" matSort 
                                         [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 12">
-                                            <!-- Checkbox Column -->
-                                            <ng-container matColumnDef="select">
-                                                <th mat-header-cell *matHeaderCellDef>
-                                                    <mat-checkbox (change)="$event ? masterToggle() : null"
-                                                        [checked]="selection.hasValue() && isAllSelected()"
-                                                        [indeterminate]="selection.hasValue() && !isAllSelected()"
-                                                        [aria-label]="checkboxLabel()">
-                                                    </mat-checkbox>
-                                                </th>
-                                                <td mat-cell *matCellDef="let row">
-                                                    <mat-checkbox (click)="$event.stopPropagation()"
-                                                        (change)="$event ? selection.toggle(row) : null"
-                                                        [checked]="selection.isSelected(row)"
-                                                        [aria-label]="checkboxLabel(row)">
-                                                    </mat-checkbox>
-                                                </td>
-                                            </ng-container>
                                             <!-- Data Columns -->
                                             <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
                                                 <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
@@ -132,7 +115,7 @@
                                                             <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
                                                             (click)="toggleColumn(column)">
                                                                 <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                                                {{definitions[column.name]}}
+                                                                {{definitions[column.name].name}}
                                                             </a>
                                                         </span>
                                                     </mat-menu>

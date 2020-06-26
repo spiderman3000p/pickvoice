@@ -160,6 +160,9 @@ export class EditOrderComponent implements OnInit {
       this.row.customerId = value;
       this.getCustomerDetails();
     });
+    this.form.get('customerId').patchValue(this.row.customerId ? this.row.customerId : '');
+    this.form.get('transportId').patchValue(this.row.transportId ? this.row.transportId : '');
+    this.utilities.log('form value', this.form.value);
   }
 
   initColumnsDefs() {
@@ -400,14 +403,15 @@ export class EditOrderComponent implements OnInit {
 
   export() {
     // TODO: hacer la exportacion de la orden completa
-    const dataToExport = this.row;
+    const dataToExport = Object.assign({}, this.row);
+    delete dataToExport.id;
+    delete dataToExport.ownerId;
     this.utilities.exportToXlsx(dataToExport, 'Order ' + this.row.orderNumber);
   }
 
   exportOrderLines() {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
-      delete row.id;
-      delete row.index;
+      delete row.orderId;
       return row;
     });
     this.utilities.exportToXlsx(dataToExport, 'Order Lines List');

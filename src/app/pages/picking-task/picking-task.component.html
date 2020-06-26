@@ -26,14 +26,14 @@
           <div class="col-sm-3 text-left toolbar-label">
             <label>Selected rows: {{selection.selected.length}}</label>
           </div>
-          <!--div class="col-sm-9 text-right toolbar-buttons">
-            <button class="" (click)="advancedOptions()">Advanced options</button>
+          <div class="col-sm-9 text-right toolbar-buttons">
+            <!--button class="" (click)="advancedOptions()">Advanced options</button>
             <button class="" (click)="chechTasks(selection.selected)">Check tasks</button>
             <button class="" (click)="cancelTasks(selection.selected)">Cancel tasks</button>
             <button class="" (click)="orderingProcess(selection.selected)">Ordering process</button>
-            <button class="" (click)="export(selection.selected)">Export</button>
+            <button class="" (click)="export(selection.selected)">Export</button-->
             <button class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
-          </div-->
+          </div>
         </div>
         <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 10"-->
         <table mat-table [dataSource]="dataSource" matSort matSortActive="date" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 11">

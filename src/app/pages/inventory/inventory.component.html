@@ -46,7 +46,7 @@
             <table mat-table [dataSource]="dataSource" matSort matSortActive="lpnItemId" matSortDirection="asc"
             [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 8">
                 <!-- Checkbox Column -->
-                <ng-container matColumnDef="select">
+                <!--ng-container matColumnDef="select">
                     <th mat-header-cell *matHeaderCellDef>
                         <mat-checkbox (change)="$event ? masterToggle() : null"
                             [checked]="selection.hasValue() && isAllSelected()"
@@ -61,7 +61,7 @@
                             [aria-label]="checkboxLabel(row)">
                         </mat-checkbox>
                     </td>
-                </ng-container>
+                </ng-container-->
                 <!-- Data Columns -->
                 <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}}

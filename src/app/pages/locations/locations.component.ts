@@ -514,7 +514,8 @@ export class LocationsComponent implements OnInit, AfterViewInit, OnDestroy {
     const dataToExport = this.dataSource.data.map((row: any) => {
       return this.utilities.getJsonFromObject(row, this.type);
     });
-    this.utilities.exportToXlsx(dataToExport, 'Uoms List');
+    this.utilities.log('locations to export: ', dataToExport);
+    this.utilities.exportToXlsx(dataToExport, 'Locations List');
   }
 
   /*

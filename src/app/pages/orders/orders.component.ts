@@ -536,6 +536,8 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
+      delete row.orderId;
+      delete row.ownerId;
       return row;
     });
 

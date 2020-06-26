@@ -390,15 +390,18 @@ export class DataProviderService {
         break;
       }
       case IMPORTING_TYPES.USERS: {
-        // TODO: falta owner
         this.utilities.log(`obteniendo users...`);
         toReturn = this.getAllUsers().pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.TASK_TYPES: {
-        // TODO: falta owner
         this.utilities.log(`obteniendo pick task types...`);
         toReturn = this.getAllTaskTypes().pipe(retry(3));
+        break;
+      }
+      case IMPORTING_TYPES.LPN_LIST: {
+        this.utilities.log(`obteniendo lpns...`);
+        toReturn = this.getAllLpns(params).pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.DOCK_TYPE: {
@@ -884,10 +887,11 @@ export class DataProviderService {
       '/outbound/transportsVO1/all;' + params).pipe(retry(3));
   }
 
-  public getTransportsOrders(id: number, observe: any = 'body', reportProgress = false) {
-    // return this.orderService.orderByTransport(id, observe, reportProgress);
+  public getTransportsOrders(id: number, observe: any = 'body', reportProgress = false): Observable<any> {
+    /*return this.orderService.orderByTransport(["startRow=0", 'endRow=1000'], id, observe, reportProgress)
+    .pipe(retry(3));*/
     return this.httpClient.get<any>(environment.apiBaseUrl +
-      '/outbound/order/orderByTransport/' + id).pipe(retry(3));
+      `/outbound/order/orderByTransport/startRow=0;endRow=10000?transportId=${id}`).pipe(retry(3));
   }
 
   public deleteTransport(id: number, observe: any = 'body', reportProgress = false) {

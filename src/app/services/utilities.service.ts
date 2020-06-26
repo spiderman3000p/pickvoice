@@ -36,17 +36,21 @@ export class UtilitiesService implements OnDestroy {
     itemTypes: ModelMap.ItemTypeMap,
     qualityStates: ModelMap.QualityStateMap,
     locations: ModelMap.LocationMap,
+    locationsList: ModelMap.LocationListMap,
     locationsDto: ModelMap.LoadLocationDtoMap,
     orders: ModelMap.OrderMap,
+    ordersList: ModelMap.OrderListMap,
     uoms: ModelMap.UomMap,
     ordersDto: ModelMap.LoadOrderDtoMap,
     customers: ModelMap.CustomerMap,
+    customersList: ModelMap.CustomerListMap,
     orderTypes: ModelMap.OrderTypeMap,
     sections: ModelMap.SectionMap,
     transports: ModelMap.TransportMap,
     transportsList: ModelMap.TransportListMap,
     loadPicksDto: ModelMap.LoadPickDtoMap,
     pickPlannings: ModelMap.PickPlanningMap,
+    pickPlanningsList: ModelMap.PickPlanningListMap,
     pickTasks: ModelMap.PickTaskMap,
     pickTaskLines: ModelMap.PickTaskLineMap,
     docks: ModelMap.DockMap,
@@ -434,14 +438,17 @@ export class UtilitiesService implements OnDestroy {
     // this.log('parseando objeto', object);
     if (dataMap && object) {
       for (const key in dataMap) {
-        if (object[key]) {
-          if (dataMap[key].formControl.control !== 'select' && dataMap[key].formControl.control !== 'table') {
+        if (object[key] !== undefined) {
+          if (dataMap[key].formControl.control !== 'select' &&
+              dataMap[key].formControl.control !== 'table') {
             toExport[key] = object[key];
           } else if (dataMap[key].formControl.control === 'select') {
             // this.log('parseando objeto', object[key]);
             // this.log('formControl de mapa de objeto', dataMap[key].formControl);
             // this.log('objeto con indice', object[key][dataMap[key].formControl.valueIndex]);
-            toExport[key] = dataMap[key].formControl.valueIndex === null ? object[key] :
+            toExport[key] = dataMap[key].formControl.valueIndex === null ||
+            dataMap[key].formControl.type === 'number' ||
+            dataMap[key].formControl.type === 'text' ? object[key] :
             object[key][dataMap[key].formControl.valueIndex];
           }
         }

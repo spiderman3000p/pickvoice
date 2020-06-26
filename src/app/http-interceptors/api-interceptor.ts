@@ -23,8 +23,6 @@ export class ApiInterceptor implements HttpInterceptor {
                 console.error('Error al hacer peticion', error);
                 if (error instanceof HttpErrorResponse && error.status === 401) {
                     return this.handle401Error(req, next);
-                } else if (error instanceof HttpErrorResponse && error.status === 400 && error.statusText !== 'Bad Request') {
-                    return this.handle400Error(req, next);
                 } else {
                     return throwError(error);
                 }
@@ -53,6 +51,16 @@ export class ApiInterceptor implements HttpInterceptor {
                 if (response && response.access_token) {
                     this.tokenSubject.next(response.access_token);
                     return next.handle(this.setTokenToRequest(req, response.access_token));
+                }
+                if (req.url.includes(environment.apiKeycloak)) {
+                    return next.handle(req).pipe(catchError(error => {
+                        console.error('Error al hacer peticion token', error);
+                        if (error instanceof HttpErrorResponse && error.status === 401) {
+                            return this.handle401Error(req, next);
+                        } else if (error instanceof HttpErrorResponse && error.status === 400) {
+                            return this.handle400Error(req, next);
+                        }
+                    }));
                 }
                 // If we don't get a new token, we are in trouble so logout.
                 console.error('Error desconocido...haciendo logout');

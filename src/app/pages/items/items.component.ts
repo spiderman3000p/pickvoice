@@ -13,17 +13,17 @@ import { AllCommunityModules, GridOptions } from '@ag-grid-community/all-modules
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { timeout, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Subject, zip, forkJoin, merge, Subscription, Observable, Observer } from 'rxjs';
-import { take, catchError } from 'rxjs/operators';
+import { Subject, merge, Subscription, Observable, Observer } from 'rxjs';
+import { take  } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-items',
-  templateUrl: './items.component.html',styleUrls: ['./items.component.css']
+  templateUrl: './items.component.html',
+  styleUrls: ['./items.component.css']
 })
 export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
   definitions: any = ModelMap.ItemListMap;

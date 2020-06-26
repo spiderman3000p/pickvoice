@@ -5,9 +5,6 @@ import { AuthService } from '../../services/auth.service';
 import { DataProviderService } from '../../services/data-provider.service';
 
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
-import { retry, takeLast } from 'rxjs/operators';
-import { SelectionModel } from '@angular/cdk/collections';
-import { merge, Observer, Subscription } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 
 interface City {

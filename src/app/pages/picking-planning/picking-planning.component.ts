@@ -63,8 +63,8 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
       this.showFilters = true;
       this.actionForSelected = new FormControl('');
       this.displayedDataColumns = Object.keys(this.definitions);
-      // this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
-      this.displayedHeadersColumns = Object.keys(this.definitions);
+      this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
+      // this.displayedHeadersColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns.push('options');
       this.initColumnsDefs(); // columnas a mostrarse
       this.utilities.log('filters', this.filters);
@@ -193,7 +193,7 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
       this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInPickPlanningsPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
-        shouldShow = index === this.displayedHeadersColumns.length - 1 || index < 7;
+        shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
         return {show: shouldShow, name: columnName};
       });
     }
@@ -205,7 +205,7 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
     this.selectsData = [];
     this.columnDefs.slice().forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
-      if (index < this.columnDefs.length - 1) {
+      if (index > 0 && index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
@@ -534,7 +534,7 @@ export class PickingPlanningComponent implements OnInit, OnDestroy, AfterViewIni
     const dataToExport = this.dataSource.data.map((row: any) => {
       return this.utilities.getJsonFromObject(row, this.type);
     });
-    this.utilities.exportToXlsx(dataToExport, 'Uoms List');
+    this.utilities.exportToXlsx(dataToExport, 'Pick Planning List');
   }
 
   /*

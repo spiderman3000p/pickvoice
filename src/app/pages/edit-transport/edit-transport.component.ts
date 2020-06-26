@@ -45,7 +45,7 @@ export class EditTransportComponent implements OnInit {
   viewMode: string;
   transportData: TransportData;
   /* para tabla de orders */
-  definitions: any = ModelMap.OrderMap;
+  definitions: any = ModelMap.OrderListMap;
   dataSource: MatTableDataSource<Order>;
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
@@ -159,7 +159,9 @@ export class EditTransportComponent implements OnInit {
 
   export() {
     // TODO: hacer la exportacion de la orden completa
-    const dataToExport = this.row;
+    const dataToExport = Object.assign({}, this.row);
+    delete dataToExport.id;
+    delete dataToExport.ownerId;
     this.utilities.exportToXlsx(dataToExport, 'Transport # ' + this.row.transportNumber);
   }
 
@@ -298,12 +300,11 @@ export class EditTransportComponent implements OnInit {
     }
     aux = this.columnDefs.slice();
     aux.pop();
-    aux.shift();
     this.defaultColumnDefs = aux;
     this.selectsData = {};
     this.columnDefs.forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
-      if (index > 0 && index < this.columnDefs.length - 1) {
+      if (index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
@@ -488,7 +489,12 @@ export class EditTransportComponent implements OnInit {
     .subscribe(results => {
       this.isLoadingResults = false;
       this.utilities.log('orders received', results);
-      if (results && results.length > 0) {
+      if (results && results.content && results.content.length > 0) {
+        this.dataSource.data = results.content.map((element, i) => {
+          return { index: i, ... element};
+        });
+        this.refreshTable();
+      } else if (results && results.length > 0 && results.content === undefined) {
         this.dataSource.data = results.map((element, i) => {
           return { index: i, ... element};
         });
@@ -533,7 +539,7 @@ export class EditTransportComponent implements OnInit {
 
   exportOrders() {
     const dataToExport = this.dataSource.data.map((row: any) => {
-      return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ORDERS);
+      return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ORDERS_LIST);
     });
     this.utilities.exportToXlsx(dataToExport, 'Orders List');
   }

@@ -123,7 +123,7 @@ export class EditPickTaskComponent implements OnInit {
       this.dataSource.data = this.pickTaskData.pickTaskLines;
       // inicializar tabla mat-table
       this.displayedDataColumns = Object.keys(this.definitions);
-      this.displayedHeadersColumns = ['select'].concat(Object.keys(this.definitions));
+      this.displayedHeadersColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns.push('options');
       this.initColumnsDefs(); // columnas a mostrarse en la tabla
     }
@@ -156,19 +156,17 @@ export class EditPickTaskComponent implements OnInit {
       this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInPickTaskPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
-        shouldShow = index === 0 || index === this.displayedHeadersColumns.length - 1 || index < 7;
+        shouldShow = index === this.displayedHeadersColumns.length - 1 || index < 7;
         return {show: shouldShow, name: columnName};
       });
     }
 
     aux = this.columnDefs.slice();
     aux.pop();
-    aux.shift();
     this.defaultColumnDefs = aux;
 
     this.columnDefs.forEach((column, index) => {
-      // ignoramos la columna 0 y la ultima (select y opciones)
-      if (index > 0 && index < this.columnDefs.length - 1) {
+      if (index < this.columnDefs.length - 1) {
         filter = new Object();
         filter.show = column.show;
         filter.name = this.definitions[column.name].name;
@@ -209,42 +207,6 @@ export class EditPickTaskComponent implements OnInit {
     // guardamos la eleccion en el local storage
     localStorage.setItem('displayedColumnsInPickTaskPage', JSON.stringify(this.columnDefs));
     // this.utilities.log('displayed column after', this.columnDefs);
-  }
-
-  /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
-    this.isAllSelected() ?
-        this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
-  }
-
-  /** The label for the checkbox on the passed row */
-  checkboxLabel(row?: any): string {
-    if (!row) {
-      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
-    }
-    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.index + 1}`;
-  }
-
-  actionForSelectedRows(action) {
-    // this.utilities.log('action selected', action);
-    switch (action) {
-      case 'delete':
-        if (this.selection.selected.length > 0) {
-          this.deletePickTaskLinePrompt(this.selection.selected);
-        } else {
-          this.utilities.showSnackBar('You have no selected records', 'OK');
-        }
-        break;
-      default: break;
-    }
   }
 
   deleteRow(row: any) {
@@ -291,7 +253,7 @@ export class EditPickTaskComponent implements OnInit {
 
   deletePickTaskLine(row: any) {
     const index = this.pickTaskData.pickTaskLines.findIndex(_row => _row.pickTaskLineId === row.pickTaskLineId);
-    if (index > 1) {
+    if (index > -1) {
       this.pickTaskData.pickTaskLines.splice(index, 1);
     }
   }
@@ -380,7 +342,9 @@ export class EditPickTaskComponent implements OnInit {
 
   export() {
     // TODO: hacer la exportacion de la orden completa
-    const dataToExport = this.row;
+    const dataToExport = Object.assign({}, this.row);
+    delete dataToExport.id;
+    delete dataToExport.ownerId;
     this.utilities.exportToXlsx(dataToExport, 'Pick Task ' + this.row.id);
   }
 
@@ -388,6 +352,7 @@ export class EditPickTaskComponent implements OnInit {
     const dataToExport = this.dataSource.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
+      delete row.ownerId;
       return row;
     });
     this.utilities.exportToXlsx(dataToExport, 'Pick Task Lines List');

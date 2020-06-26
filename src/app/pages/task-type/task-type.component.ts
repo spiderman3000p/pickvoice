@@ -399,7 +399,7 @@ export class TaskTypeComponent implements OnInit, AfterViewInit, OnDestroy {
     const dataToExport = this.dataSource.data.map((row: any) => {
       return this.utilities.getJsonFromObject(row, this.type);
     });
-    this.utilities.exportToXlsx(dataToExport, 'Task List');
+    this.utilities.exportToXlsx(dataToExport, 'Task Types List');
   }
 
   /*

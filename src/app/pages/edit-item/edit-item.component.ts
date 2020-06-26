@@ -21,6 +21,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NumericEditorComponent } from './numeric-editor.component';
 import { RowOptionComponent } from './row-option.component';
+import '@ag-grid-enterprise/excel-export';
 
 interface ItemData {
   uomsList: UnityOfMeasure[];
@@ -122,7 +123,6 @@ export class EditItemComponent implements OnInit {
     },
     {
       headerName: 'UOM',
-      key: 'uomId',
       field: 'uomId',
       // valueFormatter: null,
       // valueParser: null,
@@ -139,7 +139,6 @@ export class EditItemComponent implements OnInit {
     },
     {
       headerName: 'DIMENSION UOM',
-      key: 'dimensionUomId',
       field: 'dimensionUomId',
       // valueFormatter: null,
       // valueParser: null,
@@ -156,7 +155,6 @@ export class EditItemComponent implements OnInit {
     },
     {
       headerName: 'VOLUME UOM',
-      key: 'volumeUomId',
       field: 'volumeUomId',
       // valueFormatter: null,
       // valueParser: null,
@@ -173,7 +171,6 @@ export class EditItemComponent implements OnInit {
     },
     {
       headerName: 'WEIGHT UOM',
-      key: 'weightUomId',
       field: 'weightUomId',
       // valueFormatter: null,
       // valueParser: null,
@@ -311,7 +308,9 @@ export class EditItemComponent implements OnInit {
 
   export() {
     // TODO: hacer la exportacion de la orden completa
-    const dataToExport = this.row;
+    const dataToExport = Object.assign({}, this.row);
+    delete dataToExport.id;
+    delete dataToExport.ownerId;
     this.utilities.exportToXlsx(dataToExport, 'Item # ' + this.row.sku);
   }
 
@@ -700,10 +699,17 @@ export class EditItemComponent implements OnInit {
   }
 
   exportTableData() {
-    const dataToExport = this.dataSource.data.map((row: any) => {
-      return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ITEMUOMS);
+    let dataToExport;
+    this.dataProviderService.getAllItemUoms(this.row.id).subscribe(data => {
+      if (data && data.length > 0) {
+        dataToExport = data.map((row: any) => {
+          delete row.uomId;
+          delete row.itemId;
+          return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ITEMUOMS);
+        });
+        this.utilities.exportToXlsx(dataToExport, 'Item Uoms List');
+      }
     });
-    this.utilities.exportToXlsx(dataToExport, 'Item Uoms List');
   }
 
   /*
@@ -815,7 +821,7 @@ export class EditItemComponent implements OnInit {
         };*/
         this.uomGetter = (params) => {
           console.log('uomGetter', params);
-          const key = params.colDef.key;
+          const key = params.colDef.field;
           console.log('key', key);
           const value = params.data[key];
           let found;
@@ -842,7 +848,7 @@ export class EditItemComponent implements OnInit {
         };*/
         this.uomSetter = (params) => {
           console.log('uomSetter', params);
-          const key = params.colDef.key;
+          const key = params.colDef.field;
           const value = params.newValue;
           console.log('key', key);
           console.log('newValue', value);
