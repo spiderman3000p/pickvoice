@@ -5,13 +5,11 @@ import { IMPORTING_TYPES } from '../models/model-maps.model';
 const routes: Routes = [
   {
     path: 'import',
-    loadChildren: () => import('./import/import.module').then(m => m.ImportModule),
-    pathMatch: 'full'
+    loadChildren: () => import('./import/import.module').then(m => m.ImportModule)
   },
   {
     path: 'recent-origins',
-    loadChildren: () => import('./recent-origins/recent-origins.module').then(m => m.RecentOriginsModule),
-    pathMatch: 'full'
+    loadChildren: () => import('./recent-origins/recent-origins.module').then(m => m.RecentOriginsModule)
   },
   {
     path: IMPORTING_TYPES.LPN,
@@ -21,14 +19,6 @@ const routes: Routes = [
     path: IMPORTING_TYPES.INVENTORY,
     loadChildren: () => import('./inventory/inventory.module').then(m => m.InventoryModule)
   },
-  {
-    path: 'edit-templates',
-    loadChildren: () => import('./edit-templates/edit-templates.module').then(m => m.EditTemplatesModule)
-  },
-  /*{
-    path: 'edit-templates2',
-    loadChildren: () => import('./edit-templates-grapes/edit-templates.module').then(m => m.EditTemplatesModule)
-  },*/
   {
     path: IMPORTING_TYPES.ITEMS,
     loadChildren: () => import('./items/items.module').then(m => m.ItemsModule)
@@ -87,43 +77,35 @@ const routes: Routes = [
   },
   {
     path: 'administration',
-    loadChildren: () => import('./administration/administration.module').then(m => m.AdministrationModule),
-    pathMatch: 'full'
+    loadChildren: () => import('./administration/administration.module').then(m => m.AdministrationModule)
   },
   {
     path: 'pending-orders',
-    loadChildren: () => import('./pending-orders/pending-orders.module').then(m => m.PendingOrdersModule),
-    pathMatch: 'full'
+    loadChildren: () => import('./pending-orders/pending-orders.module').then(m => m.PendingOrdersModule)
   },
   {
     path: 'current-actions',
-    loadChildren: () => import('./current-actions/current-actions.module').then(m => m.CurrentActionsModule),
-    pathMatch: 'full'
+    loadChildren: () => import('./current-actions/current-actions.module').then(m => m.CurrentActionsModule)
   },
   {
-    path: 'plants',
-    loadChildren: () => import('./plants/plants.module').then(m => m.PlantsModule),
-    pathMatch: 'full'
+    path: IMPORTING_TYPES.PLANTS,
+    loadChildren: () => import('./plants/plants.module').then(m => m.PlantsModule)
   },
   {
-    path: 'depots',
-    loadChildren: () => import('./depots/depots.module').then(m => m.DepotsModule),
-    pathMatch: 'full'
+    path: IMPORTING_TYPES.DEPOTS,
+    loadChildren: () => import('./depots/depots.module').then(m => m.DepotsModule)
   },
   {
-    path: 'owners',
-    loadChildren: () => import('./owners/owners.module').then(m => m.OwnersModule),
-    pathMatch: 'full'
+    path: IMPORTING_TYPES.OWNERS,
+    loadChildren: () => import('./owners/owners.module').then(m => m.OwnersModule)
   },
   {
     path: 'dashboard',
-    loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
-    pathMatch: 'full'
+    loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
   },
   {
     path: 'not-found',
-    loadChildren: () => import('./not-found/not-found.module').then(m => m.NotFoundModule),
-    pathMatch: 'full'
+    loadChildren: () => import('./not-found/not-found.module').then(m => m.NotFoundModule)
   },
   {
     path: '',

@@ -3,36 +3,28 @@ import { CommonModule } from '@angular/common';
 
 import { EditTemplatesRoutingModule } from './edit-templates-routing.module';
 import { EditTemplatesComponent } from './edit-templates.component';
+import { OpenTemplateDialogComponent } from '../../components/open-template-dialog/open-template-dialog.component';
+import { SaveTemplateDialogComponent } from '../../components/save-template-dialog/save-template-dialog.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-
-import { MatListModule } from '@angular/material/list';
 
 @NgModule({
-  declarations: [EditTemplatesComponent],
+  declarations: [EditTemplatesComponent, OpenTemplateDialogComponent, SaveTemplateDialogComponent],
   imports: [
     CommonModule,
     EditTemplatesRoutingModule,
 
     FormsModule,
     ReactiveFormsModule,
-
-    MatProgressSpinnerModule,
     MatButtonModule,
-    MatIconModule,
     MatCardModule,
-    MatCheckboxModule,
-    MatMenuModule,
-    MatSlideToggleModule,
-    MatListModule
+    MatDialogModule,
+    MatProgressSpinnerModule
   ]
 })
 export class EditTemplatesModule { }

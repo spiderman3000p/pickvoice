@@ -783,6 +783,7 @@ export class EditPickPlanningComponent implements OnInit {
       delete row.id;
       delete row.pickTaskId;
       delete row.index;
+      delete row.ownerId;
       return row;
     });
     this.utilities.exportToXlsx(dataToExport, 'Pick Planning Tasks List');
@@ -792,6 +793,8 @@ export class EditPickPlanningComponent implements OnInit {
     const dataToExport = this.dataSourceTransports.data.slice().map((row: any) => {
       delete row.id;
       delete row.index;
+      delete row.ownerId;
+      delete row.orders;
       return row;
     });
     this.utilities.exportToXlsx(dataToExport, 'Pick Planning Transports List');

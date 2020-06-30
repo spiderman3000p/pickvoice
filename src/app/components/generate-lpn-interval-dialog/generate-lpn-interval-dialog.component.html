@@ -1,0 +1,42 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h2 mat-dialog-title>Generate Lpn Interval</h2>
+    <div mat-dialog-content>
+        <span>
+            <div class="example-loading-shade" *ngIf="isLoading">
+                <mat-spinner class="spinner"></mat-spinner>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select formControlName="type" class="form-control" required="true">
+                            <option [value]="type" *ngFor="let type of types | async">
+                                {{type}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" class="form-control" formControlName="qty">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>State</label>
+                        <select formControlName="state" class="form-control" required="true">
+                            <option [value]="state" *ngFor="let state of states | async">
+                                {{STATES[state]}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </span>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button mat-button type="submit">OK</button>
+        <button mat-button mat-dialog-close type="button">CANCEL</button>
+    </div>
+</form>

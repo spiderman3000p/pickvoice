@@ -8,9 +8,12 @@ import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-ro
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
+import { PrintLabelDialogComponent } from '../../components/print-label-dialog/print-label-dialog.component';
+import {
+          GenerateLpnIntervalDialogComponent
+       } from '../../components/generate-lpn-interval-dialog/generate-lpn-interval-dialog.component';
 
-import { Lpns } from '../../models/lpns.model';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { ModelMap, IMPORTING_TYPES, STATES } from '../../models/model-maps.model';
 
 import { FormGroup, FormControl } from '@angular/forms';
 import { Subject, merge, Subscription, Observable, Observer } from 'rxjs';
@@ -24,11 +27,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./lpns.component.css']
 })
 export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
-  definitions: any = ModelMap.LpnListMap;
-  dataToSend: Lpns[];
-  filter: FormControl;
   filtersForm: FormGroup;
-  showFilters: boolean;
   filters: any[] = [];
   actionForSelected: FormControl;
   isLoadingResults = false;
@@ -36,20 +35,24 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   type = IMPORTING_TYPES.LPN_LIST;
   subscriptions: Subscription[] = [];
   selectedLpns: any;
+  selectedNodes = [];
   nodes = [];
   length = 100;
-  pageSize = 10;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
+  pageSize = 15;
+  states = STATES;
+  pageSizeOptions: number[] = [5, 15, 10, 25, 100];
   // MatPaginator Output
-  dataSource: MyDataSource<Lpns>;
+  dataSource: MyDataSource<any>;
   filterParams = '';
   paginatorParams = '';
   pageEvent: PageEvent;
+  options: any = {
+    useCheckbox: true,
+    getChildren: this.getChildren.bind(this)
+  };
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   constructor(private dataProviderService: DataProviderService, private router: Router,
               private utilities: UtilitiesService, private dialog: MatDialog) {
-      this.filter = new FormControl('');
-      this.dataToSend = [];
       this.selectedLpns = {};
       this.utilities.log('filters', this.filters);
       this.filtersForm = new FormGroup({
@@ -59,7 +62,6 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
         interface: new FormControl(''),
         labelWithMaterial: new FormControl('')
       });
-      this.initColumnsDefs();
   }
 
   ngOnInit() {
@@ -75,8 +77,32 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     .subscribe();
   }
 
-  viewLpnsDetail(event: any) {
-    const lpns = event.node.data;
+  getChildren(node: any) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => resolve(node.children), 1000);
+    });
+  }
+
+  onSelect(event) {
+    try {
+      this.selectedNodes.push(event.node.data);
+    } catch (e) {
+      this.utilities.log(e.message);
+    }
+  }
+
+  onDeSelect(event) {
+    try {
+      const index = this.selectedNodes.findIndex(node => node === event.node.data);
+      if (index > -1) {
+        this.selectedNodes.splice(index, 1);
+      }
+    } catch (e) {
+      this.utilities.error('Error deselecting node: ', e.message);
+    }
+  }
+
+  viewLpnsDetail(lpns: any) {
     this.utilities.log('data: ', lpns);
     this.selectedLpns = {};
     if (lpns.id && lpns.id.includes('IT')) {
@@ -88,12 +114,29 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
         if (result && result.content && result.content.length > 0 && result.content[0].lpnItemId) {
           this.selectedLpns = result.content[0];
         }
+      }, error => {
+        this.isLoadingLpnsDetail = false;
+        this.utilities.error('Error al cargar detalles: ', error);
+      });
+    } else if (lpns.id) {
+      this.isLoadingLpnsDetail = true;
+      const id = lpns.id.replace('Carton', '');
+      this.dataProviderService.getLpn3(id).subscribe(result => {
+        this.isLoadingLpnsDetail = false;
+        this.utilities.log('lpns details: ', result);
+        if (result && result.content && result.content.length > 0 && result.content[0].lpnId) {
+          this.selectedLpns = result.content[0];
+        }
+      }, error => {
+        this.isLoadingLpnsDetail = false;
+        this.utilities.error('Error al cargar detalles: ', error);
       });
     }
   }
 
   resetFilters() {
     this.filtersForm.reset();
+    this.loadDataPage();
   }
 
   applyFilters() {
@@ -130,31 +173,109 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
   }
 
-  initColumnsDefs() {
-    let filter: any;
-    const formControls = {} as any;
-    const filtersFields = ['code', 'state', 'type', 'interface'];
-    filtersFields.forEach((column, index) => {
-        filter = new Object();
-        filter.show = column;
-        filter.name = this.definitions[column].name;
-        filter.type = this.definitions[column].formControl.type;
-        filter.key = column;
-        formControls[column] = new FormGroup({
-          type: new FormControl('contains'),
-          value: new FormControl('')
-        });
-        filter.controls = formControls[column].controls;
-        filter.controls.value.valueChanges.pipe(debounceTime(500), distinctUntilChanged(), tap((value) => {
-          this.utilities.log(`valor del campo ${column} cambiando a: `, value);
-          this.applyFilters();
-        })).subscribe();
-        this.filters[column] = filter;
+  executeContext(action: string, lpn: any) {
+    this.utilities.log('action: ', action);
+    this.utilities.log('lapn: ', lpn);
+    switch (action) {
+      case 'print': this.printLpn(lpn); break;
+      case 'details': this.viewLpnsDetail(lpn); break;
+      default: this.utilities.log('Accion no definida');
+    }
+  }
+
+  generateHtmlContent(lpn: any, htmlTemplate: string): string {
+    const htmlWrapper = document.createElement('div');
+    htmlWrapper.innerHTML = htmlTemplate;
+    let objectMap;
+    let barcode;
+    const spanAux = document.createElement('span');
+    this.utilities.log('gerating html to lpn:', lpn);
+    // sustituir valores segun el mapa
+    if (lpn.lpnId) { // si es lpn padre
+      objectMap = ModelMap.LpnItemVO2Map;
+      barcode = this.utilities.generateBarCode(lpn.code);
+    } else if (lpn.lpnItemId) { // si es lpn hijo
+      objectMap = ModelMap.LpnItemVO3Map;
+      barcode = this.utilities.generateBarCode(lpn.sku);
+    }
+    this.utilities.log('model map to use for print:', objectMap);
+    // replace demo barcode
+    spanAux.innerHTML = barcode;
+    const htmlBarCode = htmlWrapper.querySelector('#data-barcode');
+    if (htmlBarCode) {
+      this.utilities.log(`propiedad barcode encontrada en el template`);
+      htmlBarCode.setAttribute('src', barcode);
+    } else {
+      this.utilities.log(`propiedad barcode no encontrada en el template`);
+    }
+    const keys = Object.keys(objectMap);
+    let htmlProp;
+    // replace demo data
+    keys.forEach(key => {
+      htmlProp = htmlWrapper.querySelector(`#data-${key}`);
+      if (htmlProp) {
+        this.utilities.log(`propiedad ${key} encontrada en el template`);
+        htmlProp.innerHTML = '';
+        spanAux.innerHTML = lpn[key];
+        htmlProp.appendChild(spanAux);
+      } else {
+        this.utilities.log(`propiedad ${key} no encontrada en el template`);
+      }
     });
-    this.filtersForm = new FormGroup(formControls);
-    this.utilities.log('filters', this.filters);
-    this.utilities.log('formControls', formControls);
-    this.utilities.log('form values', this.filtersForm.value);
+
+    return htmlWrapper.innerHTML;
+  }
+
+  printLpn(selectedLpn: any) {
+    let idSelectedLpn;
+    let lpnToPrint;
+    if (selectedLpn.id && selectedLpn.id.includes('IT')) {
+      idSelectedLpn = Number(selectedLpn.id.replace('IT', ''));
+      this.dataProviderService.getLpn(idSelectedLpn).subscribe(result => {
+        if (result.content) {
+          lpnToPrint = result.content[0];
+        } else {
+          lpnToPrint = result;
+        }
+        this.utilities.log('lpn obtenido del api: ', lpnToPrint);
+      });
+    } else if (selectedLpn.id && selectedLpn.id.includes('Carton')) {
+      idSelectedLpn = Number(selectedLpn.id.replace('Carton', ''));
+      this.dataProviderService.getLpn3(idSelectedLpn).subscribe(result => {
+        if (result.content) {
+          lpnToPrint = result.content[0];
+        } else {
+          lpnToPrint = result;
+        }
+        this.utilities.log('lpn obtenido del api: ', lpnToPrint);
+      });
+    }
+    const dialogRef = this.dialog.open(PrintLabelDialogComponent);
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      this.utilities.log('lpnToPrint: ', lpnToPrint);
+      if (result && lpnToPrint) {
+        const jsonTemplate = JSON.parse(result.template.jsonTemplate);
+        const htmlContent = this.generateHtmlContent(lpnToPrint, jsonTemplate['gjs-html']);
+        const cssStyles = jsonTemplate['gjs-css'];
+        const idLpnToPrint = lpnToPrint.lpnId ? lpnToPrint.lpnId : (lpnToPrint.id ? lpnToPrint.id : '');
+        const size = result.size;
+        this.utilities.log('html to print:', htmlContent);
+        this.utilities.log('css to print:', cssStyles);
+        this.utilities.print(`Label LPN ${idLpnToPrint}`, htmlContent, cssStyles,
+        size.width, size.heigth);
+      } else if (!result) {
+        this.utilities.error('Error con los valores seleccionados para imprimir, puede' +
+        ' que no se hayan seleccionado valores validos');
+      } else if (!lpnToPrint) {
+        this.utilities.error('Error con el valor del lpn a imprimir, puede' +
+        ' que no se haya obtenido resultado del api');
+        this.utilities.showSnackBar('Error fetching lpn values', 'OK');
+      }
+    }, error => {
+      this.utilities.error('error after closing print label dialog');
+      this.utilities.showSnackBar('Error after closing print label dialog', 'OK');
+    });
   }
 
   getFilterParams(): string {
@@ -199,7 +320,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     const paramsArray = Array.of(this.paginatorParams, this.filterParams)
     .filter(paramArray => paramArray.length > 0);
     const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
-    // this.utilities.log('loadDataPage() params: ', params);
+    this.utilities.log('loadDataPage() params: ', params);
     this.dataSource.loadData(this.type, `${params}`)
     .subscribe((response: any) => {
         // this.utilities.log('this.dataSource.loadData() response: ', response);
@@ -251,10 +372,13 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   loadData(useCache = true) {
     this.utilities.log('requesting Lpns');
     this.isLoadingResults = true;
+    this.dataSource.loadingSubject.next(true);
     let newData;
     let results = [];
+    this.selectedLpns = {};
     this.subscriptions.push(this.dataProviderService.getAllLpns().subscribe((res: any) => {
       this.isLoadingResults = false;
+      this.dataSource.loadingSubject.next(false);
       // this.utilities.log('lpns received', results);
       if (res && res.content && res.content.length > 0) {
         results = res.content;
@@ -268,6 +392,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.loadDataPage();
     }, error => {
       this.isLoadingResults = false;
+      this.dataSource.loadingSubject.next(false);
       this.utilities.error('error on requesting data');
       this.utilities.showSnackBar('Error requesting data', 'OK');
     }));
@@ -277,17 +402,8 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadData(false);
   }
 
-  addRow() {
-    this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.lpn);
-    const dialogRef = this.dialog.open(AddRowDialogComponent, {
-      data: {
-        map: ModelMap.LpnMap,
-        type: IMPORTING_TYPES.LPN,
-        remoteSync: true, // para mandar los datos a la BD por la API
-        title: 'Add New LPNS'
-      }
-    });
+  generate() {
+    const dialogRef = this.dialog.open(GenerateLpnIntervalDialogComponent);
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
@@ -306,10 +422,6 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.utilities.getJsonFromObject(row, this.type);
     });
     this.utilities.exportToXlsx(dataToExport, 'Lpns List');*/
-  }
-
-  toggleFilters() {
-    this.showFilters = !this.showFilters;
   }
 
   ngOnDestroy() {

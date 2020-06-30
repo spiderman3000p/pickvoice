@@ -1,0 +1,51 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h2 mat-dialog-title>Save Template</h2>
+    <div mat-dialog-content>
+        <p>Select a type, set a title and press OK</p>
+        <span>
+            <div class="example-loading-shade" *ngIf="isLoading">
+                <mat-spinner class="spinner"></mat-spinner>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Template Type</label>
+                        <select formControlName="labelTypeId" class="form-control" required="true">
+                            <option [value]="type.id" *ngFor="let type of types | async">
+                                {{type.name}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Code</label>
+                        <input type="text" formControlName="code" class="form-control" required="true">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" formControlName="name" class="form-control" required="true">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" formControlName="description" class="form-control" required="true">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Enable date</label>
+                        <input type="date" formControlName="enableDate" class="form-control" required="true">
+                    </div>
+                </div>
+            </div>
+        </span>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button mat-button type="submit">OK</button>
+        <button mat-button mat-dialog-close type="button">CANCEL</button>
+    </div>
+</form>

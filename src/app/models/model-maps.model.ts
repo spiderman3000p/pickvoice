@@ -1,3 +1,4 @@
+/* IMPORTING_TYPES: models data type string descriptions */
 export const IMPORTING_TYPES = {
     STORES: 'stores',
     DEPOTS: 'depots',
@@ -54,6 +55,7 @@ export const IMPORTING_TYPES = {
     TASK_STATE: 'taskState',
     PICK_STATE: 'pickPlanningState'
 };
+/* FILTER_TYPES is used in column filters */
 export const FILTER_TYPES = [
     {
         value: 'equals',
@@ -106,15 +108,26 @@ export const FILTER_TYPES = [
         availableForTypes: ['number', 'date']
     }
 ];
-/**
- * Estado de la tarea (  PE - Pending, WP - Work In Progress,CP - Complete,CA - Canceled)
- */
+/* Common tasks status (  PE - Pending, WP - Work In Progress,CP - Complete,CA - Canceled) */
 export const STATES = {
     PE: 'PENDING',
     CA: 'CANCELED',
+    PS: 'PAUSED',
     AC: 'ACTIVATED',
     WP: 'IN PROGRESS',
-    CP: 'COMPLETED'
+    CP: 'COMPLETED',
+    OI: 'Open Interface',
+    CI: 'Close Interface',
+    PG: 'Pre-Generado',
+    RR: 'Reside en recepcion',
+    RQ: 'Reside en cuarentena',
+    RI: 'Reside en el inventario',
+    IT: 'Transito interno',
+    WI: 'Reside en WIP',
+    OT: 'Transito de salida',
+    RS: 'Reside en las tiendas',
+    NL: 'No localizado',
+    NS: 'Stock no apto'
 };
 /*
     Esta clase contiene propiedades estaticas. Cada propiedad se refiere a una entidad distinta.
@@ -125,13 +138,14 @@ export const STATES = {
     fechas por ejemplo).
 
     Los atributos validados hasta ahora son:
-    boolean: para mostrar un toggle en los formularios
     required: la columna no puede estar vacia
-    unique: el valor no puede repetirse en el mismo archivo,
-    min: valor minimo aceptado,
-    max: valor maximo aceptado,
-    type: tipo de dato (solo para fechas con el valor 'date' por cuestiones de formato especial distinto
-    a los campos de texto)
+    unique: el valor no puede repetirse en el mismo archivo (en el caso de las importaciones),
+    min: valor minimo aceptado en los campos tipo number,
+    max: valor maximo aceptado en los campos tipo number,
+    type: tipo de dato
+    formControl: objeto que controla los aspectos de un control de formulario
+    validate: no recuerdo
+    addNew: la capacidad de poder agregar un nuevo registro, en el caso de los combos o selects
 */
 export class ModelMap {
     /*********************************************
@@ -188,19 +202,19 @@ export class ModelMap {
         phone1: {
             name: 'phone 1',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         phone2: {
             name: 'phone 2',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         }
     };
@@ -286,19 +300,19 @@ export class ModelMap {
         phone1: {
             name: 'phone 1',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         phone2: {
             name: 'phone 2',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         pcl: {
@@ -371,19 +385,19 @@ export class ModelMap {
         phone1: {
             name: 'phone 1',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         phone2: {
             name: 'phone 2',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         customerId: {
@@ -405,7 +419,7 @@ export class ModelMap {
     public static TaskTypeMap = {
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -414,7 +428,7 @@ export class ModelMap {
         },
         name: {
             name: 'name',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -435,7 +449,7 @@ export class ModelMap {
     public static LpnMap = {
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -444,7 +458,7 @@ export class ModelMap {
         },
         lpnType: {
             name: 'type',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.LPN_TYPE,
             formControl: {
                 control: 'select',
@@ -458,7 +472,7 @@ export class ModelMap {
         },
         lpnState: {
             name: 'state',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.LPN_STATE,
             formControl: {
                 control: 'select',
@@ -472,7 +486,7 @@ export class ModelMap {
         },
         lpnInterface: {
             name: 'interface',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.LPN_INTERFACE,
             formControl: {
                 control: 'select',
@@ -486,7 +500,7 @@ export class ModelMap {
         },
         locationId: {
             name: 'location',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.LPN_LOCATION,
             formControl: {
                 control: 'select',
@@ -500,7 +514,7 @@ export class ModelMap {
         },
         location: {
             name: 'location',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.LPN_LOCATION,
             formControl: {
                 control: 'select',
@@ -513,11 +527,275 @@ export class ModelMap {
             }
         }
     };
+    /* lpnitemvo2 object map for CRUD */
+    public static LpnItemVO2Map = {
+        activationDate: {
+            name: 'activation date',
+            required: true,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'text'
+            }
+        },
+        closingDate: {
+            name: 'closing date',
+            required: true,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'text'
+            }
+        },
+        openingDate: {
+            name: 'opening date',
+            required: true,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'text'
+            }
+        },
+        depotId: {
+            name: 'depot id',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        ownerId: {
+            name: 'owner id',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        code: {
+            name: 'code',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnChilds: {
+            name: 'childs',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        lpnState: {
+            name: 'state',
+            required: true,
+            type: IMPORTING_TYPES.LPN_STATE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        lpnInterface: {
+            name: 'interface',
+            required: true,
+            type: IMPORTING_TYPES.LPN_INTERFACE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        lpnType: {
+            name: 'type',
+            required: true,
+            type: IMPORTING_TYPES.LPN_TYPE,
+            formControl: {
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        locationCode: {
+            name: 'location code',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationState: {
+            name: 'location state',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationType: {
+            name: 'location type',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationId: {
+            name: 'location id',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnId: {
+            name: 'id',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        }
+    };
+    /* lpnitemvo3 object map for CRUD */
+    public static LpnItemVO3Map = {
+        createDate: {
+            name: 'create date',
+            required: true,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'text'
+            }
+        },
+        expiryDate: {
+            name: 'expiry date',
+            required: true,
+            type: 'date',
+            formControl: {
+                control: 'date',
+                type: 'text'
+            }
+        },
+        batchNumber: {
+            name: 'batch number',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        itemType: {
+            name: 'type',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnItemId: {
+            name: 'item id',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        qty: {
+            name: 'qty',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        qtyAvailable: {
+            name: 'qty available',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        qtyBooking: {
+            name: 'qty booking',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        },
+        serial: {
+            name: 'serial',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        sku: {
+            name: 'sku',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        skuDescription: {
+            name: 'serial',
+            required: true,
+            type: 'string',
+            formControl: {
+                control: 'input',
+                type: 'text'
+            }
+        },
+        weight: {
+            name: 'weight',
+            required: true,
+            type: 'number',
+            formControl: {
+                control: 'input',
+                type: 'number'
+            }
+        }
+    };
     /* lpns object map for CRUD */
     public static LpnListMap = {
         lpn: {
             name: 'lpn',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -526,7 +804,7 @@ export class ModelMap {
         },
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -574,7 +852,7 @@ export class ModelMap {
     public static InventoryItemMap = {
         lpnItemId: {
             name: 'lpn item id',
-            required: false,
+            required: true,
             type: 'number',
             formControl: {
                 control: 'input',
@@ -583,7 +861,7 @@ export class ModelMap {
         },
         lpnId: {
             name: 'lpn id',
-            required: false,
+            required: true,
             type: 'number',
             formControl: {
                 control: 'input',
@@ -601,7 +879,7 @@ export class ModelMap {
         },
         lpnCode: {
             name: 'lpn code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -713,7 +991,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 999999
             }
         },
         batchNumber: {
@@ -756,7 +1036,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         classification: {
@@ -773,7 +1055,7 @@ export class ModelMap {
     public static CustomerMap = {
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -782,7 +1064,7 @@ export class ModelMap {
         },
         name: {
             name: 'name',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -801,10 +1083,10 @@ export class ModelMap {
         phone: {
             name: 'phone',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         address: {
@@ -819,10 +1101,10 @@ export class ModelMap {
         postalCode: {
             name: 'postal code',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         gln: {
@@ -837,19 +1119,19 @@ export class ModelMap {
         longitude: {
             name: 'longitude',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         latitude: {
             name: 'latitude',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         zone: {
@@ -868,15 +1150,6 @@ export class ModelMap {
             formControl: {
                 control: 'input',
                 type: 'text'
-            }
-        },
-        cityId: {
-            name: 'city id',
-            required: false,
-            type: 'number',
-            formControl: {
-                control: 'input',
-                type: 'number'
             }
         }
     };
@@ -912,10 +1185,10 @@ export class ModelMap {
         customerPhone: {
             name: 'phone',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         customerCityCode: {
@@ -957,28 +1230,28 @@ export class ModelMap {
         customerPostalCode: {
             name: 'zip',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         customerLatitude: {
             name: 'latitude',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         customerLongitude: {
             name: 'longitude',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         }
     };
@@ -995,7 +1268,7 @@ export class ModelMap {
         },
         upc: {
             name: 'upc',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1137,12 +1410,12 @@ export class ModelMap {
         weightTolerance: {
             name: 'weight tolerance',
             required: true,
-            min: 0,
-            max: 100,
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 100
             }
         },
         scannedVerification: {
@@ -1199,7 +1472,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         tolerance: {
@@ -1208,7 +1483,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 100
             }
         },
         shelfLife: {
@@ -1466,7 +1743,7 @@ export class ModelMap {
     public static ItemTypeMap = {
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1475,7 +1752,7 @@ export class ModelMap {
         },
         name: {
             name: 'name',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1496,20 +1773,24 @@ export class ModelMap {
     public static ItemUomMap = {
         denominator: {
             name: 'denominator',
-            required: false,
+            required: true,
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 999999
             }
         },
         numerator: {
             name: 'numerator',
-            required: false,
+            required: true,
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         factor: {
@@ -1527,7 +1808,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         width: {
@@ -1536,7 +1819,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 999999
             }
         },
         unitsPallet: {
@@ -1545,7 +1830,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 999999
             }
         },
         height: {
@@ -1554,7 +1841,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 999999
             }
         },
         eanCode: {
@@ -1666,7 +1955,7 @@ export class ModelMap {
     public static QualityStateMap = {
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1675,7 +1964,7 @@ export class ModelMap {
         },
         name: {
             name: 'name',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1693,7 +1982,7 @@ export class ModelMap {
         },
         qualityStateTypeId: {
             name: 'type',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.QUALITY_STATE_TYPES,
             formControl: {
                 control: 'select',
@@ -1707,7 +1996,7 @@ export class ModelMap {
         },
         state: {
             name: 'status',
-            required: false,
+            required: true,
             type: 'boolean',
             formControl: {
                 control: 'toggle'
@@ -1739,7 +2028,7 @@ export class ModelMap {
     public static UomMap = {
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1748,7 +2037,7 @@ export class ModelMap {
         },
         name: {
             name: 'name',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1760,7 +2049,7 @@ export class ModelMap {
     public static SectionMap = {
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1769,7 +2058,7 @@ export class ModelMap {
         },
         name: {
             name: 'name',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -1808,7 +2097,7 @@ export class ModelMap {
         },
         sectionId: {
             name: 'section',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.SECTIONS,
             formControl: {
                 control: 'select',
@@ -1866,18 +2155,18 @@ export class ModelMap {
             required: false,
             unique: true,
             type: 'number',
-            min: 1,
-            max: 99999,
-            minlength: 1,
-            maxlength: 5,
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 1,
+                max: 99999,
+                minlength: 1,
+                maxlength: 5
             }
         },
         locationType: {
             name: 'type',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.LOCATION_TYPE,
             validate: true,
             formControl: {
@@ -1892,7 +2181,7 @@ export class ModelMap {
         },
         operationType: {
             name: 'operation',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.OPERATION_TYPE,
             validate: true,
             formControl: {
@@ -1926,7 +2215,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 1,
+                max: 99999
             }
         },
         heightSize: {
@@ -1935,7 +2226,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         depthSize: {
@@ -1944,7 +2237,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         allowedLpns: {
@@ -2142,7 +2437,7 @@ export class ModelMap {
         },
         orderDate: {
             name: 'order date',
-            required: false,
+            required: true,
             type: 'date',
             formControl: {
                 control: 'date',
@@ -2160,7 +2455,7 @@ export class ModelMap {
         },
         orderTypeId: {
             name: 'type',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.ORDER_TYPE,
             formControl: {
                 control: 'select',
@@ -2184,7 +2479,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 100
             }
         },
         note:  {
@@ -2198,7 +2495,7 @@ export class ModelMap {
         },
         transportId: {
             name: 'transport',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.TRANSPORTS,
             formControl: {
                 control: 'select',
@@ -2217,7 +2514,7 @@ export class ModelMap {
         },
         customerId: {
             name: 'customer',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.CUSTOMERS,
             formControl: {
                 control: 'select',
@@ -2342,10 +2639,10 @@ export class ModelMap {
             name: 'customer phone',
             required: false,
             unique: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number'
             }
         },
         customerCityCode:  {
@@ -2383,7 +2680,7 @@ export class ModelMap {
     public static OrderTypeMap = {
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -2392,7 +2689,7 @@ export class ModelMap {
         },
         description: {
             name: 'description',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'textarea',
@@ -2422,7 +2719,7 @@ export class ModelMap {
         },
         nameRoute: {
             name: 'route name',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -2440,7 +2737,7 @@ export class ModelMap {
         },
         shipmentDate: {
             name: 'shipment date',
-            required: false,
+            required: true,
             type: 'date',
             formControl: {
                 control: 'date',
@@ -2486,7 +2783,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         trailer: {
@@ -2670,7 +2969,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         uomWeightCode: {
@@ -2715,7 +3016,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         transportationState: {
@@ -2758,17 +3061,19 @@ export class ModelMap {
         },
         qtyRequired:  {
             name: 'qty required',
-            required: false,
+            required: true,
             unique: false,
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         batchNumber: {
             name: 'batch number',
-            required: false,
+            required: true,
             type: 'number',
             formControl: {
                 control: 'input',
@@ -2777,7 +3082,7 @@ export class ModelMap {
         },
         createDate: {
             name: 'create date',
-            required: false,
+            required: true,
             type: 'date',
             formControl: {
                 control: 'date',
@@ -2803,13 +3108,23 @@ export class ModelMap {
             }
         },
         qualityState:  {
-            name: 'qlity state',
-            required: false,
+            name: 'quality state',
+            required: true,
             unique: false,
-            type: 'string',
+            type: IMPORTING_TYPES.QUALITY_STATES,
             formControl: {
-                control: 'input',
-                type: 'text'
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            },
+            addNew: {
+                text: 'Add new quality',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.QUALITY_STATES
             }
         }
     };
@@ -2872,7 +3187,7 @@ export class ModelMap {
         },
         state: {
             name: 'state',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.PICK_STATE,
             validate: true,
             formControl: {
@@ -2887,11 +3202,14 @@ export class ModelMap {
         },
         progress: {
             name: 'progress',
-            required: false,
+            required: true,
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                max: 100,
+                min: 0,
+                maxlength: 3
             }
         },
         processDate: {
@@ -2966,7 +3284,10 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 100,
+                maxlength: 3
             }
         },
         processDate: {
@@ -2992,7 +3313,7 @@ export class ModelMap {
         },
         enableDate: {
             name: 'enable date',
-            required: false,
+            required: true,
             type: 'date',
             formControl: {
                 control: 'date',
@@ -3019,11 +3340,13 @@ export class ModelMap {
         },
         priority: {
             name: 'priority',
-            required: false,
+            required: true,
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 100
             }
         },
         lines: {
@@ -3042,6 +3365,8 @@ export class ModelMap {
             formControl: {
                 control: 'input',
                 type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         document: {
@@ -3073,7 +3398,7 @@ export class ModelMap {
         },
         taskState: {
             name: 'state',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.TASK_STATE,
             validate: true,
             formControl: {
@@ -3107,7 +3432,7 @@ export class ModelMap {
         },
         taskTypeId: {
             name: 'type',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.TASK_TYPES,
             formControl: {
                 control: 'select',
@@ -3283,14 +3608,17 @@ export class ModelMap {
         taskProgress: {
             name: 'progress',
             required: false,
-            type: 'string',
+            type: 'number',
             formControl: {
                 control: 'input',
-                type: 'text'
+                type: 'number',
+                min: 0,
+                max: 100,
+                maxlength: 3
             }
         }
     };
-    /* picking task object map for CRUD */
+    /* picking task line object map for CRUD (not used) */
     public static PickTaskLineMap = {
         lpnItemId: {
             name: 'lpn',
@@ -3303,7 +3631,7 @@ export class ModelMap {
         },
         sku: {
             name: 'sku',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -3348,7 +3676,7 @@ export class ModelMap {
         },
         sectionCode: {
             name: 'section code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -3357,7 +3685,7 @@ export class ModelMap {
         },
         locationId: {
             name: 'location id',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -3389,6 +3717,8 @@ export class ModelMap {
             formControl: {
                 control: 'input',
                 type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         uomId: {
@@ -3459,7 +3789,7 @@ export class ModelMap {
     public static DockMap = {
         dockType: {
             name: 'dock type',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.DOCK_TYPE,
             validate: true,
             formControl: {
@@ -3474,7 +3804,7 @@ export class ModelMap {
         },
         sectionId: {
             name: 'section',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.SECTIONS,
             formControl: {
                 control: 'select',
@@ -3493,7 +3823,7 @@ export class ModelMap {
         },
         code: {
             name: 'code',
-            required: false,
+            required: true,
             type: 'string',
             formControl: {
                 control: 'input',
@@ -3511,7 +3841,7 @@ export class ModelMap {
         },
         locationType: {
             name: 'location type',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.LOCATION_TYPE,
             validate: true,
             formControl: {
@@ -3526,7 +3856,7 @@ export class ModelMap {
         },
         locationState: {
             name: 'location state',
-            required: false,
+            required: true,
             type: IMPORTING_TYPES.LOCATION_STATE,
             validate: true,
             formControl: {
@@ -3628,7 +3958,7 @@ export class ModelMap {
         }*/
     };
     /*********************************************
-    *                   DTO's
+    *        DTO's for importing files
     **********************************************/
 
     /* order dto map (for importing proccess) */
@@ -3728,7 +4058,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 100
             }
         },
         note:  {
@@ -3758,7 +4090,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         uomCode:  {
@@ -4204,7 +4538,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 100
             }
         },
         expiryDate: {
@@ -4314,7 +4650,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         tolerance:  {
@@ -4324,7 +4662,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 100
             }
         },
         shelfLife:  {
@@ -4370,7 +4710,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         factor: {
@@ -4388,7 +4730,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         width: {
@@ -4397,7 +4741,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         height: {
@@ -4406,7 +4752,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         eanCode: {
@@ -4599,7 +4947,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         heightSize: {
@@ -4608,7 +4958,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         depthSize: {
@@ -4617,7 +4969,9 @@ export class ModelMap {
             type: 'number',
             formControl: {
                 control: 'input',
-                type: 'number'
+                type: 'number',
+                min: 0,
+                max: 99999
             }
         },
         allowedLpns: {

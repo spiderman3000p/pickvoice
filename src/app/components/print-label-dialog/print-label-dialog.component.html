@@ -1,0 +1,37 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h2 mat-dialog-title>Print label</h2>
+    <div mat-dialog-content>
+        <p>Select one template and press PRINT</p>
+        <span>
+            <div class="example-loading-shade" *ngIf="isLoading">
+                <mat-spinner class="spinner"></mat-spinner>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Template</label>
+                        <select formControlName="template" class="form-control" required="true">
+                            <option [ngValue]="template" *ngFor="let template of templates | async">
+                                {{template.name}} - code: {{template.code}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Paper Size</label>
+                        <select formControlName="size" class="form-control" required="true">
+                            <option [ngValue]="size" *ngFor="let size of sizes">
+                                {{size.label}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </span>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button mat-button type="submit">PRINT</button>
+        <button mat-button mat-dialog-close (click)="(null)" type="button">CANCEL</button>
+    </div>
+</form>

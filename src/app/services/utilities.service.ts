@@ -509,25 +509,20 @@ export class UtilitiesService implements OnDestroy {
     }
   }
 
-  print(htmlElementId: string): boolean {
-    let printContents;
-    let popupWin;
-    printContents = document.getElementById(htmlElementId).innerHTML;
-    this.log('printContent', printContents);
-    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
-    popupWin.document.open();
-    popupWin.document.write(`
-      <html>
-        <head>
-          <title>Print tab</title>
-          <style>
-          //........Customized style.......
-          </style>
-        </head>
-    <body onload="window.print();window.close()">${printContents}</body>
-      </html>`
-    );
-    popupWin.document.close();
+  print(title: string, htmlContent: string, cssStyles: string, paperHeight: string, paperWidth: string) {
+    const mWindow = window.open('', '_blank',
+    `left=0,top=0,toolbar=0,scrollbars=0,status=0`);
+    mWindow.document.write(`<html><head><title>${title}</title>`);
+    mWindow.document.write(`<style>
+    @media print {@page{size: ${paperWidth} ${paperHeight}}}${cssStyles}</style>`);
+    mWindow.document.write('</head><body>');
+    mWindow.document.write(htmlContent);
+    mWindow.document.write('</body></html>');
+    mWindow.document.close();
+    setTimeout(() => {
+      mWindow.print();
+      mWindow.close();
+    }, 1000);
     return true;
   }
 

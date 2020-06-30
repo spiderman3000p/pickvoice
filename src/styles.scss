@@ -3,7 +3,7 @@ $primary: #00b19d;
 $accent: #00535e;
 $secondary: #00535e;
 @import "node_modules/bootstrap/scss/bootstrap";
-@import "~@fortawesome/fontawesome-free/css/all.css";
+@import "~assets/font-awesome-4.7.0/css/font-awesome.min.css";
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 @import '~angular-tree-component/dist/angular-tree-component.css';
@@ -739,6 +739,11 @@ div.tree>tree-node>div>tree-node-wrapper>.node-wrapper>tree-node-expander>.toggl
 
 div.tree tree-node-expander + div.node-content-wrapper {
   /*margin-left: 30px*/
+}
+
+.tree-node-checkbox{
+  margin-top: 4px;
+  margin-left: 13px;
 }
 
 .add-link{

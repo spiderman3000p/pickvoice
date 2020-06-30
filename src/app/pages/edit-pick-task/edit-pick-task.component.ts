@@ -209,38 +209,7 @@ export class EditPickTaskComponent implements OnInit {
     // this.utilities.log('displayed column after', this.columnDefs);
   }
 
-  deleteRow(row: any) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
-    }
-    const index = this.dataSource.data.findIndex(_row => _row === row);
-    // this.utilities.log('index to delete', index);
-    this.dataSource.data.splice(index, 1);
-    this.refreshTable();
-    return true;
-  }
-
   deleteRows(rows: any) {
-    let deletedCounter = 0;
-    const observer = {
-      next: (result) => {
-        if (result) {
-          this.deleteRow(rows);
-          this.utilities.log('Row deleted');
-          if (deletedCounter === 0) {
-            this.utilities.showSnackBar('Row deleted', 'OK');
-          }
-          deletedCounter++;
-        }
-      },
-      error: (error) => {
-        this.utilities.error('Error on delete rows', error);
-        if (deletedCounter === 0) {
-          this.utilities.showSnackBar('Error on delete rows', 'OK');
-        }
-        deletedCounter++;
-      }
-    } as Observer<any>;
     if (Array.isArray(rows)) {
       rows.forEach(row => {
         // TODO: tener servicio para eliminar registros de pick tasks
@@ -253,8 +222,10 @@ export class EditPickTaskComponent implements OnInit {
 
   deletePickTaskLine(row: any) {
     const index = this.pickTaskData.pickTaskLines.findIndex(_row => _row.pickTaskLineId === row.pickTaskLineId);
+    console.log('index', index);
     if (index > -1) {
       this.pickTaskData.pickTaskLines.splice(index, 1);
+      this.refreshTable();
     }
   }
 
@@ -337,6 +308,23 @@ export class EditPickTaskComponent implements OnInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
+    });
+  }
+
+  deletePickTaskPrompt(rows?: any) {
+    const observer = {
+      next: (result) => {
+        if (result) {
+          this.deleteRows(rows);
+        }
+      },
+      error: (error) => {
+
+      }
+    } as Observer<boolean>;
+    this.utilities.showCommonDialog(observer, {
+      title: 'Delete Row',
+      message: 'You are about to delete this record(s). Are you sure to continue?'
     });
   }
 

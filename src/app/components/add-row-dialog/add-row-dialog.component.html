@@ -48,9 +48,9 @@
                     <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
                     <input class="form-control"  type="number" [formControlName]="key"
                     [required]="dataMap[key].required" 
-                    [min]="dataMap[key].min ? dataMap[key].min : 0"
-                    [max]="dataMap[key].max ? dataMap[key].min : 999999999999"
-                    [maxlength]="dataMap[key].maxlength ? dataMap[key].maxlength : 12">
+                    [min]="dataMap[key].formControl.min ? dataMap[key].formControl.min : 0"
+                    [max]="dataMap[key].formControl.max ? dataMap[key].formControl.max : 999999999999"
+                    [maxlength]="dataMap[key].formControl.maxlength ? dataMap[key].formControl.maxlength : 12">
                 </div>
                 <!-- campos date -->
                 <div class="form-group"

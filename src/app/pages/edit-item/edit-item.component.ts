@@ -223,7 +223,8 @@ export class EditItemComponent implements OnInit {
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService,
     private location: WebLocation, private activatedRoute: ActivatedRoute,
-    private dataProviderService: DataProviderService, private router: Router, private dialog: MatDialog
+    private dataProviderService: DataProviderService, private router: Router,
+    private dialog: MatDialog
   ) {
     this.itemData = new Object() as ItemData;
     this.itemData.uomsList = [];

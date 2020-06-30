@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { LpnsRoutingModule } from './lpns-routing.module';
 import { LpnsComponent } from './lpns.component';
+import { PrintLabelDialogComponent } from '../../components/print-label-dialog/print-label-dialog.component';
+import { GenerateLpnIntervalDialogComponent } from '../../components/generate-lpn-interval-dialog/generate-lpn-interval-dialog.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -14,12 +16,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { TreeModule } from 'angular-tree-component';
+import { ContextMenuModule } from 'ngx-contextmenu';
 
 @NgModule({
   declarations: [
-    LpnsComponent
+    LpnsComponent, PrintLabelDialogComponent, GenerateLpnIntervalDialogComponent
   ],
   imports: [
     CommonModule,
@@ -35,8 +40,11 @@ import { TreeModule } from 'angular-tree-component';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
+    MatMenuModule,
+    MatSlideToggleModule,
 
-    TreeModule.forRoot()
+    TreeModule.forRoot(),
+    ContextMenuModule
   ]
 })
 export class LpnsModule { }

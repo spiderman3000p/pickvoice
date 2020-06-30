@@ -768,7 +768,7 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
     const dataToExport = this.dataSource.data.map((row: any) => {
       return this.utilities.getJsonFromObject(row, this.type);
     });
-    this.utilities.exportToXlsx(dataToExport, 'Uoms List');
+    this.utilities.exportToXlsx(dataToExport, 'Tasks List');
   }
 
   /*

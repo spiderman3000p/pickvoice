@@ -20,9 +20,18 @@ export class ApiInterceptor implements HttpInterceptor {
                 req = this.setTokenToRequest(req, this.authService.getSessionToken());
             }
             return next.handle(req).pipe(catchError(error => {
-                console.error('Error al hacer peticion', error);
+                console.error('Error al hacer peticion api', error);
                 if (error instanceof HttpErrorResponse && error.status === 401) {
                     return this.handle401Error(req, next);
+                } else {
+                    return throwError(error);
+                }
+            }));
+        } else if (req.url.includes(environment.apiKeycloak)) {
+            return next.handle(req).pipe(catchError(error => {
+                console.error('Error al hacer peticion token', error);
+                if (error instanceof HttpErrorResponse && error.status === 400) {
+                    return this.handle400Error(req, next);
                 } else {
                     return throwError(error);
                 }

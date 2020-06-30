@@ -1,8 +1,18 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { ApplicationRef, Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ModelMap } from '../../models/model-maps.model';
 import { FormControl } from '@angular/forms';
+
 import { UtilitiesService } from '../../services/utilities.service';
-import { Observer } from 'rxjs';
+import { DataProviderService } from '../../services/data-provider.service';
+import { AuthService } from '../../services/auth.service';
+import { OpenTemplateDialogComponent } from '../../components/open-template-dialog/open-template-dialog.component';
+import { SaveTemplateDialogComponent } from '../../components/save-template-dialog/save-template-dialog.component';
+import { LabelTemplate } from '@pickvoice/pickvoice-api/model/labeltemplate';
+import { LabelType } from '@pickvoice/pickvoice-api/model/labeltype';
+
+import { environment } from 'src/environments/environment';
+import { Observer, Observable } from 'rxjs';
 import grapesjs from 'grapesjs';
 
 @Component({
@@ -144,8 +154,11 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
   };
   fields = [];
   date = new Date().toLocaleDateString();
-  model = ModelMap.InventoryItemMap;
-  constructor(private utilities: UtilitiesService) {
+  model = ModelMap.LpnItemVO3Map;
+  templateObject: LabelTemplate;
+  constructor(private utilities: UtilitiesService, private appRef: ApplicationRef,
+              private dialog: MatDialog, private authService: AuthService,
+              private dataProvider: DataProviderService) {
     Object.keys(this.model).forEach(key => {
       this.fields.push({
         id: `field-${key}`,
@@ -155,7 +168,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
         value: 'Lorem ipsum dolor',
         disabled: false,
         model: this.model[key],
-        iconClass: 'fas fa-database',
+        iconClass: 'fa fa-cubes',
         blockType: 'text',
         type: this.model[key].formControl.type
       });
@@ -163,14 +176,14 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
     const barCode = this.utilities.generateBarCode('12345678910');
     console.log('bar code', barCode);
     this.fields.push({
-      id: `field-bar-code`,
+      id: `field-barcode`,
       selected: false,
       label: 'bar code',
-      key: 'barCode',
+      key: 'barcode',
       value: barCode,
       disabled: false,
       model: null,
-      iconClass: 'fas fa-barcode',
+      iconClass: 'fa fa-barcode',
       blockType: 'image',
       type: 'image'
     });
@@ -181,7 +194,51 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
     this.editor = grapesjs.init({
         container : '#gjs',
         components: '',
-        style: '.txt-red{color: red}'
+        style: '.txt-red{color: red}',
+        storageManager: {
+          type: 'custom-remote',
+          stepsBeforeSave: 3,
+          // For custom parameters/headers on requests
+          autoload: false,
+          autosave: false
+        }
+    });
+    const that = this;
+    this.editor.StorageManager.add('custom-remote', {
+      /**
+       * Load the data
+       * @param  {Array} keys Array containing values to load, eg, ['gjs-components', 'gjs-style', ...]
+       * @param  {Function} clb Callback function to call when the load is ended
+       * @param  {Function} clbErr Callback function to call in case of errors
+       */
+      
+      load(keys, clb, clbErr) {
+        const obs = new Observable(suscriber => {
+          const result = {};
+          const template = JSON.parse(that.templateObject.jsonTemplate);
+          keys.forEach(key => {
+            const value = template[key];
+            if (value) {
+              result[key] = value;
+            }
+          });
+          suscriber.next(result);
+        }).subscribe(result => clb(result), error => clbErr(error));
+      },
+
+      /**
+       * Store the data
+       * @param  {Object} data Data object to store
+       * @param  {Function} clb Callback function to call when the load is ended
+       * @param  {Function} clbErr Callback function to call in case of errors
+       */
+      store(data, clb, clbErr) {
+        that.utilities.log('data on store: ', data);
+        that.templateObject.jsonTemplate = JSON.stringify(data);
+        // that.templateObject.jsonTemplate = data['gjs-html'];
+        that.dataProvider.saveTemplate(that.templateObject).subscribe(result => clb(result),
+        (error) => clbErr(error));
+      }
     });
     this.initEditorBlocks();
     this.initEditorPanels();
@@ -191,7 +248,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
     // bloque de tablas
     this.editor.BlockManager.add('table-block', {
       label: `<div>
-      <i class="fas fa-table icon-block"></i>
+      <i class="fa fa-table icon-block"></i>
       <div class="text-block">Table Row</div>
       </div>`,
       category: 'Structure',
@@ -223,7 +280,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
     // bloque de columnas
     this.editor.BlockManager.add('cell-block', {
       label: `<div>
-      <i class="fas fa-table icon-block"></i>
+      <i class="fa fa-columns icon-block"></i>
       <div class="text-block">Column</div>
       </div>`,
       category: 'Structure',
@@ -287,7 +344,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
     // bloque de texto
     this.editor.BlockManager.add('text-block', {
       label: `<div>
-      <i class="fas fa-font icon-block"></i>
+      <i class="fa fa-font icon-block"></i>
       <div class="text-block">Text</div>
       </div>`,
       category: 'Structure',
@@ -304,6 +361,8 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
 
   initEditorPanels() {
     const panelManager = this.editor.Panels;
+    // console.log('panels existentes: ', panelManager.getPanels());
+    panelManager.removePanel('devices-c');
     panelManager.addButton('options', {
       id: 'undo-button',
       className: 'fa fa-undo',
@@ -313,7 +372,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
     });
     panelManager.addButton('options', {
       id: 'redo-button',
-      className: 'fa fa-redo',
+      className: 'fa fa-repeat',
       command: 'core:redo',
       attributes: { title: 'Redo'},
       active: false,
@@ -325,15 +384,84 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       attributes: { title: 'Clear All'},
       active: false,
     });
-    const button = panelManager.getButton('options', 'sw-visibility');
-    console.log('button: ', button);
-    console.log('className: ', button.attributes.className);
-    button.attributes.className = 'fa fa-square';
-    // this.editor.render();
+    panelManager.addPanel({
+      id: 'left-panel',
+      visible  : true,
+      buttons  : [
+      {
+        id: 'open-button',
+        className: 'fa fa-folder-open',
+        attributes: { title: 'Open Template'},
+        active: false,
+        command: {
+          run: (editor) => {
+            const dialogRef = this.dialog.open(OpenTemplateDialogComponent);
+            dialogRef.afterClosed().subscribe(result => {
+              this.utilities.log('dialog result:', result);
+              if (result && result.name && result.description) {
+                this.templateObject = new Object(result) as LabelTemplate;
+                editor.load((response: any) => {
+                  editor.Panels.getButton('left-panel', 'open-button').active = false;
+                  this.utilities.log('Template successfully loaded');
+                  this.utilities.showSnackBar('Template successfully loaded', 'OK');
+                }, (error) => {
+                  editor.Panels.getButton('left-panel', 'open-button').active = false;
+                  this.utilities.error('Error on loading template', error);
+                  this.utilities.showSnackBar('Error on loading template', 'OK');
+                });
+              }
+            }, error => {
+              this.utilities.error('error after closing open template dialog');
+              this.utilities.showSnackBar('Error after closing open template', 'OK');
+              this.isLoadingResults = false;
+            });
+          },
+          stop: (editor) => {
+            editor.Panels.getButton('left-panel', 'open-button').active = false;
+          }
+        }
+      },
+      {
+        id: 'save-button',
+        className: 'fa fa-save',
+        attributes: { title: 'Save Template'},
+        active: false,
+        command: {
+          run: (editor) => {
+            const dialogRef = this.dialog.open(SaveTemplateDialogComponent);
+            dialogRef.afterClosed().subscribe(result => {
+              this.utilities.log('dialog result:', result);
+              if (result && result.name && result.description) {
+                this.templateObject = new Object(result) as LabelTemplate;
+                this.templateObject.ownerId = this.authService.getOwnerId();
+                this.templateObject.depotId = this.authService.getDepotId();
+                this.templateObject.dataSet = '';
+                editor.store((response: any) => {
+                  editor.Panels.getButton('left-panel', 'save-button').active = false;
+                  this.utilities.log('Template successfully saved');
+                  this.utilities.showSnackBar('Template successfully saved', 'OK');
+                }, (error) => {
+                  editor.Panels.getButton('left-panel', 'save-button').active = false;
+                  this.utilities.error('Error on saving template', error);
+                  this.utilities.showSnackBar('Error on saving template', 'OK');
+                });
+              }
+            }, error => {
+              this.utilities.error('error after closing save template dialog');
+              this.utilities.showSnackBar('Error after closing save template', 'OK');
+              this.isLoadingResults = false;
+            });
+          },
+          stop: (editor) => {
+            editor.Panels.getButton('left-panel', 'save-button').active = false;
+          }
+        }
+      }
+      ]
+    });
   }
 
   export() {
-
   }
 
   ngOnInit(): void {
@@ -376,17 +504,18 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
           removable: true, // Once inserted it can't be removed
         }
       });
-      if (field.blockType === 'image') {
+      if (field.blockType === 'image' && field.key === 'barcode') {
         aux.content.type = 'image';
         aux.content.attributes = {};
+        aux.content.attributes.id = 'data-' + field.key;
         aux.content.attributes.src = field.value;
-        aux.content.attributes.height = '40px';
+        aux.content.attributes.height = '70px';
         aux.content.attributes.width = '100%';
         aux.content.components = [];
       }
       // (igual que texto pero con un id o clase identificadora para sustitui su valor luego)
       this.editor.BlockManager.add(field.id + '-block', aux);
-      this.utilities.log('aux insertado: ', aux);
+      // this.utilities.log('aux insertado: ', aux);
     });
   }
 }

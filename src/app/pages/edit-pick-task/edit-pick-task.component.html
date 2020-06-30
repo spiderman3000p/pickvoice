@@ -85,7 +85,7 @@
                             <ng-template matTabContent>
                                 <div class="col-sm-12">
                                     <div class="col-sm-12 text-right mb-3">
-                                        <a mat-raised-button color="warn" (click)="exportTaskLines()">
+                                        <a mat-raised-button color="warn" (click)="exportPickTaskLines()">
                                             <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
                                         </a>
                                         <!--a mat-raised-button color="accent" (click)="addTaskLine()" class="ml-2"
@@ -120,7 +120,7 @@
                                                 </mat-menu>
                                             </th>
                                             <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                                                <a mat-icon-button (click)="editTaskLineOnDialog(element, 'view')" *ngIf="viewMode === 'view'">
+                                                <a mat-icon-button (click)="editTaskLineOnDialog(element, 'view')">
                                                     <img src="assets/icons/zoom.png">
                                                 </a>
                                                 <a mat-icon-button (click)="editTaskLineOnDialog(element, 'edit')" *ngIf="viewMode === 'edit'">
@@ -138,9 +138,9 @@
                                                 <!--a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
                                                     <img src="assets/icons/printer.png">
                                                 </a-->
-                                                <a mat-icon-button (click)="deletePickTaskPrompt(element)" *ngIf="viewMode === 'edit'">
+                                                <!--a mat-icon-button (click)="deletePickTaskPrompt(element)" *ngIf="viewMode === 'edit'">
                                                     <img src="assets/icons/delete.png">
-                                                </a>
+                                                </a-->
                                             </td>
                                         </ng-container>
                         

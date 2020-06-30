@@ -1,0 +1,13 @@
+.column-filter-icon {
+    position: relative;
+    display: inline-block;
+    padding-left: 15px;
+}
+
+.mat-header-row th {
+    display: table-cell;
+}
+
+.mat-dialog-content {
+    max-height: 50vh !important;
+}

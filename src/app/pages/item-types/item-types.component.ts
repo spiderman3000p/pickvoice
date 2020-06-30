@@ -435,25 +435,6 @@ export class ItemTypesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.utilities.exportToXlsx(dataToExport, 'Item Types List');
   }
-
-  printRow(data: any) {
-    this.printableData = data;
-    setTimeout(() => {
-      if (this.utilities.print('printSection')) {
-        this.printableData = null;
-      }
-    }, 1000);
-  }
-
-  printRows() {
-    this.printableData = this.selection.selected;
-    setTimeout(() => {
-      if (this.utilities.print('printSection')) {
-        this.printableData = null;
-      }
-    }, 1000);
-  }
-
   /*
     Esta funcion se encarga de refrescar la tabla cuando el contenido cambia.
     TODO: mejorar esta funcion usando this.dataSource y no el filtro

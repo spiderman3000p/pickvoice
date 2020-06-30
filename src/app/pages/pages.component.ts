@@ -124,13 +124,6 @@ export class PagesComponent implements OnInit, OnDestroy  {
               target: '_self',
               children: []
             },
-            /*{
-              text: 'Template Designer',
-              icon: 'home',
-              route: '/pages/edit-templates',
-              target: '_blank',
-              children: []
-            },*/
             {
               text: 'Template Designer',
               icon: 'home',
@@ -142,6 +135,27 @@ export class PagesComponent implements OnInit, OnDestroy  {
               text: 'Task Types',
               icon: '',
               route: '/pages/' + IMPORTING_TYPES.TASK_TYPES,
+              target: '_self',
+              children: []
+            },
+            {
+              text: 'Plants',
+              icon: '',
+              route: '/pages/plants',
+              target: '_self',
+              children: []
+            },
+            {
+              text: 'Depots',
+              icon: '',
+              route: '/pages/depots',
+              target: '_self',
+              children: []
+            },
+            {
+              text: 'Owners',
+              icon: '',
+              route: '/pages/owners',
               target: '_self',
               children: []
             }
@@ -209,27 +223,6 @@ export class PagesComponent implements OnInit, OnDestroy  {
           text: 'Inventory',
           icon: '',
           route: '/pages/inventory',
-          target: '_self',
-          children: []
-        },
-        {
-          text: 'Plants',
-          icon: '',
-          route: '/pages/plants',
-          target: '_self',
-          children: []
-        },
-        {
-          text: 'Depots',
-          icon: '',
-          route: '/pages/depots',
-          target: '_self',
-          children: []
-        },
-        {
-          text: 'Owners',
-          icon: '',
-          route: '/pages/owners',
           target: '_self',
           children: []
         }

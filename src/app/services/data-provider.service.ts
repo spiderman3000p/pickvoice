@@ -5,6 +5,7 @@ import { Transport, Location, Item, UomService, SectionService, OrderService, Or
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
          DockService, UserService, ItemUomService, QualityStates, QualityStateService, StoreService,
          QualityStateTypeService, TaskTypeService, PlantService, OwnerService, DepotService,
+         LabelTemplateService, LabelTypeService, LabelTemplate, Lpn
        } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { AuthService } from './auth.service';
@@ -30,7 +31,8 @@ export class DataProviderService {
     private taskTypeService: TaskTypeService, private authService: AuthService,
     private qualityStateTypeService: QualityStateTypeService, private plantService: PlantService,
     private ownerService: OwnerService, private depotService: DepotService,
-    private storeService: StoreService) {
+    private storeService: StoreService, private labelTemplateService: LabelTemplateService,
+    private labelTypeTemplateService: LabelTypeService) {
   }
 
   createObject(type: string, toUpload: any, observe: string = 'body', reportProgress: boolean = false) {
@@ -485,12 +487,7 @@ export class DataProviderService {
   }
 
   public getPlant(id: number, observe: any = 'body', reportProgress = false) {
-    const owner = this.authService.getOwnerId();
-    if (owner !== null) {
-      // TODO: agregar metodo getPlant
-      // return this.plantService.retrievePlant(id, owner, observe, reportProgress);
-    }
-    return of(false);
+    return this.plantService.retrievePlantById(id, observe, reportProgress).pipe(retry(3));
   }
   /**********************************************************************************
     Grupo de metodos para depots
@@ -513,12 +510,7 @@ export class DataProviderService {
   }
 
   public getDepot(id: number, observe: any = 'body', reportProgress = false) {
-    const owner = this.authService.getOwnerId();
-    if (owner !== null) {
-      // TODO: agregar metodo getPlant
-      // return this.plantService.retrievePlant(id, owner, observe, reportProgress);
-    }
-    return of(false);
+    return this.depotService.retrieveDepotById(id, observe, reportProgress);
   }
   /**********************************************************************************
     Grupo de metodos para owners
@@ -541,12 +533,7 @@ export class DataProviderService {
   }
 
   public getOwner(id: number, observe: any = 'body', reportProgress = false) {
-    const owner = this.authService.getOwnerId();
-    if (owner !== null) {
-      // TODO: agregar metodo getPlant
-      // return this.ownerService.retrieveOwner(id, owner, observe, reportProgress);
-    }
-    return of(false);
+    return this.ownerService.retrieveOwnerById(id, observe, reportProgress);
   }
   /**********************************************************************************
     Grupo de metodos para items
@@ -647,12 +634,24 @@ export class DataProviderService {
    *********************************************************************************/
   public getLpn(id: number, params = 'startRow=0;endRow=1', observe: any = 'body', reportProgress = false): Observable<any> {
     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemVO2/all;` + params +
-    `;lpnItemId-filterType=number;lpnItemId-type=equals;lpnItemId-filter=${id}`);
+    `;lpnItemId-filterType=number;lpnItemId-type=equals;lpnItemId-filter=${id}`).pipe(retry(3));
+  }
+
+  public getLpn3(id: number, params = 'startRow=0;endRow=1', observe: any = 'body', reportProgress = false): Observable<any> {
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnVO3/all;` + params +
+    `;lpnId-filterType=number;lpnId-type=equals;lpnId-filter=${id}`).pipe(retry(3));
   }
 
   public getAllLpns(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false): Observable<any[]> {
-      // return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnsVO1`);
-      return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnVO1/all;` + params);
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnVO1/all;` + params).pipe(retry(3));
+  }
+
+  public getAllLpnTypes(): Observable<any[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Lpn.LpnTypeEnum)));
+  }
+
+  public getAllLpnStates(): Observable<any[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Lpn.LpnStateEnum)));
   }
 
   public deleteLpn(id: number, observe: any = 'body', reportProgress = false) {
@@ -664,6 +663,11 @@ export class DataProviderService {
   }
 
   public createLpns(data: any, observe: any = 'body', reportProgress = false) {
+    return this.httpClient.post(environment.apiBaseUrl +
+      `/storage/lpn/generate?lpnType=${data.type}&count=${data.qty}`, data).pipe(retry(3));
+  }
+
+  public createLpn(data: any, observe: any = 'body', reportProgress = false) {
     return this.uomService.createUom(data, observe, reportProgress);
   }
   /*********************************************************************************
@@ -743,6 +747,7 @@ export class DataProviderService {
   }
 
   public createQualityState(data: any, observe: any = 'body', reportProgress = false) {
+    data.ownerId = this.authService.getOwnerId();
     return this.qualityStateService.createQualityState(data, observe, reportProgress);
   }
 
@@ -967,16 +972,20 @@ export class DataProviderService {
 
   public updateCustomer(data: any, id: number, observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
-    if (owner !== null) {
+    const city = this.authService.getCityId();
+    if (owner !== null && city !== null) {
       data.ownerId = owner;
+      data.cityId = city;
     }
     return this.customerService.updateCustomer(data, id, observe, reportProgress);
   }
 
   public createCustomer(data: any, observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
-    if (owner !== null) {
+    const city = this.authService.getCityId();
+    if (owner !== null && city !== null) {
       data.ownerId = owner;
+      data.cityId = city;
     }
     return this.customerService.createCustomer(data, observe, reportProgress);
   }
@@ -1239,10 +1248,27 @@ export class DataProviderService {
   }
 
   public createTaskType(data: any, observe: any = 'body', reportProgress = false) {
-    return this.taskTypeService.createTaskType(data, observe, reportProgress);
+    return this.taskTypeService.createTaskType(data, observe, reportProgress).pipe(retry(3));
   }
 
   public getTaskType(id: number, observe: any = 'body', reportProgress = false) {
-    return this.taskTypeService.retrieveTaskTypeById(id, observe, reportProgress);
+    return this.taskTypeService.retrieveTaskTypeById(id, observe, reportProgress).pipe(retry(3));
   }
+  /* templates endpoints */
+  public getAllTemplates(observe: any = 'body', reportProgress = false) {
+    const ownerId = this.authService.getOwnerId();
+    const depotId = this.authService.getDepotId();
+    return this.labelTemplateService.retrieveAllLabelTemplate(ownerId, depotId, observe, reportProgress)
+    .pipe(retry(3));
+  }
+
+  public getAllTemplateTypes(observe: any = 'body', reportProgress = false) {
+    return this.labelTypeTemplateService.retrieveAllILabelType(observe, reportProgress).pipe(retry(3));
+  }
+
+  public saveTemplate(data: LabelTemplate, observe: any = 'body', reportProgress = false) {
+    return this.labelTemplateService.createLabelTemplate(data, observe, reportProgress)
+    .pipe(retry(3));
+  }
+  /* end templates endpoints*/
 }

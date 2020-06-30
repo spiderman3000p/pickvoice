@@ -382,7 +382,7 @@ export class DocksComponent implements OnInit, AfterViewInit, OnDestroy {
     this.utilities.dataTypesModelMaps.docks);
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
-        map: this.definitions,
+        map: this.utilities.dataTypesModelMaps.docks,
         type: IMPORTING_TYPES.DOCKS,
         remoteSync: true, // para mandar los datos a la BD por la API
         title: 'Add New Dock'
