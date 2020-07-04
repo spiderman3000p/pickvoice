@@ -1,0 +1,281 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Add Transport</h1>
+              </div>
+          </div>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Basic details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.transportNumber.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="transportNumber" min="0">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.transportNumber.formControl.helpText &&
+                                definitions.transportNumber.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.transportNumber.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.route.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="route">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.route.formControl.helpText &&
+                                definitions.route.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.route.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.nameRoute.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="nameRoute">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.nameRoute.formControl.helpText &&
+                                definitions.nameRoute.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.nameRoute.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.carrierCode.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="carrierCode">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.carrierCode.formControl.helpText &&
+                                definitions.carrierCode.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.carrierCode.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.vehicle.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="vehicle">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.vehicle.formControl.helpText &&
+                                definitions.vehicle.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.vehicle.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.containerNumber.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="containerNumber">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.containerNumber.formControl.helpText &&
+                                definitions.containerNumber.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.containerNumber.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.weight.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="weight" min="0" max="100">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.weight.formControl.helpText &&
+                                definitions.weight.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.weight.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.trailer.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="trailer">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.trailer.formControl.helpText &&
+                                definitions.trailer.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.trailer.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.description.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="description">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.description.formControl.helpText &&
+                                definitions.description.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.description.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.transportationStatus.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="transportationStatus">
+                                        <option [value]="option" *ngFor="let option of selectsData.states | async">
+                                            {{option}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.transportationStatus.formControl.helpText &&
+                                definitions.transportationStatus.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.transportationStatus.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.uomWeightId.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="uomWeightId">
+                                        <option [value]="option.id" *ngFor="let option of selectsData.uoms | async">
+                                            {{option.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.uomWeightId.formControl.helpText &&
+                                definitions.uomWeightId.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.uomWeightId.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.uomVolumeId.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="uomVolumeId">
+                                        <option [value]="option.id" *ngFor="let option of selectsData.uoms | async">
+                                            {{option.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.uomVolumeId.formControl.helpText &&
+                                definitions.uomVolumeId.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.uomVolumeId.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Dates</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.shipmentDate.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="shipmentDate">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.shipmentDate.formControl.helpText &&
+                                definitions.shipmentDate.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.shipmentDate.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.plannedCheckin.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="plannedCheckin">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.plannedCheckin.formControl.helpText &&
+                                definitions.plannedCheckin.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.plannedCheckin.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.actualCheckin.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="actualCheckin">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.actualCheckin.formControl.helpText &&
+                                definitions.actualCheckin.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.actualCheckin.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.plannedStartLoading.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="plannedStartLoading">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.plannedStartLoading.formControl.helpText &&
+                                definitions.plannedStartLoading.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.plannedStartLoading.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.currentStartLoading.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="currentStartLoading">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.currentStartLoading.formControl.helpText &&
+                                definitions.currentStartLoading.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.currentStartLoading.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.plannedEndLoading.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="plannedEndLoading">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.plannedEndLoading.formControl.helpText &&
+                                definitions.plannedEndLoading.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.plannedEndLoading.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.actualEndLoading.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="actualEndLoading">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.actualEndLoading.formControl.helpText &&
+                                definitions.actualEndLoading.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.actualEndLoading.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.plannedShipmentCompletion.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="plannedShipmentCompletion">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.plannedShipmentCompletion.formControl.helpText &&
+                                definitions.plannedShipmentCompletion.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.plannedShipmentCompletion.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.currentShipmentCompletion.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="currentShipmentCompletion">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.currentShipmentCompletion.formControl.helpText &&
+                                definitions.currentShipmentCompletion.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.currentShipmentCompletion.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

@@ -3,7 +3,9 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ItemsComponent } from './items.component';
 import { EditItemComponent } from '../edit-item/edit-item.component';
+import { AddItemComponent } from '../add-item/add-item.component';
 import { ItemsResolverService } from './items-resolver.service';
+import { AddItemResolverService } from '../add-item/add-item-resolver.service';
 import { NotFoundComponent } from '../not-found/not-found.component';
 import { IMPORTING_TYPES } from '../../models/model-maps.model';
 
@@ -28,6 +30,13 @@ const routes: Routes = [
         data: {
             viewMode: 'view',
             type: IMPORTING_TYPES.ITEMS
+        }
+    },
+    {
+        path: 'add',
+        component: AddItemComponent,
+        resolve: {
+            data: AddItemResolverService
         }
     },
     {

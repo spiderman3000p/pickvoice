@@ -12,11 +12,12 @@ import { PrintLabelDialogComponent } from '../../components/print-label-dialog/p
 import {
           GenerateLpnIntervalDialogComponent
        } from '../../components/generate-lpn-interval-dialog/generate-lpn-interval-dialog.component';
+import { Lpn } from '@pickvoice/pickvoice-api';
 
 import { ModelMap, IMPORTING_TYPES, STATES } from '../../models/model-maps.model';
 
 import { FormGroup, FormControl } from '@angular/forms';
-import { Subject, merge, Subscription, Observable, Observer } from 'rxjs';
+import { of, Subject, merge, Subscription, Observable, Observer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, take, tap  } from 'rxjs/operators';
 
 import { Router } from '@angular/router';
@@ -35,6 +36,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   type = IMPORTING_TYPES.LPN_LIST;
   subscriptions: Subscription[] = [];
   selectedLpns: any;
+  lpnToPrint: any;
   selectedNodes = [];
   nodes = [];
   length = 100;
@@ -49,6 +51,11 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   options: any = {
     useCheckbox: true,
     getChildren: this.getChildren.bind(this)
+  };
+  selectsData = {
+    types: of([]),
+    states: of([]),
+    interfaces: of([])
   };
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   constructor(private dataProviderService: DataProviderService, private router: Router,
@@ -69,6 +76,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.paginator.pageIndex = 0;
     this.paginator.pageSize = 10;
+    this.loadSelectsData();
     this.loadData();
   }
 
@@ -105,27 +113,33 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   viewLpnsDetail(lpns: any) {
     this.utilities.log('data: ', lpns);
     this.selectedLpns = {};
-    if (lpns.id && lpns.id.includes('IT')) {
+    if (this.isItem(lpns)) {
+      this.utilities.log('lpn is item');
       this.isLoadingLpnsDetail = true;
-      const id = lpns.id.replace('IT', '');
-      this.dataProviderService.getLpn(id).subscribe(result => {
+      const id = this.getIdFromNode(lpns);
+      this.utilities.log('lpn id: ', id);
+      this.dataProviderService.getLpnItemVO2(id).subscribe(result => {
         this.isLoadingLpnsDetail = false;
         this.utilities.log('lpns details: ', result);
         if (result && result.content && result.content.length > 0 && result.content[0].lpnItemId) {
           this.selectedLpns = result.content[0];
+          this.lpnToPrint = this.selectedLpns;
         }
       }, error => {
         this.isLoadingLpnsDetail = false;
         this.utilities.error('Error al cargar detalles: ', error);
       });
-    } else if (lpns.id) {
+    } else if (this.isRoot(lpns)) {
+      this.utilities.log('lpn is root');
       this.isLoadingLpnsDetail = true;
-      const id = lpns.id.replace('Carton', '');
-      this.dataProviderService.getLpn3(id).subscribe(result => {
+      const id = this.getIdFromNode(lpns);
+      this.utilities.log('lpn id: ', id);
+      this.dataProviderService.getLpn(id).subscribe(result => {
         this.isLoadingLpnsDetail = false;
         this.utilities.log('lpns details: ', result);
         if (result && result.content && result.content.length > 0 && result.content[0].lpnId) {
           this.selectedLpns = result.content[0];
+          this.lpnToPrint = this.selectedLpns;
         }
       }, error => {
         this.isLoadingLpnsDetail = false;
@@ -140,9 +154,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyFilters() {
-    const formValues = this.filtersForm.value;
-    const filters = this.filters.filter(filter => filter.show &&
-                    formValues[filter.key] && formValues[filter.key].length > 0);
+    this.loadData();
   }
 
   editRowOnPage(element: any) {
@@ -177,7 +189,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.utilities.log('action: ', action);
     this.utilities.log('lapn: ', lpn);
     switch (action) {
-      case 'print': this.printLpn(lpn); break;
+      case 'print': this.print(lpn); break;
       case 'details': this.viewLpnsDetail(lpn); break;
       default: this.utilities.log('Accion no definida');
     }
@@ -191,11 +203,11 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     const spanAux = document.createElement('span');
     this.utilities.log('gerating html to lpn:', lpn);
     // sustituir valores segun el mapa
-    if (lpn.lpnId) { // si es lpn padre
-      objectMap = ModelMap.LpnItemVO2Map;
+    if (lpn.code) { // si es lpn padre
+      objectMap = ModelMap.LpnVO3Map;
       barcode = this.utilities.generateBarCode(lpn.code);
-    } else if (lpn.lpnItemId) { // si es lpn hijo
-      objectMap = ModelMap.LpnItemVO3Map;
+    } else if (lpn.sku) { // si es lpn hijo
+      objectMap = ModelMap.LpnItemVO2Map;
       barcode = this.utilities.generateBarCode(lpn.sku);
     }
     this.utilities.log('model map to use for print:', objectMap);
@@ -226,56 +238,87 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     return htmlWrapper.innerHTML;
   }
 
-  printLpn(selectedLpn: any) {
-    let idSelectedLpn;
-    let lpnToPrint;
-    if (selectedLpn.id && selectedLpn.id.includes('IT')) {
-      idSelectedLpn = Number(selectedLpn.id.replace('IT', ''));
-      this.dataProviderService.getLpn(idSelectedLpn).subscribe(result => {
-        if (result.content) {
-          lpnToPrint = result.content[0];
-        } else {
-          lpnToPrint = result;
-        }
-        this.utilities.log('lpn obtenido del api: ', lpnToPrint);
-      });
-    } else if (selectedLpn.id && selectedLpn.id.includes('Carton')) {
-      idSelectedLpn = Number(selectedLpn.id.replace('Carton', ''));
-      this.dataProviderService.getLpn3(idSelectedLpn).subscribe(result => {
-        if (result.content) {
-          lpnToPrint = result.content[0];
-        } else {
-          lpnToPrint = result;
-        }
-        this.utilities.log('lpn obtenido del api: ', lpnToPrint);
-      });
-    }
-    const dialogRef = this.dialog.open(PrintLabelDialogComponent);
-    dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      this.utilities.log('lpnToPrint: ', lpnToPrint);
-      if (result && lpnToPrint) {
-        const jsonTemplate = JSON.parse(result.template.jsonTemplate);
-        const htmlContent = this.generateHtmlContent(lpnToPrint, jsonTemplate['gjs-html']);
-        const cssStyles = jsonTemplate['gjs-css'];
-        const idLpnToPrint = lpnToPrint.lpnId ? lpnToPrint.lpnId : (lpnToPrint.id ? lpnToPrint.id : '');
-        const size = result.size;
-        this.utilities.log('html to print:', htmlContent);
-        this.utilities.log('css to print:', cssStyles);
-        this.utilities.print(`Label LPN ${idLpnToPrint}`, htmlContent, cssStyles,
-        size.width, size.heigth);
-      } else if (!result) {
-        this.utilities.error('Error con los valores seleccionados para imprimir, puede' +
-        ' que no se hayan seleccionado valores validos');
-      } else if (!lpnToPrint) {
-        this.utilities.error('Error con el valor del lpn a imprimir, puede' +
-        ' que no se haya obtenido resultado del api');
-        this.utilities.showSnackBar('Error fetching lpn values', 'OK');
-      }
-    }, error => {
-      this.utilities.error('error after closing print label dialog');
-      this.utilities.showSnackBar('Error after closing print label dialog', 'OK');
+  isItem(lpn: any): boolean {
+    const exist = Object.keys(Lpn.LpnStateEnum).findIndex(type => {
+      return lpn.id.includes(type);
     });
+    return exist > -1;
+  }
+
+  isRoot(lpn: any): boolean {
+    const exist = Object.keys(Lpn.LpnTypeEnum).findIndex(type => {
+      return lpn.id.includes(type);
+    });
+    return !this.isItem(lpn) && exist > -1;
+  }
+
+  getIdFromNode(lpn: any): number {
+    let id;
+    this.utilities.log('getIdFromNode: ', lpn);
+    id = lpn.id.replace(/\D/g, '');
+    this.utilities.log('getIdFromNode id obtained: ', id);
+    return Number(id);
+  }
+
+  print(node: any) {
+    const idSelectedLpn = this.getIdFromNode(node);
+    const observer = {
+      next: (result) => {
+        if (result.content) {
+          this.lpnToPrint = result.content[0];
+        } else {
+          this.lpnToPrint = result;
+        }
+        this.utilities.log('lpn obtenido del api: ', this.lpnToPrint);
+      },
+      error: (error) => {
+        this.utilities.error('Error al obtener lpn del api: ', error);
+      },
+      complete: () => {
+
+      }
+    } as Observer<any>;
+    if (this.isItem(node)) {
+      this.dataProviderService.getLpnItemVO2(idSelectedLpn).subscribe(observer);
+    } else if (this.isRoot(node)) {
+      this.dataProviderService.getLpn(idSelectedLpn).subscribe(observer);
+    }
+    this.openPrintDialog();
+  }
+
+  openPrintDialog() {
+    this.utilities.log('openPrintDialog() selectedLpn: ', this.lpnToPrint);
+    const observer = {
+      next: (result) => {
+        this.utilities.log('dialog result:', result);
+        this.utilities.log('this.lpnToPrint: ', this.lpnToPrint);
+        if (result && this.lpnToPrint) {
+          const jsonTemplate = JSON.parse(result.template.jsonTemplate);
+          const htmlContent = this.generateHtmlContent(this.lpnToPrint, jsonTemplate['gjs-html']);
+          const cssStyles = jsonTemplate['gjs-css'];
+          const idLpnToPrint = this.lpnToPrint.lpnId ? this.lpnToPrint.lpnId :
+          (this.lpnToPrint.lpnItemId ? this.lpnToPrint.lpnItemId : '');
+          const size = result.size;
+          this.utilities.log('html to print:', htmlContent);
+          this.utilities.log('css to print:', cssStyles);
+          this.utilities.print(`Label LPN ${idLpnToPrint}`, htmlContent, cssStyles,
+          size.width, size.heigth);
+        } else if (!result) {
+          this.utilities.error('Error con los valores seleccionados para imprimir, puede' +
+          ' que no se hayan seleccionado valores validos');
+        } else if (!this.lpnToPrint) {
+          this.utilities.error('Error con el valor del lpn a imprimir, puede' +
+          ' que no se haya obtenido resultado del api');
+          this.utilities.showSnackBar('Error fetching lpn values', 'OK');
+        }
+      },
+      error: (error) => {
+        this.utilities.error('error after closing print label dialog');
+        this.utilities.showSnackBar('Error after closing print label dialog', 'OK');
+      }
+    } as Observer<any>;
+    const dialogRef = this.dialog.open(PrintLabelDialogComponent);
+    dialogRef.afterClosed().subscribe(observer);
   }
 
   getFilterParams(): string {
@@ -369,23 +412,31 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     return newData;
   }
 
+  loadSelectsData() {
+    this.selectsData.types = this.dataProviderService.getAllLpnTypes();
+    this.selectsData.states = this.dataProviderService.getAllLpnStates();
+    this.selectsData.interfaces = this.dataProviderService.getAllLpnInterfaces();
+  }
+
   loadData(useCache = true) {
     this.utilities.log('requesting Lpns');
     this.isLoadingResults = true;
     this.dataSource.loadingSubject.next(true);
-    let newData;
+    let newData = [];
     let results = [];
     this.selectedLpns = {};
     this.subscriptions.push(this.dataProviderService.getAllLpns().subscribe((res: any) => {
       this.isLoadingResults = false;
       this.dataSource.loadingSubject.next(false);
       // this.utilities.log('lpns received', results);
-      if (res && res.content && res.content.length > 0) {
-        results = res.content;
-      } else if (res) {
-        results = res;
+      if (res) {
+        if (res.content && res.content) {
+          results = res.content;
+        } else {
+          results = res;
+        }
+        newData = this.generateNodes(results);
       }
-      newData = this.generateNodes(results);
       // this.utilities.log('newData: ', newData);
       // this.nodes = newData;
       this.dataSource.localData = newData;

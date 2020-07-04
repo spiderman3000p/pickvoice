@@ -116,8 +116,10 @@ export const STATES = {
     AC: 'ACTIVATED',
     WP: 'IN PROGRESS',
     CP: 'COMPLETED',
+
     OI: 'Open Interface',
     CI: 'Close Interface',
+
     PG: 'Pre-Generado',
     RR: 'Reside en recepcion',
     RQ: 'Reside en cuarentena',
@@ -159,6 +161,7 @@ export class ModelMap {
             type: 'string',
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -168,6 +171,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -177,6 +181,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -186,6 +191,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -195,8 +201,9 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
-                type: 'text'
+                type: 'email'
             }
         },
         phone1: {
@@ -204,6 +211,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -213,6 +221,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -226,6 +235,7 @@ export class ModelMap {
             type: 'string',
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -235,6 +245,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -248,6 +259,7 @@ export class ModelMap {
             type: 'string',
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -257,6 +269,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -266,6 +279,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -275,6 +289,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -284,8 +299,9 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
-                type: 'text'
+                type: 'email'
             }
         },
         ean13: {
@@ -293,6 +309,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -302,6 +319,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -311,6 +329,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -320,6 +339,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -333,6 +353,7 @@ export class ModelMap {
             type: 'string',
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -342,6 +363,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -351,6 +373,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -360,6 +383,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -369,8 +393,9 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
-                type: 'text'
+                type: 'email'
             }
         },
         ean13: {
@@ -378,6 +403,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -387,6 +413,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -396,6 +423,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -405,6 +433,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.CUSTOMERS_LIST,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'customerId',
@@ -422,6 +451,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -431,6 +461,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -440,6 +471,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -452,6 +484,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -461,6 +494,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.LPN_TYPE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -475,6 +509,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.LPN_STATE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -489,6 +524,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.LPN_INTERFACE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -503,6 +539,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.LPN_LOCATION,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -517,6 +554,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.LPN_LOCATION,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -527,13 +565,14 @@ export class ModelMap {
             }
         }
     };
-    /* lpnitemvo2 object map for CRUD */
-    public static LpnItemVO2Map = {
+    /* lpnVO3 object map for CRUD */
+    public static LpnVO3Map = {
         activationDate: {
             name: 'activation date',
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'text'
             }
@@ -543,6 +582,7 @@ export class ModelMap {
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'text'
             }
@@ -552,6 +592,7 @@ export class ModelMap {
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'text'
             }
@@ -561,6 +602,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -570,6 +612,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -579,6 +622,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -588,6 +632,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -597,6 +642,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.LPN_STATE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -611,6 +657,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.LPN_INTERFACE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -625,6 +672,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.LPN_TYPE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -639,6 +687,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -648,6 +697,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -657,6 +707,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -666,6 +717,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -675,18 +727,20 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
         }
     };
-    /* lpnitemvo3 object map for CRUD */
-    public static LpnItemVO3Map = {
+    /* lpnItemVO2 object map for CRUD */
+    public static LpnItemVO2Map = {
         createDate: {
             name: 'create date',
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'text'
             }
@@ -696,6 +750,7 @@ export class ModelMap {
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'text'
             }
@@ -705,6 +760,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -714,6 +770,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -723,6 +780,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -732,6 +790,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -741,6 +800,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -750,6 +810,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -759,6 +820,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -768,15 +830,17 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
         skuDescription: {
-            name: 'serial',
+            name: 'sku description',
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -786,6 +850,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -798,6 +863,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -807,6 +873,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -816,6 +883,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -825,6 +893,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -834,6 +903,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -843,6 +913,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -855,6 +926,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -864,6 +936,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -873,6 +946,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -882,6 +956,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -891,6 +966,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -900,6 +976,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -909,6 +986,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -918,6 +996,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -927,6 +1006,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -936,6 +1016,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -945,6 +1026,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -954,6 +1036,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -963,6 +1046,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -972,6 +1056,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -981,6 +1066,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -990,6 +1076,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1001,6 +1088,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1010,6 +1098,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date'
             }
         },
@@ -1018,6 +1107,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date'
             }
         },
@@ -1026,6 +1116,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1035,6 +1126,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1046,6 +1138,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1058,6 +1151,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1067,6 +1161,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1076,6 +1171,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1085,6 +1181,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1094,6 +1191,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1103,6 +1201,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1112,6 +1211,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1121,6 +1221,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1130,6 +1231,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1139,6 +1241,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1148,6 +1251,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1160,6 +1264,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1169,6 +1274,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1178,6 +1284,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1187,6 +1294,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1196,6 +1304,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1205,6 +1314,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1214,6 +1324,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1223,6 +1334,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1232,6 +1344,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1241,6 +1354,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1250,6 +1364,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1262,6 +1377,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'Sku de item',
                 control: 'input',
                 type: 'text'
             }
@@ -1271,6 +1387,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'Upc de item',
                 control: 'input',
                 type: 'text'
             }
@@ -1280,6 +1397,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'hola',
                 control: 'textarea',
                 type: 'text'
             }
@@ -1289,6 +1407,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1298,6 +1417,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.ITEM_TYPE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1317,6 +1437,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.QUALITY_STATES,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1336,6 +1457,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1355,6 +1477,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1374,6 +1497,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1393,6 +1517,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1412,6 +1537,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1423,6 +1549,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1432,6 +1559,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1442,6 +1570,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.ITEM_STATE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -1457,6 +1586,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.ITEM_CLASSIFICATIONS,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -1471,6 +1601,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1482,6 +1613,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1493,6 +1625,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1502,6 +1635,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -1510,6 +1644,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -1518,6 +1653,7 @@ export class ModelMap {
             required: true,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -1526,6 +1662,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -1534,6 +1671,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         }
@@ -1545,6 +1683,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1554,6 +1693,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1563,6 +1703,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -1572,6 +1713,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1581,6 +1723,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1590,6 +1733,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1599,6 +1743,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1608,6 +1753,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1617,6 +1763,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1626,6 +1773,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1635,6 +1783,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1644,6 +1793,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1653,6 +1803,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1662,6 +1813,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1671,6 +1823,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1680,6 +1833,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1689,6 +1843,7 @@ export class ModelMap {
             required: true,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'boolean'
             }
@@ -1698,6 +1853,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text'
             }
@@ -1707,6 +1863,7 @@ export class ModelMap {
             required: true,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text'
             }
@@ -1716,6 +1873,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text'
             }
@@ -1725,6 +1883,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text'
             }
@@ -1734,6 +1893,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text'
             }
@@ -1746,6 +1906,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1755,6 +1916,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1764,6 +1926,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -1776,6 +1939,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1787,6 +1951,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1798,6 +1963,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -1807,6 +1973,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1818,6 +1985,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1829,6 +1997,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1840,6 +2009,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -1851,6 +2021,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1860,6 +2031,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1879,6 +2051,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1898,6 +2071,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1917,6 +2091,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -1936,6 +2111,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.ITEMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'itemId',
@@ -1958,6 +2134,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1967,6 +2144,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1976,6 +2154,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -1985,6 +2164,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.QUALITY_STATE_TYPES,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 displayIndex: 'name',
@@ -1999,6 +2179,7 @@ export class ModelMap {
             required: true,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         }
@@ -2010,6 +2191,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2019,6 +2201,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2031,6 +2214,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2040,6 +2224,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2052,6 +2237,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2061,6 +2247,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2070,6 +2257,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -2082,6 +2270,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2091,6 +2280,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -2100,6 +2290,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.SECTIONS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -2119,6 +2310,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2128,6 +2320,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2137,15 +2330,17 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
         depth: {
-            name: 'deep',
+            name: 'depth',
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2156,6 +2351,7 @@ export class ModelMap {
             unique: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 1,
@@ -2170,6 +2366,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.LOCATION_TYPE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -2185,6 +2382,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.OPERATION_TYPE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -2200,6 +2398,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.RACK_TYPE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -2214,6 +2413,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 1,
@@ -2225,6 +2425,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -2236,6 +2437,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -2247,6 +2449,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -2257,6 +2460,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.LOCATION_STATE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -2271,6 +2475,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -2279,6 +2484,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         }
@@ -2290,6 +2496,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2299,6 +2506,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2308,6 +2516,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2317,6 +2526,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -2326,6 +2536,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2335,6 +2546,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2344,6 +2556,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2353,6 +2566,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2362,6 +2576,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2371,6 +2586,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2380,6 +2596,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2389,6 +2606,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2398,6 +2616,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2405,32 +2624,35 @@ export class ModelMap {
     };
     /* order object map for CRUD */
     public static OrderMap = {
-        orderNumber:  {
+        orderNumber: {
             name: 'order number',
             required: true,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        purchaseNumber:  {
+        purchaseNumber: {
             name: 'purchase number',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
         },
-        invoiceNumber:  {
+        invoiceNumber: {
             name: 'invoice number',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -2440,6 +2662,7 @@ export class ModelMap {
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2449,6 +2672,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2458,6 +2682,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.ORDER_TYPE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -2472,24 +2697,26 @@ export class ModelMap {
                 modelType: IMPORTING_TYPES.ORDER_TYPE
             }
         },
-        priority:  {
+        priority: {
             name: 'priority',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
                 max: 100
             }
         },
-        note:  {
+        note: {
             name: 'note',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea'
             }
         },
@@ -2498,6 +2725,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.TRANSPORTS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'transportId',
@@ -2517,6 +2745,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.CUSTOMERS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'customerId',
@@ -2536,6 +2765,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.ORDER_LINE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'table',
                 type: 'normal'
             },
@@ -2548,32 +2778,35 @@ export class ModelMap {
     };
     /* order object map for LIST */
     public static OrderListMap = {
-        orderNumber:  {
+        orderNumber: {
             name: 'order number',
             required: true,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        orderPurchaseNumber:  {
+        orderPurchaseNumber: {
             name: 'purchase number',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
         },
-        orderInvoiceNumber:  {
+        orderInvoiceNumber: {
             name: 'invoice number',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -2583,6 +2816,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2592,85 +2826,94 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
         },
-        orderPriority:  {
+        orderPriority: {
             name: 'priority',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
         },
-        orderNote:  {
+        orderNote: {
             name: 'note',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea'
             }
         },
-        customerCode:  {
+        customerCode: {
             name: 'customer code',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        customerName:  {
+        customerName: {
             name: 'customer name',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        customerPhone:  {
+        customerPhone: {
             name: 'customer phone',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
         },
-        customerCityCode:  {
+        customerCityCode: {
             name: 'customer city code',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        customerCityName:  {
+        customerCityName: {
             name: 'customer city name',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        customerAddress:  {
+        customerAddress: {
             name: 'customer address',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2683,6 +2926,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2692,6 +2936,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -2704,6 +2949,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -2713,6 +2959,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2722,6 +2969,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2731,6 +2979,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2740,6 +2989,7 @@ export class ModelMap {
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2750,6 +3000,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.TRANSPORT_STATE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -2764,6 +3015,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2773,6 +3025,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2782,6 +3035,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -2793,6 +3047,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2802,6 +3057,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -2816,6 +3072,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -2830,6 +3087,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -2839,6 +3097,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2848,6 +3107,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2857,6 +3117,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2866,6 +3127,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2875,6 +3137,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2884,6 +3147,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2893,6 +3157,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2902,6 +3167,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2914,6 +3180,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -2923,6 +3190,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2932,6 +3200,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2941,6 +3210,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -2950,6 +3220,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -2959,6 +3230,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2968,6 +3240,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -2979,6 +3252,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2988,6 +3262,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -2997,6 +3272,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3006,6 +3282,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -3015,6 +3292,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -3027,6 +3305,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.TRANSPORT_STATE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -3039,12 +3318,13 @@ export class ModelMap {
     };
     /* order line object map for CRUD */
     public static OrderLineMap = {
-        itemId:  {
+        itemId: {
             name: 'item',
             required: true,
             unique: true,
             type: IMPORTING_TYPES.ITEMS_LIST,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: 'itemId',
@@ -3059,12 +3339,13 @@ export class ModelMap {
                 modelType: IMPORTING_TYPES.ITEMS
             }
         },
-        qtyRequired:  {
+        qtyRequired: {
             name: 'qty required',
             required: true,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -3076,6 +3357,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -3085,6 +3367,7 @@ export class ModelMap {
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3094,6 +3377,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3103,16 +3387,18 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        qualityState:  {
+        qualityState: {
             name: 'quality state',
             required: true,
             unique: false,
             type: IMPORTING_TYPES.QUALITY_STATES,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -3162,6 +3448,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.DOCKS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -3181,6 +3468,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -3191,6 +3479,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.PICK_STATE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -3205,6 +3494,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 max: 100,
@@ -3217,6 +3507,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3226,6 +3517,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3238,6 +3530,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3247,6 +3540,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3256,6 +3550,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3265,6 +3560,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3274,6 +3570,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3283,6 +3580,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -3295,6 +3593,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3307,6 +3606,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -3316,6 +3616,7 @@ export class ModelMap {
             required: true,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3325,6 +3626,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3334,6 +3636,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3343,6 +3646,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -3354,6 +3658,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -3363,6 +3668,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -3374,6 +3680,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3383,6 +3690,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
             }
@@ -3392,6 +3700,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
             }
@@ -3402,6 +3711,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.TASK_STATE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -3416,6 +3726,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.USERS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -3435,6 +3746,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.TASK_TYPES,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'number',
                 valueIndex: 'id',
@@ -3457,6 +3769,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -3466,6 +3779,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3475,6 +3789,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3484,6 +3799,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3493,6 +3809,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3502,6 +3819,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3511,6 +3829,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3520,6 +3839,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3529,6 +3849,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3538,6 +3859,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3547,6 +3869,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3556,6 +3879,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3565,6 +3889,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3574,6 +3899,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3583,6 +3909,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3592,6 +3919,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3601,6 +3929,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3610,6 +3939,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -3625,6 +3955,7 @@ export class ModelMap {
             required: true,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -3634,6 +3965,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3643,6 +3975,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -3652,6 +3985,7 @@ export class ModelMap {
             required: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -3661,6 +3995,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3670,6 +4005,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -3679,6 +4015,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text',
             }
@@ -3688,6 +4025,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3697,6 +4035,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text',
             }
@@ -3706,6 +4045,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
             }
@@ -3715,6 +4055,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -3726,6 +4067,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -3735,6 +4077,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -3744,6 +4087,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3753,6 +4097,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3762,6 +4107,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -3771,6 +4117,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3780,6 +4127,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3793,6 +4141,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.DOCK_TYPE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -3807,6 +4156,7 @@ export class ModelMap {
             required: true,
             type: IMPORTING_TYPES.SECTIONS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: 'id',
@@ -3826,6 +4176,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3835,6 +4186,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -3845,6 +4197,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.LOCATION_TYPE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -3860,6 +4213,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.LOCATION_STATE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -3878,6 +4232,7 @@ export class ModelMap {
             type: 'string',
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3887,6 +4242,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3896,6 +4252,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3905,6 +4262,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3914,6 +4272,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3923,6 +4282,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3932,6 +4292,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3942,6 +4303,7 @@ export class ModelMap {
             type: 'string',
             validate: true,
             formControl: {
+helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3952,6 +4314,7 @@ export class ModelMap {
             type: 'string',
             validate: true,
             formControl: {
+helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -3963,144 +4326,158 @@ export class ModelMap {
 
     /* order dto map (for importing proccess) */
     public static LoadOrderDtoMap = {
-        orderNumber:  {
+        orderNumber: {
             name: 'order number',
             required: true,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        purchaseNumber:  {
+        purchaseNumber: {
             name: 'purchase number',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        invoiceNumber:  {
+        invoiceNumber: {
             name: 'invoice number',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        orderDate:  {
+        orderDate: {
             name: 'order date',
             required: false,
             unique: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date'
             }
         },
-        deliveryDate:  {
+        deliveryDate: {
             name: 'delivery date',
             required: false,
             unique: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date'
             }
         },
-        customerNumber:  {
+        customerNumber: {
             name: 'customer number',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        customerName:  {
+        customerName: {
             name: 'customer name',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        customerAddress:  {
+        customerAddress: {
             name: 'customer address',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        orderType:  {
+        orderType: {
             name: 'order type',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        priority:  {
+        priority: {
             name: 'priority',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
                 max: 100
             }
         },
-        note:  {
+        note: {
             name: 'note',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        sku:  {
+        sku: {
             name: 'sku',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        qtyRequired:  {
+        qtyRequired: {
             name: 'qty required',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
                 max: 99999
             }
         },
-        uomCode:  {
+        uomCode: {
             name: 'uom code',
             required: false,
             unique: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: 'code',
@@ -4110,50 +4487,55 @@ export class ModelMap {
                 }
             }
         },
-        batchNumber:  {
+        batchNumber: {
             name: 'batch number',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        createDate:  {
+        createDate: {
             name: 'create date',
             required: false,
             unique: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date'
             }
         },
-        expirateDate:  {
+        expirateDate: {
             name: 'expirate date',
             required: false,
             unique: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date'
             }
         },
-        serial:  {
+        serial: {
             name: 'serial',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        qualityState:  {
+        qualityState: {
             name: 'quality state',
             required: false,
             unique: false,
             type: IMPORTING_TYPES.QUALITY_STATES,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -4172,6 +4554,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4182,6 +4565,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4192,6 +4576,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4202,6 +4587,7 @@ export class ModelMap {
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -4212,6 +4598,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4222,6 +4609,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4232,6 +4620,7 @@ export class ModelMap {
             unique: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date'
             }
         },
@@ -4241,6 +4630,7 @@ export class ModelMap {
             unique: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -4251,6 +4641,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4261,6 +4652,7 @@ export class ModelMap {
             unique: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -4271,6 +4663,7 @@ export class ModelMap {
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -4281,6 +4674,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4291,6 +4685,7 @@ export class ModelMap {
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -4301,6 +4696,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4311,6 +4707,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4321,6 +4718,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4331,6 +4729,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4341,6 +4740,7 @@ export class ModelMap {
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -4351,6 +4751,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -4361,6 +4762,7 @@ export class ModelMap {
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -4371,6 +4773,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4381,6 +4784,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4391,6 +4795,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4401,6 +4806,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4411,6 +4817,7 @@ export class ModelMap {
             unique: false,
             type: 'date',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'date',
                 type: 'date'
             }
@@ -4421,6 +4828,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4431,6 +4839,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4441,6 +4850,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4451,6 +4861,7 @@ export class ModelMap {
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4461,6 +4872,7 @@ export class ModelMap {
             unique: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -4470,48 +4882,53 @@ export class ModelMap {
             unique: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         }
     };
     /* item dto map (for importing process) */
     public static LoadItemDtoMap = {
-        sku:  {
+        sku: {
             name: 'sku',
             required: true,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        upc:  {
+        upc: {
             name: 'upc',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        phonetic:  {
+        phonetic: {
             name: 'phonetic',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
         },
-        description:  {
+        description: {
             name: 'description',
             required: false,
             unique: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -4521,6 +4938,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -4529,6 +4947,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -4537,6 +4956,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -4548,6 +4968,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -4556,6 +4977,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -4564,6 +4986,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -4572,6 +4995,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4581,6 +5005,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4591,6 +5016,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.ITEM_STATE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: null,
@@ -4605,6 +5031,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.ITEM_TYPE,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text',
                 valueIndex: 'code',
@@ -4619,6 +5046,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text',
                 valueIndex: 'code',
@@ -4634,6 +5062,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.ITEM_CLASSIFICATIONS,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -4643,46 +5072,50 @@ export class ModelMap {
                 }
             }
         },
-        cost:  {
+        cost: {
             name: 'cost',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
                 max: 99999
             }
         },
-        tolerance:  {
+        tolerance: {
             name: 'tolerance',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
                 max: 100
             }
         },
-        shelfLife:  {
+        shelfLife: {
             name: 'shelf life',
             required: false,
             unique: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
         },
-        qualityStatesCode:  {
+        qualityStatesCode: {
             name: 'quality state',
             required: false,
             unique: false,
             type: IMPORTING_TYPES.QUALITY_STATES,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text',
                 valueIndex: 'code',
@@ -4700,6 +5133,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -4709,6 +5143,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -4720,6 +5155,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -4729,6 +5165,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -4740,6 +5177,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -4751,6 +5189,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -4762,6 +5201,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4771,6 +5211,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: 'code',
@@ -4790,6 +5231,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.ITEMS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: 'sku',
@@ -4812,6 +5254,7 @@ export class ModelMap {
             required: true,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4821,6 +5264,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'textarea',
                 type: 'text'
             }
@@ -4830,6 +5274,7 @@ export class ModelMap {
             required: false,
             type: IMPORTING_TYPES.SECTIONS,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 valueIndex: 'code',
@@ -4849,6 +5294,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4858,6 +5304,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4867,6 +5314,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4876,6 +5324,7 @@ export class ModelMap {
             required: false,
             type: 'string',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'text'
             }
@@ -4886,6 +5335,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.LOCATION_TYPE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -4901,6 +5351,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.OPERATION_TYPE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -4915,6 +5366,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -4924,6 +5376,7 @@ export class ModelMap {
             type: IMPORTING_TYPES.RACK_TYPE,
             validate: true,
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'select',
                 type: 'text',
                 displayIndex: null,
@@ -4938,6 +5391,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         },
@@ -4946,6 +5400,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -4957,6 +5412,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -4968,6 +5424,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number',
                 min: 0,
@@ -4979,6 +5436,7 @@ export class ModelMap {
             required: false,
             type: 'number',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'input',
                 type: 'number'
             }
@@ -4988,6 +5446,7 @@ export class ModelMap {
             required: false,
             type: 'boolean',
             formControl: {
+                helpText: 'descripcion corta',
                 control: 'toggle'
             }
         }

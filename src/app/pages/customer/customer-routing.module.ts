@@ -3,6 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { CustomerComponent } from './customer.component';
 import { EditCustomerComponent } from '../edit-customer/edit-customer.component';
+import { AddCustomerComponent } from '../add-customer/add-customer.component';
+import { AddCustomerResolverService } from '../add-customer/add-customer-resolver.service';
 import { CustomerResolverService } from './customer-resolver.service';
 import { NotFoundComponent } from '../not-found/not-found.component';
 import { IMPORTING_TYPES } from '../../models/model-maps.model';
@@ -28,6 +30,13 @@ const routes: Routes = [
         data: {
             viewMode: 'view',
             type: IMPORTING_TYPES.CUSTOMERS
+        }
+    },
+    {
+        path: 'add',
+        component: AddCustomerComponent,
+        resolve: {
+            data: AddCustomerResolverService,
         }
     },
     {

@@ -37,19 +37,28 @@
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label>Type</label>
-                                                <input type="text" class="form-control" formControlName="type">
+                                                <select class="form-control" formControlName="type">
+                                                    <option *ngFor="let type of selectsData.types | async"
+                                                    [value]="type">{{type}}</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label>State</label>
-                                                <input type="text" class="form-control" formControlName="state">
+                                                <select class="form-control" formControlName="state">
+                                                    <option *ngFor="let state of selectsData.states | async"
+                                                    [value]="state">{{states[state]}}</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label>Interface</label>
-                                                <input type="text" class="form-control" formControlName="interface">
+                                                <select class="form-control" formControlName="interface">
+                                                    <option *ngFor="let interface of selectsData.interfaces | async"
+                                                    [value]="interface">{{states[interface]}}</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-6">
@@ -133,7 +142,7 @@
                             <mat-icon>more_vert</mat-icon>
                         </div>
                         <mat-menu #menulpnd="matMenu">
-                            <div mat-menu-item (click)="printLpn(selectedLpns)">Print</div>
+                            <div mat-menu-item (click)="openPrintDialog()" *ngIf="selectedLpns.lpnItemId">Print</div>
                             <div mat-menu-item>Realocate</div>
                             <div mat-menu-item>Transfer</div>
                         </mat-menu>
@@ -270,7 +279,7 @@
                                 <strong>State</strong>
                             </div>
                             <div class="col-sm-8">
-                                {{selectedLpns.lpnState}}
+                                {{states[selectedLpns.lpnState]}}
                             </div>
                         </div>
                         <div class="row pt-2 pb-2" *ngIf="selectedLpns.locationType">
@@ -318,7 +327,7 @@
                                 <strong>Interface</strong>
                             </div>
                             <div class="col-sm-8">
-                                {{selectedLpns.lpnInterface}}
+                                {{states[selectedLpns.lpnInterface]}}
                             </div>
                         </div>
                         <!-- fin campos lpn padre -->

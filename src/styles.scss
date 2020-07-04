@@ -21,10 +21,24 @@ body {
   font-size: 12px;
 }
 .form-group{
-  position: relative;
+  /*position: relative;*/
 }
 .form-control{
   font-size: 12px;
+}
+.form-check-input {
+  position: relative;
+  margin-top: unset;
+  margin-left: unset;
+}
+.help-icon {
+    background-image: url(https://cdn1.alegra.com/images/sm-help.png) !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: help;
+    width: 21px;
+    padding: 10px;
+    margin-left: 10px;
 }
 .col-form-label {
   font-size: 12px;
@@ -429,7 +443,7 @@ mat-label{
 }
 
 .example-loading-shade {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   bottom: 0;

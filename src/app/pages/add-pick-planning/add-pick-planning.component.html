@@ -1,0 +1,112 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Add Pick Planning</h1>
+              </div>
+          </div>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Basic details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.description.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="description">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.description.formControl.helpText &&
+                                definitions.description.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.description.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.progress.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="progress" min="0" max="100">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.progress.formControl.helpText &&
+                                definitions.progress.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.progress.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.rootWork.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="rootWork">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.rootWork.formControl.helpText &&
+                                definitions.rootWork.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.rootWork.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Other details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.processDate.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="processDate">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.processDate.formControl.helpText &&
+                                definitions.processDate.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.processDate.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.state.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="state">
+                                        <option [value]="option" *ngFor="let option of selectsData.states | async">
+                                            {{option}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.state.formControl.helpText &&
+                                definitions.state.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.state.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.targetDockId.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="targetDockId">
+                                        <option [value]="option.id" *ngFor="let option of selectsData.docks | async">
+                                            {{option.description}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.targetDockId.formControl.helpText &&
+                                definitions.targetDockId.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.targetDockId.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

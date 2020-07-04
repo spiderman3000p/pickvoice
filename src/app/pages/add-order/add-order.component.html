@@ -1,0 +1,160 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Add Order</h1>
+              </div>
+          </div>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Basic details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.orderNumber.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="orderNumber">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.orderNumber.formControl.helpText &&
+                                definitions.orderNumber.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.orderNumber.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.purchaseNumber.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="purchaseNumber">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.purchaseNumber.formControl.helpText &&
+                                definitions.purchaseNumber.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.purchaseNumber.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.invoiceNumber.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="invoiceNumber">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.invoiceNumber.formControl.helpText &&
+                                definitions.invoiceNumber.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.invoiceNumber.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.priority.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="priority" min="0" max="100">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.priority.formControl.helpText &&
+                                definitions.priority.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.priority.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.note.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="note">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.note.formControl.helpText &&
+                                definitions.note.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.note.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Other details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.orderTypeId.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="orderTypeId">
+                                        <option [value]="option.id" *ngFor="let option of selectsData.orderTypes | async">
+                                            {{option.description}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.orderTypeId.formControl.helpText &&
+                                definitions.orderTypeId.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.orderTypeId.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.transportId.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="transportId">
+                                        <option [value]="option.transportId" *ngFor="let option of selectsData.transports | async">
+                                            {{option.transportNumber}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.transportId.formControl.helpText &&
+                                definitions.transportId.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.transportId.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.customerId.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="customerId">
+                                        <option [value]="option.customerId" *ngFor="let option of selectsData.customers | async">
+                                            {{option.customerName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.customerId.formControl.helpText &&
+                                definitions.customerId.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.customerId.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.orderDate.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="orderDate">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.orderDate.formControl.helpText &&
+                                definitions.orderDate.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.orderDate.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.deliveryDate.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="date" required formControlName="deliveryDate">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.deliveryDate.formControl.helpText &&
+                                definitions.deliveryDate.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.deliveryDate.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

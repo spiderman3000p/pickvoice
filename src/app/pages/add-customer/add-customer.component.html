@@ -1,0 +1,164 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Add Customer</h1>
+              </div>
+          </div>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Basic details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.code.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="code">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.code.formControl.helpText &&
+                                definitions.code.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.code.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.name.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="name">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.name.formControl.helpText &&
+                                definitions.name.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.name.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.contact.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="contact">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.contact.formControl.helpText &&
+                                definitions.contact.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.contact.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.phone.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="phone">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.phone.formControl.helpText &&
+                                definitions.phone.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.phone.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Address details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.address.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="address">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.address.formControl.helpText &&
+                                definitions.address.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.address.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.neighborhood.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="neighborhood">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.neighborhood.formControl.helpText &&
+                                definitions.neighborhood.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.neighborhood.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.postalCode.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="postalCode" min="0">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.postalCode.formControl.helpText &&
+                                definitions.postalCode.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.postalCode.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.longitude.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="longitude">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.longitude.formControl.helpText &&
+                                definitions.longitude.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.longitude.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.latitude.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="latitude">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.latitude.formControl.helpText &&
+                                definitions.latitude.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.latitude.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Other details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.gln.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="gln">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.gln.formControl.helpText &&
+                                definitions.gln.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.gln.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.zone.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="zone">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.zone.formControl.helpText &&
+                                definitions.zone.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.zone.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

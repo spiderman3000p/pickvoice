@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { OrdersComponent } from './orders.component';
-import { EditRowComponent } from '../edit-row/edit-row.component';
+import { AddOrderComponent } from '../add-order/add-order.component';
+import { AddOrderResolverService } from '../add-order/add-order-resolver.service';
 import { EditOrderComponent } from '../edit-order/edit-order.component';
 import { OrdersResolverService } from './orders-resolver.service';
 import { NotFoundComponent } from '../not-found/not-found.component';
@@ -29,6 +30,13 @@ const routes: Routes = [
         data: {
             viewMode: 'view',
             type: IMPORTING_TYPES.ORDERS
+        }
+    },
+    {
+        path: 'add',
+        component: AddOrderComponent,
+        resolve: {
+            data: AddOrderResolverService
         }
     },
     {

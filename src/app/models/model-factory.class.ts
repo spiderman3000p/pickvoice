@@ -139,6 +139,7 @@ export class ModelFactory {
         object.optionalCode = '';
         object.qualityStateTypeId = 0;
         object.state = false;
+        object.qualityStateTypeId = 0;
         return object;
     }
 
@@ -203,6 +204,7 @@ export class ModelFactory {
         object.weight = false;
         object.weightTolerance = 0;
         object.tolerance = 0;
+        object.state = Item.StateEnum.Active;
         return object;
     }
 

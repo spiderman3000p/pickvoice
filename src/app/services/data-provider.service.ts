@@ -246,7 +246,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.ITEM_STATE: {
         this.utilities.log(`obteniendo item states...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Item.StateEnum)));
+        toReturn = this.getAllItemStates();
         break;
       }
       case IMPORTING_TYPES.QUALITY_STATE_TYPES: {
@@ -275,12 +275,12 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.LOCATION_STATE: {
         this.utilities.log(`obteniendo locations states...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Location.LocationStateEnum)));
+        toReturn = this.getAllLocationStates();
         break;
       }
       case IMPORTING_TYPES.OPERATION_TYPE: {
         this.utilities.log(`obteniendo operation types...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Location.OperationTypeEnum)));
+        toReturn = this.getAllLocationOperations();
         break;
       }
       case IMPORTING_TYPES.RACK_TYPE: {
@@ -290,7 +290,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.LOCATION_TYPE: {
         this.utilities.log(`obteniendo locations types...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Location.LocationTypeEnum)));
+        toReturn = this.getAllLocationTypes();
         break;
       }
       case IMPORTING_TYPES.ORDERS: {
@@ -413,7 +413,7 @@ export class DataProviderService {
       }
       case IMPORTING_TYPES.ITEM_CLASSIFICATIONS: {
         this.utilities.log(`obteniendo item classifications...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Item.ClassificationEnum)));
+        toReturn = this.getAllItemClassifications();
         break;
       }
       default: toReturn = new Observable(suscriber => {
@@ -543,6 +543,14 @@ export class DataProviderService {
     .pipe(retry(3));
   }
 
+  public getAllItemStates(): Observable<string[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Item.StateEnum)));
+  }
+
+  public getAllItemClassifications(): Observable<string[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Item.ClassificationEnum)));
+  }
+
   public deleteItem(id: number, observe: any = 'body', reportProgress = false) {
     return this.itemService.deleteItem(id, observe, reportProgress);
   }
@@ -633,13 +641,15 @@ export class DataProviderService {
    *  Grupo de metodos para lpns
    *********************************************************************************/
   public getLpn(id: number, params = 'startRow=0;endRow=1', observe: any = 'body', reportProgress = false): Observable<any> {
-    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemVO2/all;` + params +
-    `;lpnItemId-filterType=number;lpnItemId-type=equals;lpnItemId-filter=${id}`).pipe(retry(3));
-  }
-
-  public getLpn3(id: number, params = 'startRow=0;endRow=1', observe: any = 'body', reportProgress = false): Observable<any> {
+    // roots
     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnVO3/all;` + params +
     `;lpnId-filterType=number;lpnId-type=equals;lpnId-filter=${id}`).pipe(retry(3));
+  }
+
+  public getLpnItemVO2(id: number, params = 'startRow=0;endRow=1', observe: any = 'body', reportProgress = false): Observable<any> {
+    // childs
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemVO2/all;` + params +
+    `;lpnItemId-filterType=number;lpnItemId-type=equals;lpnItemId-filter=${id}`).pipe(retry(3));
   }
 
   public getAllLpns(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false): Observable<any[]> {
@@ -652,6 +662,10 @@ export class DataProviderService {
 
   public getAllLpnStates(): Observable<any[]> {
     return new Observable(suscriber  => suscriber.next(Object.keys(Lpn.LpnStateEnum)));
+  }
+
+  public getAllLpnInterfaces(): Observable<any[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Lpn.LpnInterfaceEnum)));
   }
 
   public deleteLpn(id: number, observe: any = 'body', reportProgress = false) {
@@ -783,6 +797,18 @@ export class DataProviderService {
       this.utilities.log(`obteniendo locations...`);
       return this.httpClient.get(environment.apiBaseUrl + '/settings/locationsVO1/all;' + params)
       .pipe(retry(3));
+  }
+
+  public getAllLocationOperations(): Observable<string[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Location.OperationTypeEnum)));
+  }
+
+  public getAllLocationStates(): Observable<string[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Location.LocationStateEnum)));
+  }
+
+  public getAllLocationTypes(): Observable<string[]> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Location.LocationTypeEnum)));
   }
 
   public deleteLocation(id: number, observe: any = 'body', reportProgress = false) {

@@ -71,17 +71,21 @@ export class InitializeComponent implements OnInit {
             this.isLoadingResults = false;
             this.utilities.log('member data: ', resp);
             this.fillUserData(resp);
+            this.utilities.log('generated data: ', this.cities);
             this.form.get('selectedCity').valueChanges.subscribe(value => {
               this.plants = this.cities[value].plants;
+              this.form.get('selectedPlant').patchValue(0);
             });
             this.form.get('selectedPlant').valueChanges.subscribe(value => {
               const city = this.form.get('selectedCity').value;
               this.depots = this.cities[city].plants[value].depots;
+              this.form.get('selectedDepot').patchValue(0);
             });
             this.form.get('selectedDepot').valueChanges.subscribe(value => {
               const city = this.form.get('selectedCity').value;
               const plant = this.form.get('selectedPlant').value;
               this.owners = this.cities[city].plants[plant].depots[value].owners;
+              this.form.get('selectedOwner').patchValue(0);
             });
             this.form.get('selectedCity').patchValue(0);
             this.form.get('selectedPlant').patchValue(0);

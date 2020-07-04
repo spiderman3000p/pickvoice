@@ -154,7 +154,7 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
   };
   fields = [];
   date = new Date().toLocaleDateString();
-  model = ModelMap.LpnItemVO3Map;
+  model = ModelMap.LpnItemVO2Map;
   templateObject: LabelTemplate;
   constructor(private utilities: UtilitiesService, private appRef: ApplicationRef,
               private dialog: MatDialog, private authService: AuthService,

@@ -10,7 +10,7 @@
                 <button mat-raised-button color="warn" (click)="export()">
                     <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
                 </button>
-                <button mat-raised-button color="accent" (click)="addRow()" class="ml-2">
+                <button mat-raised-button color="accent" [routerLink]="['add']" class="ml-2">
                     <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
                 </button>
               </div>
@@ -123,10 +123,10 @@
                         </mat-menu>
                     </th>
                     <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                        <button mat-icon-button [routerLink]="['/pages/items' + '/view', element.itemId]">
+                        <button mat-icon-button [routerLink]="['view', element.itemId]">
                             <img src="assets/icons/zoom.png">
                         </button>
-                        <button mat-icon-button [routerLink]="['/pages/items' + '/edit', element.itemId]">
+                        <button mat-icon-button [routerLink]="['edit', element.itemId]">
                             <img src="assets/icons/page_edit.png">
                         </button>
                         <!--button mat-icon-button (click)="printRow(element)">

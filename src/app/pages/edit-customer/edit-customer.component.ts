@@ -516,10 +516,17 @@ export class EditCustomerComponent implements OnInit {
   }
 
   exportTableData() {
-    const dataToExport = this.dataSource.data.map((row: any) => {
-      return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.STORES);
+    let dataToExport;
+    this.dataProviderService.getAllCustomerStores(this.row.id).subscribe(data => {
+      if (data && data.length > 0) {
+        dataToExport = data.map((row: any) => {
+          /*delete row.uomId;
+          delete row.itemId;*/
+          return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.STORES);
+        });
+        this.utilities.exportToXlsx(dataToExport, 'Stores List');
+      }
     });
-    this.utilities.exportToXlsx(dataToExport, 'Customer Store List');
   }
 
   /*

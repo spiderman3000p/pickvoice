@@ -3,6 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { PickingPlanningComponent } from './picking-planning.component';
 import { EditPickPlanningComponent } from '../edit-pick-planning/edit-pick-planning.component';
+import { AddPickPlanningComponent } from '../add-pick-planning/add-pick-planning.component';
+import { AddPickPlanningResolverService } from '../add-pick-planning/add-pick-planning-resolver.service';
 import { EditPickTaskComponent } from '../edit-pick-task/edit-pick-task.component';
 import { EditTaskLineComponent } from '../edit-task-line/edit-task-line.component';
 import { EditRowComponent } from '../edit-row/edit-row.component';
@@ -35,6 +37,13 @@ const routes: Routes = [
         data: {
             viewMode: 'view',
             type: IMPORTING_TYPES.PICK_PLANNINGS
+        }
+    },
+    {
+        path: 'add',
+        component: AddPickPlanningComponent,
+        resolve: {
+            data: AddPickPlanningResolverService,
         }
     },
     {
