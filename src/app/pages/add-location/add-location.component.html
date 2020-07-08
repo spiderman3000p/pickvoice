@@ -187,7 +187,7 @@
                                 <label class="col-3 col-form-label">{{definitions.locationState.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="locationState">
-                                        <option [value]="option" *ngFor="let option of selectsData.states | async">
+                                        <option [ngValue]="option" *ngFor="let option of selectsData.states | async">
                                             {{option}}
                                         </option>
                                     </select>
@@ -202,7 +202,7 @@
                                 <label class="col-3 col-form-label">{{definitions.sectionId.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="sectionId">
-                                        <option [value]="option.id" *ngFor="let option of selectsData.sections | async">
+                                        <option [ngValue]="option.id" *ngFor="let option of selectsData.sections | async">
                                             {{option.name}}
                                         </option>
                                     </select>
@@ -217,7 +217,7 @@
                                 <label class="col-3 col-form-label">{{definitions.locationType.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="locationType">
-                                        <option [value]="option" *ngFor="let option of selectsData.locationTypes | async">
+                                        <option [ngValue]="option" *ngFor="let option of selectsData.locationTypes | async">
                                             {{option}}
                                         </option>
                                     </select>
@@ -232,7 +232,7 @@
                                 <label class="col-3 col-form-label">{{definitions.operationType.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="operationType">
-                                        <option [value]="option" *ngFor="let option of selectsData.operations | async">
+                                        <option [ngValue]="option" *ngFor="let option of selectsData.operations | async">
                                             {{option}}
                                         </option>
                                     </select>

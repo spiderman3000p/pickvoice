@@ -1,0 +1,109 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Add Plant</h1>
+              </div>
+          </div>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.name.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="name">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.name.formControl.helpText &&
+                                definitions.name.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.name.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.code.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="code">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.code.formControl.helpText &&
+                                definitions.code.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.code.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.address.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="address">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.address.formControl.helpText &&
+                                definitions.address.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.address.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.contact.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="contact">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.contact.formControl.helpText &&
+                                definitions.contact.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.contact.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.email.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="mail" required formControlName="email">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.email.formControl.helpText &&
+                                definitions.email.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.email.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.phone1.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="phone1">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.phone1.formControl.helpText &&
+                                definitions.phone1.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.phone1.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.phone2.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="phone2">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.phone2.formControl.helpText &&
+                                definitions.phone2.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.phone2.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

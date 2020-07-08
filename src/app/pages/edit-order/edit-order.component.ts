@@ -4,17 +4,23 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
-import { Order, OrderService, Customer, OrderLine, OrderType, Transport, CustomerService,
-         OrderTypeService, TransportService, UomService, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+
+import { QualityStates, Item, Customer, OrderLine, OrderType, Transport, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { PrintComponent } from '../../components/print/print.component';
+import { AddOrderLineDialogComponent } from '../../components/add-order-line-dialog/add-order-line-dialog.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { SharedDataService } from '../../services/shared-data.service';
-import { from, Observable, Observer } from 'rxjs';
-import { retry, switchMap } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
+import { NumericEditorComponent } from './numeric-editor.component';
+import { DateEditorComponent } from './date-editor.component';
+import { RowOptionComponent } from './row-option.component';
+
+import { from, Observable, Observer } from 'rxjs';
+import { retry, switchMap } from 'rxjs/operators';
+
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,13 +28,17 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
+import { AgGridAngular } from 'ag-grid-angular';
+
 interface OrdersData {
+  itemList: Item[];
   orderTypeList: OrderType[];
   transportList: Transport[];
   customerList: Customer[];
   orderLineList: OrderLine[];
   transportStatus: string[];
   uomList: UnityOfMeasure[];
+  qualityStateList: QualityStates[];
 }
 @Component({
   selector: 'app-edit-order',
@@ -77,12 +87,87 @@ export class EditOrderComponent implements OnInit {
     this.paginator = mp;
     this.setDataSourceAttributes();
   }
+  /* para tabla ag-grid */
+  gridApi;
+  gridColumnApi;
+  frameworkComponents: any;
+  itemGetter: any;
+  itemSetter: any;
+  qualityGetter: any;
+  qualitySetter: any;
+  orderLineColDefs: any[] = [
+    {
+      headerName: 'ITEM',
+      field: 'itemId',
+      width: 160,
+      editable: true,
+      valueGetter: null,
+      valueSetter: null,
+      cellEditor: 'agSelectCellEditor',
+      cellEditorParams: (params) => {
+        return {
+          values: this.ordersData.itemList.map((el: any) => el.itemDescription)
+        };
+      }
+    },
+    {
+      headerName: 'QUALITY',
+      field: 'qualityState',
+      width: 150,
+      editable: true,
+      valueGetter: null,
+      valueSetter: null,
+      cellEditor: 'agSelectCellEditor',
+      cellEditorParams: (params) => {
+        return {
+          values: this.ordersData.qualityStateList.map(el => el.name)
+        };
+      }
+    },
+    {
+      headerName: 'QTY',
+      field: 'qtyRequired',
+      width: 100,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
+      headerName: 'BATCH NUMBER',
+      field: 'batchNumber',
+      width: 150,
+      cellEditor: 'numericEditor',
+      editable: true
+    },
+    {
+      headerName: 'EXPIRY DATE',
+      field: 'expiryDate',
+      width: 150,
+      cellEditor: 'dateEditor',
+      editable: true
+    },
+    {
+      headerName: 'SERIAL',
+      field: 'serial',
+      width: 100,
+      editable: true
+    },
+    {
+      headerName: 'OPTIONS',
+      field: 'options',
+      cellRenderer: 'rowOption',
+      cellRendererParams: {
+        deleteItemUom: this.deletePrompt.bind(this),
+        startEditItemUom: this.startEditItemUom.bind(this),
+        finishEditItemUom: this.finishEditItemUom.bind(this),
+      }
+    }
+  ];
+  orderLinesData = [];
+  @ViewChild('agGrid') agGrid: AgGridAngular;
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService,
     private location: WebLocation, private activatedRoute: ActivatedRoute,
-    private orderService: OrderService, private router: Router, private dialog: MatDialog,
-    private orderTypeService: OrderTypeService, private customerService: CustomerService,
-    private transportService: TransportService, private uomService: UomService,
+    private router: Router, private dialog: MatDialog,
     private authService: AuthService, private dataProviderService: DataProviderService
   ) {
     this.dataSource = new MatTableDataSource([]);
@@ -91,6 +176,8 @@ export class EditOrderComponent implements OnInit {
     this.ordersData.orderLineList = [];
     this.ordersData.orderTypeList = [];
     this.ordersData.transportList = [];
+    this.ordersData.itemList = [];
+    this.ordersData.qualityStateList = [];
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
     this.isLoadingResults = true;
     this.form = new FormGroup({
@@ -113,6 +200,12 @@ export class EditOrderComponent implements OnInit {
       this.row.customerId = value;
       this.getCustomerDetails();
     });
+    /* para tabla ag-grid */
+    this.frameworkComponents = {
+      dateEditor: DateEditorComponent,
+      rowOption: RowOptionComponent,
+      numericEditor: NumericEditorComponent,
+    };
   }
 
   setDataSourceAttributes() {
@@ -122,6 +215,8 @@ export class EditOrderComponent implements OnInit {
 
   init() {
     this.utilities.log('order', this.row);
+    this.getItemList();
+    this.getQualityStateList();
     this.getTransportList();
     this.getCustomerList();
     this.getOrderTypeList();
@@ -309,11 +404,6 @@ export class EditOrderComponent implements OnInit {
     }
   }
 
-  deleteOrderLine(row: any) {
-    /*const index = this.dataSource.data.findIndex(_row => _row.idOrder === row.id);
-    this.row.orderLines.splice(index, 1);*/
-  }
-
   deleteOrderLinePrompt(rows?: any) {
     const observer = {
       next: (result) => {
@@ -379,15 +469,8 @@ export class EditOrderComponent implements OnInit {
   }
 
   addOrderLine() {
-    this.utilities.log('map to send to add dialog', this.definitions);
-    const dialogRef = this.dialog.open(AddRowDialogComponent, {
-      data: {
-        map: this.definitions,
-        type: IMPORTING_TYPES.ORDER_LINE,
-        title: 'Add Order Line',
-        remoteSync: false // para mandar los datos a la BD por la API
-      }
-    });
+    /*this.utilities.log('map to send to add dialog', this.definitions);
+    const dialogRef = this.dialog.open(AddOrderLineDialogComponent);
     dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
@@ -398,7 +481,15 @@ export class EditOrderComponent implements OnInit {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
-    });
+    });*/
+    const newRow = ModelFactory.newEmptyOrderLine();
+    newRow.idOrder = this.row.id;
+    // this.itemUomsData.push(newRow);
+    const transaction = {
+      // rows to add
+      add: [newRow]
+    };
+    this.gridApi.applyTransaction(transaction);
   }
 
   export() {
@@ -470,10 +561,8 @@ export class EditOrderComponent implements OnInit {
   }
 
   getOrderLineList() {
-    this.orderService.orderLineByOrderId(this.row.id).subscribe((results: any) => {
+    this.dataProviderService.getAllOrderLinesForOrder(this.row.id).subscribe((results: any) => {
       this.ordersData.orderLineList = results;
-      this.dataSource.data = results;
-      this.refreshTable();
       this.utilities.log('this.ordersData.orderLineList', this.ordersData.orderLineList);
     });
   }
@@ -497,6 +586,28 @@ export class EditOrderComponent implements OnInit {
         this.ordersData.transportList = results;
       }
       this.utilities.log('this.ordersData.transportList', this.ordersData.transportList);
+    });
+  }
+
+  getItemList() {
+    this.dataProviderService.getAllItems('startRow=0;endRow=100000').subscribe((results: any) => {
+      if (results && results.content && Array.isArray(results.content)) {
+        this.ordersData.itemList = results.content;
+      } else if (results && Array.isArray(results)) {
+        this.ordersData.itemList = results;
+      }
+      this.utilities.log('this.ordersData.itemList', this.ordersData.itemList);
+    });
+  }
+
+  getQualityStateList() {
+    this.dataProviderService.getAllQualityStates().subscribe((results: any) => {
+      if (results && results.content && Array.isArray(results.content)) {
+        this.ordersData.qualityStateList = results.content;
+      } else if (results && Array.isArray(results)) {
+        this.ordersData.qualityStateList = results;
+      }
+      this.utilities.log('this.ordersData.itemList', this.ordersData.itemList);
     });
   }
 
@@ -532,8 +643,11 @@ export class EditOrderComponent implements OnInit {
     }
     this.utilities.log('onSubmit');
     const formData = this.form.value;
-    formData.orderLines = this.dataSource.data;
-
+    formData.orderLines = [];
+    this.gridApi.forEachNode((node) => {
+      formData.orderLines.push(node.data);
+    });
+    this.utilities.log('orderlines', formData.orderLines);
     const toUpload = this.row;
     this.utilities.log('form data', formData);
     for (let key in formData) {
@@ -561,7 +675,7 @@ export class EditOrderComponent implements OnInit {
           this.utilities.error('error on update', error);
         }
       };
-      this.orderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
+      this.dataProviderService.updateOrder(toUpload, this.row.id, 'response').pipe(retry(3))
         .subscribe(observer);
     } else {
       this.sharedDataService.returnData = toUpload;
@@ -611,6 +725,81 @@ export class EditOrderComponent implements OnInit {
     this.location.back();
   }
 
+  addRow() {
+    const newRow = ModelFactory.newEmptyItemUom();
+    newRow.itemId = this.row.id;
+    newRow.id = 0;
+    // this.itemUomsData.push(newRow);
+    const transaction = {
+      // rows to add
+      add: [newRow]
+    };
+    this.gridApi.applyTransaction(transaction);
+  }
+
+  exportTableData() {
+    let dataToExport;
+    this.dataProviderService.getAllItemUoms(this.row.id).subscribe(data => {
+      if (data && data.length > 0) {
+        dataToExport = data.map((row: any) => {
+          delete row.uomId;
+          delete row.itemId;
+          return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ITEMUOMS);
+        });
+        this.utilities.exportToXlsx(dataToExport, 'Item Uoms List');
+      }
+    });
+  }
+
+  updateOrderLine(event) {
+    console.log(event);
+    const orderLine = event.data;
+    console.log('updateOrderLine', orderLine);
+    const index = this.ordersData.orderLineList.findIndex(item => item.idOrder === event.rowData.idOrder);
+    if (index > -1) {
+      this.ordersData.orderLineList.splice(index, 1);
+    }
+  }
+
+  deleteOrderLine(params: any) {
+    const transaction = {
+      // rows to remove
+      remove: [params.rowData]
+    };
+    this.gridApi.applyTransaction(transaction);
+  }
+
+  deletePrompt(params: any) {
+    const observer = {
+      next: (result) => {
+        if (result) {
+          this.deleteOrderLine(params);
+        }
+      },
+      error: (error) => {
+
+      }
+    } as Observer<boolean>;
+    this.utilities.showCommonDialog(observer, {
+      title: 'Delete Row',
+      message: 'You are about to delete this record(s). Are you sure to continue?'
+    });
+  }
+
+  startEditItemUom(params: any, rIndex: number, cKey: string) {
+    this.gridApi.startEditingCell({rowIndex: rIndex, colKey: cKey});
+  }
+
+  finishEditItemUom(params: any) {
+    this.utilities.log('edit-order. finishEditOrderLine params', params);
+    this.gridApi.stopEditing();
+  }
+
+  onGridReady(params) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+  }
+
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -629,7 +818,79 @@ export class EditOrderComponent implements OnInit {
         const keys = Object.keys(element).filter(key => key !== 'id');
         const keysForItem = keys.filter(key => key !== 'state');
         this.cardTitle = 'Order # ' + this.row.orderNumber;
+        this.itemGetter = (params) => {
+          console.log('itemGetter', params);
+          const key = params.colDef.field;
+          console.log('key', key);
+          const value = params.data[key];
+          let found;
+          if (typeof value === 'number') {
+            found = this.ordersData.itemList.find((item: any) => item.itemId === value);
+          }
+          if (typeof value === 'string') {
+            found = this.ordersData.itemList.find((item: any) => item.itemDescription === value);
+          }
+          console.log('found', found);
+          return found && found.itemDescription ? found.itemDescription : '-';
+        };
+        this.itemSetter = (params) => {
+          console.log('itemSetter', params);
+          const key = params.colDef.field;
+          const value = params.newValue;
+          console.log('key', key);
+          console.log('newValue', value);
+          let found;
+          if (typeof value === 'number') {
+            found = this.ordersData.itemList.find((item: any) => item.itemId === value);
+          }
+          if (typeof value === 'string') {
+            found = this.ordersData.itemList.find((item: any) => item.itemDescription === value);
+          }
+          console.log('found', found);
+          params.data[key] = found && found.itemId ? found.itemId : null;
+          return true;
+        };
+        this.qualityGetter = (params) => {
+          console.log('qualityGetter', params);
+          const key = params.colDef.field;
+          console.log('key', key);
+          const value = params.data[key];
+          let found;
+          if (typeof value === 'number') {
+            found = this.ordersData.qualityStateList.find((item: any) => item.id === value);
+          }
+          if (typeof value === 'string') {
+            found = this.ordersData.qualityStateList.find((item: any) => item.name === value);
+          }
+          console.log('found', found);
+          return found && found.name ? found.name : '-';
+        };
+        this.qualitySetter = (params) => {
+          console.log('itemSetter', params);
+          const key = params.colDef.field;
+          const value = params.newValue;
+          console.log('key', key);
+          console.log('newValue', value);
+          let found;
+          if (typeof value === 'number') {
+            found = this.ordersData.qualityStateList.find((item: any) => item.id === value);
+          }
+          if (typeof value === 'string') {
+            found = this.ordersData.qualityStateList.find((item: any) => item.name === value);
+          }
+          console.log('found', found);
+          params.data[key] = found && found.id ? found.id : null;
+          return true;
+        };
+        this.orderLineColDefs[0].valueSetter = this.itemSetter;
+        this.orderLineColDefs[0].valueGetter = this.itemGetter;
+        this.orderLineColDefs[1].valueGetter = this.qualityGetter;
+        this.orderLineColDefs[1].valueSetter = this.qualitySetter;
         this.init();
+      }, error => {
+        this.isLoadingResults = false;
+        this.utilities.error('Error fetching order details');
+        this.utilities.showSnackBar('Error fetching order details. Check your Internet conection', 'OK');
       });
       this.remoteSync = true;
     });

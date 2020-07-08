@@ -1,0 +1,109 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Add Lpn Interval</h1>
+              </div>
+          </div>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Basic details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.fromToNumber.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="fromToNumber">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.fromToNumber.formControl.helpText &&
+                                definitions.fromToNumber.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.fromToNumber.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.upToNumber.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="upToNumber">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.upToNumber.formControl.helpText &&
+                                definitions.upToNumber.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.upToNumber.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.currentInterval.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="currentInterval">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.currentInterval.formControl.helpText &&
+                                definitions.currentInterval.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.currentInterval.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Other details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.prefijo.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="prefijo">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.prefijo.formControl.helpText &&
+                                definitions.prefijo.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.prefijo.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.labelTemplateId.name}}</label>
+                                <div class="col">
+                                    <select class="form-control" required formControlName="labelTemplateId">
+                                        <option [ngValue]="option.id" *ngFor="let option of selectsData.templates | async">
+                                            {{option.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.labelTemplateId.formControl.helpText &&
+                                definitions.labelTemplateId.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.labelTemplateId.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.state.name}}</label>
+                                <div class="col">
+                                    <!--input class="form-check-input" type="checkbox" formControlName="batchNumber"-->
+                                    <mat-slide-toggle  color="primary" formControlName="state"></mat-slide-toggle>
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.state.formControl.helpText &&
+                                definitions.state.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.state.formControl.helpText">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

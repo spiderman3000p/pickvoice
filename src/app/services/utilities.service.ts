@@ -28,6 +28,7 @@ export class UtilitiesService implements OnDestroy {
     taskTypes: ModelMap.TaskTypeMap,
     inventory: ModelMap.InventoryItemMap,
     lpn: ModelMap.LpnMap,
+    lpnInterval: ModelMap.LpnIntervalMap,
     items: ModelMap.ItemMap,
     itemsList: ModelMap.ItemListMap,
     itemsDto: ModelMap.LoadItemDtoMap,
@@ -52,6 +53,7 @@ export class UtilitiesService implements OnDestroy {
     pickPlannings: ModelMap.PickPlanningMap,
     pickPlanningsList: ModelMap.PickPlanningListMap,
     pickTasks: ModelMap.PickTaskMap,
+    pickTasksList: ModelMap.PickTaskVO3Map,
     pickTaskLines: ModelMap.PickTaskLineMap,
     docks: ModelMap.DockMap,
     docksList: ModelMap.DockListMap
@@ -448,7 +450,11 @@ export class UtilitiesService implements OnDestroy {
             // this.log('objeto con indice', object[key][dataMap[key].formControl.valueIndex]);
             toExport[key] = dataMap[key].formControl.valueIndex === null ||
             dataMap[key].formControl.type === 'number' ||
-            dataMap[key].formControl.type === 'text' ? object[key] :
+            dataMap[key].formControl.type === 'text' ||
+            dataMap[key].formControl.type === 'textarea' ||
+            dataMap[key].formControl.type === 'date' ||
+            dataMap[key].formControl.type === 'email' ||
+            dataMap[key].formControl.type === 'phone' ? object[key] :
             object[key][dataMap[key].formControl.valueIndex];
           }
         }

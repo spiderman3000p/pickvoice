@@ -1,0 +1,113 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Add Depot</h1>
+              </div>
+          </div>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">number</label>
+                                <div class="col">
+                                    <input class="form-control" type="text">
+                                </div>
+                                <!--span  class="help-icon"
+                                *ngIf="definitions.sku.formControl.helpText &&
+                                definitions.sku.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.sku.formControl.helpText">
+                                </span-->
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Installation</label>
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <input class="form-control" type="text" placeholder="Select a installation">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--span  class="help-icon"
+                                *ngIf="definitions.upc.formControl.helpText &&
+                                definitions.upc.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.upc.formControl.helpText">
+                                </span-->
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.name.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="name">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.name.formControl.helpText &&
+                                definitions.name.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.name.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.code.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="code">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.code.formControl.helpText &&
+                                definitions.code.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.code.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">State</label>
+                                <div class="col">
+                                    <select class="form-control">
+                                        <option [ngValue]="option" *ngFor="let option of selectsData.states | async">
+                                            {{option}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <!--span class="help-icon"
+                                *ngIf="definitions.state.formControl.helpText &&
+                                definitions.state.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.state.formControl.helpText">
+                                </span-->
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    Owners: {{selectedOwners.length}}
+                                </div>
+                                <div class="col-6">
+                                    <button mat-raised-button color="accent" (click)="openOwnerSelector()" class="float-right" type="button">
+                                        <mat-icon>add</mat-icon>
+                                        Add Owner
+                                    </button>
+                                </div>
+                            </div>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let owner of selectedOwners">
+                                    {{owner.name}}
+                                    <span class="badge badge-primary badge-pill" (click)="removeOwner(owner)">x</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

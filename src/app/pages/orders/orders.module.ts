@@ -4,6 +4,11 @@ import { CommonModule } from '@angular/common';
 import { OrdersRoutingModule } from './orders-routing.module';
 import { OrdersComponent } from './orders.component';
 import { AddOrderComponent } from '../add-order/add-order.component';
+import { EditOrderComponent } from '../edit-order/edit-order.component';
+import { NumericEditorComponent } from '../edit-order/numeric-editor.component';
+import { DateEditorComponent } from '../edit-order/date-editor.component';
+import { RowOptionComponent } from '../edit-order/row-option.component';
+import { AddOrderLineDialogComponent } from '../../components/add-order-line-dialog/add-order-line-dialog.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -22,9 +27,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 
+import { AgGridModule } from 'ag-grid-angular';
+
 @NgModule({
   declarations: [
-    OrdersComponent, AddOrderComponent
+    OrdersComponent, AddOrderComponent, EditOrderComponent,
+    NumericEditorComponent, DateEditorComponent, RowOptionComponent
   ],
   imports: [
     CommonModule,
@@ -46,7 +54,9 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatSlideToggleModule,
     MatListModule,
     MatTabsModule,
-    MatTooltipModule
+    MatTooltipModule,
+
+    AgGridModule.withComponents([])
   ],
   providers: [
   ]

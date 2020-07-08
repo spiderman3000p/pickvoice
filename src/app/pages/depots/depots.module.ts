@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { DepotsRoutingModule } from './depots-routing.module';
 import { DepotsComponent } from './depots.component';
+import { AddDepotComponent } from '../add-depot/add-depot.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatTabsModule } from '@angular/material/tabs';
@@ -52,7 +53,7 @@ export const MY_FORMATS = {
 };
 @NgModule({
   declarations: [
-    DepotsComponent
+    DepotsComponent, AddDepotComponent
   ],
   imports: [
     CommonModule,

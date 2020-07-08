@@ -408,80 +408,18 @@
                             <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
                         </a>
                     </div>
-                    <table mat-table [dataSource]="dataSource" matSort>
-                        <!-- Checkbox Column -->
-                        <ng-container matColumnDef="select">
-                            <th mat-header-cell *matHeaderCellDef>
-                                <mat-checkbox (change)="$event ? masterToggle() : null"
-                                    [checked]="selection.hasValue() && isAllSelected()"
-                                    [indeterminate]="selection.hasValue() && !isAllSelected()"
-                                    [aria-label]="checkboxLabel()">
-                                </mat-checkbox>
-                            </th>
-                            <td mat-cell *matCellDef="let row">
-                                <mat-checkbox (click)="$event.stopPropagation()"
-                                    (change)="$event ? selection.toggle(row) : null"
-                                    [checked]="selection.isSelected(row)"
-                                    [aria-label]="checkboxLabel(row)">
-                                </mat-checkbox>
-                            </td>
-                        </ng-container>
-                        <!-- Data Columns -->
-                        <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
-                            <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
-                        </ng-container>
-                        <!-- Options Sticky Column -->
-                        <ng-container matColumnDef="options" stickyEnd>
-                            <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
-                                {{'Options' | uppercase}}
-                                <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
-                                    <mat-icon>more_vert</mat-icon>
-                                </a>
-                                
-                                <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
-                                    <span>
-                                        <a mat-menu-item (click)="toggleColumn()">Show all</a>
-                                        <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
-                                        (click)="toggleColumn(column)">
-                                            <mat-icon color="accent">{{ column.show ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-                                            {{definitions[column.name].name}}
-                                        </a>
-                                    </span>
-                                </mat-menu>
-                            </th>
-                            <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-                                <a mat-icon-button (click)="editOrderLineOnDialog(element, 'view')">
-                                    <img src="assets/icons/zoom.png">
-                                </a>
-                                <a mat-icon-button (click)="editOrderLineOnDialog(element, 'edit')" *ngIf="viewMode === 'edit'">
-                                    <img src="assets/icons/page_edit.png">
-                                </a>
-                                <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
-                                    <img src="assets/icons/zoom.png">
-                                </a>
-                                <a mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.code]">
-                                    <img src="assets/icons/page_edit.png">
-                                </a-->
-                                <!--button mat-icon-button (click)="printRow(element)">
-                                    <img src="assets/icons/printer.png">
-                                </button-->
-                                <!--a mat-icon-button [href]="'/print/' + type + '/' + element.code" target="_blank">
-                                    <img src="assets/icons/printer.png">
-                                </a-->
-                                <a mat-icon-button (click)="deleteOrderLinePrompt(element)" *ngIf="viewMode === 'edit'">
-                                    <img src="assets/icons/delete.png">
-                                </a>
-                            </td>
-                        </ng-container>
-        
-                        <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
-                        <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                        [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
-                        <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
-                        [ngClass]="{'alert alert-danger': row.invalid}" [routerLink]="['/pages/' + type + '/view', row.code]"></tr>
-                    </table>
-                    <mat-paginator [length]="dataSource.data.length" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+                    <ag-grid-angular
+                    #agGrid
+                    style="width: 100%; height: 300px;"
+                    class="ag-theme-balham"
+                    [frameworkComponents]="frameworkComponents"
+                    [rowData]="ordersData.orderLineList"
+                    [columnDefs]="orderLineColDefs"
+                    editType="fullRow"
+                    [animateRows]="true"
+                    (gridReady)="onGridReady($event)"
+                    (rowValueChanged)="updateOrderLine($event)">
+                    </ag-grid-angular>
                 </div>
                 <div class="col-sm-12 text-right">
                     <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>

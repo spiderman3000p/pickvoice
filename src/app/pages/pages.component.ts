@@ -158,6 +158,13 @@ export class PagesComponent implements OnInit, OnDestroy  {
               route: '/pages/owners',
               target: '_self',
               children: []
+            },
+            {
+              text: 'Lpn Intervals',
+              icon: '',
+              route: '/pages/lpnInterval',
+              target: '_self',
+              children: []
             }
           ]
         }
@@ -302,6 +309,7 @@ export class PagesComponent implements OnInit, OnDestroy  {
 
   changeUserData() {
     const dialogRef = this.dialog.open(ChangeUserDataComponent, {
+      width: '400px',
       data: {
         remoteSync: true, // para mandar los datos a la BD por la API
       }

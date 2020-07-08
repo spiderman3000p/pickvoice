@@ -462,7 +462,7 @@ export class AuthService {
         this.isRefreshingToken = true;
         this.refreshToken().pipe(tap((response: any) => {
           this.isRefreshingToken = false;
-          this.utilities.log('Respuesta al refrescar token: ', response);
+          // this.utilities.log('Respuesta al refrescar token: ', response);
           if (response && response.refresh_token) {
               this.utilities.log('Token regenerado con exito');
               this.setRefreshToken(response.refresh_token);

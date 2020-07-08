@@ -44,6 +44,10 @@ const routes: Routes = [
     loadChildren: () => import('./quality-states/quality-states.module').then(m => m.QualityStatesModule)
   },
   {
+    path: IMPORTING_TYPES.LPN_INTERVAL,
+    loadChildren: () => import('./lpn-intervals/lpn-interval.module').then(m => m.LpnIntervalModule)
+  },
+  {
     path: IMPORTING_TYPES.CUSTOMERS,
     loadChildren: () => import('./customer/customer.module').then(m => m.CustomerModule)
   },

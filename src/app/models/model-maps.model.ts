@@ -5,6 +5,7 @@ export const IMPORTING_TYPES = {
     OWNERS: 'owners',
     PLANTS: 'plants',
     INVENTORY_CLASSIFICATION: 'inventoryClassification',
+    LPN_INTERVAL: 'lpnInterval',
     LPN_STATE: 'lpnState',
     LPN_INTERFACE: 'lpnInterface',
     LPN_LOCATION: 'lpnLocation',
@@ -43,6 +44,7 @@ export const IMPORTING_TYPES = {
     PICK_PLANNINGS: 'pickPlannings',
     PICK_PLANNINGS_LIST: 'pickPlanningsList',
     PICK_TASKS: 'pickTasks',
+    PICK_TASKS_LIST: 'pickTasksList',
     PICK_TASKLINES: 'pickTaskLines',
     TASK_TYPES: 'taskTypes',
     DOCKS: 'docks',
@@ -562,6 +564,74 @@ export class ModelMap {
                 compareFn: (c1, c2) => {
                     return c1 === c2;
                 }
+            }
+        }
+    };
+    /* lpn interval object map for CRUD */
+    public static LpnIntervalMap = {
+        fromToNumber: {
+            name: 'from',
+            required: true,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'number'
+            }
+        },
+        upToNumber: {
+            name: 'to',
+            required: true,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'number'
+            }
+        },
+        currentInterval: {
+            name: 'current interval',
+            required: true,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'number'
+            }
+        },
+        labelTemplateId: {
+            name: 'label template',
+            required: true,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.id === c2.id;
+                }
+            }
+        },
+        prefijo: {
+            name: 'prefijo',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        state: {
+            name: 'state',
+            required: true,
+            type: 'boolean',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'toggle',
+                type: 'boolean'
             }
         }
     };
@@ -3759,6 +3829,192 @@ export class ModelMap {
                 text: 'Add new type',
                 icon: 'add',
                 modelType: IMPORTING_TYPES.TASK_TYPES
+            }
+        }
+    };
+    /* picking task object map for list */
+    public static PickTaskVO3Map = {
+        description: {
+            name: 'description',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        enableDate: {
+            name: 'enable date',
+            required: true,
+            type: 'date',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'date',
+                type: 'date'
+            }
+        },
+        priority: {
+            name: 'priority',
+            required: true,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'number',
+                min: 0,
+                max: 100
+            }
+        },
+        dockCode: {
+            name: 'dock code',
+            required: false,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        dockType: {
+            name: 'dock type',
+            required: true,
+            type: 'text',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        taskState: {
+            name: 'state',
+            required: true,
+            type: IMPORTING_TYPES.TASK_STATE,
+            validate: true,
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'select',
+                type: 'text',
+                valueIndex: null,
+                displayIndex: null,
+                compareFn: (c1, c2) => {
+                    return c1 === c2;
+                }
+            }
+        },
+        userName: {
+            name: 'user',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            },
+            /*addNew: {
+                text: 'Add new user',
+                icon: 'add',
+                modelType: IMPORTING_TYPES.USERS
+            }*/
+        },
+        taskType: {
+            name: 'type',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        sku: {
+            name: 'sku',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        customerName: {
+            name: 'customer',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        lpnCode: {
+            name: 'lpn code',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        batchNumber: {
+            name: 'batch number',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        locationCode: {
+            name: 'location code',
+            required: true,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        currentLine: {
+            name: 'current line',
+            required: true,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'number'
+            }
+        },
+        taskName: {
+            name: 'task name',
+            required: true,
+            type: 'text',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
+        numberLines: {
+            name: 'lines',
+            required: true,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'number'
+            }
+        },
+        taskProgress: {
+            name: 'progress',
+            required: true,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'number'
             }
         }
     };

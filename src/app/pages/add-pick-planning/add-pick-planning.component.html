@@ -72,7 +72,7 @@
                                 <label class="col-3 col-form-label">{{definitions.state.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="state">
-                                        <option [value]="option" *ngFor="let option of selectsData.states | async">
+                                        <option [ngValue]="option" *ngFor="let option of selectsData.states | async">
                                             {{option}}
                                         </option>
                                     </select>
@@ -87,7 +87,7 @@
                                 <label class="col-3 col-form-label">{{definitions.targetDockId.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="targetDockId">
-                                        <option [value]="option.id" *ngFor="let option of selectsData.docks | async">
+                                        <option [ngValue]="option.id" *ngFor="let option of selectsData.docks | async">
                                             {{option.description}}
                                         </option>
                                     </select>

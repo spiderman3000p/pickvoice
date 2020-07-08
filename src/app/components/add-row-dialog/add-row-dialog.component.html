@@ -59,6 +59,13 @@
                     <input class="form-control"  type="date" [formControlName]="key"
                     [required]="dataMap[key].required" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}">
                 </div>
+                <!-- campos email -->
+                <div class="form-group"
+                *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'email'">
+                    <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                    <input class="form-control"  type="email" [formControlName]="key"
+                    [required]="dataMap[key].required" pattern="">
+                </div>
                 <!-- campos textarea -->
                 <div class="form-group"
                 *ngIf="dataMap[key].formControl.control === 'textarea'">

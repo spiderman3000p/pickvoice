@@ -36,7 +36,7 @@
           </div>
         </div>
         <!--table mat-table [dataSource]="dataSource" matSort [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 10"-->
-        <table mat-table [dataSource]="dataSource" matSort matSortActive="date" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 11">
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="pickTaskId" matSortDirection="asc" [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 11">
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
@@ -86,7 +86,7 @@
                       [name]="column">
                           <option value="">Select a value</option>
                           <option *ngFor="let data of selectsData[column]"
-                          [value]="data.id !== undefined && data.id !== null ? data.id : 
+                          [value]="data.pickTaskId !== undefined && data.pickTaskId !== null ? data.pickTaskId : 
                           (definitions[column].formControl.valueIndex !== null ?
                           data[definitions[column].formControl.valueIndex] : data)">
                               {{ definitions[column].formControl.displayIndex !== null ?
@@ -147,16 +147,16 @@
               <!--button mat-icon-button (click)="editRowOnPage(element)">
                   <img src="assets/icons/zoom.png">
               </button-->
-              <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.id]">
+              <button mat-icon-button [routerLink]="['/pages/' + type + '/view', element.pickTaskId]">
                   <img src="assets/icons/zoom.png">
               </button>
-              <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.id]">
+              <button mat-icon-button [routerLink]="['/pages/' + type + '/edit', element.pickTaskId]">
                   <img src="assets/icons/page_edit.png">
               </button>
               <!--button mat-icon-button (click)="printRow(element)">
                   <img src="assets/icons/printer.png">
               </button-->
-              <a mat-icon-button [href]="'/print/' + type + '/' + element.id" target="_blank">
+              <a mat-icon-button [href]="'/print/' + type + '/' + element.pickTaskId" target="_blank">
                   <img src="assets/icons/printer.png">
               </a>
               <button mat-icon-button (click)="deletePrompt(element)">
@@ -170,7 +170,7 @@
                     [ngClass]="{'alert alert-danger': row.invalid}" (click)="editRow(row)"></tr-->
           <tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
           [ngClass]="{'alert alert-danger': row.invalid}"
-          [routerLink]="['/pages/' + type + '/view', row.id]"
+          [routerLink]="['/pages/' + type + '/view', row.pickTaskId]"
           [contextMenu]="basicMenuC" [contextMenuSubject]="row"></tr>
         </table>
         <mat-paginator [length]="dataSource.dataCount" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>

@@ -21,7 +21,10 @@ body {
   font-size: 12px;
 }
 .form-group{
-  /*position: relative;*/
+  position: relative;
+}
+.mat-menu-content .form-group{
+  position: unset;
 }
 .form-control{
   font-size: 12px;
@@ -32,13 +35,14 @@ body {
   margin-left: unset;
 }
 .help-icon {
-    background-image: url(https://cdn1.alegra.com/images/sm-help.png) !important;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: help;
-    width: 21px;
-    padding: 10px;
-    margin-left: 10px;
+  background-image: url(https://cdn1.alegra.com/images/sm-help.png) !important;
+  background-position: top;
+  background-repeat: no-repeat;
+  cursor: help;
+  width: 21px;
+  padding: 10px;
+  margin-left: 10px;
+  margin-top: 10px;
 }
 .col-form-label {
   font-size: 12px;

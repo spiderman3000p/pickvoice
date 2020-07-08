@@ -5,7 +5,7 @@ import { Transport, Location, Item, UomService, SectionService, OrderService, Or
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
          DockService, UserService, ItemUomService, QualityStates, QualityStateService, StoreService,
          QualityStateTypeService, TaskTypeService, PlantService, OwnerService, DepotService,
-         LabelTemplateService, LabelTypeService, LabelTemplate, Lpn
+         LabelTemplateService, LabelTypeService, LabelTemplate, Lpn, LpnIntervalService
        } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { AuthService } from './auth.service';
@@ -32,7 +32,7 @@ export class DataProviderService {
     private qualityStateTypeService: QualityStateTypeService, private plantService: PlantService,
     private ownerService: OwnerService, private depotService: DepotService,
     private storeService: StoreService, private labelTemplateService: LabelTemplateService,
-    private labelTypeTemplateService: LabelTypeService) {
+    private labelTypeTemplateService: LabelTypeService, private lpnIntervalService: LpnIntervalService) {
   }
 
   createObject(type: string, toUpload: any, observe: string = 'body', reportProgress: boolean = false) {
@@ -348,14 +348,14 @@ export class DataProviderService {
           this.utilities.log(`obteniendo pick tasks de ${id}...`);
           toReturn = this.pickTaskService.taskByPickPlanning(id).pipe(retry(3));
         } else {
-          if (owner !== null) {
-            httpHeaders.append('owner-id', owner.toString());
-            toReturn = this.httpClient.get(environment.apiBaseUrl +
-              '/outbound/pick/taskList/all;' + params, {
-              headers: httpHeaders
-            }).pipe(retry(3));
-          }
+          toReturn = this.httpClient.get(environment.apiBaseUrl +
+            '/outbound/pick/taskVO3/all;' + params).pipe(retry(3));
         }
+        break;
+      }
+      case IMPORTING_TYPES.PICK_TASKS_LIST: {
+        toReturn = this.httpClient.get(environment.apiBaseUrl +
+            '/outbound/pick/taskVO3/all;' + params).pipe(retry(3));
         break;
       }
       case IMPORTING_TYPES.PICK_TASKLINES: {
@@ -585,7 +585,7 @@ export class DataProviderService {
   public getAllItemTypes(observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
     if (owner !== null) {
-      return this.itemTypeService.retrieveAllItemTypes(owner, observe, reportProgress);
+      return this.itemTypeService.retrieveAllItemTypes(owner, observe, reportProgress).pipe(retry(3));
     }
     return of([]);
   }
@@ -616,7 +616,7 @@ export class DataProviderService {
   public getAllUoms(observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
     if (owner !== null) {
-      return this.uomService.retrieveAllUom(owner, observe, reportProgress);
+      return this.uomService.retrieveAllUom(owner, observe, reportProgress).pipe(retry(3));
     }
     return of([]);
   }
@@ -636,6 +636,33 @@ export class DataProviderService {
 
   public getUom(id: number, observe: any = 'body', reportProgress = false) {
     return this.uomService.retrieveUomById(id, observe, reportProgress);
+  }
+  /**********************************************************************************
+    Grupo de metodos para lpn intervals
+  ***********************************************************************************/
+  public getAllLpnIntervals(observe: any = 'body', reportProgress = false) {
+    const owner = this.authService.getOwnerId();
+    if (owner !== null) {
+      return this.lpnIntervalService.retrieveAllLpnInterval(owner, observe, reportProgress);
+    }
+    return of([]);
+  }
+
+  public deleteLpnInterval(id: number, observe: any = 'body', reportProgress = false) {
+    return this.lpnIntervalService.deleteLpnIntervale(id, observe, reportProgress);
+  }
+
+  public updateLpnInterval(data: any, id: number, observe: any = 'body', reportProgress = false) {
+    return this.lpnIntervalService.updateLpnInterval(data, id, observe, reportProgress);
+  }
+
+  public createLpnInterval(data: any, observe: any = 'body', reportProgress = false) {
+    data.ownerId = this.authService.getOwnerId();
+    return this.lpnIntervalService.createlpnInterval(data, observe, reportProgress);
+  }
+
+  public getLpnInterval(id: number, observe: any = 'body', reportProgress = false) {
+    return this.lpnIntervalService.retrieveLpnIntervalById(id, observe, reportProgress);
   }
   /*********************************************************************************
    *  Grupo de metodos para lpns
@@ -747,7 +774,7 @@ export class DataProviderService {
   public getAllQualityStates(observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
     if (owner !== null) {
-      return this.qualityStateService.retrieveAllQualityStates(owner, observe, reportProgress);
+      return this.qualityStateService.retrieveAllQualityStates(owner, observe, reportProgress).pipe(retry(3));
     }
     return of([]);
   }
@@ -870,6 +897,10 @@ export class DataProviderService {
   public getAllOrders(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
     return this.httpClient.get(environment.apiBaseUrl + '/outbound/ordersVO1/all;' + params)
     .pipe(retry(3));
+  }
+
+  public getAllOrderLinesForOrder(id: number, ) {
+    return this.orderService.orderLineByOrderId(id).pipe(retry(3));
   }
 
   public deleteOrder(id: number, observe: any = 'body', reportProgress = false) {

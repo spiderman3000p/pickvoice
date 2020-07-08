@@ -1,0 +1,110 @@
+<h2 mat-dialog-title>Add Order Line</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div mat-dialog-content>
+        <div class="example-loading-shade" *ngIf="isLoadingResults">
+            <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-section-title row">
+                    <h5>Basic details</h5>
+                </div>
+                <div class="form-group row">
+                    <label class="col-3 col-form-label">{{definitions.itemId.name}}</label>
+                    <div class="col">
+                        <ng-select [items]="selectsData.items | async"
+                        bindLabel="item"
+                        autofocus
+                        bindValue="id"
+                        [trackByFn]="trackByFn"
+                        [minTermLength]="2"
+                        [loading]="itemLoading"
+                        typeToSearchText="Search item"
+                        [typeahead]="itemInput$"
+                        formControlName="itemId">
+                        </ng-select>
+                        <!--select class="form-control" required formControlName="itemId">
+                            <option [ngValue]="option.id" *ngFor="let option of selectsData.items | async">
+                                {{option.name}}
+                            </option>
+                        </select-->
+                    </div>
+                    <span class="help-icon"
+                    *ngIf="definitions.itemId.formControl.helpText &&
+                    definitions.itemId.formControl.helpText.length > 0"
+                    [matTooltip]="definitions.itemId.formControl.helpText">
+                    </span>
+                </div>
+                <div class="form-group row">
+                    <label class="col-3 col-form-label">{{definitions.qualityState.name}}</label>
+                    <div class="col">
+                        <select class="form-control" required formControlName="qualityState">
+                            <option [ngValue]="option.id" *ngFor="let option of selectsData.qualityStates | async">
+                                {{option.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <span class="help-icon"
+                    *ngIf="definitions.qualityState.formControl.helpText &&
+                    definitions.qualityState.formControl.helpText.length > 0"
+                    [matTooltip]="definitions.qualityState.formControl.helpText">
+                    </span>
+                </div>
+                <div class="form-group row">
+                    <label class="col-3 col-form-label">{{definitions.qtyRequired.name}}</label>
+                    <div class="col">
+                        <input class="form-control" type="number" required formControlName="qtyRequired">
+                    </div>
+                    <span class="help-icon"
+                    *ngIf="definitions.qtyRequired.formControl.helpText &&
+                    definitions.qtyRequired.formControl.helpText.length > 0"
+                    [matTooltip]="definitions.qtyRequired.formControl.helpText">
+                    </span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-section-title row">
+                    <h5>Other details</h5>
+                </div>
+                <div class="form-group row">
+                    <label class="col-3 col-form-label">{{definitions.batchNumber.name}}</label>
+                    <div class="col">
+                        <input class="form-control" type="number" required formControlName="batchNumber">
+                    </div>
+                    <span class="help-icon"
+                    *ngIf="definitions.batchNumber.formControl.helpText &&
+                    definitions.batchNumber.formControl.helpText.length > 0"
+                    [matTooltip]="definitions.batchNumber.formControl.helpText">
+                    </span>
+                </div>
+                <div class="form-group row">
+                    <label class="col-3 col-form-label">{{definitions.expiryDate.name}}</label>
+                    <div class="col">
+                        <input class="form-control" type="date" required formControlName="expiryDate">
+                    </div>
+                    <span class="help-icon"
+                    *ngIf="definitions.expiryDate.formControl.helpText &&
+                    definitions.expiryDate.formControl.helpText.length > 0"
+                    [matTooltip]="definitions.expiryDate.formControl.helpText">
+                    </span>
+                </div>
+                <div class="form-group row">
+                    <label class="col-3 col-form-label">{{definitions.serial.name}}</label>
+                    <div class="col">
+                        <input class="form-control" type="number" required formControlName="serial">
+                    </div>
+                    <span class="help-icon"
+                    *ngIf="definitions.serial.formControl.helpText &&
+                    definitions.serial.formControl.helpText.length > 0"
+                    [matTooltip]="definitions.serial.formControl.helpText">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions align="end">
+        <small class="footer-label">Required fields are marked with *</small>
+        <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+        <button mat-button mat-dialog-close [disabled]="isLoadingResults">CANCEL</button>
+    </div>
+</form>

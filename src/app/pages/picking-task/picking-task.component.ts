@@ -30,8 +30,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   styleUrls: ['./picking-task.component.css']
 })
 export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
-  definitions: any = ModelMap.PickTaskMap;
-  dataSource: MyDataSource<PickTask>;
+  definitions: any = ModelMap.PickTaskVO3Map;
+  dataSource: MyDataSource<any>;
   dataToSend: PickTask[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
@@ -252,7 +252,7 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
   updatePickTask(newTask: any, oldTask: any) {
     this.dataProviderService.updatePickTask(newTask, oldTask.id).subscribe(response => {
       if (response) {
-        oldTask.priority = newTask;
+        oldTask.priority = newTask.priority;
         this.utilities.log('task update response', response);
         this.utilities.showSnackBar('Task updated successfully', 'OK');
       }

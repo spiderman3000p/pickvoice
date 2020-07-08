@@ -12,18 +12,18 @@ import { DataProviderService} from '../../services/data-provider.service';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
 
-
 @Component({
   selector: 'app-add-item',
   templateUrl: './add-item.component.html',
   styleUrls: ['./add-item.component.scss']
 })
 export class AddItemComponent implements OnInit, OnDestroy {
-  definitions = ModelMap.ItemMap;
+  dataMap = ModelMap.ItemMap;
   form: FormGroup;
   row: any;
+  importingTypes = IMPORTING_TYPES;
   isLoadingResults = false;
-  selectsData: any;
+  itemData: any;
   subscriptions: Subscription[] = [];
   constructor(
     private utilities: UtilitiesService, private activatedRoute: ActivatedRoute,
@@ -37,10 +37,10 @@ export class AddItemComponent implements OnInit, OnDestroy {
     Object.keys(this.row).forEach((key, index) => {
       validators = null;
       value = '';
-      if (this.definitions[key] && this.definitions[key].required !== undefined && this.definitions[key].required === true) {
+      if (this.dataMap[key] && this.dataMap[key].required !== undefined && this.dataMap[key].required === true) {
         validators = Validators.required;
       }
-      if (this.definitions[key] && this.definitions[key].type === 'boolean') {
+      if (this.dataMap[key] && this.dataMap[key].type === 'boolean') {
         value = false;
       }
       formControls[key] = new FormControl(value, validators);
@@ -48,20 +48,20 @@ export class AddItemComponent implements OnInit, OnDestroy {
     this.form = new FormGroup(formControls);
     this.utilities.log('form', this.form.value);
   }
-  addNewObject(key: string, objectType: string, myTitle: string) {
-    this.utilities.log('map to send to add dialog', this.utilities.dataTypesModelMaps[objectType]);
+  addNewObject(objectType: string, myTitle: string) {
     const dialogRef = this.dialog.open(AddRowDialogComponent, {
       data: {
         map: this.utilities.dataTypesModelMaps[objectType],
         type: objectType,
         title: myTitle,
-        remoteSync: true // para mandar los datos a la BD por la API
+        remoteSync: true, // para mandar los datos a la BD por la API
       }
     });
     dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
-        this.selectsData[key] = this.dataProviderService.getDataFromApi(key);
+        this.utilities.showSnackBar('Resgistered correct', 'OK');
+        // TODO: agregar los tipos de datos que se pueden agregar desde selects
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');
@@ -73,6 +73,7 @@ export class AddItemComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (!this.form.valid) {
       this.utilities.error('formulario invalido');
+      this.utilities.log('formulario:', this.form.value);
       this.utilities.showSnackBar('Please check the required fields', 'OK');
       return;
     }
@@ -118,10 +119,11 @@ export class AddItemComponent implements OnInit, OnDestroy {
       data: any
     }) => {
       console.log('data', data.data);
-      this.selectsData = {};
+      this.itemData = {};
       if (data.data) {
         Object.keys(data.data).forEach(key => {
-          this.selectsData[key] = data.data[key];
+          console.log('datos de ' + key);
+          this.itemData[key] = data.data[key];
         });
         this.isLoadingResults = false;
       }

@@ -272,27 +272,15 @@
                                         </a>
                                         <br><br>
                                     </div>
-                                    <!--strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong-->
-                                    <div class="table-toolbar" *ngIf="selection.selected.length > 0">
-                                        <div class="col-sm-6 text-left toolbar-label">
-                                            <label class="col-sm-2 col-form-label">Selected rows: {{selection.selected.length}}</label>
-                                        </div>
-                                        <div class="col-sm-6 text-right toolbar-buttons">
-                                            <!--button class="print-button" (click)="printRows(selection.selected)">Print</button-->
-                                            <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button-->
-                                            <button type="button" class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
-                                        </div>
-                                    </div>
                                     <ag-grid-angular
+                                    #agGrid
                                     style="width: 100%; height: 300px;"
                                     class="ag-theme-balham"
                                     [frameworkComponents]="frameworkComponents"
-                                    [rowData]="itemUomsData | async"
+                                    [rowData]="itemUomsData"
                                     [columnDefs]="itemUomsColDefs"
-                                    [suppressClickEdit]="true"
                                     editType="fullRow"
-                                    (keydown)="checkKeyPressed($event)"
-                                    (keypress)="checkKeyPressed($event)"
+                                    [animateRows]="true"
                                     (gridReady)="onGridReady($event)"
                                     (rowValueChanged)="updateItemUom($event)">
                                     </ag-grid-angular>

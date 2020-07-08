@@ -33,7 +33,7 @@
                             <div class="form-group row">
                                 <label class="col-3 col-form-label">{{definitions.purchaseNumber.name}}</label>
                                 <div class="col">
-                                    <input class="form-control" type="text" required formControlName="purchaseNumber">
+                                    <input class="form-control" type="number" required formControlName="purchaseNumber">
                                 </div>
                                 <span  class="help-icon"
                                 *ngIf="definitions.purchaseNumber.formControl.helpText &&
@@ -83,7 +83,7 @@
                                 <label class="col-3 col-form-label">{{definitions.orderTypeId.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="orderTypeId">
-                                        <option [value]="option.id" *ngFor="let option of selectsData.orderTypes | async">
+                                        <option [ngValue]="option.id" *ngFor="let option of selectsData.orderTypes | async">
                                             {{option.description}}
                                         </option>
                                     </select>
@@ -98,7 +98,7 @@
                                 <label class="col-3 col-form-label">{{definitions.transportId.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="transportId">
-                                        <option [value]="option.transportId" *ngFor="let option of selectsData.transports | async">
+                                        <option [ngValue]="option.transportId" *ngFor="let option of selectsData.transports | async">
                                             {{option.transportNumber}}
                                         </option>
                                     </select>
@@ -113,7 +113,7 @@
                                 <label class="col-3 col-form-label">{{definitions.customerId.name}}</label>
                                 <div class="col">
                                     <select class="form-control" required formControlName="customerId">
-                                        <option [value]="option.customerId" *ngFor="let option of selectsData.customers | async">
+                                        <option [ngValue]="option.customerId" *ngFor="let option of selectsData.customers | async">
                                             {{option.customerName}}
                                         </option>
                                     </select>

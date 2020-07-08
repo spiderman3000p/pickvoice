@@ -40,7 +40,6 @@ import { BASE_PATH } from '@pickvoice/pickvoice-api';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ApiInterceptor } from './http-interceptors/api-interceptor';
 
-import { EditOrderComponent } from './pages/edit-order/edit-order.component';
 import { EditTaskLineComponent } from './pages/edit-task-line/edit-task-line.component';
 import { EditPickTaskComponent } from './pages/edit-pick-task/edit-pick-task.component';
 import { EditRowComponent } from './pages/edit-row/edit-row.component';
@@ -60,7 +59,6 @@ import { OrderSelectorDialogComponent } from './components/order-selector-dialog
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
-import { AgGridModule } from 'ag-grid-angular';
 
 import { AuthService } from './services/auth.service';
 
@@ -68,7 +66,6 @@ import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
 
-import { NgSelectModule } from '@ng-select/ng-select';
 // import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
 // import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -96,7 +93,6 @@ export function apiConfigFactory(): Configuration {
     FileImportComponent,
     CommonDialogComponent,
     EditRowComponent,
-    EditOrderComponent,
     EditPickTaskComponent,
     EditTaskLineComponent,
     AddRowDialogComponent,
@@ -112,8 +108,6 @@ export function apiConfigFactory(): Configuration {
     AppRoutingModule,
     BrowserAnimationsModule,
     LayoutModule,
-
-    NgSelectModule,
     // NgOptionHighlightModule,
     /*FontAwesomeModule,*/
 
@@ -146,7 +140,6 @@ export function apiConfigFactory(): Configuration {
     AuthModule,
     FormsModule,
     ReactiveFormsModule,
-    AgGridModule.withComponents([]),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     RouterModule,
     ContextMenuModule.forRoot({useBootstrap4: true})

@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<div mat-dialog-content>
+    <p>{{ message }}</p>
+    <input matInput placeholder="Filter" [formControl]="filterInput">
+    <div class="user-list-wrapper">
+        <div class="example-loading-shade" *ngIf="isLoadingResults">
+            <mat-spinner class="spinner"></mat-spinner>
+        </div>
+        <mat-action-list>
+            <button class="text-left" mat-list-item *ngFor="let element of filteredCollection"
+            (click)="setSelectedElement(element)">
+                {{element?.firstName}} {{element?.lastName}} ({{element?.userName}}) 
+            </button>
+        </mat-action-list>
+    </div>
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close (click)="close()">CANCEL</button>
+</div>

@@ -2,7 +2,7 @@ import {
     Item, UnityOfMeasure, Location, Customer, OrderLine, ItemType, OrderType, Transport,
     Section, Order, LoadPick, OrderLines, PickPlanning, PickTask, PickTaskLine, LoadOrder,
     PickTaskLines, Dock, User, /*Role,*/ TaskType, LoadItem, LoadLocation, ItemUom, QualityStates,
-    QualityStateType, Lpn, Plant, Owner, Depot, Store
+    QualityStateType, Lpn, Plant, Owner, Depot, Store, LpnInterval
 } from '@pickvoice/pickvoice-api';
 import { IMPORTING_TYPES } from './model-maps.model';
 
@@ -77,6 +77,9 @@ export class ModelFactory {
         }
         if (type === IMPORTING_TYPES.LPN) {
             return this.newEmptyLpn();
+        }
+        if (type === IMPORTING_TYPES.LPN_INTERVAL) {
+            return this.newEmptyLpnInterval();
         }
         return null;
     }
@@ -153,6 +156,18 @@ export class ModelFactory {
         object.lpnState = Lpn.LpnStateEnum.IT;
         object.lpnType = Lpn.LpnTypeEnum.Carton;
         object.openingDate = '';
+        return object;
+    }
+
+    public static newEmptyLpnInterval(): LpnInterval {
+        const object = new Object() as LpnInterval;
+        object.currentInterval = 0;
+        object.fromToNumber = 0;
+        object.id = 0;
+        object.labelTemplateId = 0;
+        object.prefijo = '';
+        object.state = true;
+        object.upToNumber = 0;
         return object;
     }
 
