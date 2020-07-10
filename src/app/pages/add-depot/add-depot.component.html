@@ -28,11 +28,11 @@
                                 </span-->
                             </div>
                             <div class="form-group row">
-                                <label class="col-3 col-form-label">Installation</label>
+                                <label class="col-3 col-form-label">installation</label>
                                 <div class="col">
                                     <div class="input-group mb-3">
-                                        <input class="form-control" type="text" placeholder="Select a installation">
-                                        <div class="input-group-prepend">
+                                        <input class="form-control" type="text" placeholder="Select a installation" [value]="selectedPlant.name" readonly>
+                                        <div class="input-group-prepend" (click)="openPlantSelector()">
                                             <span class="input-group-text"><i class="fa fa-search"></i></span>
                                         </div>
                                     </div>
@@ -66,7 +66,7 @@
                                 </span>
                             </div>
                             <div class="form-group row">
-                                <label class="col-3 col-form-label">State</label>
+                                <label class="col-3 col-form-label">state</label>
                                 <div class="col">
                                     <select class="form-control">
                                         <option [ngValue]="option" *ngFor="let option of selectsData.states | async">
@@ -93,10 +93,12 @@
                                     </button>
                                 </div>
                             </div>
-                            <ul class="list-group">
+                            <ul class="list-group mt-3">
                                 <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let owner of selectedOwners">
                                     {{owner.name}}
-                                    <span class="badge badge-primary badge-pill" (click)="removeOwner(owner)">x</span>
+                                    <button mat-icon-button class="float-right" (click)="removeOwner(owner)">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
                                 </li>
                             </ul>
                         </div>

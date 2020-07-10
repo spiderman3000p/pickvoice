@@ -22,7 +22,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-depots',
   templateUrl: './depots.component.html',
-  styleUrls: ['./depots.component.css']
+  styleUrls: ['./depots.component.scss']
 })
 export class DepotsComponent implements OnInit, AfterViewInit, OnDestroy {
   definitions: any = ModelMap.DepotsMap;
@@ -371,33 +371,6 @@ export class DepotsComponent implements OnInit, AfterViewInit, OnDestroy {
   reloadData() {
     this.selection.clear();
     this.loadData(false);
-  }
-
-  addRow() {
-    this.utilities.log('map to send to add dialog',
-    this.utilities.dataTypesModelMaps.depots);
-    const dialogRef = this.dialog.open(AddRowDialogComponent, {
-      data: {
-        map: this.definitions,
-        type: IMPORTING_TYPES.DEPOTS,
-        remoteSync: true, // para mandar los datos a la BD por la API
-        title: 'Add New Depot',
-        defaultValues: {
-          plantId: this.authService.getPlantId()
-        }
-      }
-    });
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-        this.dataSource.data.push(result);
-        this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    }));
   }
 
   export() {

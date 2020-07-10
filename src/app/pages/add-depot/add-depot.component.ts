@@ -6,12 +6,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
+import { OwnerSelectorDialogComponent } from '../../components/owner-selector-dialog/owner-selector-dialog.component';
+import { PlantSelectorDialogComponent } from '../../components/plant-selector-dialog/plant-selector-dialog.component';
 import { UtilitiesService } from '../../services/utilities.service';
 import { Location as WebLocation } from '@angular/common';
 import { DataProviderService} from '../../services/data-provider.service';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
-
 
 @Component({
   selector: 'app-add-depot',
@@ -26,6 +27,9 @@ export class AddDepotComponent implements OnInit, OnDestroy {
   selectsData: any;
   subscriptions: Subscription[] = [];
   selectedOwners = [];
+  selectedPlant = {
+    name: ''
+  };
   constructor(
     private utilities: UtilitiesService, private activatedRoute: ActivatedRoute,
     private router: Router, private dialog: MatDialog, private location: WebLocation,
@@ -72,7 +76,59 @@ export class AddDepotComponent implements OnInit, OnDestroy {
   }
 
   openOwnerSelector() {
+    let exist;
+    const dialogRef = this.dialog.open(OwnerSelectorDialogComponent, {
+      width: '400px',
+      data: {
+        collection: this.dataProviderService.getAllOwners(),
+        title: 'Select Owner',
+        message: 'Please select an owner from the list'
+      }
+    });
+    dialogRef.afterClosed().subscribe(selectedOwner => {
+      this.utilities.log('owner selector dialog result:', selectedOwner);
+      if (selectedOwner) {
+        exist = this.selectedOwners.findIndex(owner => owner.id === selectedOwner.id);
+        if (exist === -1) {
+          this.selectedOwners.push(selectedOwner);
+        } else {
+          this.utilities.showSnackBar('Selected owner already added', 'OK');
+        }
+      }
+    }, error => {
+      this.utilities.error('error after closing owner selector dialog');
+      this.utilities.showSnackBar('Error after closing owner selector dialog', 'OK');
+      this.isLoadingResults = false;
+    });
+  }
 
+  openPlantSelector() {
+    const dialogRef = this.dialog.open(PlantSelectorDialogComponent, {
+      width: '700px',
+      data: {
+        collection: this.dataProviderService.getAllPlants(),
+        title: 'Select Plant',
+        message: 'Please select a plant from the list'
+      }
+    });
+    dialogRef.afterClosed().subscribe(selectedPlant => {
+      this.utilities.log('plant selector dialog result:', selectedPlant);
+      if (selectedPlant) {
+        this.form.get('plantId').setValue(selectedPlant.id);
+        this.selectedPlant = selectedPlant;
+      }
+    }, error => {
+      this.utilities.error('error after closing plant selector dialog');
+      this.utilities.showSnackBar('Error after closing plant selector dialog', 'OK');
+      this.isLoadingResults = false;
+    });
+  }
+
+  removeOwner(selectedOwner: any) {
+    const index = this.selectedOwners.findIndex(owner => owner.id === selectedOwner.id);
+    if (index > -1) {
+      this.selectedOwners.splice(index, 1);
+    }
   }
 
   onSubmit() {

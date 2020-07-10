@@ -77,6 +77,13 @@
                             <input class="form-control" type="text" [formControlName]="key"
                             [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                         </div>
+                        <!-- campos email -->
+                        <div  class="form-group"
+                        *ngIf="dataMap[key].formControl.control === 'input' && dataMap[key].formControl.type === 'email'">
+                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
+                            <input class="form-control" type="email" [formControlName]="key" pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$"
+                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                        </div>
                         <!-- campos textarea -->
                         <div  class="form-group"
                         *ngIf="dataMap[key].formControl.control === 'textarea'">

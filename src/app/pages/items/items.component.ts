@@ -23,7 +23,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-items',
   templateUrl: './items.component.html',
-  styleUrls: ['./items.component.css']
+  styleUrls: ['./items.component.scss']
 })
 export class ItemsComponent implements OnInit, AfterViewInit, OnDestroy {
   definitions: any = ModelMap.ItemListMap;

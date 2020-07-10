@@ -1,0 +1,12 @@
+.lpn-items-container{
+  border: 1px #B3B3B3  solid;
+  min-height: 300px;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+  position: relative;
+}
+
+.example-loading-shade.inside {
+  position: absolute;
+}

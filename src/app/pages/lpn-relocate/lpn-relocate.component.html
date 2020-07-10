@@ -1,0 +1,126 @@
+<div class="content-area">
+    <!--button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content">
+        <div class="section-wrapper">
+            <div class="header actionbar align-content-top">
+                <div class="title actionbar-section align-content-top">
+                    <h1>Lpn Relocate</h1>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="example-loading-shade" *ngIf="isLoadingResults">
+                <mat-spinner class="spinner"></mat-spinner>
+            </div>
+            <div class="row">
+                <div class="col-6 container-group">
+                    <label>Origin LPN</label>
+                    <div class="row">
+                        <form class="form-inline p-1" [formGroup]="searchOriginLpnForm" (ngSubmit)="searchLpnOrigin()">
+                            <div class="col-9">
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">Code</label>
+                                <div class="col-10">
+                                    <input type="text" placeholder="Type a LPN code" class="form-control" formControlName="code" required>
+                                </div>
+                                <button mat-raised-button type="submit">
+                                    <mat-icon>search</mat-icon>
+                                    Search
+                                </button>
+                            </div>
+                            <button mat-raised-button type="submit">
+                                <mat-icon>search</mat-icon>
+                                Search
+                            </button>
+                        </form>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 lpn-items-container">
+                            <div class="example-loading-shade inside" *ngIf="isLoadingLpnOrigin">
+                                <mat-spinner class="spinner"></mat-spinner>
+                            </div>
+                            <div class="list-group">
+                                <a href="javascript:void(0)" class="list-group-item list-group-item-action"
+                                [ngClass]="{'active': lpn.qtyToTransfer > 0}"
+                                *ngFor="let lpn of lpnsOrigin">
+                                    <div class="info-body">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <strong class="">{{lpn.itemDescription}}</strong>
+                                            <small>{{lpn.lpnState}}</small>
+                                        </div>
+                                        <p class="mb-0">{{lpn.uomName}}</p>
+                                        <small>Qty available: {{lpn.qty - lpn.qtyToTransfer}}</small>
+                                    </div>
+                                    <div class="qty-selector">
+                                        <div class="form-group">
+                                            <label>Transfer</label>
+                                            <input type="number" class="form-control" [(ngModel)]="lpn.qtyToTransfer">
+                                        </div>
+                                        <button mat-icon-button type="button" (click)="transfer(lpn)">
+                                            <mat-icon>send</mat-icon>
+                                        </button>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-12 pl-0 pr-0 pt-1">
+                            <div class="">
+                                <span class="float-left">Total LPN items: {{ lpnsOrigin.length }}</span>
+                                <span class="float-right">Total selected: {{ getSelectedLpns() }}</span>
+                            </div>
+                            <button mat-raised-button color="primary" type="button"
+                            (click)="transfer()" class="float-right" *ngIf="getSelectedLpns() > 0">
+                                Bulk Transfer
+                                <mat-icon>arrow_right</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 container-group">
+                    <label>Destination LPN</label>
+                    <div class="row">
+                        <form class="form-inline p-1" [formGroup]="searchDestLpnForm" (ngSubmit)="searchLpnDest()">
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">Code</label>
+                                <div class="col-10">
+                                    <input type="text" placeholder="Type a LPN code" class="form-control" formControlName="code" required>
+                                </div>
+                            </div>
+                            <button mat-raised-button type="submit">
+                                <mat-icon>search</mat-icon>
+                                Search
+                            </button>
+                        </form>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 lpn-items-container">
+                            <div class="example-loading-shade inside" *ngIf="isLoadingLpnDest">
+                                <mat-spinner class="spinner"></mat-spinner>
+                            </div>
+                            <div class="list-group">
+                                <a href="javascript:void(0)" class="list-group-item list-group-item-action"
+                                *ngFor="let lpn of lpnsDest">
+                                    <div class="info-body">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <strong class="">{{lpn.itemDescription}}</strong>
+                                            <small>{{lpn.lpnState}}</small>
+                                        </div>
+                                        <p class="mb-0">{{lpn.uomName}}</p>
+                                        <small>Qty available: {{lpn.qty}}</small>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="col-12 pl-0 pr-0 pt-1">
+                                <div class="">
+                                    <span class="float-left">Total LPN items: {{ lpnsDest.length }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

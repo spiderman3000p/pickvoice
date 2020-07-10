@@ -30,7 +30,10 @@ export class AddPlantComponent implements OnInit, OnDestroy {
     private router: Router, private dialog: MatDialog, private location: WebLocation,
     private dataProviderService: DataProviderService
   ) {
-    const formControls = {};
+    const formControls = {
+      countryId: null,
+      departmentId: null
+    };
     this.row = ModelFactory.newEmptyPlant();
     let validators;
     let value;
@@ -45,7 +48,15 @@ export class AddPlantComponent implements OnInit, OnDestroy {
       }
       formControls[key] = new FormControl(value, validators);
     });
+    formControls.countryId = new FormControl('', Validators.required);
+    formControls.departmentId = new FormControl('', Validators.required);
     this.form = new FormGroup(formControls);
+    this.form.get('countryId').valueChanges.subscribe(countryId => {
+      this.selectsData.departments = this.dataProviderService.getAllDepartments(countryId);
+    });
+    this.form.get('departmentId').valueChanges.subscribe(departmentId => {
+      this.selectsData.cities = this.dataProviderService.getAllCities(departmentId);
+    });
     this.utilities.log('form', this.form.value);
   }
   addNewObject(key: string, objectType: string, myTitle: string) {

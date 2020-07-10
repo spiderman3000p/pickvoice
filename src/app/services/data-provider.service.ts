@@ -5,7 +5,7 @@ import { Transport, Location, Item, UomService, SectionService, OrderService, Or
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
          DockService, UserService, ItemUomService, QualityStates, QualityStateService, StoreService,
          QualityStateTypeService, TaskTypeService, PlantService, OwnerService, DepotService,
-         LabelTemplateService, LabelTypeService, LabelTemplate, Lpn, LpnIntervalService
+         LabelTemplateService, LabelTypeService, LabelTemplate, Lpn, LpnIntervalService, StorageService
        } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { AuthService } from './auth.service';
@@ -32,7 +32,8 @@ export class DataProviderService {
     private qualityStateTypeService: QualityStateTypeService, private plantService: PlantService,
     private ownerService: OwnerService, private depotService: DepotService,
     private storeService: StoreService, private labelTemplateService: LabelTemplateService,
-    private labelTypeTemplateService: LabelTypeService, private lpnIntervalService: LpnIntervalService) {
+    private labelTypeTemplateService: LabelTypeService, private lpnIntervalService: LpnIntervalService,
+    private storageService: StorageService) {
   }
 
   createObject(type: string, toUpload: any, observe: string = 'body', reportProgress: boolean = false) {
@@ -216,7 +217,7 @@ export class DataProviderService {
         break;
       }
       case IMPORTING_TYPES.PLANTS: {
-        toReturn = this.getAllPlants(params);
+        toReturn = this.getAllPlants();
         break;
       }
       case IMPORTING_TYPES.DEPOTS: {
@@ -470,7 +471,8 @@ export class DataProviderService {
   /**********************************************************************************
     Grupo de metodos para plants
   ***********************************************************************************/
-  public getAllPlants(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+  public getAllPlants(cityId: number = null, observe: any = 'body', reportProgress = false) {
+    const params = `cityId-filterType=number;cityId-type=equal;cityId-filter=${cityId};startRow=0;endRow=1000`;
     return this.plantService.retrieveAllPlant(observe, reportProgress).pipe(retry(3));
   }
 
@@ -677,6 +679,11 @@ export class DataProviderService {
     // childs
     return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemVO2/all;` + params +
     `;lpnItemId-filterType=number;lpnItemId-type=equals;lpnItemId-filter=${id}`).pipe(retry(3));
+  }
+
+  public getLpnItemVO1(params = 'startRow=0;endRow=1', observe: any = 'body', reportProgress = false): Observable<any> {
+    return this.httpClient.get<any[]>(`${environment.apiBaseUrl}/storage/lpnItemVO1/all;` + params
+    ).pipe(retry(3));
   }
 
   public getAllLpns(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false): Observable<any[]> {
@@ -1328,4 +1335,24 @@ export class DataProviderService {
     .pipe(retry(3));
   }
   /* end templates endpoints*/
+  public getAllCountries(): Observable<any[]> {
+    return this.httpClient.get<any[]>(environment.apiBaseUrl +
+      '/settings/geographic/location/country').pipe(retry(3));
+  }
+
+  public getAllDepartments(countryId: number): Observable<any[]> {
+    return this.httpClient.get<any[]>(environment.apiBaseUrl +
+      '/settings/geographic/location/department/' + countryId).pipe(retry(3));
+  }
+
+  public getAllCities(departmentId: number): Observable<any[]> {
+    return this.httpClient.get<any[]>(environment.apiBaseUrl +
+      '/settings/geographic/location/city/' + departmentId).pipe(retry(3));
+  }
+
+  public transferLpn(targetLpnId: number, lpnItems: any[]): Observable<any> {
+    return this.storageService.transferLpnItem(targetLpnId, lpnItems).pipe(retry(3));
+    /*return this.httpClient.get<any[]>(environment.apiBaseUrl +
+      '/storage/lpn/transfer/' + targetLpnId, params).pipe(retry(3));*/
+  }
 }

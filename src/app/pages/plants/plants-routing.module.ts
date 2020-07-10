@@ -3,6 +3,9 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { PlantsComponent } from './plants.component';
 import { EditRowComponent } from '../edit-row/edit-row.component';
+import { EditPlantComponent } from '../edit-plant/edit-plant.component';
+import { AddPlantComponent } from '../add-plant/add-plant.component';
+import { AddPlantResolverService } from '../add-plant/add-plant-resolver.service';
 import { PlantsResolverService } from './plants-resolver.service';
 import { NotFoundComponent } from '../not-found/not-found.component';
 import { IMPORTING_TYPES } from '../../models/model-maps.model';
@@ -10,24 +13,29 @@ import { IMPORTING_TYPES } from '../../models/model-maps.model';
 const routes: Routes = [
     {
         path: 'edit/:id',
-        component: EditRowComponent,
+        component: EditPlantComponent,
         resolve: {
             row: PlantsResolverService,
         },
         data: {
-            viewMode: 'edit',
-            type: IMPORTING_TYPES.PLANTS
+            viewMode: 'edit'
         }
     },
     {
         path: 'view/:id',
-        component: EditRowComponent,
+        component: EditPlantComponent,
         resolve: {
             row: PlantsResolverService,
         },
         data: {
-            viewMode: 'view',
-            type: IMPORTING_TYPES.PLANTS
+            viewMode: 'view'
+        }
+    },
+    {
+        path: 'add',
+        component: AddPlantComponent,
+        resolve: {
+            data: AddPlantResolverService,
         }
     },
     {

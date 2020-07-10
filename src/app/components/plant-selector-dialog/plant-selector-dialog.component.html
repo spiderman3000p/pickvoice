@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<div mat-dialog-content>
+    <p>{{ message }}</p>
+    <div class="row">
+        <div class="col-6">
+            <div class="w-100">
+                <div class="form-group row">
+                    <label class="col-3 col-form-label pl-0">Country</label>
+                    <div class="col">
+                        <select [formControl]="country" class="form-control">
+                            <option *ngFor="let opt of countries | async" [ngValue]="opt">
+                                {{ opt.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-3 col-form-label pl-0">Department</label>
+                    <div class="col">
+                        <select [formControl]="department" class="form-control">
+                            <option *ngFor="let opt of departments | async" [ngValue]="opt">
+                                {{ opt.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-3 col-form-label pl-0">City</label>
+                    <div class="col">
+                        <select [formControl]="city" class="form-control">
+                            <option *ngFor="let opt of cities | async" [ngValue]="opt">
+                                {{ opt.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="col-12">
+                <input type="text" class="form-control" placeholder="Filter" [formControl]="filterInput">
+            </div>
+            <div class="user-list-wrapper mt-1">
+                <div class="example-loading-shade" *ngIf="isLoadingResults">
+                    <mat-spinner class="spinner"></mat-spinner>
+                </div>
+                <mat-action-list>
+                    <button class="text-left" mat-list-item *ngFor="let element of filteredCollection"
+                    (click)="setSelectedElement(element)">
+                        {{element?.name}}
+                    </button>
+                </mat-action-list>
+            </div>
+        </div>
+    </div>
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close (click)="close()">CANCEL</button>
+</div>

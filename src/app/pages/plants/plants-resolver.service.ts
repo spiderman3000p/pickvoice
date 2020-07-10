@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, Resolve, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { Plant } from '@pickvoice/pickvoice-api/model/plant';
 import { DataProviderService} from '../../services/data-provider.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +13,14 @@ export class PlantsResolverService implements Resolve<Plant> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Plant> {
     const id = Number(route.paramMap.get('id'));
+    const observables = {
+      plant: of({}),
+      countries: of([])
+    };
     return Observable.create((observer) => {
-      observer.next(this.dataProviderService.getPlant(id));
+      observables.plant = this.dataProviderService.getPlant(id);
+      observables.countries = this.dataProviderService.getAllCountries();
+      observer.next(observables);
       observer.complete();
     });
   }

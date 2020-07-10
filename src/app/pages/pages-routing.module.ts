@@ -16,6 +16,14 @@ const routes: Routes = [
     loadChildren: () => import('./lpns/lpns.module').then(m => m.LpnsModule)
   },
   {
+    path: 'lpn-relocate',
+    loadChildren: () => import('./lpn-relocate/lpn-relocate.module').then(m => m.LpnRelocateModule)
+  },
+  {
+    path: 'lpn-transfer',
+    loadChildren: () => import('./lpn-transfer/lpn-transfer.module').then(m => m.LpnTransferModule)
+  },
+  {
     path: IMPORTING_TYPES.INVENTORY,
     loadChildren: () => import('./inventory/inventory.module').then(m => m.InventoryModule)
   },

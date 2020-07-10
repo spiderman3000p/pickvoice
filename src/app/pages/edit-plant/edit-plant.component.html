@@ -1,5 +1,9 @@
 <div class="content-area">
-    <div class="content">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
         <div class="section-wrapper">
             <div class="header actionbar align-content-top">
                 <div class="title actionbar-section align-content-top">
@@ -14,297 +18,146 @@
                     </button>
                 </div>
             </div>
-      </div>
-      <mat-card>
-            <div class="example-loading-shade" *ngIf="isLoadingResults">
-                <mat-spinner class="spinner"></mat-spinner>
-            </div>
-            <mat-card-content>
-                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        </div>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
                     <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Sku</label>
-                                <input class="form-control"  type="text" formControlName="sku"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Geographic details</h5>
                             </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Upc</label>
-                                <input class="form-control"  type="text" formControlName="upc"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">country</label>
+                                <div class="col">
+                                    <select formControlName="countryId" class="form-control"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        <option *ngFor="let opt of selectsData.countries | async" [ngValue]="opt.id">
+                                            {{ opt.name }}
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>
-                                    Type
-                                    <span class="add-link" *ngIf="viewMode === 'edit'">
-                                        <a href="javascript: void(0)"
-                                        (click)="addNewObject(importingTypes.ITEM_TYPE, 'Add new item type')">
-                                            new type
-                                        </a>
-                                    </span>
-                                </label>
-                                <select [compareWith]="dataMap.itemTypeId.formControl.compareFn" formControlName="itemTypeId"
-                                [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                    <option *ngFor="let type of itemData.itemTypeList" [value]="type.id">
-                                        {{ type.description }}
-                                    </option>
-                                </select>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">department</label>
+                                <div class="col">
+                                    <select formControlName="departmentId" class="form-control"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        <option *ngFor="let opt of selectsData.departments | async" [ngValue]="opt.id">
+                                            {{ opt.name }}
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Classification</label>
-                                <select [compareWith]="dataMap.classification.formControl.compareFn" formControlName="classification"
-                                [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                    <option *ngFor="let classification of itemData.classificationsList" [value]="classification">
-                                        {{ classification }}
-                                    </option>
-                                </select>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.cityId.name}}</label>
+                                <div class="col">
+                                    <select formControlName="cityId" class="form-control"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        <option *ngFor="let opt of selectsData.cities | async" [ngValue]="opt.id">
+                                            {{ opt.name }}
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Phonetic</label>
-                                <input class="form-control"  type="text" formControlName="phonetic"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>State</label>
-                                <select [compareWith]="dataMap.state.formControl.compareFn" formControlName="state"
-                                [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                    <option *ngFor="let state of itemData.statesList" [value]="state">
-                                        {{ state }}
-                                    </option>
-                                </select>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.code.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="code"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.code.formControl.helpText &&
+                                definitions.code.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.code.formControl.helpText">
+                                </span>
                             </div>
                         </div>
-                        <div class="col-sm-12">
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Description</label>
-                                <input class="form-control"  type="text" formControlName="description"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                        <div class="col-6">
+                            <div class="form-section-title row">
+                                <h5>Other details</h5>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.name.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="name"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                </div>
+                                <span  class="help-icon"
+                                *ngIf="definitions.name.formControl.helpText &&
+                                definitions.name.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.name.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.address.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="address"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.address.formControl.helpText &&
+                                definitions.address.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.address.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.contact.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="text" required formControlName="contact"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.contact.formControl.helpText &&
+                                definitions.contact.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.contact.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.email.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="mail" required formControlName="email"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.email.formControl.helpText &&
+                                definitions.email.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.email.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.phone1.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="phone1"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.phone1.formControl.helpText &&
+                                definitions.phone1.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.phone1.formControl.helpText">
+                                </span>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">{{definitions.phone2.name}}</label>
+                                <div class="col">
+                                    <input class="form-control" type="number" required formControlName="phone2"
+                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                </div>
+                                <span class="help-icon"
+                                *ngIf="definitions.phone2.formControl.helpText &&
+                                definitions.phone2.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.phone2.formControl.helpText">
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <mat-tab-group class="tab-specific-information">
-                        <mat-tab label="Especific Information">
-                            <ng-template matTabContent>
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-3 col-lg-2 pt-3">
-                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                        appearance="none">
-                                            <input  formControlName="expiryDate" [readonly]="viewMode === 'view'"  hidden>
-                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                            [checked]="form.get('expiryDate').value"
-                                            (change)="form.get('expiryDate').setValue(!form.get('expiryDate').value)">
-                                                Expiry Date
-                                            </mat-slide-toggle>
-                                        </div>
-                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                        appearance="none">
-                                            <input  formControlName="weight" [readonly]="viewMode === 'view'"  hidden>
-                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                            [checked]="form.get('weight').value"
-                                            (change)="form.get('weight').setValue(!form.get('weight').value)">
-                                            Weight
-                                            </mat-slide-toggle>
-                                        </div>
-                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                        appearance="none">
-                                            <input  formControlName="variableWeight" [readonly]="viewMode === 'view'"  hidden>
-                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                            [checked]="form.get('variableWeight').value"
-                                            (change)="form.get('variableWeight').setValue(!form.get('variableWeight').value)">
-                                            Variable Weight
-                                            </mat-slide-toggle>
-                                        </div>
-                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                        appearance="none">
-                                            <input  formControlName="serial" [readonly]="viewMode === 'view'" hidden>
-                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                            [checked]="form.get('serial').value"
-                                            (change)="form.get('serial').setValue(!form.get('serial').value)">
-                                            Serial
-                                            </mat-slide-toggle>
-                                        </div>
-                                        <div class="toggle-input" [class.readonly]="viewMode === 'view'"
-                                        appearance="none">
-                                            <input  formControlName="batchNumber" [readonly]="viewMode === 'view'"
-                                            style="display: none">
-                                            <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
-                                            [checked]="form.get('batchNumber').value"
-                                            (change)="form.get('batchNumber').setValue(!form.get('batchNumber').value)">
-                                            Batch Number
-                                            </mat-slide-toggle>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-9 col-lg-10">
-                                        <div class="row">
-                                            <div class="col-sm-4 pt-3">
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>
-                                                        Uom Handling
-                                                        <span class="add-link" *ngIf="viewMode === 'edit'">
-                                                            <a href="javascript: void(0)"
-                                                            (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
-                                                                <span>new uom</span>
-                                                            </a>
-                                                        </span>
-                                                    </label>
-                                                    <select [compareWith]="dataMap.uomHandlingId.formControl.compareFn" formControlName="uomHandlingId"
-                                                    [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom.id">
-                                                            {{ uom.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 pt-3">
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>
-                                                        Uom Packing
-                                                        <span class="add-link" *ngIf="viewMode === 'edit'">
-                                                            <a href="javascript: void(0)"
-                                                            (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
-                                                                new uom
-                                                            </a>
-                                                        </span>
-                                                    </label>
-                                                    <select [compareWith]="dataMap.uomPackingId.formControl.compareFn" formControlName="uomPackingId"
-                                                    [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom.id">
-                                                            {{ uom.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 pt-3">
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>
-                                                        Uom Outbound
-                                                        <span class="add-link" *ngIf="viewMode === 'edit'">
-                                                            <a href="javascript: void(0)"
-                                                            (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
-                                                            new uom
-                                                            </a>
-                                                        </span>
-                                                    </label>
-                                                    <select [compareWith]="dataMap.uomOutboundId.formControl.compareFn" formControlName="uomOutboundId"
-                                                    [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom.id">
-                                                            {{ uom.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 pt-3">
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>
-                                                        Uom Inbound
-                                                        <span class="add-link" *ngIf="viewMode === 'edit'">
-                                                            <a href="javascript: void(0)"
-                                                            (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
-                                                            new uom
-                                                            </a>
-                                                        </span>
-                                                    </label>
-                                                    <select [compareWith]="dataMap.uomInboundId.formControl.compareFn" formControlName="uomInboundId"
-                                                    [class.readonly]="viewMode === 'view'" class="form-control" [disabled]="viewMode === 'view'">
-                                                        <option *ngFor="let uom of itemData.uomsList" [value]="uom.id">
-                                                            {{ uom.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 pt-3">
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>Weight Tolerance</label>
-                                                    <input class="form-control"  type="number" formControlName="weightTolerance"
-                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 pt-3">
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>Tolerance</label>
-                                                    <input class="form-control"  type="number" formControlName="tolerance"
-                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 pt-3">
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>Scanned Verification</label>
-                                                    <input class="form-control"  type="text" formControlName="scannedVerification"
-                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                                </div>
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>Spoken Verification</label>
-                                                    <input class="form-control"  type="text" formControlName="spokenVerification"
-                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 pt-3">
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>Cost</label>
-                                                    <input class="form-control"  type="number" formControlName="cost"
-                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                                </div>
-                                                <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                                    <label>Shelf Life</label>
-                                                    <input class="form-control"  type="number" formControlName="shelfLife"
-                                                    [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </mat-tab>
-                        <mat-tab label="Item Uom" class="tab-example0">
-                            <ng-template matTabContent class="tab-example">
-                                <div class="tab-example1">
-                                    <div class="w-100 text-right">
-                                        <a href="javascript:void(0)" mat-raised-button color="warn" (click)="exportTableData()">
-                                            <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
-                                        </a>
-                                        <a href="javascript:void(0)" mat-raised-button color="accent" (click)="addRow()"
-                                        class="ml-2" *ngIf="viewMode === 'edit'">
-                                            <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
-                                        </a>
-                                        <br><br>
-                                    </div>
-                                    <!--strong *ngIf="dataSource.filter.length > 0">Filtred results: {{dataSource.filteredData.length}}</strong-->
-                                    <div class="table-toolbar" *ngIf="selection.selected.length > 0">
-                                        <div class="col-sm-6 text-left toolbar-label">
-                                            <label class="col-sm-2 col-form-label">Selected rows: {{selection.selected.length}}</label>
-                                        </div>
-                                        <div class="col-sm-6 text-right toolbar-buttons">
-                                            <!--button class="print-button" (click)="printRows(selection.selected)">Print</button-->
-                                            <!--button class="download-pdf-button" (click)="downloadPdf(selection.selected)">Download PDF</button-->
-                                            <button type="button" class="delete-button" (click)="deletePrompt(selection.selected)">Delete</button>
-                                        </div>
-                                    </div>
-                                    <ag-grid-angular
-                                    #agGrid
-                                    style="width: 100%; height: 300px;"
-                                    class="ag-theme-balham"
-                                    [frameworkComponents]="frameworkComponents"
-                                    [rowData]="itemUomsData"
-                                    [columnDefs]="itemUomsColDefs"
-                                    editType="fullRow"
-                                    [animateRows]="true"
-                                    (gridReady)="onGridReady($event)"
-                                    (rowValueChanged)="updateItemUom($event)">
-                                    </ag-grid-angular>
-                                </div>
-                            </ng-template>
-                        </mat-tab>
-                    </mat-tab-group>
-                    <div class="col-sm-12 text-right">
-                        <button mat-button type="submit" *ngIf="viewMode === 'edit'" [disabled]="isLoadingResults">SAVE</button>
-                        <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
-                    </div>
-                </form>
-            </mat-card-content>
-      </mat-card>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
     </div>
 </div>

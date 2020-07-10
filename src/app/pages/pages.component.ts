@@ -227,6 +227,20 @@ export class PagesComponent implements OnInit, OnDestroy  {
           children: []
         },
         {
+          text: 'Lpn relocate',
+          icon: '',
+          route: '/pages/lpn-relocate',
+          target: '_self',
+          children: []
+        },
+        {
+          text: 'Lpn transfer',
+          icon: '',
+          route: '/pages/lpn-transfer',
+          target: '_self',
+          children: []
+        },
+        {
           text: 'Inventory',
           icon: '',
           route: '/pages/inventory',

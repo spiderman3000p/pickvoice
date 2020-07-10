@@ -1,7 +1,7 @@
 <h2 mat-dialog-title>{{ title }}</h2>
 <div mat-dialog-content>
     <p>{{ message }}</p>
-    <input matInput placeholder="Filter" [formControl]="filterInput">
+    <input type="text" class="form-control" placeholder="Filter" [formControl]="filterInput">
     <div class="user-list-wrapper">
         <div class="example-loading-shade" *ngIf="isLoadingResults">
             <mat-spinner class="spinner"></mat-spinner>

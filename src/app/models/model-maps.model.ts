@@ -227,6 +227,18 @@ export class ModelMap {
                 control: 'input',
                 type: 'number'
             }
+        },
+        cityId: {
+            name: 'city',
+            required: false,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'select',
+                type: 'number',
+                valueIndex: 'id',
+                displayIndex: 'name'
+            }
         }
     };
     /* depot object map for CRUD */

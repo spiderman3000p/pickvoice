@@ -22,7 +22,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-plants',
   templateUrl: './plants.component.html',
-  styleUrls: ['./plants.component.css']
+  styleUrls: ['./plants.component.scss']
 })
 export class PlantsComponent implements OnInit, AfterViewInit, OnDestroy {
   definitions: any = ModelMap.PlantsMap;
