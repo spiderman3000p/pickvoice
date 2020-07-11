@@ -16,7 +16,7 @@
                 <div class="col-6 container-group">
                     <label>Origin LPN</label>
                     <div class="row">
-                        <form class="form-inline p-1 w-100" [formGroup]="searchOriginLpnForm" (ngSubmit)="searchLpnOrigin()">
+                        <form class="form-inline pb-1 w-100" [formGroup]="searchOriginLpnForm" (ngSubmit)="searchLpnOrigin()">
                             <div class="form-group row w-100">
                                 <label class="col-2 col-form-label p-0">Code</label>
                                 <div class="col-6">
@@ -31,7 +31,7 @@
                             </div>
                         </form>
                     </div>
-                    <div class="row">
+                    <div class="row pt-2">
                         <div class="col-12 lpn-items-container p-0">
                             <div class="example-loading-shade inside" *ngIf="isLoadingLpnOrigin">
                                 <mat-spinner class="spinner"></mat-spinner>
@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="col-6 container-group">
-                    <label>Destination LPN</label>
+                    <label>Target LPN</label>
                     <div class="row">
                         <form class="form-inline pb-1 w-100" [formGroup]="searchDestLpnForm" (ngSubmit)="searchLpnDest()">
                             <div class="form-group row w-100">

@@ -3,11 +3,15 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { LpnRelocateComponent } from './lpn-relocate.component';
 import { NotFoundComponent } from '../not-found/not-found.component';
+import { LpnRelocateResolverService } from './lpn-relocate-resolver.service';
 
 const routes: Routes = [
     {
         path: '',
-        component: LpnRelocateComponent
+        component: LpnRelocateComponent,
+        resolve: {
+            data: LpnRelocateResolverService
+        }
     },
     {
         path: '**',

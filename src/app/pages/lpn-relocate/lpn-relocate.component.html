@@ -16,105 +16,148 @@
                 <div class="col-6 container-group">
                     <label>Origin LPN</label>
                     <div class="row">
-                        <form class="form-inline p-1" [formGroup]="searchOriginLpnForm" (ngSubmit)="searchLpnOrigin()">
-                            <div class="col-9">
-                            <div class="form-group row">
-                                <label class="col-2 col-form-label">Code</label>
-                                <div class="col-10">
-                                    <input type="text" placeholder="Type a LPN code" class="form-control" formControlName="code" required>
+                        <form class="p-1 w-100" [formGroup]="searchOriginLpnForm" (ngSubmit)="searchLpnOrigin()">
+                            <div class="row">
+                                <div class="col-8 p-0">
+                                    <div class="form-group">
+                                        <label>Code</label>
+                                        <input type="text" placeholder="Type a LPN code" class="form-control" formControlName="code" required>
+                                    </div>
                                 </div>
-                                <button mat-raised-button type="submit">
-                                    <mat-icon>search</mat-icon>
-                                    Search
-                                </button>
+                                <div class="col-4 p-0 text-right">
+                                    <br>
+                                    <button mat-raised-button type="submit">
+                                        <mat-icon>search</mat-icon>
+                                        Search
+                                    </button>
+                                </div>
                             </div>
-                            <button mat-raised-button type="submit">
-                                <mat-icon>search</mat-icon>
-                                Search
-                            </button>
                         </form>
                     </div>
                     <div class="row">
-                        <div class="col-12 lpn-items-container">
+                        <div class="col-12 lpn-items-container p-0">
                             <div class="example-loading-shade inside" *ngIf="isLoadingLpnOrigin">
                                 <mat-spinner class="spinner"></mat-spinner>
                             </div>
-                            <div class="list-group">
+                            <!--div class="list-group">
                                 <a href="javascript:void(0)" class="list-group-item list-group-item-action"
-                                [ngClass]="{'active': lpn.qtyToTransfer > 0}"
                                 *ngFor="let lpn of lpnsOrigin">
+                                    <div class="row">
+                                        <div class="col-12 pl-0">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <strong class="">{{lpn.code}}</strong>
+                                                <small>{{lpn.lpnState}}</small>
+                                            </div>
+                                            <p class="mb-0">{{lpn.lpnInterface}}</p>
+                                            <small>Childs: {{lpn.lpnChilds}}</small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div-->
+                            <div
+                            cdkDropList
+                            #originList="cdkDropList"
+                            [cdkDropListData]="lpnsOrigin"
+                            [cdkDropListConnectedTo]="[destList]"
+                            class="example-list"
+                            [cdkDropListEnterPredicate]="originPredicate"
+                            (cdkDropListDropped)="drop($event)">
+                                <!--div class="example-box" *ngFor="let lpn of lpnsOrigin" cdkDrag>{{lpn.code}}</div-->
+                                <a href="javascript:void(0)" class="list-group-item list-group-item-action"
+                                *ngFor="let lpn of lpnsOrigin" cdkDrag>
                                     <div class="info-body">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <strong class="">{{lpn.itemDescription}}</strong>
+                                            <strong class="">{{lpn.code}}</strong>
                                             <small>{{lpn.lpnState}}</small>
                                         </div>
-                                        <p class="mb-0">{{lpn.uomName}}</p>
-                                        <small>Qty available: {{lpn.qty - lpn.qtyToTransfer}}</small>
-                                    </div>
-                                    <div class="qty-selector">
-                                        <div class="form-group">
-                                            <label>Transfer</label>
-                                            <input type="number" class="form-control" [(ngModel)]="lpn.qtyToTransfer">
-                                        </div>
-                                        <button mat-icon-button type="button" (click)="transfer(lpn)">
-                                            <mat-icon>send</mat-icon>
-                                        </button>
+                                        <p class="mb-0">{{lpn.lpnInterface}}</p>
+                                        <small>Childs: {{lpn.lpnChilds}}</small>
                                     </div>
                                 </a>
                             </div>
                         </div>
-                        <div class="col-12 pl-0 pr-0 pt-1">
-                            <div class="">
-                                <span class="float-left">Total LPN items: {{ lpnsOrigin.length }}</span>
-                                <span class="float-right">Total selected: {{ getSelectedLpns() }}</span>
-                            </div>
-                            <button mat-raised-button color="primary" type="button"
-                            (click)="transfer()" class="float-right" *ngIf="getSelectedLpns() > 0">
-                                Bulk Transfer
-                                <mat-icon>arrow_right</mat-icon>
-                            </button>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="col-12 pl-0">
+                            <span class="float-left">Total LPN's: {{ lpnsOrigin.length }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 container-group">
-                    <label>Destination LPN</label>
+                    <label>Target Location</label>
                     <div class="row">
-                        <form class="form-inline p-1" [formGroup]="searchDestLpnForm" (ngSubmit)="searchLpnDest()">
-                            <div class="form-group row">
-                                <label class="col-2 col-form-label">Code</label>
-                                <div class="col-10">
-                                    <input type="text" placeholder="Type a LPN code" class="form-control" formControlName="code" required>
+                        <form class="pb-1 w-100" [formGroup]="searchDestLocationForm" (ngSubmit)="searchLocationDest()">
+                            <div class="row">
+                                <div class="col-6 pl-0">
+                                    <div class="form-group">
+                                        <label>Type</label>
+                                        <select class="form-control" formControlName="type" required>
+                                            <option [value]="type" *ngFor="let type of locationTypes | async">
+                                                {{type}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label>Code</label>
+                                        <input type="text" placeholder="Type a location code" class="form-control" formControlName="code" required>
+                                    </div>
+                                </div>
+                                <div class="col-2 p-0 text-right">
+                                    <br>
+                                    <button mat-raised-button type="submit">
+                                        <mat-icon>search</mat-icon>
+                                    </button>
                                 </div>
                             </div>
-                            <button mat-raised-button type="submit">
-                                <mat-icon>search</mat-icon>
-                                Search
-                            </button>
                         </form>
                     </div>
-                    <div class="row">
-                        <div class="col-12 lpn-items-container">
-                            <div class="example-loading-shade inside" *ngIf="isLoadingLpnDest">
+                    <div class="row pt-2">
+                        <div class="col-12 lpn-items-container p-0">
+                            <div class="example-loading-shade inside" *ngIf="isLoadingLpnsDest">
                                 <mat-spinner class="spinner"></mat-spinner>
                             </div>
-                            <div class="list-group">
+                            <!--div class="list-group">
                                 <a href="javascript:void(0)" class="list-group-item list-group-item-action"
                                 *ngFor="let lpn of lpnsDest">
                                     <div class="info-body">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <strong class="">{{lpn.itemDescription}}</strong>
+                                            <strong class="">{{lpn.code}}</strong>
                                             <small>{{lpn.lpnState}}</small>
                                         </div>
-                                        <p class="mb-0">{{lpn.uomName}}</p>
-                                        <small>Qty available: {{lpn.qty}}</small>
+                                        <p class="mb-0">{{lpn.lpnInterface}}</p>
+                                        <small>Childs: {{lpn.lpnChilds}}</small>
                                     </div>
                                 </a>
+                            </div-->
+                            <div
+                            cdkDropList
+                            #destList="cdkDropList"
+                            [cdkDropListData]="lpnsDest"
+                            [cdkDropListConnectedTo]="[originList]"
+                            class="example-list"
+                            (CdkDragRelease)="onRelease($event)"
+                            [cdkDropListDisabled]="true"
+                            (cdkDropListDropped)="drop($event)">
+                                <a href="javascript:void(0)" class="list-group-item list-group-item-action"
+                                *ngFor="let lpn of lpnsDest" cdkDrag>
+                                    <div class="info-body">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <strong class="">{{lpn.code}}</strong>
+                                            <small>{{lpn.lpnState}}</small>
+                                        </div>
+                                        <p class="mb-0">{{lpn.lpnInterface}}</p>
+                                        <small>Childs: {{lpn.lpnChilds}}</small>
+                                    </div>
+                                </a>
+                                <!--div class="example-box" *ngFor="let lpn of lpnsDest" cdkDrag>{{lpn.code}}</div-->
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="col-12 pl-0 pr-0 pt-1">
                                 <div class="">
-                                    <span class="float-left">Total LPN items: {{ lpnsDest.length }}</span>
+                                    <span class="float-left">Total LPNS: {{ lpnsDest.length }}</span>
                                 </div>
                             </div>
                         </div>

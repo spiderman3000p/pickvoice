@@ -1355,4 +1355,15 @@ export class DataProviderService {
     /*return this.httpClient.get<any[]>(environment.apiBaseUrl +
       '/storage/lpn/transfer/' + targetLpnId, params).pipe(retry(3));*/
   }
+
+  public relocateLpn(originLpnId: number, targetLocationId: number): Observable<any> {
+    return this.storageService.relocateLpn(originLpnId, targetLocationId).pipe(retry(3));
+    /*return this.httpClient.get<any[]>(environment.apiBaseUrl +
+      '/storage/lpn/transfer/' + targetLpnId, params).pipe(retry(3));*/
+  }
+
+  public getAllLpnVO3(params: string): Observable<any> {
+    return this.httpClient.get<any>(environment.apiBaseUrl +
+      '/storage/lpnVO3/all;' + params).pipe(retry(3));
+  }
 }

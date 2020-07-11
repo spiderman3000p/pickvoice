@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 
 import { LpnRelocateRoutingModule } from './lpn-relocate-routing.module';
 import { LpnRelocateComponent } from './lpn-relocate.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatListModule } from '@angular/material/list';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -20,12 +21,14 @@ import { MatListModule } from '@angular/material/list';
     LpnRelocateRoutingModule,
 
     FormsModule,
+    ReactiveFormsModule,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatMenuModule,
-    MatListModule
+    MatListModule,
+    DragDropModule
   ],
   providers: [
   ]
