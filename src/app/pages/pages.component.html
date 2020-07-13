@@ -68,12 +68,27 @@
     </mat-toolbar>
     <router-outlet></router-outlet>
     <div class="status-bar">
-      <ul class="user-data">
+      <!--ul class="user-data">
         <li><strong class="text-accent">City:</strong> {{memberData.cityName}}</li>
         <li><strong class="text-accent">Plant:</strong> {{memberData.plantName}}</li>
         <li><strong class="text-accent">Depot:</strong> {{memberData.depotName}}</li>
         <li><strong class="text-accent">Owner:</strong> {{memberData.ownerName}}</li>
-      </ul>
+      </ul-->
+      <div class="row">
+        <i class="fa fa-arrow-up up-arrow" (click)="toggleStatusBar()"></i>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2">
+            <strong class="text-accent">City:</strong> {{memberData.cityName}}
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2">
+            <strong class="text-accent">Plant:</strong> {{memberData.plantName}}
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2">
+            <strong class="text-accent">Depot:</strong> {{memberData.depotName}}
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-2">
+            <strong class="text-accent">Owner:</strong> {{memberData.ownerName}}
+        </div>
+      </div>
       <span class="tools">
         <a href="javascript: void(0);" (click)="changeUserData()">Change user data</a>
       </span>

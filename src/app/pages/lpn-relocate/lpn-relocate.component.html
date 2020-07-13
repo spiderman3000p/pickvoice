@@ -18,15 +18,14 @@
                     <div class="row">
                         <form class="p-1 w-100" [formGroup]="searchOriginLpnForm" (ngSubmit)="searchLpnOrigin()">
                             <div class="row">
-                                <div class="col-8 p-0">
+                                <div class="col-sm-12 col-md-8 p-0">
                                     <div class="form-group">
                                         <label>Code</label>
                                         <input type="text" placeholder="Type a LPN code" class="form-control" formControlName="code" required>
                                     </div>
                                 </div>
-                                <div class="col-4 p-0 text-right">
-                                    <br>
-                                    <button mat-raised-button type="submit">
+                                <div class="col-sm-12 col-md-12 p-0 text-right search-lpn-block">
+                                    <button mat-raised-button type="submit" class="w-100">
                                         <mat-icon>search</mat-icon>
                                         Search
                                     </button>
@@ -34,7 +33,7 @@
                             </div>
                         </form>
                     </div>
-                    <div class="row">
+                    <div class="row pt-2">
                         <div class="col-12 lpn-items-container p-0">
                             <div class="example-loading-shade inside" *ngIf="isLoadingLpnOrigin">
                                 <mat-spinner class="spinner"></mat-spinner>
@@ -88,7 +87,7 @@
                     <div class="row">
                         <form class="pb-1 w-100" [formGroup]="searchDestLocationForm" (ngSubmit)="searchLocationDest()">
                             <div class="row">
-                                <div class="col-6 pl-0">
+                                <div class="col-sm-12 col-md-6 pl-0">
                                     <div class="form-group">
                                         <label>Type</label>
                                         <select class="form-control" formControlName="type" required>
@@ -98,16 +97,16 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-sm-12 col-md-4 pl-0">
                                     <div class="form-group">
                                         <label>Code</label>
                                         <input type="text" placeholder="Type a location code" class="form-control" formControlName="code" required>
                                     </div>
                                 </div>
-                                <div class="col-2 p-0 text-right">
-                                    <br>
-                                    <button mat-raised-button type="submit">
+                                <div class="col-sm-12 col-md-12 p-0 text-right search-location-block">
+                                    <button mat-raised-button type="submit" class="w-100">
                                         <mat-icon>search</mat-icon>
+                                        Search
                                     </button>
                                 </div>
                             </div>

@@ -287,11 +287,11 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openPrintDialog() {
-    this.utilities.log('openPrintDialog() selectedLpn: ', this.lpnToPrint);
+    // this.utilities.log('openPrintDialog() selectedLpn: ', this.lpnToPrint);
     const observer = {
       next: (result) => {
-        this.utilities.log('dialog result:', result);
-        this.utilities.log('this.lpnToPrint: ', this.lpnToPrint);
+        // this.utilities.log('dialog result:', result);
+        // this.utilities.log('this.lpnToPrint: ', this.lpnToPrint);
         if (result && this.lpnToPrint) {
           const jsonTemplate = JSON.parse(result.template.jsonTemplate);
           const htmlContent = this.utilities.generateHtmlLpnContent(this.lpnToPrint, jsonTemplate['gjs-html']);
@@ -299,8 +299,8 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
           const idLpnToPrint = this.lpnToPrint.lpnId ? this.lpnToPrint.lpnId :
           (this.lpnToPrint.lpnItemId ? this.lpnToPrint.lpnItemId : '');
           const size = result.size;
-          this.utilities.log('html to print:', htmlContent);
-          this.utilities.log('css to print:', cssStyles);
+          // this.utilities.log('html to print:', htmlContent);
+          // this.utilities.log('css to print:', cssStyles);
           this.utilities.print(`Label LPN ${idLpnToPrint}`, htmlContent, cssStyles,
           size.width, size.heigth);
         } else if (!result) {
@@ -462,6 +462,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (result) {
         /*this.dataSource.data.push(result);
         this.refreshTable();*/
+        this.reloadData();
       }
     }, error => {
       this.utilities.error('error after closing edit row dialog');

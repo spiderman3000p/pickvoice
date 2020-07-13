@@ -2,7 +2,13 @@
 <div mat-dialog-content>
     <div class="row">
         <div class="col-3">
+            <div class="row p-2">
+                <input type="text" class="form-control" placeholder="Filter" [formControl]="filterInput">
+            </div>
             <div class="list-group">
+                <div class="example-loading-shade" *ngIf="isLoadingList">
+                    <mat-spinner class="spinner"></mat-spinner>
+                </div>
                 <a href="#" class="list-group-item list-group-item-action" (click)="selectedTemplate = template"
                 *ngFor="let template of templates" [ngClass]="{'active': selectedTemplate.id === template.id}">
                     {{template.name}}
@@ -10,61 +16,57 @@
             </div>
         </div>
         <div class="col-6">
-            <div class="form-group row">
-                <label class="col-3 col-form-label pl-0">Code</label>
-                <div class="col">
-                    <input type="text">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div class="row">
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label pl-0">Code</label>
+                        <div class="col">
+                            <input type="text" class="form-control" formControlName="code">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label pl-0">Name</label>
+                        <div class="col">
+                            <input type="text" class="form-control" formControlName="name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label pl-0">Description</label>
+                        <div class="col">
+                            <input type="text" class="form-control" formControlName="description">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label pl-0">Enable Date</label>
+                        <div class="col">
+                            <input type="date" class="form-control" formControlName="enableDate">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label pl-0">Type</label>
+                        <div class="col">
+                            <select [formControl]="labelTypeId" class="form-control">
+                                <option *ngFor="let opt of types | async" [ngValue]="opt.id">
+                                    {{ opt.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-3 col-form-label pl-0">Country</label>
-                <div class="col">
-                    <select [formControl]="country" class="form-control">
-                        <option *ngFor="let opt of countries | async" [ngValue]="opt">
-                            {{ opt.name }}
-                        </option>
-                    </select>
+                <div class="row">
+                    <button mat-raised-button color="primary" *ngIf="viewMode === 'view'" type="button" (click)="edit()">Editar</button>
+                    <button mat-raised-button color="primary" *ngIf="viewMode === 'view'" type="submit" (click)="save()">Guardar</button>
+                    <button mat-raised-button color="primary" *ngIf="viewMode === 'edit'" type="reset" (click)="cancel()">Cancelar</button>
+                    <button mat-raised-button color="accent" class="float-left" type="button" (click)="delete()">Eliminar</button>
                 </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-3 col-form-label pl-0">Department</label>
-                <div class="col">
-                    <select [formControl]="department" class="form-control">
-                        <option *ngFor="let opt of departments | async" [ngValue]="opt">
-                            {{ opt.name }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-3 col-form-label pl-0">City</label>
-                <div class="col">
-                    <select [formControl]="city" class="form-control">
-                        <option *ngFor="let opt of cities | async" [ngValue]="opt">
-                            {{ opt.name }}
-                        </option>
-                    </select>
-                </div>
-            </div>
+            </form>
         </div>
-        <div class="col-6">
-            <div class="col-12">
-                <input type="text" class="form-control" placeholder="Filter" [formControl]="filterInput">
-            </div>
-            <div class="user-list-wrapper mt-1">
-                <div class="example-loading-shade" *ngIf="isLoadingResults">
-                    <mat-spinner class="spinner"></mat-spinner>
-                </div>
-                <mat-action-list>
-                    <button class="text-left" mat-list-item *ngFor="let element of filteredCollection"
-                    (click)="setSelectedElement(element)">
-                        {{element?.name}}
-                    </button>
-                </mat-action-list>
+        <div class="col-3">
+            <div class="template-preview">
             </div>
         </div>
     </div>
 </div>
 <div mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close (click)="close()">CANCEL</button>
+    <button mat-button mat-dialog-close (click)="close()">CLOSE</button>
 </div>

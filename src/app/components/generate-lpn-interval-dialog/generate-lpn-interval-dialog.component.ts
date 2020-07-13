@@ -62,7 +62,7 @@ export class GenerateLpnIntervalDialogComponent implements OnInit, AfterViewInit
     delete dataToUpload.template;
     this.dataProviderService.createLpns(dataToUpload).subscribe((result: any) => {
       this.isLoading = false;
-      this.utilities.log('Respuesta generar lpn: ', result);
+      // this.utilities.log('Respuesta generar lpn: ', result);
       if (result) {
         this.utilities.showSnackBar('Lpn gerated successfully', 'OK');
         if (this.form.get('print').value) {
@@ -74,8 +74,8 @@ export class GenerateLpnIntervalDialogComponent implements OnInit, AfterViewInit
             htmlContent += this.utilities.generateHtmlLpnContent(lpn, jsonTemplate['gjs-html']);
           });
           const cssStyles = jsonTemplate['gjs-css'];
-          this.utilities.log('html to print:', htmlContent);
-          this.utilities.log('css to print:', cssStyles);
+          // this.utilities.log('html to print:', htmlContent);
+          // this.utilities.log('css to print:', cssStyles);
           this.utilities.print(`Labels`, htmlContent, cssStyles,
           '80mm', '100mm');
         }

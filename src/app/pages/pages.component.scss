@@ -126,11 +126,12 @@ mat-sidenav mat-toolbar{
     height: unset;
 }
 .status-bar {
+    transition: all 1s;
     z-index: 9998;
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 30px;
+    height: 28px;
     padding: 5px;
     background-color: #efebde;
     color: black;
@@ -148,9 +149,50 @@ mat-sidenav mat-toolbar{
 }
 .status-bar .tools{
     z-index: 9999;
-    right: 100px;
-    position: fixed;
+    right: 350px;
+    position: absolute;
+    top: 5px;
 }
 .text-accent {
     color: $accent;
+}
+.up-arrow{
+    display: none;
+}
+
+@media screen and (max-width:'600px'){
+    .status-bar .tools{
+        right: 10px;
+        position: absolute;
+        top: 5px;
+    }
+    .status-bar.show{
+        height: 90px;
+    }
+    .up-arrow{
+        display: block;
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        right: 0;
+        left: 0;
+        background: var(--primary);
+        padding: 5px;
+        border-radius: 20px;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        color: white;
+        top: -15px;
+        cursor: pointer;
+        transition: all 2s;
+    }
+    .up-arrow:before{
+        content: '\f062';
+        vertical-align: -webkit-baseline-middle;
+    }
+    .up-arrow.show:before{
+        content: '\f063';
+        vertical-align: -webkit-baseline-middle;
+    }
 }

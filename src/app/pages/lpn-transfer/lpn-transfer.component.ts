@@ -83,6 +83,7 @@ export class LpnTransferComponent implements OnInit {
       retry(3)
     ).subscribe(result => {
       if (result) {
+        lpn.qtyToTransfer = 0;
         this.utilities.log('Transfer done succesfully');
         this.utilities.showSnackBar('Transfer done successfully', 'OK');
         this.searchLpnDest();

@@ -15,7 +15,6 @@ import { ChangeUserDataComponent } from '../components/change-user-data/change-u
 })
 export class PagesComponent implements OnInit, OnDestroy  {
   username: string;
-  mobileQuery: MediaQueryList;
   menuOptions = [
     {
       text: 'Dashboard',
@@ -262,8 +261,8 @@ export class PagesComponent implements OnInit, OnDestroy  {
   internetStatusMessage = '';
   showInternetStatus = false;
   memberData: any;
+  mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
-  
   constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
               private authService: AuthService, private utilities: UtilitiesService,
               private router: Router, private dialog: MatDialog) {
@@ -345,6 +344,13 @@ export class PagesComponent implements OnInit, OnDestroy  {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
     }));
+  }
+
+  toggleStatusBar() {
+    const statusBar = document.querySelector('.status-bar');
+    statusBar.classList.toggle('show');
+    const statusBarToggleButton = document.querySelector('.up-arrow');
+    statusBarToggleButton.classList.toggle('show');
   }
 
   ngOnInit() {

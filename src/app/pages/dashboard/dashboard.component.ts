@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { MediaMatcher } from '@angular/cdk/layout';
 import { map, debounceTime } from 'rxjs/operators';
 import Chart from 'chart.js';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
@@ -84,12 +85,11 @@ const BODY_DUMMY_DATA = [
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit, AfterViewChecked {
   userData: any;
   chartTasks: any;
   chartPlannings: any;
   chartProgress: any;
-  isHandset = false;
   tasksChartLabels = [
     {
       name: 'Pending Tasks',
@@ -181,33 +181,17 @@ export class DashboardComponent implements OnInit {
       }
     }
   ];
-  cards = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
-    map(({ matches }) => {
-      if (matches) {
-        this.isHandset = true;
-        this.utilities.log('is handset');
-        return [
-          { title: 'Card 1', cols: 2, rows: 1 },
-          { title: 'Card 2', cols: 2, rows: 1 },
-          { title: 'Card 3', cols: 2, rows: 1 },
-          { title: 'Card 4', cols: 2, rows: 1 }
-        ];
-      }
-      this.isHandset = false;
-      this.utilities.log('is not handset');
-      return [
-        { title: 'Card 1', cols: 1, rows: 1 },
-        { title: 'Card 2', cols: 1, rows: 1 },
-        { title: 'Card 3', cols: 1, rows: 2 },
-        { title: 'Card 4', cols: 1, rows: 1 }
-      ];
-    })
-  );
   chartsFrom = new FormControl('');
   chartsTo = new FormControl('');
-  constructor(private breakpointObserver: BreakpointObserver, private authService: AuthService,
+  mobileQuery: MediaQueryList;
+  private _mobileQueryListener: () => void;
+  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
+              private breakpointObserver: BreakpointObserver, private authService: AuthService,
               private utilities: UtilitiesService, private dataProviderService: DataProviderService) {
     // this.utilities.log('last url', this.authService.redirectUrl);
+    this.mobileQuery = media.matchMedia('(max-width: 600px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
     this.chartsFrom.setValue(this.utilities.formatDate(new Date(Date.now() - (30 * 24 * 60 * 60000)), 'YYYY-MM-DD'));
     this.chartsTo.setValue(this.utilities.formatDate(new Date(), 'YYYY-MM-DD'));
     this.utilities.log('this.taskChartTo: ', this.chartsTo.value);
@@ -638,7 +622,14 @@ export class DashboardComponent implements OnInit {
         },
       }
     });
-    const element = document.getElementById('date-filters');
+    this.initCharts();
+  }
+
+  ngAfterViewInit() {
+  }
+
+  ngAfterViewChecked(): void {
+    /*const element = document.getElementById('date-filters');
     const elementPosition = element.offsetTop;
     document.querySelector('.mat-sidenav-content').addEventListener('scroll', function(event) {
       const posTop = this.scrollTop;
@@ -646,9 +637,11 @@ export class DashboardComponent implements OnInit {
       if (posTop > 90) {
         element.style.position = 'fixed';
         element.style.top = '0';
-        if (!this.isHandSet) {
+        if (this.mobileQuery.matches) {
+          this.utilities.log('is handset');
           element.style.width = '75%';
         } else {
+          this.utilities.log('is not handset');
           element.style.width = '90%';
         }
       } else {
@@ -656,7 +649,6 @@ export class DashboardComponent implements OnInit {
         element.style.top = 'auto';
         element.style.width = 'unset';
       }
-    });
-    this.initCharts();
+    });*/
   }
 }

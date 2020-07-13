@@ -16,18 +16,18 @@
                 <div class="col-6 container-group">
                     <label>Origin LPN</label>
                     <div class="row">
-                        <form class="form-inline pb-1 w-100" [formGroup]="searchOriginLpnForm" (ngSubmit)="searchLpnOrigin()">
-                            <div class="form-group row w-100">
-                                <label class="col-2 col-form-label p-0">Code</label>
-                                <div class="col-6">
+                        <form class="pb-1 w-100" [formGroup]="searchOriginLpnForm" (ngSubmit)="searchLpnOrigin()">
+                            <div class="col-sm-12 p-0">
+                                <div class="form-group">
+                                    <label>Code</label>
                                     <input type="text" placeholder="Type a LPN code" class="form-control" formControlName="code" required>
                                 </div>
-                                <div class="col-4 p-0 text-right">
-                                    <button mat-raised-button type="submit">
-                                        <mat-icon>search</mat-icon>
-                                        Search
-                                    </button>
-                                </div>
+                            </div>
+                            <div class="col-sm-12 p-0">
+                                <button mat-raised-button type="submit" class="w-100">
+                                    <mat-icon>search</mat-icon>
+                                    Search
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -41,7 +41,7 @@
                                 [ngClass]="{'active': lpn.qtyToTransfer > 0}"
                                 *ngFor="let lpn of lpnItemsOrigin">
                                     <div class="row">
-                                        <div class="col-8 pl-0">
+                                        <div class="col-sm-12 col-md-8 p-0">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <strong class="">{{lpn.itemDescription}}</strong>
                                                 <small>{{lpn.lpnState}}</small>
@@ -49,7 +49,7 @@
                                             <p class="mb-0">{{lpn.uomName}}</p>
                                             <small>Qty available: {{lpn.qty - lpn.qtyToTransfer}}</small>
                                         </div>
-                                        <div class="col-4 p-0 d-flex" style="align-items:center">
+                                        <div class="col-sm-12 col-md-8 p-0 d-flex" style="align-items:center">
                                             <div class="form-group">
                                                 <small>Qty to transfer</small>
                                                 <input type="number" class="form-control" [(ngModel)]="lpn.qtyToTransfer">
@@ -64,15 +64,15 @@
                         </div>
                     </div>
                     <div class="row pt-2">
-                        <div class="col-3 pl-0">
+                        <div class="col-12 pl-0">
                             <span class="float-left">Total LPN items: {{ lpnItemsOrigin.length }}</span>
                         </div>
-                        <div class="col-3">
-                            <span class="float-right">Total selected: {{ getSelectedLpns() }}</span>
+                        <div class="col-12 pl-0">
+                            <span class="float-left">Total selected: {{ getSelectedLpns() }}</span>
                         </div>
-                        <div class="col-6 pr-0">
+                        <div class="col-12 pl-0">
                             <button mat-raised-button color="primary" type="button"
-                            (click)="transfer()" class="float-right" *ngIf="getSelectedLpns() > 1">
+                            (click)="transfer()" class="w-100" *ngIf="getSelectedLpns() > 1">
                                 Bulk Transfer
                                 <mat-icon>arrow_right</mat-icon>
                             </button>
@@ -82,18 +82,18 @@
                 <div class="col-6 container-group">
                     <label>Target LPN</label>
                     <div class="row">
-                        <form class="form-inline pb-1 w-100" [formGroup]="searchDestLpnForm" (ngSubmit)="searchLpnDest()">
-                            <div class="form-group row w-100">
-                                <label class="col-2 col-form-label">Code</label>
-                                <div class="col-6">
+                        <form class="pb-1 w-100" [formGroup]="searchDestLpnForm" (ngSubmit)="searchLpnDest()">
+                            <div class="col-sm-12 p-0">
+                                <div class="form-group">
+                                    <label>Code</label>
                                     <input type="text" placeholder="Type a LPN code" class="form-control" formControlName="code" required>
                                 </div>
-                                <div class="col-4 p-0 text-right">
-                                    <button mat-raised-button type="submit">
-                                        <mat-icon>search</mat-icon>
-                                        Search
-                                    </button>
-                                </div>
+                            </div>
+                            <div class="col-sm-12 p-0">
+                                <button mat-raised-button type="submit" class="w-100">
+                                    <mat-icon>search</mat-icon>
+                                    Search
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -116,12 +116,8 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="col-12 pl-0 pr-0 pt-1">
-                                <div class="">
-                                    <span class="float-left">Total LPN items: {{ lpnItemsDest.length }}</span>
-                                </div>
-                            </div>
+                        <div class="col-12 pl-0 pr-0 pt-1">
+                            <span class="float-left">Total LPN items: {{ lpnItemsDest.length }}</span>
                         </div>
                     </div>
                 </div>
