@@ -61,3 +61,13 @@ $danger: #9C080B;
   font-size: 36px;
   margin-bottom: 10px;
 }
+
+::ng-deep .template-name{
+  position: absolute;
+  right: 0;
+  left: 29%;
+  padding: 5px;
+  top: 5px;
+  z-index: 9999;
+  color: white;
+}

@@ -33,7 +33,11 @@
               "./node_modules/jquery/dist/jquery.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js",
               "src/assets/js/JsBarcode.all.min.js",
-              "./node_modules/grapesjs/dist/grapes.min.js"
+              "./node_modules/grapesjs/dist/grapes.min.js",
+              "src/assets/js/zip.js",
+              "src/assets/js/zip-ext.js",
+              "src/assets/js/deflate.js",
+              "src/assets/js/JSPrintManager.js"
             ],
             "es5BrowserSupport": true,
             "webWorkerTsConfig": "tsconfig.worker.json"
@@ -101,7 +105,11 @@
             "scripts": [
               "./node_modules/jquery/dist/jquery.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.min.js",
-              "./node_modules/grapesjs/dist/grapes.min.js"
+              "./node_modules/grapesjs/dist/grapes.min.js",
+              "src/assets/js/zip.js",
+              "src/assets/js/zip-ext.js",
+              "src/assets/js/deflate.js",
+              "src/assets/js/JSPrintManager.js"
             ],
             "assets": [
               "src/favicon.ico",

@@ -21,18 +21,24 @@ export class GenerateLpnIntervalDialogComponent implements OnInit, AfterViewInit
   isLoading = false;
   form: FormGroup;
   STATES = STATES;
+  templates: any[];
   constructor(public dialogRef: MatDialogRef<GenerateLpnIntervalDialogComponent>,
               private dataProviderService: DataProviderService, private utilities: UtilitiesService,
               @Inject(MAT_DIALOG_DATA) public data: any) {
     this.form = new FormGroup({
       type: new FormControl('', [Validators.required]),
       qty: new FormControl('', [Validators.required]),
-      state: new FormControl('', [Validators.required])
+      state: new FormControl('', [Validators.required]),
+      print: new FormControl(false),
+      template: new FormControl(null)
     });
   }
 
   ngOnInit(): void {
     this.loadData();
+    this.dataProviderService.getAllTemplates().subscribe(results => {
+      this.templates = results;
+    });
   }
 
   ngAfterViewInit() {
@@ -51,11 +57,28 @@ export class GenerateLpnIntervalDialogComponent implements OnInit, AfterViewInit
       return;
     }
     this.isLoading = true;
-    this.dataProviderService.createLpn(this.form.value).subscribe(result => {
+    const dataToUpload = Object.assign({}, this.form.value);
+    delete dataToUpload.print;
+    delete dataToUpload.template;
+    this.dataProviderService.createLpns(dataToUpload).subscribe((result: any) => {
       this.isLoading = false;
       this.utilities.log('Respuesta generar lpn: ', result);
       if (result) {
         this.utilities.showSnackBar('Lpn gerated successfully', 'OK');
+        if (this.form.get('print').value) {
+          let htmlContent = '';
+          const jsonTemplate = JSON.parse(this.form.value.template.jsonTemplate);
+          this.utilities.log('jsonTemplate:', jsonTemplate);
+          result.forEach((lpn, index) => {
+            htmlContent += index > 0 ? '<div class="page-break"></div>' : '';
+            htmlContent += this.utilities.generateHtmlLpnContent(lpn, jsonTemplate['gjs-html']);
+          });
+          const cssStyles = jsonTemplate['gjs-css'];
+          this.utilities.log('html to print:', htmlContent);
+          this.utilities.log('css to print:', cssStyles);
+          this.utilities.print(`Labels`, htmlContent, cssStyles,
+          '80mm', '100mm');
+        }
         this.dialogRef.close(this.form.value);
       }
     }, error => {

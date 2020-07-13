@@ -52,6 +52,10 @@ const routes: Routes = [
     loadChildren: () => import('./quality-states/quality-states.module').then(m => m.QualityStatesModule)
   },
   {
+    path: 'test-print',
+    loadChildren: () => import('./test-print/test-print.module').then(m => m.TestPrintModule)
+  },
+  {
     path: IMPORTING_TYPES.LPN_INTERVAL,
     loadChildren: () => import('./lpn-intervals/lpn-interval.module').then(m => m.LpnIntervalModule)
   },
@@ -90,10 +94,6 @@ const routes: Routes = [
   {
     path: 'administration',
     loadChildren: () => import('./administration/administration.module').then(m => m.AdministrationModule)
-  },
-  {
-    path: 'pending-orders',
-    loadChildren: () => import('./pending-orders/pending-orders.module').then(m => m.PendingOrdersModule)
   },
   {
     path: 'current-actions',

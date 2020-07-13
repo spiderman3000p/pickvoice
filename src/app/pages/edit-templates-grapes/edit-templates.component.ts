@@ -152,30 +152,41 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       }
     }
   };
-  fields = [];
+  lpnItemFields = [];
+  lpnsFields = [];
   date = new Date().toLocaleDateString();
-  model = ModelMap.LpnItemVO2Map;
-  templateObject: LabelTemplate;
+  templateObject: LabelTemplate = {
+    name: 'New Unknow *'
+  };
+  hasBeenSaved = false;
+  lastSavedId: number;
+  selectedSaveType: string;
   constructor(private utilities: UtilitiesService, private appRef: ApplicationRef,
               private dialog: MatDialog, private authService: AuthService,
               private dataProvider: DataProviderService) {
-    Object.keys(this.model).forEach(key => {
-      this.fields.push({
+    this.lpnItemFields = this.initFields(ModelMap.LpnItemVO2Map);
+    this.lpnsFields = this.initFields(ModelMap.LpnVO3Map);
+  }
+
+  initFields(model: any): any[] {
+    const fields = [];
+    Object.keys(model).forEach(key => {
+      fields.push({
         id: `field-${key}`,
         selected: false,
         key: key,
-        label: this.model[key].name,
+        label: model[key].name,
         value: 'Lorem ipsum dolor',
         disabled: false,
-        model: this.model[key],
+        model: model[key],
         iconClass: 'fa fa-cubes',
         blockType: 'text',
-        type: this.model[key].formControl.type
+        type: model[key].formControl.type
       });
     });
     const barCode = this.utilities.generateBarCode('12345678910');
     console.log('bar code', barCode);
-    this.fields.push({
+    fields.push({
       id: `field-barcode`,
       selected: false,
       label: 'bar code',
@@ -187,8 +198,11 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       blockType: 'image',
       type: 'image'
     });
-    console.log('fields:', this.fields);
+    console.log('fields:', fields);
+    return fields;
   }
+
+
 
   initEditor() {
     this.editor = grapesjs.init({
@@ -211,7 +225,6 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
        * @param  {Function} clb Callback function to call when the load is ended
        * @param  {Function} clbErr Callback function to call in case of errors
        */
-      
       load(keys, clb, clbErr) {
         const obs = new Observable(suscriber => {
           const result = {};
@@ -236,8 +249,14 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
         that.utilities.log('data on store: ', data);
         that.templateObject.jsonTemplate = JSON.stringify(data);
         // that.templateObject.jsonTemplate = data['gjs-html'];
-        that.dataProvider.saveTemplate(that.templateObject).subscribe(result => clb(result),
-        (error) => clbErr(error));
+        if (that.selectedSaveType === 'new') {
+          that.dataProvider.saveTemplate(that.templateObject).subscribe(result => clb(result),
+          (error) => clbErr(error));
+        } else if (that.selectedSaveType === 'update') {
+          that.templateObject.id = that.lastSavedId;
+          that.dataProvider.updateTemplate(that.lastSavedId, that.templateObject).subscribe(result => clb(result),
+          (error) => clbErr(error));
+        }
       }
     });
     this.initEditorBlocks();
@@ -388,76 +407,127 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       id: 'left-panel',
       visible  : true,
       buttons  : [
-      {
-        id: 'open-button',
-        className: 'fa fa-folder-open',
-        attributes: { title: 'Open Template'},
-        active: false,
-        command: {
-          run: (editor) => {
-            const dialogRef = this.dialog.open(OpenTemplateDialogComponent);
-            dialogRef.afterClosed().subscribe(result => {
-              this.utilities.log('dialog result:', result);
-              if (result && result.name && result.description) {
-                this.templateObject = new Object(result) as LabelTemplate;
-                editor.load((response: any) => {
-                  editor.Panels.getButton('left-panel', 'open-button').active = false;
-                  this.utilities.log('Template successfully loaded');
-                  this.utilities.showSnackBar('Template successfully loaded', 'OK');
-                }, (error) => {
-                  editor.Panels.getButton('left-panel', 'open-button').active = false;
-                  this.utilities.error('Error on loading template', error);
-                  this.utilities.showSnackBar('Error on loading template', 'OK');
-                });
-              }
-            }, error => {
-              this.utilities.error('error after closing open template dialog');
-              this.utilities.showSnackBar('Error after closing open template', 'OK');
-              this.isLoadingResults = false;
-            });
-          },
-          stop: (editor) => {
-            editor.Panels.getButton('left-panel', 'open-button').active = false;
+        {
+          id: 'open-button',
+          className: 'fa fa-folder-open',
+          attributes: { title: 'Open Template'},
+          active: false,
+          command: {
+            run: (editor) => {
+              this.openTemplate(editor);
+            },
+            stop: (editor) => {
+              editor.Panels.getButton('left-panel', 'open-button').active = false;
+            }
+          }
+        },
+        {
+          id: 'save-button',
+          className: 'fa fa-save',
+          attributes: { title: 'Save Template'},
+          active: false,
+          command: {
+            run: (editor) => {
+              this.saveLastTemplate(editor);
+            },
+            stop: (editor) => {
+              editor.Panels.getButton('left-panel', 'save-button').active = false;
+            }
+          }
+        },
+        {
+          id: 'save-new-button',
+          className: 'fa fa-file-o',
+          attributes: { title: 'Save New Template'},
+          active: false,
+          command: {
+            run: (editor) => {
+              this.saveNewTemplate(editor);
+            },
+            stop: (editor) => {
+              editor.Panels.getButton('left-panel', 'save-new-button').active = false;
+            }
           }
         }
-      },
-      {
-        id: 'save-button',
-        className: 'fa fa-save',
-        attributes: { title: 'Save Template'},
-        active: false,
-        command: {
-          run: (editor) => {
-            const dialogRef = this.dialog.open(SaveTemplateDialogComponent);
-            dialogRef.afterClosed().subscribe(result => {
-              this.utilities.log('dialog result:', result);
-              if (result && result.name && result.description) {
-                this.templateObject = new Object(result) as LabelTemplate;
-                this.templateObject.ownerId = this.authService.getOwnerId();
-                this.templateObject.depotId = this.authService.getDepotId();
-                this.templateObject.dataSet = '';
-                editor.store((response: any) => {
-                  editor.Panels.getButton('left-panel', 'save-button').active = false;
-                  this.utilities.log('Template successfully saved');
-                  this.utilities.showSnackBar('Template successfully saved', 'OK');
-                }, (error) => {
-                  editor.Panels.getButton('left-panel', 'save-button').active = false;
-                  this.utilities.error('Error on saving template', error);
-                  this.utilities.showSnackBar('Error on saving template', 'OK');
-                });
-              }
-            }, error => {
-              this.utilities.error('error after closing save template dialog');
-              this.utilities.showSnackBar('Error after closing save template', 'OK');
-              this.isLoadingResults = false;
-            });
-          },
-          stop: (editor) => {
-            editor.Panels.getButton('left-panel', 'save-button').active = false;
-          }
-        }
-      }
       ]
+    });
+  }
+
+  openTemplate(editor: any) {
+    const dialogRef = this.dialog.open(OpenTemplateDialogComponent, {
+      width: '400px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result && result.name && result.description) {
+        this.templateObject = new Object(result) as LabelTemplate;
+        editor.load((response: any) => {
+          this.hasBeenSaved = true;
+          this.lastSavedId = result.id;
+          this.utilities.log('open response: ', response);
+          editor.Panels.getButton('left-panel', 'open-button').active = false;
+          this.utilities.log('Template successfully loaded');
+          this.utilities.showSnackBar('Template successfully loaded', 'OK');
+        }, (error) => {
+          editor.Panels.getButton('left-panel', 'open-button').active = false;
+          this.utilities.error('Error on loading template', error);
+          this.utilities.showSnackBar('Error on loading template', 'OK');
+        });
+      }
+    }, error => {
+      this.utilities.error('error after closing open template dialog');
+      this.utilities.showSnackBar('Error after closing open template', 'OK');
+      this.isLoadingResults = false;
+    });
+  }
+
+  saveLastTemplate(editor: any) {
+    if (!(this.hasBeenSaved && this.lastSavedId > 0)) {
+      this.saveNewTemplate(editor);
+      return;
+    }
+    this.selectedSaveType = 'update';
+    editor.store((response: any) => {
+      this.utilities.log('update response: ', response);
+      editor.Panels.getButton('left-panel', 'save-button').active = false;
+      this.utilities.log('Template successfully updated');
+      this.utilities.showSnackBar('Template successfully updated', 'OK');
+    }, (error) => {
+      editor.Panels.getButton('left-panel', 'save-button').active = false;
+      this.utilities.error('Error on updating template', error);
+      this.utilities.showSnackBar('Error on updating template', 'OK');
+    });
+  }
+
+  saveNewTemplate(editor: any) {
+    this.selectedSaveType = 'new';
+    const dialogRef = this.dialog.open(SaveTemplateDialogComponent, {
+      width: '400px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result && result.name && result.description) {
+        this.templateObject = new Object(result) as LabelTemplate;
+        this.templateObject.ownerId = this.authService.getOwnerId();
+        this.templateObject.depotId = this.authService.getDepotId();
+        this.templateObject.dataSet = '';
+        editor.store((response: any) => {
+          this.hasBeenSaved = true;
+          this.lastSavedId = response.id;
+          this.utilities.log('save response: ', response);
+          editor.Panels.getButton('left-panel', 'save-new-button').active = false;
+          this.utilities.log('Template successfully saved');
+          this.utilities.showSnackBar('Template successfully saved', 'OK');
+        }, (error) => {
+          editor.Panels.getButton('left-panel', 'save-new-button').active = false;
+          this.utilities.error('Error on saving template', error);
+          this.utilities.showSnackBar('Error on saving template', 'OK');
+        });
+      }
+    }, error => {
+      this.utilities.error('error after closing save template dialog');
+      this.utilities.showSnackBar('Error after closing save template', 'OK');
+      this.isLoadingResults = false;
     });
   }
 
@@ -470,18 +540,16 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
   ngOnDestroy() {
   }
 
-  ngAfterViewInit() {
-    this.initEditor();
-    // bloques de datos
+  createBlock(fields: any[] = [], title: string = 'Data') {
     let aux;
-    this.fields.forEach(field => {
+    fields.forEach(field => {
       // this.utilities.log('field a insertar: ', field.label);
       aux = Object.assign({}, {
         label: `<div>
         <i class="${field.iconClass} icon-block"></i>
         <div class="text-block">${field.label}</div>
         </div>`,
-        category: 'Data',
+        category: title,
         content: {
           components: [{
             type: 'text',
@@ -517,5 +585,12 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       this.editor.BlockManager.add(field.id + '-block', aux);
       // this.utilities.log('aux insertado: ', aux);
     });
+  }
+
+  ngAfterViewInit() {
+    this.initEditor();
+    // bloques de datos
+    this.createBlock(this.lpnsFields, 'LPN Data');
+    this.createBlock(this.lpnItemFields, 'LPN Item Data');
   }
 }

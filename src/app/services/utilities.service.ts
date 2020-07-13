@@ -338,6 +338,50 @@ export class UtilitiesService implements OnDestroy {
     return response;
   }
 
+  generateHtmlLpnContent(lpn: any, htmlTemplate: string): string {
+    const htmlWrapper = document.createElement('div');
+    htmlWrapper.innerHTML = htmlTemplate;
+    let objectMap;
+    let barcode;
+    const spanAux = document.createElement('span');
+    this.log('gerating html to lpn:', lpn);
+    // sustituir valores segun el mapa
+    if (lpn.code) { // si es lpn padre
+      objectMap = ModelMap.LpnVO3Map;
+      barcode = this.generateBarCode(lpn.code);
+    } else if (lpn.sku) { // si es lpn hijo
+      objectMap = ModelMap.LpnItemVO2Map;
+      barcode = this.generateBarCode(lpn.sku);
+    }
+    this.log('model map to use for print:', objectMap);
+    // replace demo barcode
+    spanAux.innerHTML = barcode;
+    const htmlBarCode = htmlWrapper.querySelector('#data-barcode');
+    if (htmlBarCode) {
+      this.log(`propiedad barcode encontrada en el template`);
+      htmlBarCode.setAttribute('src', barcode);
+    } else {
+      this.log(`propiedad barcode no encontrada en el template`);
+    }
+    const keys = Object.keys(objectMap);
+    let htmlProp;
+    // replace demo data
+    keys.forEach(key => {
+      htmlProp = htmlWrapper.querySelector(`#data-${key}`);
+      if (htmlProp) {
+        this.log(`propiedad ${key} encontrada en el template`);
+        htmlProp.innerHTML = '';
+        spanAux.innerHTML = lpn[key];
+        htmlProp.appendChild(spanAux);
+      } else {
+        this.log(`propiedad ${key} no encontrada en el template`);
+      }
+    });
+    const allData = htmlWrapper.querySelectorAll('[id^="data-"]');
+    this.log('allData: ', allData);
+    return htmlWrapper.innerHTML;
+  }
+
   renderColumnData(type: string, data: any) {
     let dataValue = data;
 
@@ -519,8 +563,12 @@ export class UtilitiesService implements OnDestroy {
     const mWindow = window.open('', '_blank',
     `left=0,top=0,toolbar=0,scrollbars=0,status=0`);
     mWindow.document.write(`<html><head><title>${title}</title>`);
-    mWindow.document.write(`<style>
-    @media print {@page{size: ${paperWidth} ${paperHeight}}}${cssStyles}</style>`);
+    mWindow.document.write(`<style>` +
+    `@media print {` +
+    `@page{size: ${paperWidth} ${paperHeight}}` +
+    `.page-break { display: block; page-break-before: always; }` +
+    `}` +
+    `${cssStyles}</style>`);
     mWindow.document.write('</head><body>');
     mWindow.document.write(htmlContent);
     mWindow.document.write('</body></html>');

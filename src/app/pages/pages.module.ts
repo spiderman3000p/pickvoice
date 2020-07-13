@@ -3,14 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { PagesRoutingModule } from './pages-routing.module';
-import { AdministrationModule } from './administration/administration.module';
-import { PendingOrdersModule } from './pending-orders/pending-orders.module';
-import { CurrentActionsModule } from './current-actions/current-actions.module';
-import { ItemsModule } from './items/items.module';
-import { ItemTypesModule } from './item-types/item-types.module';
-import { LocationsModule } from './locations/locations.module';
-import { RecentOriginsModule } from './recent-origins/recent-origins.module';
-import { ImportModule } from './import/import.module';
 
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,14 +28,6 @@ import { ChangeUserDataComponent } from '../components/change-user-data/change-u
     ReactiveFormsModule,
 
     PagesRoutingModule,
-    AdministrationModule,
-    PendingOrdersModule,
-    CurrentActionsModule,
-    ItemsModule,
-    ItemTypesModule,
-    LocationsModule,
-    RecentOriginsModule,
-    ImportModule,
 
     MatButtonModule,
     MatToolbarModule,

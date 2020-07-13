@@ -194,7 +194,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
       default: this.utilities.log('Accion no definida');
     }
   }
-
+  /* TODO: delete
   generateHtmlContent(lpn: any, htmlTemplate: string): string {
     const htmlWrapper = document.createElement('div');
     htmlWrapper.innerHTML = htmlTemplate;
@@ -237,7 +237,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     return htmlWrapper.innerHTML;
   }
-
+  */
   isItem(lpn: any): boolean {
     const exist = Object.keys(Lpn.LpnStateEnum).findIndex(type => {
       return lpn.id.includes(type);
@@ -294,7 +294,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.utilities.log('this.lpnToPrint: ', this.lpnToPrint);
         if (result && this.lpnToPrint) {
           const jsonTemplate = JSON.parse(result.template.jsonTemplate);
-          const htmlContent = this.generateHtmlContent(this.lpnToPrint, jsonTemplate['gjs-html']);
+          const htmlContent = this.utilities.generateHtmlLpnContent(this.lpnToPrint, jsonTemplate['gjs-html']);
           const cssStyles = jsonTemplate['gjs-css'];
           const idLpnToPrint = this.lpnToPrint.lpnId ? this.lpnToPrint.lpnId :
           (this.lpnToPrint.lpnItemId ? this.lpnToPrint.lpnItemId : '');
@@ -454,7 +454,9 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   generate() {
-    const dialogRef = this.dialog.open(GenerateLpnIntervalDialogComponent);
+    const dialogRef = this.dialog.open(GenerateLpnIntervalDialogComponent, {
+      width: '400px'
+    });
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {

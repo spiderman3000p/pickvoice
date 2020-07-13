@@ -178,6 +178,13 @@ export class PagesComponent implements OnInit, OnDestroy  {
       children: []
     },
     {
+      text: 'Test Print',
+      icon: 'print',
+      route: '/pages/test-print',
+      target: '_self',
+      children: []
+    },
+    {
       text: 'Outbound',
       icon: 'crop_din',
       route: '/pages/current-actions',

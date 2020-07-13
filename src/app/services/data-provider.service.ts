@@ -715,8 +715,13 @@ export class DataProviderService {
       `/storage/lpn/generate?lpnType=${data.type}&count=${data.qty}`, data).pipe(retry(3));
   }
 
-  public createLpn(data: any, observe: any = 'body', reportProgress = false) {
-    return this.uomService.createUom(data, observe, reportProgress);
+  public createLpn(lpnType: string, count: number, observe: any = 'body', reportProgress = false) {
+    const ownerId = this.authService.getOwnerId();
+    const depotId = this.authService.getDepotId();
+    if (ownerId !== null && depotId !== null) {
+      return this.storageService.lpnsGenerate(lpnType, count, ownerId, depotId, observe, reportProgress);
+    }
+    return of([]);
   }
   /*********************************************************************************
    *  Grupo de metodos para inventory
@@ -1332,6 +1337,11 @@ export class DataProviderService {
 
   public saveTemplate(data: LabelTemplate, observe: any = 'body', reportProgress = false) {
     return this.labelTemplateService.createLabelTemplate(data, observe, reportProgress)
+    .pipe(retry(3));
+  }
+
+  public updateTemplate(templateId: number, data: LabelTemplate, observe: any = 'body', reportProgress = false) {
+    return this.labelTemplateService.updateLabelTemplate(data, templateId, observe, reportProgress)
     .pipe(retry(3));
   }
   /* end templates endpoints*/

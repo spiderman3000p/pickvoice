@@ -6,7 +6,7 @@
                 <mat-spinner class="spinner"></mat-spinner>
             </div>
             <div class="row">
-                <div class="col-12">
+                <div class="col-6">
                     <div class="form-group">
                         <label>Type</label>
                         <select formControlName="type" class="form-control" required="true">
@@ -16,7 +16,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-12">
+                <div class="col-6">
                     <div class="form-group">
                         <label>Quantity</label>
                         <input type="number" class="form-control" formControlName="qty">
@@ -28,6 +28,23 @@
                         <select formControlName="state" class="form-control" required="true">
                             <option [value]="state" *ngFor="let state of states | async">
                                 {{STATES[state]}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <mat-slide-toggle color="primary" formControlName="print">
+                            Print
+                        </mat-slide-toggle>
+                    </div>
+                </div>
+                <div class="col-8" *ngIf="form.get('print').value">
+                    <div class="form-group">
+                        <label>Label Template</label>
+                        <select formControlName="template" class="form-control">
+                            <option [ngValue]="template" *ngFor="let template of templates">
+                                {{template.name}}
                             </option>
                         </select>
                     </div>
