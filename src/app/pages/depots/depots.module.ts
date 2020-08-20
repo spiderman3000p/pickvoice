@@ -29,10 +29,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 
 import { AgGridModule } from 'ag-grid-angular';
+import { EditDepotComponent } from '../edit-depot/edit-depot.component';
+import { RowOptionComponent } from '../edit-depot/row-option.component';
+import { NumericEditorComponent } from '../edit-depot/numeric-editor.component';
 
 @NgModule({
   declarations: [
-    DepotsComponent, AddDepotComponent, OwnerSelectorDialogComponent, PlantSelectorDialogComponent
+    DepotsComponent, AddDepotComponent, OwnerSelectorDialogComponent,
+    PlantSelectorDialogComponent, EditDepotComponent, RowOptionComponent, NumericEditorComponent
   ],
   imports: [
     CommonModule,

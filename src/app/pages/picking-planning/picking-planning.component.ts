@@ -5,19 +5,16 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
-import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { PickPlanning } from '@pickvoice/pickvoice-api';
 
-import { take, takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { take, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { Observable, Subject, merge, Observer, Subscription } from 'rxjs';
 
 import { MyDataSource } from '../../models/my-data-source';

@@ -6,7 +6,6 @@ import { EditPickPlanningComponent } from '../edit-pick-planning/edit-pick-plann
 import { AddPickPlanningComponent } from '../add-pick-planning/add-pick-planning.component';
 import { AddPickPlanningResolverService } from '../add-pick-planning/add-pick-planning-resolver.service';
 import { EditPickTaskComponent } from '../edit-pick-task/edit-pick-task.component';
-import { EditTaskLineComponent } from '../edit-task-line/edit-task-line.component';
 import { EditRowComponent } from '../edit-row/edit-row.component';
 import { PickingPlanningResolverService } from './picking-planning-resolver.service';
 import { PickTaskResolverService } from './pick-task-resolver.service';

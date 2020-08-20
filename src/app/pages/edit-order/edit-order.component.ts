@@ -1,13 +1,10 @@
-import { Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { AuthService } from '../../services/auth.service';
-import { environment } from '../../../environments/environment';
 
 import { QualityStates, Item, Customer, OrderLine, OrderType, Transport, UnityOfMeasure } from '@pickvoice/pickvoice-api';
-import { PrintComponent } from '../../components/print/print.component';
-import { AddOrderLineDialogComponent } from '../../components/add-order-line-dialog/add-order-line-dialog.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { SharedDataService } from '../../services/shared-data.service';
@@ -18,10 +15,10 @@ import { NumericEditorComponent } from './numeric-editor.component';
 import { DateEditorComponent } from './date-editor.component';
 import { RowOptionComponent } from './row-option.component';
 
-import { from, Observable, Observer } from 'rxjs';
-import { retry, switchMap } from 'rxjs/operators';
+import { Observer } from 'rxjs';
+import { retry } from 'rxjs/operators';
 
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -29,16 +26,17 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { AgGridAngular } from 'ag-grid-angular';
+import { SelectCellComponent } from './select-cell.component';
 
-interface OrdersData {
-  itemList: Item[];
-  orderTypeList: OrderType[];
-  transportList: Transport[];
-  customerList: Customer[];
-  orderLineList: OrderLine[];
-  transportStatus: string[];
-  uomList: UnityOfMeasure[];
-  qualityStateList: QualityStates[];
+class OrdersData {
+  itemList: any[] = [];
+  orderTypeList: OrderType[] = [];
+  transportList: Transport[] = [];
+  customerList: Customer[] = [];
+  orderLineList: OrderLine[] = [];
+  transportStatus: string[] = [];
+  uomList: UnityOfMeasure[] = [];
+  qualityStateList: QualityStates[] = [];
 }
 @Component({
   selector: 'app-edit-order',
@@ -62,7 +60,7 @@ export class EditOrderComponent implements OnInit {
   isLoadingResults = false;
   printElement = {};
   viewMode: string;
-  ordersData: OrdersData;
+  ordersData = new OrdersData();
 
   columnDefs: any[] = [];
   dataSource: MatTableDataSource<OrderLine>;
@@ -101,13 +99,15 @@ export class EditOrderComponent implements OnInit {
       field: 'itemId',
       width: 160,
       editable: true,
-      valueGetter: null,
-      valueSetter: null,
-      cellEditor: 'agSelectCellEditor',
-      cellEditorParams: (params) => {
-        return {
-          values: this.ordersData.itemList.map((el: any) => el.itemDescription)
-        };
+      cellRenderer: (params) => {
+        const itemm = this.ordersData.itemList.find(item => item.itemId == params.data.itemId);
+        return itemm ? itemm.itemDescription : 'Loading...';
+      },
+      cellEditor: 'selectCellComponent',
+      cellEditorParams: {
+        options: () => this.ordersData.itemList,
+        display: 'itemDescription',
+        key: 'itemId'
       }
     },
     {
@@ -115,13 +115,15 @@ export class EditOrderComponent implements OnInit {
       field: 'qualityState',
       width: 150,
       editable: true,
-      valueGetter: null,
-      valueSetter: null,
-      cellEditor: 'agSelectCellEditor',
-      cellEditorParams: (params) => {
-        return {
-          values: this.ordersData.qualityStateList.map(el => el.name)
-        };
+      cellRenderer: (params) => {
+        const _quality = this.ordersData.qualityStateList.find(quality => quality.code == params.data.qualityState);
+        return _quality ? _quality.name : 'Loading...';
+      },
+      cellEditor: 'selectCellComponent',
+      cellEditorParams: {
+        options: () => this.ordersData.qualityStateList,
+        display: 'name',
+        key: 'code'
       }
     },
     {
@@ -171,13 +173,6 @@ export class EditOrderComponent implements OnInit {
     private authService: AuthService, private dataProviderService: DataProviderService
   ) {
     this.dataSource = new MatTableDataSource([]);
-    this.ordersData = new Object() as OrdersData;
-    this.ordersData.customerList = [];
-    this.ordersData.orderLineList = [];
-    this.ordersData.orderTypeList = [];
-    this.ordersData.transportList = [];
-    this.ordersData.itemList = [];
-    this.ordersData.qualityStateList = [];
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
     this.isLoadingResults = true;
     this.form = new FormGroup({
@@ -205,6 +200,7 @@ export class EditOrderComponent implements OnInit {
       dateEditor: DateEditorComponent,
       rowOption: RowOptionComponent,
       numericEditor: NumericEditorComponent,
+      selectCellComponent: SelectCellComponent
     };
   }
 
@@ -596,6 +592,9 @@ export class EditOrderComponent implements OnInit {
       } else if (results && Array.isArray(results)) {
         this.ordersData.itemList = results;
       }
+      if (this.ordersData.itemList.length > 0) {
+        this.gridApi.redrawRows();
+      }
       this.utilities.log('this.ordersData.itemList', this.ordersData.itemList);
     });
   }
@@ -607,7 +606,7 @@ export class EditOrderComponent implements OnInit {
       } else if (results && Array.isArray(results)) {
         this.ordersData.qualityStateList = results;
       }
-      this.utilities.log('this.ordersData.itemList', this.ordersData.itemList);
+      this.utilities.log('this.ordersData.qualityStateList', this.ordersData.qualityStateList);
     });
   }
 
@@ -755,7 +754,7 @@ export class EditOrderComponent implements OnInit {
     console.log(event);
     const orderLine = event.data;
     console.log('updateOrderLine', orderLine);
-    const index = this.ordersData.orderLineList.findIndex(item => item.idOrder === event.rowData.idOrder);
+    const index = this.ordersData.orderLineList.findIndex(item => item.idOrder === event.data.idOrder);
     if (index > -1) {
       this.ordersData.orderLineList.splice(index, 1);
     }

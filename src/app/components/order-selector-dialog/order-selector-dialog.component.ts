@@ -1,16 +1,16 @@
 import { ViewChild, Inject, AfterViewInit, Component, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
-import { OrderService, Order, OrderType, OrderLine } from '@pickvoice/pickvoice-api';
+import { Order } from '@pickvoice/pickvoice-api';
 import { MyDataSource } from '../../models/my-data-source';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { FormGroup, FormControl } from '@angular/forms';
-import { takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { debounceTime, tap } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { merge, Observable, Observer, Subscription } from 'rxjs';
+import { merge, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-order-selector-dialog',
@@ -63,7 +63,7 @@ export class OrderSelectorDialogComponent implements OnInit, AfterViewInit {
   }
 
   setSelectedElement() {
-    this.dialogRef.close(this.selection.selected.map((el: any) => new Object({id: el.orderId})));
+    this.dialogRef.close(this.selection.selected.map(el => el.orderId));
   }
 
   ngOnInit(): void {

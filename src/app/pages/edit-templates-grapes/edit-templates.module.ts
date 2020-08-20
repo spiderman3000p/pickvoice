@@ -12,9 +12,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AdminTemplatesDialogComponent } from 'src/app/components/admin-templates-dialog/admin-templates-dialog.component';
+import { PreviewDialogComponent } from 'src/app/components/preview-dialog/preview-dialog.component';
+import { SafeHtmlPipe } from 'src/app/pipes/safe-html';
 
 @NgModule({
-  declarations: [EditTemplatesComponent, OpenTemplateDialogComponent, SaveTemplateDialogComponent],
+  declarations: [EditTemplatesComponent, OpenTemplateDialogComponent, SaveTemplateDialogComponent, 
+    AdminTemplatesDialogComponent, PreviewDialogComponent, SafeHtmlPipe],
   imports: [
     CommonModule,
     EditTemplatesRoutingModule,

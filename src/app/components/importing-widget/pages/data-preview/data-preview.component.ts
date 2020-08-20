@@ -2,7 +2,7 @@ import { OnDestroy, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SharedDataService } from '../../../../services/shared-data.service';
 import { UtilitiesService } from '../../../../services/utilities.service';
-import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
+import { IMPORTING_TYPES } from '../../../../models/model-maps.model';
 import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-data-preview',

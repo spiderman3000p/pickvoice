@@ -1,51 +1,52 @@
 <h2 mat-dialog-title>Admin Templates</h2>
 <div mat-dialog-content>
     <div class="row">
-        <div class="col-3">
-            <div class="row p-2">
+        <div class="col-3 p-0">
+            <div class="row pb-2">
                 <input type="text" class="form-control" placeholder="Filter" [formControl]="filterInput">
             </div>
             <div class="list-group">
                 <div class="example-loading-shade" *ngIf="isLoadingList">
                     <mat-spinner class="spinner"></mat-spinner>
                 </div>
-                <a href="#" class="list-group-item list-group-item-action" (click)="selectedTemplate = template"
+                <a href="javascript: void(0);" mat-icon-btn class="list-group-item list-group-item-action" (click)="setSelectedTemplate(template)"
                 *ngFor="let template of templates" [ngClass]="{'active': selectedTemplate.id === template.id}">
                     {{template.name}}
+                    <i class="fa fa-trash-o delete-button" (click)="$event.stopPropagation(); deleteTemplatePrompt(template)"></i>
                 </a>
             </div>
         </div>
         <div class="col-6">
             <form [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="row">
-                    <div class="form-group row">
+                    <div class="form-group row w-100">
                         <label class="col-3 col-form-label pl-0">Code</label>
                         <div class="col">
-                            <input type="text" class="form-control" formControlName="code">
+                            <input type="text" [ngClass]="{'readonly': viewMode === 'view'}" class="form-control" formControlName="code">
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row w-100">
                         <label class="col-3 col-form-label pl-0">Name</label>
                         <div class="col">
-                            <input type="text" class="form-control" formControlName="name">
+                            <input type="text" class="form-control" [ngClass]="{'readonly': viewMode === 'view'}" formControlName="name">
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row w-100">
                         <label class="col-3 col-form-label pl-0">Description</label>
                         <div class="col">
-                            <input type="text" class="form-control" formControlName="description">
+                            <input type="text" class="form-control" [ngClass]="{'readonly': viewMode === 'view'}" formControlName="description">
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row w-100">
                         <label class="col-3 col-form-label pl-0">Enable Date</label>
                         <div class="col">
-                            <input type="date" class="form-control" formControlName="enableDate">
+                            <input type="date" class="form-control" [ngClass]="{'readonly': viewMode === 'view'}" formControlName="enableDate">
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row w-100">
                         <label class="col-3 col-form-label pl-0">Type</label>
                         <div class="col">
-                            <select [formControl]="labelTypeId" class="form-control">
+                            <select formControlName="labelTypeId" [ngClass]="{'readonly': viewMode === 'view'}" class="form-control">
                                 <option *ngFor="let opt of types | async" [ngValue]="opt.id">
                                     {{ opt.name }}
                                 </option>
@@ -54,16 +55,20 @@
                     </div>
                 </div>
                 <div class="row">
-                    <button mat-raised-button color="primary" *ngIf="viewMode === 'view'" type="button" (click)="edit()">Editar</button>
-                    <button mat-raised-button color="primary" *ngIf="viewMode === 'view'" type="submit" (click)="save()">Guardar</button>
-                    <button mat-raised-button color="primary" *ngIf="viewMode === 'edit'" type="reset" (click)="cancel()">Cancelar</button>
-                    <button mat-raised-button color="accent" class="float-left" type="button" (click)="delete()">Eliminar</button>
+                    <div class="col-12 text-right">
+                        <button mat-raised-button color="primary" class="ml-1 mr-1" *ngIf="viewMode === 'view' && selectedTemplate.id" type="button" (click)="edit()">Edit</button>
+                        <button mat-raised-button color="primary" class="ml-1 mr-1" *ngIf="viewMode === 'edit' && selectedTemplate.id" type="submit" (click)="save()">Save</button>
+                        <button mat-raised-button color="primary" class="ml-1 mr-1" *ngIf="viewMode === 'edit' && selectedTemplate.id" type="reset" (click)="cancel()">Cancel</button>
+                        <button mat-raised-button color="accent" class="ml-1 mr-1" *ngIf="selectedTemplate.id" type="button" (click)="deleteTemplatePrompt(selectedTemplate)">Delete</button>
+                    </div>
                 </div>
             </form>
         </div>
-        <div class="col-3">
-            <div class="template-preview">
-            </div>
+        <div class="col-3 preview-container">
+            <ng-container>
+                <!-- TODO: hay que transformar el jsonTemplate en algo visible aqui -->
+                <div [innerHtml]="preview | safeHtml" class="template-preview" *ngIf="selectedTemplate.id"></div>
+            </ng-container>
         </div>
     </div>
 </div>

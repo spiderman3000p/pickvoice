@@ -12,10 +12,10 @@ import { DataProviderService} from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { UserSelectorDialogComponent } from '../../components/user-selector-dialog/user-selector-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { ModelMap, STATES, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
-import { PickTask, PickTaskLine, PickTaskLines, LoadPick } from '@pickvoice/pickvoice-api';
+import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
+import { PickTask } from '@pickvoice/pickvoice-api';
 
-import { take, takeLast, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { take, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { Subject, merge, Observable, Observer, Subscription } from 'rxjs';
 
 import { MyDataSource } from '../../models/my-data-source';

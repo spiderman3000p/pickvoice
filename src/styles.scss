@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
-$primary: #00b19d;
-$accent: #00535e;
-$secondary: #00535e;
+$primary: #004B99;
+$accent: #457C1F;
+$secondary: #0A1060;
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~assets/font-awesome-4.7.0/css/font-awesome.min.css";
 @import "~ag-grid-community/dist/styles/ag-grid.css";
@@ -29,13 +29,16 @@ body {
 .form-control{
   font-size: 12px;
 }
+.form-group.row .form-control{
+  width: calc(100% - 35px);
+}
 .form-check-input {
   position: relative;
   margin-top: unset;
   margin-left: unset;
 }
 .help-icon {
-  background-image: url(https://cdn1.alegra.com/images/sm-help.png) !important;
+  background-image: url('assets/icons/sm-help.png') !important;
   background-position: top;
   background-repeat: no-repeat;
   cursor: help;
@@ -83,7 +86,7 @@ button:focus {
   color: #767681;
 }
 .user-menu .mat-menu-item:hover{
-  color: $primary !important;
+  color: var(--primary) !important;
 }
 .user-menu:before, .user-menu:after {
   bottom: 100%;
@@ -274,17 +277,18 @@ header, #plan-consumption-container .header {
   margin-left: 43px;
 }
 .content .header h1{
-  color: #00535e;
+  color: var(--secondary);
   font-size: 2rem;
   font-weight: 300;
   line-height: 32px;
   font-family: "Roboto",sans-serif;
-  background: url('assets/icons/index-icon.png') no-repeat 0 2px;
+  background: url('assets/icons/index-icon.png') no-repeat 0 0px;
+  background-size: contain;
   height: 38px;
   padding-left: 50px;
 }
 .ag-header-cell-label{
-  color: #00535e !important;
+  color: var(--secondary) !important;
   font-weight: bold !important;
   font-family: "Roboto",sans-serif;
   font-size: 12px !important;
@@ -297,13 +301,13 @@ tr.mat-header-row{
   font-size: 12px !important;
   height: 40px !important;
   text-align: center;
-  color: #00535e !important;
+  color: var(--accent) !important;
   border: none !important;
 }
 .mat-header-cell {
   font-size: 10px;
   font-weight: 400;
-  color: #00535e;
+  color: var(--accent);
   height: 40px;
   font-weight: bold;
 }
@@ -335,7 +339,7 @@ table.mat-table-hoverflow{
   border-color: white;
   background-color: white;
   border-width: 1px;
-  color: #00525E !important;
+  color: var(--accent) !important;
   // position: absolute!important;
   z-index: 1;
   display: flex;
@@ -364,7 +368,7 @@ table.mat-table-hoverflow{
   border: 1px #767681 solid;
   background-position: left center;
   border-color: #cac9c9 !important;
-  color: #004048 !important;
+  color: var(--accent) !important;
   transition: background .2s ease;
 }
 .table-toolbar button.print-button{
@@ -500,6 +504,7 @@ mat-datepicker{
   position: absolute !important;
   top: 20px;
   right: 20px;
+  cursor: pointer;
 }
 th.more-button-header{
   text-align: right !important;
@@ -591,7 +596,7 @@ a.mat-list-item.active .mat-list-item-content:before {
   margin-left: 0px;
 }
 a:hover {
-  color: $primary;
+  color: var(--primary);
   text-decoration: underline;
 }
 a.mat-raise-button{
@@ -629,7 +634,7 @@ a.mat-raise-button{
   background: inherit;
 }
 .select-footer .select-footer-content{
-  color: $primary;
+  color: var(--primary);
   font-size: inherit;
 }
 .select-footer .select-footer-content a{
@@ -660,7 +665,7 @@ div.tree div.tree-children::before,
 div.tree::before {
     content: "";
     position: absolute;
-    border-left: 1px dotted #23527c;
+    border-left: 1px dotted var(--secondary);
     height: 80%;
     /* top: 60px;*/
     left: 13px;
@@ -700,7 +705,7 @@ div.tree tree-node>div.tree-node-leaf>.node-wrapper {
 div.tree tree-node>div::before {
     content: "";
     position: absolute;
-    border-bottom: 1px dotted #23527c;
+    border-bottom: 1px dotted var(--secondary);
     width: 7px;
     margin-top: 12px;
     left: 7px
@@ -709,7 +714,7 @@ div.tree tree-node>div::before {
 div.tree tree-node>div .toggle-children-wrapper {
     width: 13px;
     height: 13px;
-    border: 1px solid #23527c;
+    border: 1px solid var(--secondary);
     position: absolute;
     left: 15px;
     margin-top: 5px;
@@ -723,7 +728,7 @@ div.tree tree-node>div .toggle-children-wrapper::before {
     content: "";
     display: inline-block;
     width: 7px;
-    border-top: 1px solid #23527c;
+    border-top: 1px solid var(--secondary);
     position: absolute;
     top: 5px;
     left: 2px
@@ -733,7 +738,7 @@ div.tree tree-node>div .toggle-children-wrapper.toggle-children-wrapper-collapse
     content: "";
     display: inline-block;
     height: 7px;
-    border-left: 1px solid #23527c;
+    border-left: 1px solid var(--secondary);
     position: absolute;
     top: 2px;
     left: 5px
@@ -769,12 +774,92 @@ div.tree tree-node-expander + div.node-content-wrapper {
   right: 0;
 }
 
+.status-bar {
+  transition: all 1s;
+  z-index: 9998;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 28px;
+  padding: 5px;
+  background-color: #efebde;
+  color: black;
+  box-shadow: 0px 0px 4px 2px rgba(0, 0, 0, 0.1);
+  border: #D6D2C6 solid 1px;
+  transition: all ease-in 1s;
+}
+.status-bar .user-data{
+  float: left;
+  display: inline-flex;
+}
+.status-bar.show{
+  height: 100px;
+}
+.status-bar .user-data li{
+  padding-left: 5px;
+  padding-right: 5px;
+  list-style-type: none;
+}
+.status-bar .tools{
+  z-index: 9999;
+  right: 350px;
+  position: absolute;
+  top: 5px;
+}
+.text-accent {
+  color: $accent;
+}
+.up-arrow{
+  display: none;
+}
+
+.mat-warn .mat-icon.mat-accent  {
+  color: white !important;
+}
+
 @media screen and (max-width:800px){
   .header.actionbar.align-content-top .title.actionbar-section.align-content-top {
     width: 100%;
   }
   .header.actionbar.align-content-top .actions.actionbar-section.right{
     text-align: right;
+  }
+  .status-bar .tools{
+      right: 250px;
+      position: absolute;
+      top: 50px;
+      width: fit-content;
+  }
+
+  .status-bar .row{
+      position: fixed;
+  }
+
+  .up-arrow{
+      display: block;
+      position: absolute;
+      margin-left: auto;
+      margin-right: auto;
+      right: 0;
+      left: 0;
+      background: var(--primary);
+      padding: 5px;
+      border-radius: 20px;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      color: white;
+      top: -25px;
+      cursor: pointer;
+      transition: all 2s;
+  }
+  .up-arrow:before{
+      content: '\f062';
+      vertical-align: -webkit-baseline-middle;
+  }
+  .up-arrow.show:before{
+      content: '\f063';
+      vertical-align: -webkit-baseline-middle;
   }
 }
 
@@ -822,5 +907,40 @@ div.tree tree-node-expander + div.node-content-wrapper {
   }
   .mat-sidenav .mat-expansion-panel-body {
     padding: 0px !important;
+  }
+  .status-bar .tools{
+      right: 10px;
+      position: absolute;
+      top: 5px;
+      width: fit-content;
+  }
+  .status-bar.show{
+      height: 90px;
+  }
+  .up-arrow{
+      display: block;
+      position: absolute;
+      margin-left: auto;
+      margin-right: auto;
+      right: 0;
+      left: 0;
+      background: var(--primary);
+      padding: 5px;
+      border-radius: 20px;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      color: white;
+      top: -15px;
+      cursor: pointer;
+      transition: all 2s;
+  }
+  .up-arrow:before{
+      content: '\f062';
+      vertical-align: -webkit-baseline-middle;
+  }
+  .up-arrow.show:before{
+      content: '\f063';
+      vertical-align: -webkit-baseline-middle;
   }
 }

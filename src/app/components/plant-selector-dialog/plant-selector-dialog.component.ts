@@ -1,10 +1,10 @@
-import { Inject, AfterViewInit, Component, OnInit } from '@angular/core';
+import { Inject, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { Observable } from 'rxjs';
-import { debounceTime, takeLast } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';

@@ -1,6 +1,6 @@
-$primary: #00b19d;
+/*$primary: #00b19d;
 $accent: #00535e;
-$secondary: #00535e;
+$secondary: #00535e;*/
 body{
     overflow-y: hidden;
 }
@@ -8,11 +8,11 @@ mat-sidenav-container{
     height: 100%;
 }
 mat-sidenav{
-    background: rgb(0,83,94);
-    background: -moz-linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
-    background: -webkit-linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
-    background: linear-gradient(0deg, rgba(0,83,94,1) 50%, rgba(0,177,157,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00535e",endColorstr="#00b19d",GradientType=1);
+    background: var(--secondary);
+    background: -moz-linear-gradient(0deg, var(--secondary) 50%, var(--primary) 100%);
+    background: -webkit-linear-gradient(0deg, var(--secondary) 50%, var(--primary) 100%);
+    background: linear-gradient(0deg, var(--secondary) 50%, var(--primary) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#004B99",endColorstr="#0A1060",GradientType=1);
     width: 220px;
     max-width: 220px;
 }
@@ -39,7 +39,7 @@ mat-sidenav{
 }
 .mat-h1{
     padding: 20px;
-    color: $accent;
+    color: var(--accent);
     font-size: 3.6rem;
     font-weight: 300;
     line-height: 32px;
@@ -124,75 +124,4 @@ a.mat-list-item.ng-star-inserted.active:before {
 }
 mat-sidenav mat-toolbar{
     height: unset;
-}
-.status-bar {
-    transition: all 1s;
-    z-index: 9998;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 28px;
-    padding: 5px;
-    background-color: #efebde;
-    color: black;
-    box-shadow: 0px 0px 4px 2px rgba(0, 0, 0, 0.1);
-    border: #D6D2C6 solid 1px;
-}
-.status-bar .user-data{
-    float: left;
-    display: inline-flex;
-}
-.status-bar .user-data li{
-    padding-left: 5px;
-    padding-right: 5px;
-    list-style-type: none;
-}
-.status-bar .tools{
-    z-index: 9999;
-    right: 350px;
-    position: absolute;
-    top: 5px;
-}
-.text-accent {
-    color: $accent;
-}
-.up-arrow{
-    display: none;
-}
-
-@media screen and (max-width:'600px'){
-    .status-bar .tools{
-        right: 10px;
-        position: absolute;
-        top: 5px;
-    }
-    .status-bar.show{
-        height: 90px;
-    }
-    .up-arrow{
-        display: block;
-        position: absolute;
-        margin-left: auto;
-        margin-right: auto;
-        right: 0;
-        left: 0;
-        background: var(--primary);
-        padding: 5px;
-        border-radius: 20px;
-        width: 30px;
-        height: 30px;
-        text-align: center;
-        color: white;
-        top: -15px;
-        cursor: pointer;
-        transition: all 2s;
-    }
-    .up-arrow:before{
-        content: '\f062';
-        vertical-align: -webkit-baseline-middle;
-    }
-    .up-arrow.show:before{
-        content: '\f063';
-        vertical-align: -webkit-baseline-middle;
-    }
 }

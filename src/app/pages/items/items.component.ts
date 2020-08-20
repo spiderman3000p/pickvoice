@@ -3,9 +3,8 @@ import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { ItemService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+import { Item } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 import { MyDataSource } from '../../models/my-data-source';
 

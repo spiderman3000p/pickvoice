@@ -1,24 +1,17 @@
-import { Inject, Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
-import { environment } from '../../../environments/environment';
-import { ItemUom, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
-import { PrintComponent } from '../../components/print/print.component';
+import { ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
-import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { SharedDataService } from '../../services/shared-data.service';
 import { Location as WebLocation } from '@angular/common';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
-import { ModelFactory } from '../../models/model-factory.class';
-import { NumericEditorComponent } from './numeric-editor.component';
-import { RowOptionComponent } from './row-option.component';
+import { ModelMap } from '../../models/model-maps.model';
 
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
-import { Subscription, Observable, Observer } from 'rxjs';
+import { Subscription } from 'rxjs';
 import '@ag-grid-enterprise/excel-export';
 import { AgGridAngular } from 'ag-grid-angular';
 

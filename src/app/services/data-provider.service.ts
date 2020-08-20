@@ -3,7 +3,7 @@ import { environment } from '../../environments/environment';
 import { Transport, Location, Item, UomService, SectionService, OrderService, OrderTypeService,
          LocationService, TransportService, LoadPickService, ItemTypeService, ItemService,
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
-         DockService, UserService, ItemUomService, QualityStates, QualityStateService, StoreService,
+         DockService, UserService, ItemUomService, QualityStateService, StoreService, User,
          QualityStateTypeService, TaskTypeService, PlantService, OwnerService, DepotService,
          LabelTemplateService, LabelTypeService, LabelTemplate, Lpn, LpnIntervalService, StorageService
        } from '@pickvoice/pickvoice-api';
@@ -11,8 +11,8 @@ import { UtilitiesService } from './utilities.service';
 import { AuthService } from './auth.service';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
 import { of, Observable } from 'rxjs';
-import { HttpHeaders, HttpParams, HttpClient } from '@angular/common/http';
-import { timeout, retry, delay } from 'rxjs/operators';
+import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { timeout, retry } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -1103,7 +1103,7 @@ export class DataProviderService {
   /**********************************************************************************
     Grupo de metodos para load picks
   ***********************************************************************************/
-  public createLoadPicks(data: any[], transportNumber: string, observe: any = 'body', reportProgress = false) {
+  public createLoadPicks(data: any[], observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
     const depot = this.authService.userData.depotId;
     if (owner !== null && depot !== null) {
@@ -1252,8 +1252,9 @@ export class DataProviderService {
     return this.pickTaskService.assignUserPickTask(data, user.userName);
   }
 
-  public assignUserToPickTaskList(data: any[], user: any, observe: any = 'body', reportProgress = false) {
+  public assignUserToPickTaskList(data: any[], user: User, observe: any = 'body', reportProgress = false) {
     // return this.pickTaskService.assignUserPickTask(data, user.userName);
+    console.log('user to assign task', user);
     return this.httpClient.put(environment.apiBaseUrl +
       '/outbound/pick/assignUserPickTask?userName=' + user.userName, data);
   }
@@ -1342,6 +1343,11 @@ export class DataProviderService {
 
   public updateTemplate(templateId: number, data: LabelTemplate, observe: any = 'body', reportProgress = false) {
     return this.labelTemplateService.updateLabelTemplate(data, templateId, observe, reportProgress)
+    .pipe(retry(3));
+  }
+
+  public deleteTemplate(templateId: number, observe: any = 'body', reportProgress = false) {
+    return this.labelTemplateService.deleteLabelTemplate(templateId, observe, reportProgress)
     .pipe(retry(3));
   }
   /* end templates endpoints*/

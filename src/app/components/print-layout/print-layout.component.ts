@@ -1,6 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
-import { UtilitiesService } from '../../services/utilities.service';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 

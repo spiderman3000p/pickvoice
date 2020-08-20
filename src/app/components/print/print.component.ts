@@ -1,5 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 import { UtilitiesService } from '../../services/utilities.service';
 import { ActivatedRoute } from '@angular/router';
 
@@ -74,11 +73,15 @@ export class PrintComponent implements OnInit {
       this.type = data.type;
       data.row.subscribe(element => {
         console.log('element suscribed', element);
-        this.element = element;
+        if (element.content && element.content[0]) {
+          this.element = element.content[0];
+        } else if (element) {
+          this.element = element;
+        }
         this.init();
         setTimeout(() => {
           window.print();
-          window.close();
+          //window.close();
         }, 1000);
       });
       this.format = data.format;

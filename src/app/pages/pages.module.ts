@@ -16,7 +16,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PagesComponent } from './pages.component';
 import { ChangeUserDataComponent } from '../components/change-user-data/change-user-data.component';
 
-
 @NgModule({
   declarations: [
     PagesComponent,

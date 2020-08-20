@@ -3,19 +3,18 @@ import { MatDialog } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { RecentOriginsService } from '../../services/recent-origins.service';
 import { SharedDataService } from '../../services/shared-data.service';
-import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
 import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { IMPORTING_TYPES } from '../../models/model-maps.model';
 import { RecentOrigin } from '../../models/recent-origin.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-import { timeout, map, retry, tap, last } from 'rxjs/operators';
+import { timeout, map } from 'rxjs/operators';
 import { DataProviderService} from '../../services/data-provider.service';
 import { HttpResponse, HttpEventType } from '@angular/common/http';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -241,7 +240,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     }
     if (!this.isReadyToSend) {
       this.utilities.error('Data are not ready to be sent', this.dataSource.data);
-      // this.utilities.showSnackBar('Data are not ready to be sent', 'OK');
+      this.utilities.showSnackBar('Data are not ready to be sent', 'OK');
       // this.utilities.showSnackBar(`There are ${this.invalidRows.length} invalid records`, 'OK');
     }
   }
@@ -464,7 +463,7 @@ export class ImportComponent implements OnInit, OnDestroy {
           }
         }
         if (this.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
-          if ((row && error && error.element) && (row === error.element)) {
+          if ((row && error && error.element) && (row.cartonCode == error.element.code)) {
             return true;
           }
         }

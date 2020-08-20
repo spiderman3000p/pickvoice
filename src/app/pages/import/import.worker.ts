@@ -55,6 +55,10 @@ function mapData() {
     return;
   }
   let batchMapedData = [];
+  let sections;
+  const datePattern1 = new RegExp("^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$", 'i'); // dd/mm/yyyy
+  const datePattern2 = new RegExp("^([0-9]{2})\-([0-9]{2})\-([0-9]{4})$", 'i'); // dd-mm-yyyy
+  const validDatePattern = new RegExp("^([0-9]{4})\-([0-9]{2})\-([0-9]{2})$", 'i'); // yyyy-mm-dd
   globalData.data.forEach((row, rowIndex) => {
     for (const field in headers) {
       if (1) {
@@ -67,6 +71,32 @@ function mapData() {
             row[field] = false;
           }
         }
+        // verificamos fechas para formatearlas
+        sections = null;
+        if (headers[field].type === 'date') {
+          if (!validDatePattern.test(row[field])) { // si la fecha no es valida
+            // intentamos parsearla si tiene alguno de estos formatos: dd-mm-yyyy o dd/mm/yyyy
+            if (row[field].includes('/') && datePattern1.test(row[field]) === true) {
+              sections = row[field].split('/');
+            } else if (row[field].includes('-') && datePattern2.test(row[field]) === true) {
+              sections = row[field].split('-');
+            }
+            // si la fecha cumple con el pattern, la validamos y la parseamos con el formato yyyy-mm-dd
+            if (sections) {
+              // verificamos que el dia este entre 1 y 31
+              if (Number(sections[0]) >= 1 && Number(sections[0]) <= 31 &&
+              // verificamos que el mes este entre 1 y 12
+              Number(sections[1]) >= 1 && Number(sections[1]) <= 12 && 
+              /* verificamos que el anio no tenga mas de 10 anios de antiguedad y que no sea mayor
+              a 10 anios en el futuro */
+              Number(sections[2]) >= new Date().getFullYear() - 10 && 
+              Number(sections[2]) <= new Date().getFullYear() + 10) {
+                row[field] = `${sections[2]}-${sections[1]}-${sections[0]}`;
+              }
+            }
+          }
+        }
+
         if (globalData.selectedType === IMPORTING_TYPES.LOADITEMS_DTO) {
           // this.utilities.log('validating compound items data');
           /*if (field === 'itemType' && typeof row.itemType !== 'object') {
@@ -151,6 +181,11 @@ function validateData() {
   let batchProcessedData = [];
   let auxIndex;
   let existEnum;
+  let sections;
+  let validDate: boolean;
+  const datePattern1 = new RegExp("^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$", 'i'); // dd/mm/yyyy
+  const datePattern2 = new RegExp("^([0-9]{2})\-([0-9]{2})\-([0-9]{4})$", 'i'); // dd-mm-yyyy
+  const validDatePattern = new RegExp("^([0-9]{4})\-([0-9]{2})\-([0-9]{2})$", 'i'); // yyyy-mm-dd
   globalData.data.forEach((row, rowIndex) => {
     currentRowErrors = [];
     for (const field in headers) {
@@ -181,6 +216,42 @@ function validateData() {
           validationError.error = `The field ${headers[field].name} (${field})
             must be lower than ${headers[field].max}`;
           currentRowErrors.push(validationError);
+        }
+        // verificamos fechas para formatearlas
+        sections = null;
+        validDate = true;
+        if (headers[field].type === 'date') {
+          if (!validDatePattern.test(row[field])) { // si la fecha no es valida
+            // intentamos parsearla si tiene alguno de estos formatos: dd-mm-yyyy o dd/mm/yyyy
+            if (row[field].includes('/') && datePattern1.test(row[field]) === true) {
+              sections = row[field].split('/');
+            } else if (row[field].includes('-') && datePattern2.test(row[field]) === true) {
+              sections = row[field].split('-');
+            }
+            // si la fecha cumple con el pattern, la validamos y la parseamos con el formato yyyy-mm-dd
+            if (sections) {
+              // verificamos que el dia este entre 1 y 31
+              if (Number(sections[0]) >= 1 && Number(sections[0]) <= 31 &&
+              // verificamos que el mes este entre 1 y 12
+              Number(sections[1]) >= 1 && Number(sections[1]) <= 12 && 
+              /* verificamos que el anio no tenga mas de 10 anios de antiguedad y que no sea mayor
+              a 10 anios en el futuro */
+              Number(sections[2]) >= new Date().getFullYear() - 10 && 
+              Number(sections[2]) <= new Date().getFullYear() + 10) {
+                row[field] = `${sections[2]}-${sections[1]}-${sections[0]}`;
+              } else {
+                validDate = false;
+              }
+            } else {
+              validDate = false;
+            }
+          }
+          if (!validDate) {
+            const validationError = new Object() as any;
+            validationError.index = rowIndex;
+            validationError.error = `The field ${headers[field].name} is not a valid date`;
+            currentRowErrors.push(validationError);
+          }
         }
 
         if (headers[field].formControl.control === 'select' && headers[field].validate === true &&

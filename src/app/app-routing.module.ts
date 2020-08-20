@@ -24,6 +24,7 @@ import { PickingPlanningResolverService } from './pages/picking-planning/picking
 import { PickTaskResolverService } from './pages/picking-planning/pick-task-resolver.service';
 import { TaskTypeResolverService } from './pages/task-type/task-type-resolver.service';
 import { PickTaskLineResolverService } from './pages/picking-planning/pick-task-line-resolver.service';
+import { InventoryItemResolverService } from './pages/inventory/inventory-resolver.service';
 import { IMPORTING_TYPES } from './models/model-maps.model';
 
 const routes: Routes = [
@@ -276,6 +277,18 @@ const routes: Routes = [
             type: IMPORTING_TYPES.QUALITY_STATES,
             format: 'single',
             title: 'Print Quality State'
+          }
+        },
+        {
+          path: IMPORTING_TYPES.INVENTORY + '/:id',
+          component: PrintComponent,
+          resolve: {
+            row: InventoryItemResolverService,
+          },
+          data: {
+            type: IMPORTING_TYPES.INVENTORY,
+            format: 'single',
+            title: 'Print Inventory'
           }
         }
     ],

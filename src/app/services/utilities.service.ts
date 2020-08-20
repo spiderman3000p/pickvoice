@@ -1,9 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { concat, merge, Subscription, fromEvent, Observer, Observable, of } from 'rxjs';
-import { takeLast } from 'rxjs/operators';
-import { STATES, IMPORTING_TYPES, ModelMap } from '../models/model-maps.model';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { merge, Subscription, fromEvent, Observer, Observable } from 'rxjs';
+import { IMPORTING_TYPES, ModelMap } from '../models/model-maps.model';
+import { MatDialog } from '@angular/material/dialog';
 import { CommonDialogComponent } from '../components/common-dialog/common-dialog.component';
 import { environment } from '../../environments/environment';
 import * as XLSX from 'xlsx';

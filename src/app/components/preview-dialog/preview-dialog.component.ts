@@ -1,5 +1,5 @@
-import { Inject, AfterViewInit, Component, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Inject, Component, OnInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { ModelMap } from '../../models/model-maps.model';
 import { UtilitiesService } from '../../services/utilities.service';

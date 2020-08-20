@@ -2804,7 +2804,7 @@ export class ModelMap {
         },
         transportId: {
             name: 'transport',
-            required: true,
+            required: false,
             type: IMPORTING_TYPES.TRANSPORTS,
             formControl: {
                 helpText: 'descripcion corta',
@@ -2841,7 +2841,7 @@ export class ModelMap {
                 icon: 'add',
                 modelType: IMPORTING_TYPES.CUSTOMERS
             }
-        },
+        }/*,
         orderLines: {
             name: 'order lines',
             required: false,
@@ -2856,7 +2856,7 @@ export class ModelMap {
                 icon: 'add',
                 modelType: IMPORTING_TYPES.ORDER_LINE
             }
-        }
+        }*/
     };
     /* order object map for LIST */
     public static OrderListMap = {
@@ -5309,8 +5309,53 @@ helpText: 'descripcion corta',
                 }
             }
         },
-        uomCode: {
-            name: 'uom code',
+        uomHandlingCode: {
+            name: 'uom handling code',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
+            }
+        },
+        uomOutboundCode: {
+            name: 'uom outbound code',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
+            }
+        },
+        uomInboundCode: {
+            name: 'uom inbound code',
+            required: false,
+            type: IMPORTING_TYPES.UOMS,
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text',
+                valueIndex: 'code',
+                displayIndex: 'name',
+                compareFn: (c1, c2) => {
+                    return c1.code === c2.code;
+                }
+            }
+        },
+        uomPackingCode: {
+            name: 'uom packing code',
             required: false,
             type: IMPORTING_TYPES.UOMS,
             formControl: {
@@ -5629,13 +5674,14 @@ helpText: 'descripcion corta',
                 }
             }
         },
-        locationState: {
-            name: 'status',
+        locationType_1: {
+            name: 'location type 1',
             required: false,
-            type: 'boolean',
+            type: 'string',
             formControl: {
                 helpText: 'descripcion corta',
-                control: 'toggle'
+                control: 'input',
+                type: 'text'
             }
         },
         rackType: {
@@ -5654,7 +5700,7 @@ helpText: 'descripcion corta',
                 }
             }
         },
-        multireference: {
+        multiReference: {
             name: 'multi reference',
             required: false,
             type: 'boolean',

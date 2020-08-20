@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import {
-  HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse
-} from '@angular/common/http';
+import { HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { of, throwError, Observable, BehaviorSubject } from 'rxjs';
 import { catchError, finalize, take, filter, switchMap, tap } from 'rxjs/operators';

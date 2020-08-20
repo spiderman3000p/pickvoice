@@ -6,7 +6,6 @@ import { UomsComponent } from './uoms.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';

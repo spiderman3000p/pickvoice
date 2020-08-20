@@ -28,10 +28,12 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 
 import { AgGridModule } from 'ag-grid-angular';
+import { NumericEditorComponent } from '../edit-plant/numeric-editor.component';
+import { RowOptionComponent } from '../edit-plant/row-option.component';
 
 @NgModule({
   declarations: [
-    PlantsComponent, AddPlantComponent, EditPlantComponent
+    PlantsComponent, AddPlantComponent, EditPlantComponent, NumericEditorComponent, RowOptionComponent
   ],
   imports: [
     CommonModule,

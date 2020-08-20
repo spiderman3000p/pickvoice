@@ -1,12 +1,12 @@
 import { OnDestroy, Component, OnInit } from '@angular/core';
-import { NavigationExtras, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { UtilitiesService } from '../../../../services/utilities.service';
 import { SharedDataService } from '../../../../services/shared-data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ImportDialogComponent } from '../../../import-dialog/import-dialog.component';
 import * as XLSX from 'xlsx';
-import { of, from, Subscription } from 'rxjs';
-import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
+import { Subscription } from 'rxjs';
+import { IMPORTING_TYPES } from '../../../../models/model-maps.model';
 @Component({
   selector: 'app-file-import',
   templateUrl: './file-import.component.html',

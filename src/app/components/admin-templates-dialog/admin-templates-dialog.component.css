@@ -12,3 +12,25 @@
 .user-list-wrapper .mat-action-list .mat-list-item-content{
     padding: 0px !important;
 }
+
+.delete-button {
+    position: absolute;
+    right: 5px;
+    margin-top: 0;
+    padding: 5px;
+    font-size: 16px;
+    margin-bottom: 0;
+    top: auto;
+    bottom: auto;
+    cursor: pointer;
+}
+
+.preview-container {
+    background: #a5a4a4;
+    padding: 5px;
+}
+
+.template-preview {
+    background: white;
+    border: 1px solid #8f8f8f;
+}

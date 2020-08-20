@@ -1,21 +1,10 @@
-import { OnDestroy, Component, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { OnDestroy, Component } from '@angular/core';
 import { UtilitiesService } from '../../services/utilities.service';
-import { AuthService } from '../../services/auth.service';
-import { ImportDialogComponent } from '../../components/import-dialog/import-dialog.component';
-import { ImportingWidgetComponent } from '../../components/importing-widget/importing-widget.component';
-import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { ModelMap } from '../../models/model-maps.model';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { FormControl } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';;
 import { retry } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { ItemService, Item, ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { DataProviderService } from '../../services/data-provider.service';
 import { ModuleRegistry, AllModules } from '@ag-grid-enterprise/all-modules';
-import { LicenseManager } from '@ag-grid-enterprise/core';
 import { Module } from '@ag-grid-community/core';
 
 // or if using ag-Grid Enterprise

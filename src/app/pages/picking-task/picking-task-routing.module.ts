@@ -2,9 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { PickingTaskComponent } from './picking-task.component';
-import { EditPickPlanningComponent } from '../edit-pick-planning/edit-pick-planning.component';
 import { EditPickTaskComponent } from '../edit-pick-task/edit-pick-task.component';
-import { EditTaskLineComponent } from '../edit-task-line/edit-task-line.component';
 import { EditRowComponent } from '../edit-row/edit-row.component';
 import { PickTaskResolverService } from './pick-task-resolver.service';
 import { PickTaskLineResolverService } from './pick-task-line-resolver.service';

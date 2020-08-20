@@ -8,7 +8,7 @@ import { EditOrderComponent } from '../edit-order/edit-order.component';
 import { NumericEditorComponent } from '../edit-order/numeric-editor.component';
 import { DateEditorComponent } from '../edit-order/date-editor.component';
 import { RowOptionComponent } from '../edit-order/row-option.component';
-import { AddOrderLineDialogComponent } from '../../components/add-order-line-dialog/add-order-line-dialog.component';
+import { SelectCellComponent } from '../edit-order/select-cell.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -28,11 +28,12 @@ import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 
 import { AgGridModule } from 'ag-grid-angular';
+import { AddOrderLineComponent } from '../add-order-line/add-order-line.component';
 
 @NgModule({
   declarations: [
-    OrdersComponent, AddOrderComponent, EditOrderComponent,
-    NumericEditorComponent, DateEditorComponent, RowOptionComponent
+    OrdersComponent, AddOrderComponent, EditOrderComponent, AddOrderLineComponent,
+    NumericEditorComponent, DateEditorComponent, RowOptionComponent, SelectCellComponent
   ],
   imports: [
     CommonModule,

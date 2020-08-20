@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import { IMPORTING_TYPES } from '../models/model-maps.model';
 import { timer, Subscription } from 'rxjs';
 import { ChangeUserDataComponent } from '../components/change-user-data/change-user-data.component';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 @Component({
   selector: 'app-pages',
   templateUrl: './pages.component.html',
@@ -18,14 +20,14 @@ export class PagesComponent implements OnInit, OnDestroy  {
   menuOptions = [
     {
       text: 'Dashboard',
-      icon: 'home',
+      icon: 'dashboard',
       route: '/pages/dashboard',
       target: '_self',
       children: []
     },
     {
       text: 'Maintenance',
-      icon: 'settings',
+      icon: 'maintenance',
       route: '',
       target: '_self',
       children: [
@@ -169,23 +171,16 @@ export class PagesComponent implements OnInit, OnDestroy  {
         }
       ]
     },
-    {
+    /*{
       text: 'Inbound',
       icon: 'center_focus_strong',
       route: '/pages/pending-orders',
       target: '_self',
       children: []
-    },
-    {
-      text: 'Test Print',
-      icon: 'print',
-      route: '/pages/test-print',
-      target: '_self',
-      children: []
-    },
+    },*/
     {
       text: 'Outbound',
-      icon: 'crop_din',
+      icon: 'outbound',
       route: '/pages/current-actions',
       target: '_self',
       children: [
@@ -221,7 +216,7 @@ export class PagesComponent implements OnInit, OnDestroy  {
     },
     {
       text: 'Storage',
-      icon: 'all_inbox',
+      icon: 'storage',
       route: '',
       target: '_self',
       children: [
@@ -264,6 +259,7 @@ export class PagesComponent implements OnInit, OnDestroy  {
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
   constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
+              iconRegistry: MatIconRegistry, sanitizer: DomSanitizer,
               private authService: AuthService, private utilities: UtilitiesService,
               private router: Router, private dialog: MatDialog) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -297,6 +293,14 @@ export class PagesComponent implements OnInit, OnDestroy  {
     }));
     this.memberData = this.authService.getUserMemberData();
     this.utilities.log('member data: ', this.memberData);
+    iconRegistry.addSvgIcon('dashboard',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/icons/dashboard.svg'));
+    iconRegistry.addSvgIcon('maintenance',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/icons/maintenance.svg'));
+    iconRegistry.addSvgIcon('outbound',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/icons/outbound.svg'));
+    iconRegistry.addSvgIcon('storage',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/icons/storage.svg'));  
   }
 
   logout() {

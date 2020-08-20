@@ -5,8 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
-import { CustomerService, Customer } from '@pickvoice/pickvoice-api';
+import { Customer } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -15,7 +14,7 @@ import { MatSort } from '@angular/material/sort';
 import { FormGroup, FormControl } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { takeLast, take, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
+import { take, debounceTime, distinctUntilChanged, retry, tap } from 'rxjs/operators';
 import { Observable, Subject, merge, Observer, Subscription } from 'rxjs';
 
 import { MyDataSource } from '../../models/my-data-source';

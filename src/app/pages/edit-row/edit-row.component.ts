@@ -1,22 +1,18 @@
-import { OnDestroy, Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { OnDestroy, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
-import { environment } from '../../../environments/environment';
-import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, OrderLine, Section, OrderType,
+import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, Section, OrderType,
          Transport, PickPlanning, PickTask, Dock, Lpn, Owner, Depot, Plant
        } from '@pickvoice/pickvoice-api';
 import { DataProviderService} from '../../services/data-provider.service';
-import { PrintComponent } from '../../components/print/print.component';
 import { OrderSelectorDialogComponent } from '../../components/order-selector-dialog/order-selector-dialog.component';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { SharedDataService } from '../../services/shared-data.service';
-import { from, Observable, Observer, Subscription } from 'rxjs';
-import { retry, switchMap } from 'rxjs/operators';
+import { Observer, Subscription } from 'rxjs';
 import { Location as WebLocation } from '@angular/common';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
-import { ModelFactory } from '../../models/model-factory.class';
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';

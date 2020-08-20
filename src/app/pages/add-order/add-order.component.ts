@@ -3,13 +3,13 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { UtilitiesService } from '../../services/utilities.service';
 import { Location as WebLocation } from '@angular/common';
 import { DataProviderService} from '../../services/data-provider.service';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { ModelMap } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
 
 @Component({
@@ -33,7 +33,7 @@ export class AddOrderComponent implements OnInit, OnDestroy {
     this.row = ModelFactory.newEmptyOrder();
     let validators;
     let value;
-    Object.keys(this.row).forEach((key, index) => {
+    Object.keys(this.definitions).forEach((key, index) => {
       validators = null;
       value = '';
       if (this.definitions[key] && this.definitions[key].required !== undefined && this.definitions[key].required === true) {
@@ -79,11 +79,13 @@ export class AddOrderComponent implements OnInit, OnDestroy {
     const formData = this.form.value;
     const toUpload = this.row;
     this.utilities.log('form data', formData);
+    this.utilities.log('toUpload', toUpload);
     for (const key in toUpload) {
       if (formData[key] !== undefined) {
         toUpload[key] = formData[key];
       }
     }
+    this.utilities.log('toUpload after', toUpload);
     this.isLoadingResults = true;
     const observer = {
       next: (response) => {

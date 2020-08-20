@@ -97,7 +97,7 @@
                             <div class="form-group row">
                                 <label class="col-3 col-form-label">{{definitions.transportId.name}}</label>
                                 <div class="col">
-                                    <select class="form-control" required formControlName="transportId">
+                                    <select class="form-control" formControlName="transportId">
                                         <option [ngValue]="option.transportId" *ngFor="let option of selectsData.transports | async">
                                             {{option.transportNumber}}
                                         </option>

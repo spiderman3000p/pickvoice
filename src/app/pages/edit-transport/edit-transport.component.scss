@@ -13,3 +13,7 @@
 .form-control {
     font-size: 12px;
 }
+
+::ng-deep .mat-tab-body-wrapper {
+    min-height: 50vh;
+}

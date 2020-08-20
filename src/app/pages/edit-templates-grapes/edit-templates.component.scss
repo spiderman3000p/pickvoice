@@ -1,7 +1,7 @@
-$primary: #00b19d;
+/*$primary: #00b19d;
 $accent: #00535e;
 $secondary: #00535e;
-$danger: #9C080B;
+$danger: #9C080B;*/
 /* We can remove the border we've set at the beginnig */
 ::ng-deep #gjs {
   border: none;
@@ -12,7 +12,7 @@ $danger: #9C080B;
 /* Theming */
 /* Primary color for the background */
 ::ng-deep .gjs-one-bg {
-  background-color: $primary;
+  background-color: var(--primary);
 }
 /* Secondary color for the text color */
 ::ng-deep .gjs-two-color {
@@ -20,16 +20,16 @@ $danger: #9C080B;
 }
 /* Tertiary color for the background */
 ::ng-deep .gjs-three-bg {
-  background-color: $accent;
+  background-color: var(--accent);
   color: white;
 }
 ::ng-deep .gjs-four-color-h:hover {
-  color: $accent;
+  color: var(--accent);
 }
 /* Quaternary color for the text color */
 ::ng-deep .gjs-four-color,
 .gjs-four-color-h:hover {
-  color: $accent;
+  color: var(--accent);
 }
 /* end theming */
 
@@ -70,4 +70,5 @@ $danger: #9C080B;
   top: 5px;
   z-index: 9999;
   color: white;
+  width: fit-content;
 }

@@ -3,13 +3,13 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { UtilitiesService } from '../../services/utilities.service';
 import { Location as WebLocation } from '@angular/common';
 import { DataProviderService} from '../../services/data-provider.service';
-import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
+import { ModelMap } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
 
 

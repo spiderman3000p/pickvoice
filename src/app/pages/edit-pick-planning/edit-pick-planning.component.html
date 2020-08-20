@@ -12,7 +12,7 @@
                 <button mat-raised-button color="accent" (click)="print()">
                     <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
                 </button>
-                <button mat-raised-button color="warn" (click)="export()">
+                <button mat-raised-button color="warn" (click)="export()" class="ml-2">
                     <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
                 </button>
               </div>
@@ -268,7 +268,7 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr *ngFor="let order of element.orders">
+                                                                <tr *ngFor="let order of element.orders.content">
                                                                     <td>{{order.orderNumber}}</td>
                                                                     <td>{{order.purchaseNumber}}</td>
                                                                     <td>{{order.invoiceNumber}}</td>

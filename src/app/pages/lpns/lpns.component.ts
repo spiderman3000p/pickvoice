@@ -5,7 +5,6 @@ import { MatPaginator } from '@angular/material/paginator';
 
 import { MyDataSource } from '../../models/my-data-source';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { PrintLabelDialogComponent } from '../../components/print-label-dialog/print-label-dialog.component';
@@ -17,8 +16,8 @@ import { Lpn } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES, STATES } from '../../models/model-maps.model';
 
 import { FormGroup, FormControl } from '@angular/forms';
-import { of, Subject, merge, Subscription, Observable, Observer } from 'rxjs';
-import { debounceTime, distinctUntilChanged, take, tap  } from 'rxjs/operators';
+import { of, Subscription, Observer } from 'rxjs';
+import { tap  } from 'rxjs/operators';
 
 import { Router } from '@angular/router';
 

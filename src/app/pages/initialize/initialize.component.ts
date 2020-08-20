@@ -1,10 +1,9 @@
-import { OnDestroy, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { AuthService } from '../../services/auth.service';
-import { DataProviderService } from '../../services/data-provider.service';
 
-import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
+import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 interface City {
@@ -91,9 +90,32 @@ export class InitializeComponent implements OnInit {
             this.form.get('selectedPlant').patchValue(0);
             this.form.get('selectedDepot').patchValue(0);
             this.form.get('selectedOwner').patchValue(0);
+          } else {
+            this.isLoadingResults = false;
+            console.error('No hay usuarios registradoscon esos credenciales');
+            this.logout();
+            this.utilities.showSnackBar('User doesnt exist', 'OK');
           }
+        }, err => {
+          this.isLoadingResults = false;
+          console.error('Error al obtener datos del usuario logueado');
+          this.logout();
+          this.utilities.showSnackBar('Error getting user information', 'OK');
         });
       }
+    });
+  }
+
+  logout() {
+    this.authService.logout().subscribe(result => {
+      this.utilities.log('logout response', result);
+      if (result) {
+        this.utilities.log('redirecting to /');
+        this.router.navigate(['/login']);
+      }
+    }, error => {
+      this.utilities.log('error on logout');
+      this.utilities.showSnackBar('Error requesting logout', 'OK');
     });
   }
 

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { RecentOrigin } from '../models/recent-origin.model';
-import { Observable, from, of, Subject } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
+import { Observable} from 'rxjs';
 import { UtilitiesService } from './utilities.service';
 
 @Injectable({

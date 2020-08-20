@@ -2,13 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
-import { ModelMap } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { retry, finalize, tap } from 'rxjs/operators';
-import { Observable, Observer, Subscription } from 'rxjs';
+import { Observer } from 'rxjs';
 
 @Component({
   selector: 'app-lpn-transfer',

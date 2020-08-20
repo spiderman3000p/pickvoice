@@ -1,6 +1,5 @@
-import { ViewChild, Inject, AfterViewInit, Component, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ModelMap, IMPORTING_TYPES, FILTER_TYPES } from '../../models/model-maps.model';
+import { Inject, AfterViewInit, Component, OnInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService} from '../../services/data-provider.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';

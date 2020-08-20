@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { UtilitiesService } from '../../services/utilities.service';

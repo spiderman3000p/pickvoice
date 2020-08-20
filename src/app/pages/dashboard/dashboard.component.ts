@@ -1,9 +1,7 @@
 import { AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
-import { map, debounceTime } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import Chart from 'chart.js';
-import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
-import { AuthService } from '../../services/auth.service';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { FormControl } from '@angular/forms';
@@ -186,7 +184,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, AfterViewCheck
   mobileQuery: MediaQueryList;
   private _mobileQueryListener: () => void;
   constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
-              private breakpointObserver: BreakpointObserver, private authService: AuthService,
               private utilities: UtilitiesService, private dataProviderService: DataProviderService) {
     // this.utilities.log('last url', this.authService.redirectUrl);
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -195,7 +192,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.chartsFrom.setValue(this.utilities.formatDate(new Date(Date.now() - (30 * 24 * 60 * 60000)), 'YYYY-MM-DD'));
     this.chartsTo.setValue(this.utilities.formatDate(new Date(), 'YYYY-MM-DD'));
     this.utilities.log('this.taskChartTo: ', this.chartsTo.value);
-    this.utilities.log('this.taskChartFrom: ', this.chartsFrom.value);
   }
 
   initCharts() {

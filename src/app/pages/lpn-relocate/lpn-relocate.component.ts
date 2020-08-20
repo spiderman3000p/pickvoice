@@ -2,13 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
-import { ModelMap } from '../../models/model-maps.model';
 
 import { MatDialog } from '@angular/material/dialog';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { catchError, retry, finalize, tap } from 'rxjs/operators';
-import { Observable, Observer, Subscription } from 'rxjs';
+import { retry, finalize, tap } from 'rxjs/operators';
+import { Observable, Observer } from 'rxjs';
 
 import { CdkDrag, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
@@ -239,6 +238,9 @@ export class LpnRelocateComponent implements OnInit {
     return false;
   }
 
+  onRelease(event: any) {
+    this.utilities.log('on release', event);
+  }
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);

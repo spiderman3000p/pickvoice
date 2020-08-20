@@ -1,28 +1,25 @@
-import { Inject, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
-import { environment } from '../../../environments/environment';
-import { PickPlanning, PickTask, PickTaskLine, Dock, Transport } from '@pickvoice/pickvoice-api';
-import { PrintComponent } from '../../components/print/print.component';
+import { PickTask, Dock, Transport } from '@pickvoice/pickvoice-api';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { UserSelectorDialogComponent } from '../../components/user-selector-dialog/user-selector-dialog.component';
 import { ContextMenuComponent } from 'ngx-contextmenu';
 import { SharedDataService } from '../../services/shared-data.service';
-import { from, Observable, Observer } from 'rxjs';
-import { map, retry, switchMap } from 'rxjs/operators';
+import { Observer } from 'rxjs';
+import { retry } from 'rxjs/operators';
 import { Location as WebLocation } from '@angular/common';
 import { ModelMap, IMPORTING_TYPES, STATES } from '../../models/model-maps.model';
-import { ModelFactory } from '../../models/model-factory.class';
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import {animate, state, style, transition, trigger} from '@angular/animations';
-
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { User } from '@pickvoice/pickvoice-api/model/user';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -185,13 +182,13 @@ export class EditPickPlanningComponent implements OnInit {
             message: 'Please select a user from the list'
           }
         });
-        dialogRef.afterClosed().subscribe(selectedUser => {
+        dialogRef.afterClosed().subscribe((selectedUser: User) => {
           this.utilities.log('user selector dialog result:', selectedUser);
           if (selectedUser === null) {
             return;
           }
           if (selectedUser && selectedTasks.length > 0) {
-            this.assignUserToTaskList(selectedTasks, selectedUser);
+            this.assignUserToTaskList(selectedTasks.map(task => task.id), selectedUser);
           } else {
             this.utilities.error('Selected user is invalid or none selected tasks');
             this.utilities.showSnackBar('Selected user is invalid or none selected tasks', 'OK');
@@ -242,14 +239,14 @@ export class EditPickPlanningComponent implements OnInit {
     }
   }
 
-  assignUserToTaskList(tasks: any[], user: any) {
+  assignUserToTaskList(tasks: any[], user: User) {
     this.dataProviderService.assignUserToPickTaskList(tasks, user)
     .subscribe(response => {
       this.utilities.log('assign user to task list response', response);
       if (response) {
-        tasks.forEach(task => {
+        /*tasks.forEach(task => {
           task.user = user;
-        });
+        });*/
         this.utilities.log('user assign response', response);
         this.utilities.showSnackBar('User assigned successfully', 'OK');
       }
@@ -779,7 +776,8 @@ export class EditPickPlanningComponent implements OnInit {
   }
 
   exportPickTasks() {
-    const dataToExport = this.dataSource.data.slice().map((row: any) => {
+    const dataCopy = JSON.parse(JSON.stringify(this.dataSource.data));
+    const dataToExport = dataCopy.map((row: any) => {
       delete row.id;
       delete row.pickTaskId;
       delete row.index;
@@ -790,7 +788,8 @@ export class EditPickPlanningComponent implements OnInit {
   }
 
   exportTransports() {
-    const dataToExport = this.dataSourceTransports.data.slice().map((row: any) => {
+    const dataCopy = JSON.parse(JSON.stringify(this.dataSourceTransports.data));
+    const dataToExport = dataCopy.map((row: any) => {
       delete row.id;
       delete row.index;
       delete row.ownerId;

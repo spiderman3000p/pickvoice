@@ -4,7 +4,6 @@ import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
-import { EditRowComponent } from '../../pages/edit-row/edit-row.component';
 import { LpnInterval } from '@pickvoice/pickvoice-api';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
 
@@ -13,9 +12,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormControl } from '@angular/forms';
-import { tap, retry, takeLast, take } from 'rxjs/operators';
+import { tap, take } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Observable, Subject, merge, Observer, Subscription } from 'rxjs';
+import { Observable, Subject, Observer, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({

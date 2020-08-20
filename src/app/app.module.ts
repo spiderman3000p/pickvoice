@@ -24,9 +24,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatNativeDateModule } from '@angular/material/core';
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule,
-         MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
@@ -51,7 +49,7 @@ import { ImportDialogComponent } from './components/import-dialog/import-dialog.
 import { ImportingWidgetComponent } from './components/importing-widget/importing-widget.component';
 import { FileImportComponent } from './components/importing-widget/pages/file-import/file-import.component';
 import { ImportTypeSelectionComponent } from './components/importing-widget/pages/import-type-selection/import-type-selection.component';
-import { DataPreviewComponent } from './components/importing-widget/pages/data-preview/data-preview.component';
+
 import { CommonDialogComponent } from './components/common-dialog/common-dialog.component';
 import { ContextMenuModule } from 'ngx-contextmenu';
 import { OrderSelectorDialogComponent } from './components/order-selector-dialog/order-selector-dialog.component';
@@ -60,12 +58,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
 
-import { AuthService } from './services/auth.service';
-
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
+import { AddOrderLineDialogComponent } from './components/add-order-line-dialog/add-order-line-dialog.component';
 
+import { NgSelectModule } from '@ng-select/ng-select';
 // import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
 // import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -89,7 +87,6 @@ export function apiConfigFactory(): Configuration {
     ImportDialogComponent,
     ImportingWidgetComponent,
     ImportTypeSelectionComponent,
-    DataPreviewComponent,
     FileImportComponent,
     CommonDialogComponent,
     EditRowComponent,
@@ -99,6 +96,7 @@ export function apiConfigFactory(): Configuration {
     EditRowDialogComponent,
     PrintComponent,
     PrintLayoutComponent,
+    AddOrderLineDialogComponent,
     OrderSelectorDialogComponent
   ],
   imports: [
@@ -135,6 +133,7 @@ export function apiConfigFactory(): Configuration {
     MatSortModule,
     MatCheckboxModule,
     MatProgressBarModule,
+    NgSelectModule,
 
     PagesModule,
     AuthModule,

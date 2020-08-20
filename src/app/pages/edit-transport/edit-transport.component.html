@@ -9,7 +9,7 @@
                     <button type="button" mat-raised-button color="accent" (click)="print()">
                         <mat-icon>printer</mat-icon> <span class="btn-label">Print</span>
                     </button>
-                    <button type="button" mat-raised-button color="warn" (click)="export()">
+                    <button type="button" mat-raised-button color="warn" (click)="export()" class="ml-2">
                         <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
                     </button>
                 </div>
@@ -21,90 +21,90 @@
             </div>
             <mat-card-content>
                 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Number</label>
-                                <input class="form-control"  type="text" formControlName="transportNumber"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Route</label>
-                                <input class="form-control"  type="text" formControlName="route"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Name Route</label>
-                                <input class="form-control"  type="text" formControlName="nameRoute"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Carrier Code</label>
-                                <input class="form-control"  type="text" formControlName="carrierCode"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Shipment Date</label>
-                                <input class="form-control"  type="date" formControlName="shipmentDate"
-                                pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Vehicle</label>
-                                <input class="form-control"  type="text" formControlName="vehicle"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Container Number</label>
-                                <input class="form-control"  type="number" formControlName="containerNumber"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Trailer</label>
-                                <input class="form-control"  type="text" formControlName="trailer"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Description</label>
-                                <input class="form-control"  type="text" formControlName="description"
-                                [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                <label>Transportation Status</label>
-                                <select [compareWith]="dataMap.transportationStatus.formControl.compareFn"
-                                formControlName="transportationStatus" [class.readonly]="viewMode === 'view'" class="form-control">
-                                    <option *ngFor="let status of transportData.statusList" [ngValue]="status">
-                                        {{ status }}
-                                    </option>
-                                    <!--div class="select-footer" *ngIf="dataMap.itemType.addNew && viewMode === 'edit'">
-                                        <span class="select-footer-content">
-                                            <a href="javascript: void(0)"
-                                            (click)="addNewObject(importingTypes.ITEM_TYPE, 'Add new item type')">
-                                                <mat-icon *ngIf="dataMap.itemType.addNew.icon">{{ dataMap.itemType.addNew.icon }}</mat-icon>
-                                                <span>{{ dataMap.itemType.addNew.text }}</span>
-                                            </a>
-                                        </span>
-                                    </div-->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <mat-tab-group class="tab-specific-information">
-                        <mat-tab label="Especific Information">
+                    <mat-tab-group>
+                        <mat-tab label="Transports">
                             <ng-template matTabContent>
-                                <div class="row pt-3">
-                                    <div class="col-sm-3">
+                                <div class="row p-3">
+                                    <div class="col-sm-4">
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Number</label>
+                                            <input class="form-control"  type="text" formControlName="transportNumber"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Route</label>
+                                            <input class="form-control"  type="text" formControlName="route"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Name Route</label>
+                                            <input class="form-control"  type="text" formControlName="nameRoute"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Carrier Code</label>
+                                            <input class="form-control"  type="text" formControlName="carrierCode"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Shipment Date</label>
+                                            <input class="form-control"  type="date" formControlName="shipmentDate"
+                                            pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Vehicle</label>
+                                            <input class="form-control"  type="text" formControlName="vehicle"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Container Number</label>
+                                            <input class="form-control"  type="number" formControlName="containerNumber"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Trailer</label>
+                                            <input class="form-control"  type="text" formControlName="trailer"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Description</label>
+                                            <input class="form-control"  type="text" formControlName="description"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Transportation Status</label>
+                                            <select [compareWith]="dataMap.transportationStatus.formControl.compareFn"
+                                            formControlName="transportationStatus" [class.readonly]="viewMode === 'view'" class="form-control">
+                                                <option *ngFor="let status of transportData.statusList" [ngValue]="status">
+                                                    {{ status }}
+                                                </option>
+                                                <!--div class="select-footer" *ngIf="dataMap.itemType.addNew && viewMode === 'edit'">
+                                                    <span class="select-footer-content">
+                                                        <a href="javascript: void(0)"
+                                                        (click)="addNewObject(importingTypes.ITEM_TYPE, 'Add new item type')">
+                                                            <mat-icon *ngIf="dataMap.itemType.addNew.icon">{{ dataMap.itemType.addNew.icon }}</mat-icon>
+                                                            <span>{{ dataMap.itemType.addNew.text }}</span>
+                                                        </a>
+                                                    </span>
+                                                </div-->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
                                         <div class="form-group" [class.readonly]="viewMode === 'view'">
                                             <label>Weight</label>
                                             <input class="form-control"  type="number" formControlName="weight"
                                             [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                         </div>
+                                    </div>
+                                    <div class="col-sm-4">
                                         <div class="form-group" [class.readonly]="viewMode === 'view'">
                                             <label>Uom Volume</label>
                                             <select formControlName="uomVolumeId" [class.readonly]="viewMode === 'view'"
@@ -114,6 +114,8 @@
                                                 </option>
                                             </select>
                                         </div>
+                                    </div>
+                                    <div class="col-sm-4">
                                         <div class="form-group" [class.readonly]="viewMode === 'view'">
                                             <label>Uom Weight</label>
                                             <select formControlName="uomWeightId" [class.readonly]="viewMode === 'view'"
@@ -124,55 +126,61 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                            <label>Planned Checkin</label>
-                                            <input class="form-control"  type="text" formControlName="plannedCheckin"
-                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        </div>
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                            <label>Actual Checkin</label>
-                                            <input class="form-control"  type="text" formControlName="actualCheckin"
-                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        </div>
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                            <label>Planned Start Loading</label>
-                                            <input class="form-control"  type="text" formControlName="plannedStartLoading"
-                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                            <label>Current Start Loading</label>
-                                            <input class="form-control"  type="text" formControlName="currentStartLoading"
-                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        </div>
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                            <label>Planned End Loading</label>
-                                            <input class="form-control"  type="text" formControlName="plannedEndLoading"
-                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        </div>
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                            <label>Actual End Loading</label>
-                                            <input class="form-control"  type="text" formControlName="actualEndLoading"
-                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                            <label>Planned Shipment Completion</label>
-                                            <input class="form-control"  type="text" formControlName="plannedShipmentCompletion"
-                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        </div>
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
-                                            <label>Current Shipment Completion</label>
-                                            <input class="form-control"  type="text" formControlName="currentShipmentCompletion"
-                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        </div>
-                                    </div>
                                 </div>
                             </ng-template>
                         </mat-tab>
+                        <mat-tab label="Consult Shipments">
+                            <div class="row p-3">
+                                <div class="col-6">
+                                    <h5>Planning</h5>
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <label>Planned Checkin</label>
+                                        <input class="form-control"  type="text" formControlName="plannedCheckin"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <label>Planned Start Loading</label>
+                                        <input class="form-control"  type="text" formControlName="plannedStartLoading"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <label>Planned End Loading</label>
+                                        <input class="form-control"  type="text" formControlName="plannedEndLoading"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <label>Planned Shipment Completion</label>
+                                        <input class="form-control"  type="text" formControlName="plannedShipmentCompletion"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h5>Execution</h5>
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <label>Current Shipment Completion</label>
+                                        <input class="form-control"  type="text" formControlName="currentShipmentCompletion"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <label>Actual Checkin</label>
+                                        <input class="form-control"  type="text" formControlName="actualCheckin"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <label>Current Start Loading</label>
+                                        <input class="form-control"  type="text" formControlName="currentStartLoading"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <label>Actual End Loading</label>
+                                        <input class="form-control"  type="text" formControlName="actualEndLoading"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <mat-tab-group class="tab-specific-information">
                         <mat-tab label="Orders">
                             <ng-template matTabContent>
                                 <div class="col-sm-12">

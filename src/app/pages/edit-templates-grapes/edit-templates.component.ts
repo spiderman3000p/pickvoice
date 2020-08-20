@@ -1,7 +1,6 @@
 import { ApplicationRef, Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ModelMap } from '../../models/model-maps.model';
-import { FormControl } from '@angular/forms';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
@@ -9,11 +8,10 @@ import { AuthService } from '../../services/auth.service';
 import { OpenTemplateDialogComponent } from '../../components/open-template-dialog/open-template-dialog.component';
 import { SaveTemplateDialogComponent } from '../../components/save-template-dialog/save-template-dialog.component';
 import { LabelTemplate } from '@pickvoice/pickvoice-api/model/labeltemplate';
-import { LabelType } from '@pickvoice/pickvoice-api/model/labeltype';
 
-import { environment } from 'src/environments/environment';
-import { Observer, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import grapesjs from 'grapesjs';
+import { AdminTemplatesDialogComponent } from 'src/app/components/admin-templates-dialog/admin-templates-dialog.component';
 
 @Component({
   selector: 'app-edit-templates',
@@ -408,6 +406,20 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
       visible  : true,
       buttons  : [
         {
+          id: 'open-admin-button',
+          className: 'fa fa-list-alt',
+          attributes: { title: 'Open Templates Admin'},
+          active: false,
+          command: {
+            run: (editor) => {
+              this.openTemplateAdmin(editor);
+            },
+            stop: (editor) => {
+              editor.Panels.getButton('left-panel', 'open-admin-button').active = false;
+            }
+          }
+        },
+        {
           id: 'open-button',
           className: 'fa fa-folder-open',
           attributes: { title: 'Open Template'},
@@ -450,6 +462,30 @@ export class EditTemplatesComponent implements OnInit, AfterViewInit, OnDestroy 
           }
         }
       ]
+    });
+  }
+
+  openTemplateAdmin(editor: any) {
+    const dialogRef = this.dialog.open(AdminTemplatesDialogComponent, {
+      width: '980px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result && result.name && result.description) {
+        this.templateObject = new Object(result) as LabelTemplate;
+        editor.load((response: any) => {
+          this.utilities.log('open response: ', response);
+          editor.Panels.getButton('left-panel', 'open-admin-button').active = false;
+        }, (error) => {
+          editor.Panels.getButton('left-panel', 'open-admin-button').active = false;
+          this.utilities.error('Error on loading template', error);
+          this.utilities.showSnackBar('Error on loading template', 'OK');
+        });
+      }
+    }, error => {
+      this.utilities.error('error after closing open template dialog', error);
+      this.utilities.showSnackBar('Error after closing open template', 'OK');
+      this.isLoadingResults = false;
     });
   }
 

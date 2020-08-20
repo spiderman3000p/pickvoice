@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationExtras, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { UtilitiesService } from '../../../../services/utilities.service';
 import { SharedDataService } from '../../../../services/shared-data.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ImportDialogComponent } from '../../../import-dialog/import-dialog.component';
-import { ModelMap, IMPORTING_TYPES } from '../../../../models/model-maps.model';
-import * as XLSX from 'xlsx';
-import { of, from } from 'rxjs';
+import { IMPORTING_TYPES } from '../../../../models/model-maps.model';
 
 /*import { Grid } from 'ag-grid-community';
 import 'ag-grid-community/dist/styles/ag-grid.css';
