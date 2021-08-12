@@ -22,6 +22,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { User } from '@pickvoice/pickvoice-api/model/user';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import { SearchTransportDialogComponent } from 'src/app/components/transport-selector-dialog/transport-selector-dialog.component';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 interface PickPlanningData {
@@ -261,9 +262,12 @@ export class EditPickPlanningComponent implements OnInit {
   }
 
   updatePickTask(newTask: any, oldTask: any) {
+    console.log('updating pick task')
+    console.log('old task', oldTask)
+    console.log('new task', newTask)
     this.dataProviderService.updatePickTask(newTask, oldTask.id).subscribe(response => {
       if (response) {
-        oldTask.priority = newTask;
+        oldTask.priority = newTask.priority;
         this.utilities.log('task update response', response);
         this.utilities.showSnackBar('Task updated successfully', 'OK');
       }
@@ -799,6 +803,29 @@ export class EditPickPlanningComponent implements OnInit {
     this.utilities.exportToXlsx(dataToExport, 'Pick Planning Transports List');
   }
 
+  addTransport() {
+    this.utilities.log('map to send to add dialog', this.definitions);
+    const dialogRef = this.dialog.open(SearchTransportDialogComponent);
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      this.utilities.log('hay que agregarlo a esta lista:', result);
+      if (result) {
+        // TODO: consumir servicio para persistir esto
+        // TODO: eliminar esto cuando se use el endpoint
+        this.pickPlanningData.transportList.push(result);
+        this.dataSourceTransports.data = this.pickPlanningData.transportList;
+        // fin TODO
+        if(!result){
+          this.getTransportList()
+        }
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
+    });
+  }
+
   /*
     Esta funcion se encarga de refrescar la tabla cuando el contenido cambia.
     TODO: mejorar esta funcion usando this.dataSource y no el filtro
@@ -838,7 +865,10 @@ export class EditPickPlanningComponent implements OnInit {
   getPickTaskList() {
     this.dataProviderService.getAllPickPlanningTasksVO3(this.row.id).subscribe(results => {
       if (results && results.content) {
-        this.pickPlanningData.pickTaskList = results.content;
+        this.pickPlanningData.pickTaskList = results.content.map(el => {
+          el.id = el.pickTaskId
+          return el
+        });
         this.dataSource.data = this.pickPlanningData.pickTaskList;
         this.refreshTable();
         this.utilities.log('pick task list', this.pickPlanningData.pickTaskList);
@@ -973,6 +1003,7 @@ export class EditPickPlanningComponent implements OnInit {
       type: string
     }) => {
       this.viewMode = data.viewMode;
+      this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Planning' : 'View Pick Planning';
       this.type = data.type;
       this.remoteSync = true;
       this.utilities.log('viewMode', this.viewMode);

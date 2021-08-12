@@ -8,3 +8,14 @@
 .mat-tab-body-content {
     margin-top: 3% !important;
 }
+
+::ng-deep .mat-slider-thumb-label {
+    right: -14px !important;
+    top: -40px !important;
+    transform: rotate(45deg) !important;
+    border-radius: 50% 50% 0 !important;
+}
+
+::ng-deep .mat-slider-thumb-label-text {
+    opacity: 1 !important;
+}

@@ -15,11 +15,13 @@ export class PlantsResolverService implements Resolve<Plant> {
     const id = Number(route.paramMap.get('id'));
     const observables = {
       plant: of({}),
-      countries: of([])
+      countries: of([]),
+      cities: of([])
     };
     return Observable.create((observer) => {
       observables.plant = this.dataProviderService.getPlant(id);
       observables.countries = this.dataProviderService.getAllCountries();
+      observables.cities = of([])
       observer.next(observables);
       observer.complete();
     });

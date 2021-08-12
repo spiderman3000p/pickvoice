@@ -27,7 +27,7 @@
                             <div class="form-section-title row">
                                 <h5>Geographic details</h5>
                             </div>
-                            <div class="form-group row">
+                            <!--div class="form-group row">
                                 <label class="col-3 col-form-label">country</label>
                                 <div class="col">
                                     <select formControlName="countryId" class="form-control"
@@ -48,13 +48,13 @@
                                         </option>
                                     </select>
                                 </div>
-                            </div>
+                            </div-->
                             <div class="form-group row">
                                 <label class="col-3 col-form-label">{{definitions.cityId.name}}</label>
                                 <div class="col">
                                     <select formControlName="cityId" class="form-control"
                                     [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                        <option *ngFor="let opt of selectsData.cities | async" [ngValue]="opt.id">
+                                        <option *ngFor="let opt of selectsData.cities | async" [value]="opt.id">
                                             {{ opt.name }}
                                         </option>
                                     </select>

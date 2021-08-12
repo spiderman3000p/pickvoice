@@ -1,0 +1,30 @@
+<div class="content-area">
+  <div class="example-loading-shade" *ngIf="isLoadingResults">
+      <mat-spinner class="spinner"></mat-spinner>
+  </div>
+  <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+  <div class="content">
+    <div class="section-wrapper">
+        <div class="header actionbar align-content-top">
+            <div class="title actionbar-section align-content-top">
+                <h1>Add Filter</h1>
+            </div>
+        </div>
+    </div>
+    <ejs-querybuilder  #querybuilder [(dataSource)]="data" summaryView="true" enablePersistence="true" (change)="onQueryChange($event)">
+      <e-columns>
+        <e-column *ngFor="let field of fields" [field]="field.value" [label]="field.label"
+        [type]="field.type" [values]="field.values" [format]="field.format"></e-column>
+        <!--e-column field="FirstName" label="tabla.code" type="string"></e-column>
+        <e-column field="TitleOfCourtesy" label="Title Of Courtesy" type="boolean" [values]="values"></e-column>
+        <e-column field="Title" label="state" type="string"></e-column>
+        <e-column field="HireDate" label="Hire Date" type="date" format="dd/MM/yyyy"></e-column>
+        <e-column field="Country" label="Country" type="string"></e-column>
+        <e-column field="City" label="City" type="string"></e-column-->
+      </e-columns>
+    </ejs-querybuilder>
+    <pre>
+      {{json}}
+    </pre>
+  </div>
+</div>

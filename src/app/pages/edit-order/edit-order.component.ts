@@ -1,21 +1,20 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
 import { AuthService } from '../../services/auth.service';
 
-import { QualityStates, Item, Customer, OrderLine, OrderType, Transport, UnityOfMeasure } from '@pickvoice/pickvoice-api';
+import { QualityStates, Customer, OrderLine, OrderType, Transport, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { EditRowDialogComponent } from '../../components/edit-row-dialog/edit-row-dialog.component';
 import { SharedDataService } from '../../services/shared-data.service';
 import { Location as WebLocation } from '@angular/common';
 import { ModelMap, IMPORTING_TYPES } from '../../models/model-maps.model';
-import { ModelFactory } from '../../models/model-factory.class';
 import { NumericEditorComponent } from './numeric-editor.component';
 import { DateEditorComponent } from './date-editor.component';
 import { RowOptionComponent } from './row-option.component';
 
-import { Observer } from 'rxjs';
+import { Observer, Subscription } from 'rxjs';
 import { retry } from 'rxjs/operators';
 
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,13 +26,20 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import { SelectCellComponent } from './select-cell.component';
+import { SelectCell2Component } from './select-cell2.component';
+
+import { SearchCustomerDialogComponent } from 'src/app/components/customer-selector-dialog/customer-selector-dialog.component';
+import { SearchTransportDialogComponent } from 'src/app/components/transport-selector-dialog/transport-selector-dialog.component';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { Module } from '@ag-grid-enterprise/all-modules';
+import { ModelFactory } from 'src/app/models/model-factory.class';
 
 class OrdersData {
   itemList: any[] = [];
   orderTypeList: OrderType[] = [];
   transportList: Transport[] = [];
   customerList: Customer[] = [];
-  orderLineList: OrderLine[] = [];
+  orderLineList: any[] = [];
   transportStatus: string[] = [];
   uomList: UnityOfMeasure[] = [];
   qualityStateList: QualityStates[] = [];
@@ -44,7 +50,9 @@ class OrdersData {
   styleUrls: ['./edit-order.component.scss']
 })
 
-export class EditOrderComponent implements OnInit {
+export class EditOrderComponent implements OnInit, OnDestroy, AfterViewInit {
+  subscriptions: Subscription[] = [];
+  modules: Module[] = [ClientSideRowModelModule];
   form: FormGroup;
   pageTitle = '';
   cardTitle = '';
@@ -95,19 +103,61 @@ export class EditOrderComponent implements OnInit {
   qualitySetter: any;
   orderLineColDefs: any[] = [
     {
-      headerName: 'ITEM',
       field: 'itemId',
+      hide: true
+    },
+    {
+      headerName: 'ITEM',
+      field: 'item',
       width: 160,
       editable: true,
+      resizable: true,
+      sortable: true,
+      filter: 'agTextColumnFilter',
+      floatingFilter: true,
+      valueGetter: (params) => {
+        //console.log('value getter', params.data);
+        return params.data.item;
+      },
+      filterParams: {
+        filterOptions: ['contains', 'notContains', 'startsWith', 'endsWith'],
+        textFormatter: (value) => {
+          return value.itemSku ? `${value.itemSku} ${value.itemDescription}`.toLowerCase() : value.toLowerCase();
+        },
+        debounceMs: 0,
+        suppressAndOrCondition: true,
+        textCustomComparator: (filter, valueLowerCase, filterText) => {
+          // console.log('value', valueLowerCase);
+          let filterTextLowerCase = filterText.toLowerCase();
+          //let valueLowerCase = `${value.itemSku} ${value.itemDescription}`.toLowerCase();
+          // console.log('filter', filterTextLowerCase);
+          switch (filter) {
+              case 'contains':
+                  return valueLowerCase.includes(filterTextLowerCase);
+              case 'notContains':
+                  return !valueLowerCase.includes(filterTextLowerCase);
+              case 'startsWith':
+                  return valueLowerCase.indexOf(filterTextLowerCase) === 0;
+              case 'endsWith':
+                  var index = valueLowerCase.lastIndexOf(filterTextLowerCase);
+                  return index >= 0 && index === (valueLowerCase.length - filterTextLowerCase.length);
+              default:
+                  // should never happen
+                  // console.warn('invalid filter type ' + filter);
+                  return false;
+              }
+          }
+      },
       cellRenderer: (params) => {
-        const itemm = this.ordersData.itemList.find(item => item.itemId == params.data.itemId);
-        return itemm ? itemm.itemDescription : 'Loading...';
+        return params.data?.itemSku && params.data?.itemDescription ? `[${params.data?.itemSku}] ${params.data?.itemDescription}` : ''
       },
       cellEditor: 'selectCellComponent',
       cellEditorParams: {
-        options: () => this.ordersData.itemList,
+        options: (params) => this.dataProviderService.getAllItems(params),
         display: 'itemDescription',
-        key: 'itemId'
+        key: 'itemId',
+        getUri: 'startRow=0;endRow=50;itemId-filterType=number;itemId-type=equals;itemId-filter=$;sort-itemId=asc',
+        searchUri: `startRow=0;endRow=50;itemDescription-filterType=text;itemDescription-type=contains;itemDescription-filter=$;sort-itemSku=asc`
       }
     },
     {
@@ -115,11 +165,48 @@ export class EditOrderComponent implements OnInit {
       field: 'qualityState',
       width: 150,
       editable: true,
+      resizable: true,
+      filter: 'agTextColumnFilter',
+      floatingFilter: true,
+      /*valueGetter: (params) => {
+        console.log('value getter', params.data);
+        return params.data.item;
+      },*/
+      filterParams: {
+        filterOptions: ['contains', 'notContains', 'startsWith', 'endsWith'],
+        debounceMs: 0,
+        suppressAndOrCondition: true,
+        textCustomComparator: (filter, value, filterText) => {
+          // console.log('value', value);
+          let filterTextLowerCase = filterText.toLowerCase();
+          const _quality = this.ordersData.qualityStateList.find(quality => quality.code == value.toUpperCase());
+          if(!_quality) {
+            return false;
+          }
+          const valueLowerCase = _quality.name.toLowerCase();
+          // console.log('filter', filterTextLowerCase);
+          switch (filter) {
+            case 'contains':
+                return valueLowerCase.includes(filterTextLowerCase);
+            case 'notContains':
+                return !valueLowerCase.includes(filterTextLowerCase);
+            case 'startsWith':
+                return valueLowerCase.indexOf(filterTextLowerCase) === 0;
+            case 'endsWith':
+                var index = valueLowerCase.lastIndexOf(filterTextLowerCase);
+                return index >= 0 && index === (valueLowerCase.length - filterTextLowerCase.length);
+            default:
+                // should never happen
+                // console.warn('invalid filter type ' + filter);
+                return false;
+            }
+        }
+      },
       cellRenderer: (params) => {
         const _quality = this.ordersData.qualityStateList.find(quality => quality.code == params.data.qualityState);
-        return _quality ? _quality.name : 'Loading...';
+        return _quality ? _quality.name : '';
       },
-      cellEditor: 'selectCellComponent',
+      cellEditor: 'selectCell2Component',
       cellEditorParams: {
         options: () => this.ordersData.qualityStateList,
         display: 'name',
@@ -130,37 +217,80 @@ export class EditOrderComponent implements OnInit {
       headerName: 'QTY',
       field: 'qtyRequired',
       width: 100,
+      filter: 'agNumberColumnFilter',
+      floatingFilter: true,
       cellEditor: 'numericEditor',
-      editable: true
+      editable: true,
+      resizable: true
     },
     {
       headerName: 'BATCH NUMBER',
       field: 'batchNumber',
       width: 150,
-      cellEditor: 'numericEditor',
-      editable: true
+      editable: true,
+      filter: 'agNumberColumnFilter',
+      floatingFilter: true,
+      resizable: true
     },
     {
       headerName: 'EXPIRY DATE',
       field: 'expiryDate',
       width: 150,
       cellEditor: 'dateEditor',
-      editable: true
+      editable: true,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        // provide comparator function
+        comparator: function(filterLocalDateAtMidnight, cellValue) {
+            var dateAsString = cellValue;
+            console.log('date value', dateAsString);
+            console.log('filter date value', filterLocalDateAtMidnight.toLocaleDateString());
+            if (dateAsString == null) {
+                return 0;
+            }
+
+            // In the example application, dates are stored as dd/mm/yyyy
+            // We create a Date object for comparison against the filter date
+            var dateParts = dateAsString.split('-');
+            var day = Number(dateParts[2]);
+            var month = Number(dateParts[1]) - 1;
+            var year = Number(dateParts[0]);
+            var cellDate = new Date(year, month, day);
+            console.log('new date parts', dateParts);
+            console.log('new date', cellDate.toLocaleDateString());
+            // Now that both parameters are Date objects, we can compare
+            if (cellDate < filterLocalDateAtMidnight) {
+                return -1;
+            } else if (cellDate > filterLocalDateAtMidnight) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+      },
+      floatingFilter: true,
+      resizable: true
     },
     {
       headerName: 'SERIAL',
       field: 'serial',
       width: 100,
-      editable: true
+      editable: true,
+      filter: true,
+      floatingFilter: true,
+      resizable: true
     },
     {
       headerName: 'OPTIONS',
       field: 'options',
+      pinned: 'right',
       cellRenderer: 'rowOption',
+      width: 80,
       cellRendererParams: {
-        deleteItemUom: this.deletePrompt.bind(this),
-        startEditItemUom: this.startEditItemUom.bind(this),
-        finishEditItemUom: this.finishEditItemUom.bind(this),
+        viewMode: () => { return this.viewMode },
+        deleteOrderLine: this.deletePrompt.bind(this),
+        startEditOrderLine: this.startEditOrderLine.bind(this),
+        finishEditOrderLine: this.finishEditOrderLine.bind(this),
       }
     }
   ];
@@ -176,16 +306,17 @@ export class EditOrderComponent implements OnInit {
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
     this.isLoadingResults = true;
     this.form = new FormGroup({
-      orderNumber: new FormControl(''),
-      purchaseNumber: new FormControl(''),
-      invoiceNumber: new FormControl(''),
-      orderDate: new FormControl(''),
-      deliveryDate: new FormControl(''),
-      orderTypeId: new FormControl(''),
-      priority: new FormControl(''),
-      note: new FormControl(''),
-      transportId: new FormControl(''),
-      customerId: new FormControl('')
+      orderNumber: new FormControl(null),
+      purchaseNumber: new FormControl(null),
+      invoiceNumber: new FormControl(null),
+      orderDate: new FormControl(null),
+      deliveryDate: new FormControl(null),
+      orderTypeId: new FormControl(null),
+      priority: new FormControl(null),
+      note: new FormControl(null),
+      transportId: new FormControl(null),
+      customerId: new FormControl(null),
+      price: new FormControl(null)
     });
     this.form.get('transportId').valueChanges.subscribe(value => {
       this.row.transportId = value;
@@ -200,8 +331,13 @@ export class EditOrderComponent implements OnInit {
       dateEditor: DateEditorComponent,
       rowOption: RowOptionComponent,
       numericEditor: NumericEditorComponent,
-      selectCellComponent: SelectCellComponent
+      selectCellComponent: SelectCellComponent,
+      selectCell2Component: SelectCell2Component
     };
+  }
+
+  ngAfterViewInit() {
+
   }
 
   setDataSourceAttributes() {
@@ -211,7 +347,7 @@ export class EditOrderComponent implements OnInit {
 
   init() {
     this.utilities.log('order', this.row);
-    this.getItemList();
+    // this.getItemList();
     this.getQualityStateList();
     this.getTransportList();
     this.getCustomerList();
@@ -231,17 +367,19 @@ export class EditOrderComponent implements OnInit {
       this.initColumnsDefs(); // columnas a mostrarse en la tabla
     }
     this.form = new FormGroup({
-      orderNumber: new FormControl(this.row.orderNumber ? this.row.orderNumber : '', Validators.required),
-      purchaseNumber: new FormControl(this.row.purchaseNumber ? this.row.purchaseNumber : ''),
-      invoiceNumber: new FormControl(this.row.invoiceNumber ? this.row.invoiceNumber : ''),
-      orderDate: new FormControl(this.row.orderDate ? this.row.orderDate : ''),
-      deliveryDate: new FormControl(this.row.deliveryDate ? this.row.deliveryDate : ''),
-      orderTypeId: new FormControl(this.row.orderTypeId ? this.row.orderTypeId : ''),
-      priority: new FormControl(this.row.priority ? this.row.priority : ''),
-      note: new FormControl(this.row.note ? this.row.note : ''),
+      orderNumber: new FormControl(this.row.orderNumber ? this.row.orderNumber : null, Validators.required),
+      purchaseNumber: new FormControl(this.row.purchaseNumber ? this.row.purchaseNumber : null),
+      invoiceNumber: new FormControl(this.row.invoiceNumber ? this.row.invoiceNumber : null),
+      orderDate: new FormControl(this.row.orderDate ? this.row.orderDate : null),
+      deliveryDate: new FormControl(this.row.deliveryDate ? this.row.deliveryDate : null),
+      orderTypeId: new FormControl(this.row.orderTypeId ? this.row.orderTypeId : null),
+      priority: new FormControl(this.row.priority ? this.row.priority : null),
+      note: new FormControl(this.row.note ? this.row.note : null),
       // idTransport: new FormControl(this.row.idTransport),
-      transportId: new FormControl(this.row.transportId ? this.row.transportId : ''),
-      customerId: new FormControl(this.row.customerId ? this.row.customerId : '')
+      transportId: new FormControl(this.row.transportId ? this.row.transportId : null),
+      customerId: new FormControl(this.row.customerId ? this.row.customerId : null),
+      price: new FormControl(this.row.price ? this.row.price : null)
+
     });
     this.form.get('transportId').valueChanges.subscribe(value => {
       this.row.transportId = value;
@@ -251,8 +389,8 @@ export class EditOrderComponent implements OnInit {
       this.row.customerId = value;
       this.getCustomerDetails();
     });
-    this.form.get('customerId').patchValue(this.row.customerId ? this.row.customerId : '');
-    this.form.get('transportId').patchValue(this.row.transportId ? this.row.transportId : '');
+    this.form.get('customerId').patchValue(this.row.customerId ? this.row.customerId : null);
+    this.form.get('transportId').patchValue(this.row.transportId ? this.row.transportId : null);
     this.utilities.log('form value', this.form.value);
   }
 
@@ -417,6 +555,16 @@ export class EditOrderComponent implements OnInit {
     });
   }
 
+  sortOrderLines(col = 'itemId', sort = 'asc') {
+    const sortModel = [{
+      colId: col,
+      sort: sort
+    }];
+    setTimeout(() => {
+      this.gridApi.setSortModel(sortModel);
+    }, 500);
+  }
+
   handleError(error: any) {
     this.utilities.error('error sending data to api', error);
     this.utilities.showSnackBar('Error on request. Verify your Internet connection', 'OK');
@@ -460,24 +608,38 @@ export class EditOrderComponent implements OnInit {
     }, error => {
       this.utilities.error('error after closing edit row dialog');
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
+    });
+  }
+
+  openSearchCustomerDialog() {
+    const dialogRef = this.dialog.open(SearchCustomerDialogComponent);
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+        this.form.get('customerId').setValue(result.customerId);
+        this.selectedCustomer = result;
+      }
+    }, error => {
+      this.utilities.error('error after closing search customer dialog', error);
+      this.utilities.showSnackBar('Error after closing search customer dialog', 'OK');
+    });
+  }
+
+  openSearchTransportDialog() {
+    const dialogRef = this.dialog.open(SearchTransportDialogComponent);
+    dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+        this.form.get('transportId').setValue(result.transportId);
+        this.selectedTransport = result;
+      }
+    }, error => {
+      this.utilities.error('error after closing search transport dialog', error);
+      this.utilities.showSnackBar('Error after closing search transport dialog', 'OK');
     });
   }
 
   addOrderLine() {
-    /*this.utilities.log('map to send to add dialog', this.definitions);
-    const dialogRef = this.dialog.open(AddOrderLineDialogComponent);
-    dialogRef.afterClosed().subscribe(result => {
-      this.utilities.log('dialog result:', result);
-      if (result) {
-        this.dataSource.data.push(result);
-        this.refreshTable();
-      }
-    }, error => {
-      this.utilities.error('error after closing edit row dialog');
-      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
-      this.isLoadingResults = false;
-    });*/
     const newRow = ModelFactory.newEmptyOrderLine();
     newRow.idOrder = this.row.id;
     // this.itemUomsData.push(newRow);
@@ -559,6 +721,20 @@ export class EditOrderComponent implements OnInit {
   getOrderLineList() {
     this.dataProviderService.getAllOrderLinesForOrder(this.row.id).subscribe((results: any) => {
       this.ordersData.orderLineList = results;
+      this.ordersData.orderLineList.forEach((orderLine, index) => {
+        orderLine.item = {};
+        this.subscriptions.push(
+          this.dataProviderService.getAllItems(`startRow=0;endRow=1;itemId-filterType=number;itemId-type=equals;itemId-filter=${orderLine.itemId};sort-itemDescription=asc`).subscribe((result: any) => {
+            if(result && result.content && result.content.length > 0) {
+              orderLine.item = result.content[0];
+              this.gridApi.applyTransaction({ update: [orderLine]});
+            }
+          })
+        );
+        /*if (index === this.ordersData.orderLineList.length -1) {
+          this.gridApi.redrawRows();
+        }*/
+      });
       this.utilities.log('this.ordersData.orderLineList', this.ordersData.orderLineList);
     });
   }
@@ -724,28 +900,16 @@ export class EditOrderComponent implements OnInit {
     this.location.back();
   }
 
-  addRow() {
-    const newRow = ModelFactory.newEmptyItemUom();
-    newRow.itemId = this.row.id;
-    newRow.id = 0;
-    // this.itemUomsData.push(newRow);
-    const transaction = {
-      // rows to add
-      add: [newRow]
-    };
-    this.gridApi.applyTransaction(transaction);
-  }
-
   exportTableData() {
     let dataToExport;
-    this.dataProviderService.getAllItemUoms(this.row.id).subscribe(data => {
+    this.dataProviderService.getAllOrderLinesForOrder(this.row.id).subscribe(data => {
       if (data && data.length > 0) {
         dataToExport = data.map((row: any) => {
-          delete row.uomId;
-          delete row.itemId;
-          return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ITEMUOMS);
+          /*delete row.uomId;
+          delete row.itemId;*/
+          return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ORDER_LINE);
         });
-        this.utilities.exportToXlsx(dataToExport, 'Item Uoms List');
+        this.utilities.exportToXlsx(dataToExport, 'Order Lines List');
       }
     });
   }
@@ -785,11 +949,11 @@ export class EditOrderComponent implements OnInit {
     });
   }
 
-  startEditItemUom(params: any, rIndex: number, cKey: string) {
+  startEditOrderLine(params: any, rIndex: number, cKey: string) {
     this.gridApi.startEditingCell({rowIndex: rIndex, colKey: cKey});
   }
 
-  finishEditItemUom(params: any) {
+  finishEditOrderLine(params: any) {
     this.utilities.log('edit-order. finishEditOrderLine params', params);
     this.gridApi.stopEditing();
   }
@@ -797,6 +961,11 @@ export class EditOrderComponent implements OnInit {
   onGridReady(params) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
+    this.gridApi.sizeColumnsToFit();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   ngOnInit(): void {
@@ -808,8 +977,8 @@ export class EditOrderComponent implements OnInit {
       type: string
     }) => {
       this.viewMode = data.viewMode;
+      this.pageTitle = this.viewMode === 'edit' ? 'Edit Order' : 'View Order';
       this.type = data.type;
-      this.utilities.log('viewMode', this.viewMode);
       data.row.subscribe(element => {
         this.isLoadingResults = false;
         this.utilities.log('ngOnInit => row received', element);

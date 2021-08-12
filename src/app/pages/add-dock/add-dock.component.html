@@ -1,0 +1,105 @@
+<div class="content-area">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+        <mat-spinner class="spinner"></mat-spinner>
+    </div>
+    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
+    <div class="content" *ngIf="form">
+      <div class="section-wrapper">
+          <div class="header actionbar align-content-top">
+              <div class="title actionbar-section align-content-top">
+                  <h1>Add Dock</h1>
+              </div>
+          </div>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-card>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Type</label>
+                                <select class="form-control" formControlName="dockType">
+                                    <option [value]="option" *ngFor="let option of selectsData.dockTypes | async">
+                                        {{option}}
+                                    </option>
+                                </select>
+                                <!--span class="help-icon"
+                                *ngIf="definitions.state.formControl.helpText &&
+                                definitions.state.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.state.formControl.helpText">
+                                </span-->
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Section</label>
+                                <select class="form-control" formControlName="sectionId">
+                                    <option [value]="option.id" *ngFor="let option of selectsData.sections | async">
+                                        {{option.name}}
+                                    </option>
+                                </select>
+                                <!--span class="help-icon"
+                                *ngIf="definitions.state.formControl.helpText &&
+                                definitions.state.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.state.formControl.helpText">
+                                </span-->
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Code</label>
+                                <input class="form-control" type="text" placeholder="Type a code" formControlName="code">
+                                <!--span  class="help-icon"
+                                *ngIf="definitions.upc.formControl.helpText &&
+                                definitions.upc.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.upc.formControl.helpText">
+                                </span-->
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Location Type</label>
+                                <select class="form-control" formControlName="locationType">
+                                    <option [value]="option" *ngFor="let option of selectsData.locationTypes | async">
+                                        {{option}}
+                                    </option>
+                                </select>
+                                <!--span class="help-icon"
+                                *ngIf="definitions.name.formControl.helpText &&
+                                definitions.name.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.name.formControl.helpText">
+                                </span-->
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Location State</label>
+                                <select class="form-control" formControlName="locationState">
+                                    <option [value]="option" *ngFor="let option of selectsData.locationStates | async">
+                                        {{option}}
+                                    </option>
+                                </select>
+                                <!--span class="help-icon"
+                                *ngIf="definitions.code.formControl.helpText &&
+                                definitions.code.formControl.helpText.length > 0"
+                                [matTooltip]="definitions.code.formControl.helpText">
+                                </span-->
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>Descripcion</label>
+                                <input class="form-control" type="text" placeholder="Type a description" formControlName="description">
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end" [ngClass]="'mb-0'">
+                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
+                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

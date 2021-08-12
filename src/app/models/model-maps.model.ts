@@ -10,6 +10,7 @@ export const IMPORTING_TYPES = {
     LPN_INTERFACE: 'lpnInterface',
     LPN_LOCATION: 'lpnLocation',
     LPN_TYPE: 'lpnType',
+    LPN_LABEL_TEMPLATE: 'lpnLabelTemplate',
     INVENTORY: 'inventory',
     LPN: 'lpn',
     LPN_LIST: 'lpnList',
@@ -614,7 +615,7 @@ export class ModelMap {
         labelTemplateId: {
             name: 'label template',
             required: true,
-            type: 'number',
+            type: IMPORTING_TYPES.LPN_LABEL_TEMPLATE,
             formControl: {
                 helpText: 'descripcion corta',
                 control: 'select',
@@ -3287,6 +3288,16 @@ export class ModelMap {
                 type: 'text'
             }
         },
+        carrierName: {
+            name: 'carrier name',
+            required: false,
+            type: 'string',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'text'
+            }
+        },
         transportShipmentDate: {
             name: 'shipment date',
             required: false,
@@ -3329,8 +3340,8 @@ export class ModelMap {
                 max: 99999
             }
         },
-        uomWeightCode: {
-            name: 'uom weight code',
+        unitsOfCapacity: {
+            name: 'units of capacity',
             required: false,
             type: 'string',
             formControl: {
@@ -3339,18 +3350,8 @@ export class ModelMap {
                 type: 'text'
             }
         },
-        uomWeightName: {
-            name: 'uom weight name',
-            required: false,
-            type: 'string',
-            formControl: {
-                helpText: 'descripcion corta',
-                control: 'input',
-                type: 'text'
-            }
-        },
-        uomVolumeCode: {
-            name: 'uom volume code',
+        unitsOfVolume: {
+            name: 'units of volume',
             required: false,
             type: 'string',
             formControl: {
@@ -3381,7 +3382,7 @@ export class ModelMap {
                 max: 99999
             }
         },
-        transportationState: {
+        transportState: {
             name: 'state',
             required: false,
             type: IMPORTING_TYPES.TRANSPORT_STATE,
@@ -3573,7 +3574,7 @@ export class ModelMap {
         },
         progress: {
             name: 'progress',
-            required: true,
+            required: false,
             type: 'number',
             formControl: {
                 helpText: 'descripcion corta',
@@ -4320,6 +4321,18 @@ export class ModelMap {
         },
         qtyToPicked: {
             name: 'qty to pick',
+            required: false,
+            type: 'number',
+            formControl: {
+                helpText: 'descripcion corta',
+                control: 'input',
+                type: 'number',
+                min: 0,
+                max: 99999
+            }
+        },
+        qtyToSelected: {
+            name: 'qty selected',
             required: false,
             type: 'number',
             formControl: {

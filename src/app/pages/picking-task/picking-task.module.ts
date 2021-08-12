@@ -51,7 +51,7 @@ export const MY_FORMATS = {
   },
 };
 @NgModule({
-  declarations: [PickingTaskComponent, UserSelectorDialogComponent],
+  declarations: [PickingTaskComponent],
   imports: [
     CommonModule,
     PickingTaskRoutingModule,

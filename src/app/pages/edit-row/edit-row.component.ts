@@ -2,7 +2,7 @@ import { OnDestroy, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UtilitiesService } from '../../services/utilities.service';
 import { Item, ItemType, UnityOfMeasure, Location, Order, Customer, Section, OrderType,
-         Transport, PickPlanning, PickTask, Dock, Lpn, Owner, Depot, Plant
+         Transport, PickPlanning, PickTask, Dock, Lpn, Owner, Depot, Plant, LpnInterval
        } from '@pickvoice/pickvoice-api';
 import { DataProviderService} from '../../services/data-provider.service';
 import { OrderSelectorDialogComponent } from '../../components/order-selector-dialog/order-selector-dialog.component';
@@ -103,6 +103,11 @@ export class EditRowComponent implements OnInit, OnDestroy {
     if (this.type === IMPORTING_TYPES.PICK_PLANNINGS) {
       this.utilities.log('pick planning', this.row);
       this.definitions = ModelMap.PickTaskMap;
+    }
+
+    if (this.type === IMPORTING_TYPES.LPN_INTERVAL) {
+      this.utilities.log('lpn interval', this.row);
+      this.definitions = ModelMap.LpnIntervalMap;
     }
 
     if (this.type === IMPORTING_TYPES.TRANSPORTS) {
@@ -323,9 +328,6 @@ export class EditRowComponent implements OnInit, OnDestroy {
         if (result) {
           this.deleteRows(rows, key);
         }
-      },
-      error: (error) => {
-
       }
     } as Observer<boolean>;
     this.utilities.showCommonDialog(observer, {
@@ -346,7 +348,6 @@ export class EditRowComponent implements OnInit, OnDestroy {
 
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -373,11 +374,11 @@ export class EditRowComponent implements OnInit, OnDestroy {
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       this.utilities.log('dialog result:', result);
       if (result) {
-            this.dataSource.data[element.index] = result;
-            this.refreshTable();
+        this.dataSource.data[element.index] = result;
+        this.refreshTable();
       }
     }, error => {
-      this.utilities.error('error after closing edit row dialog');
+      this.utilities.error('error after closing edit row dialog', error);
       this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
       this.isLoadingResults = false;
     }));
@@ -592,6 +593,7 @@ export class EditRowComponent implements OnInit, OnDestroy {
     }) => {
       if (data) {
         this.viewMode = data.viewMode;
+        this.pageTitle = this.viewMode === 'edit' ? 'Edit Row' : 'View Row';
         this.type = data.type;
         this.utilities.log('viewMode', this.viewMode);
         data.row.subscribe(row => {
@@ -693,6 +695,11 @@ export class EditRowComponent implements OnInit, OnDestroy {
               this.row = row as Lpn;
               this.cardTitle = 'Inventory Item #' + this.row.lpnId;
               this.pageTitle = this.viewMode === 'edit' ? 'Edit Inventory Item' : 'View Inventory Item';
+            }  else if (this.type === IMPORTING_TYPES.LPN_INTERVAL) {
+              this.utilities.log('object is a lpn interval');
+              this.row = row as LpnInterval;
+              this.cardTitle = 'Lpn Interval #' + this.row.id;
+              this.pageTitle = this.viewMode === 'edit' ? 'Edit Lpn Iterval' : 'View Lpn Interval';
             } else {
               this.cardTitle = 'Unknown object type';
               console.error('object is unknown');

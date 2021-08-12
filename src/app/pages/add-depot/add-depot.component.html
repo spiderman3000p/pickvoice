@@ -59,7 +59,7 @@
                                 <div class="col">
                                     <select class="form-control">
                                         <option [ngValue]="option" *ngFor="let option of selectsData.states | async">
-                                            {{option}}
+                                            {{states[option]}}
                                         </option>
                                     </select>
                                 </div>

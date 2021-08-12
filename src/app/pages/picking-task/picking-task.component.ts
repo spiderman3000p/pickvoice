@@ -82,6 +82,7 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
         (element.user && element.user.lastName ? element.user.lastName : '') +
         (element.user && element.user.userName ? '(' + element.user.userName + ')' : '');
         element.taskType = element.taskType && element.taskType.name ? element.taskType.name : '';
+        element.id = element.pickTaskId;
         return element;
       };
       // inicializar formulario de busqueda
@@ -250,6 +251,7 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updatePickTask(newTask: any, oldTask: any) {
+    console.log('updating picktask', newTask)
     this.dataProviderService.updatePickTask(newTask, oldTask.id).subscribe(response => {
       if (response) {
         oldTask.priority = newTask.priority;
@@ -431,7 +433,7 @@ export class PickingTaskComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   search() {
-    
+
   }
 
   isFilteredBy(column: string): boolean {

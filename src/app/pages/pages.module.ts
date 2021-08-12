@@ -16,10 +16,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PagesComponent } from './pages.component';
 import { ChangeUserDataComponent } from '../components/change-user-data/change-user-data.component';
 
+import { NgSelectModule } from '@ng-select/ng-select';
+import { UserSelectorDialogComponent } from '../components/user-selector-dialog/user-selector-dialog.component';
+
 @NgModule({
   declarations: [
     PagesComponent,
-    ChangeUserDataComponent
+    ChangeUserDataComponent, UserSelectorDialogComponent
   ],
   imports: [
     CommonModule,
@@ -27,6 +30,7 @@ import { ChangeUserDataComponent } from '../components/change-user-data/change-u
     ReactiveFormsModule,
 
     PagesRoutingModule,
+    NgSelectModule,
 
     MatButtonModule,
     MatToolbarModule,

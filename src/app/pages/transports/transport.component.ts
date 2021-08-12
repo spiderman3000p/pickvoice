@@ -25,7 +25,7 @@ import { Router } from '@angular/router';
 })
 export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
   definitions: any = ModelMap.TransportListMap;
-  dataSource: MatTableDataSource<Transport>;
+  dataSource: MatTableDataSource<any>;
   dataToSend: Transport[];
   displayedDataColumns: string[];
   displayedHeadersColumns: any[];
@@ -96,6 +96,8 @@ export class TransportComponent implements OnInit, AfterViewInit, OnDestroy {
     aux.shift();
     this.defaultColumnDefs = aux;
     this.selectsData = {};
+    /*console.log('definitions', this.definitions);
+    console.log('columnDefs', this.columnDefs);*/
     this.columnDefs.forEach((column, index) => {
       // ignoramos la columna 0 y la ultima (select y opciones)
       if (index > 0 && index < this.columnDefs.length - 1) {

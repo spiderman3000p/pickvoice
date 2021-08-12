@@ -11,7 +11,7 @@ import { PlantSelectorDialogComponent } from '../../components/plant-selector-di
 import { UtilitiesService } from '../../services/utilities.service';
 import { Location as WebLocation } from '@angular/common';
 import { DataProviderService} from '../../services/data-provider.service';
-import { ModelMap } from '../../models/model-maps.model';
+import { ModelMap, STATES } from '../../models/model-maps.model';
 import { ModelFactory } from '../../models/model-factory.class';
 
 @Component({
@@ -30,6 +30,7 @@ export class AddDepotComponent implements OnInit, OnDestroy {
   selectedPlant = {
     name: ''
   };
+  states = STATES;
   constructor(
     private utilities: UtilitiesService, private activatedRoute: ActivatedRoute,
     private router: Router, private dialog: MatDialog, private location: WebLocation,

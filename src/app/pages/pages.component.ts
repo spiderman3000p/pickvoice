@@ -10,6 +10,9 @@ import { timer, Subscription } from 'rxjs';
 import { ChangeUserDataComponent } from '../components/change-user-data/change-user-data.component';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+
+const CHAT_URL = "ws://echo.websocket.org/";
+
 @Component({
   selector: 'app-pages',
   templateUrl: './pages.component.html',
@@ -31,6 +34,13 @@ export class PagesComponent implements OnInit, OnDestroy  {
       route: '',
       target: '_self',
       children: [
+        {
+          text: 'Query Builder',
+          icon: 'build_circle',
+          route: '/pages/query-builder',
+          target: '_self',
+          children: []
+        },
         {
           text: 'Import',
           icon: 'upload',
@@ -300,7 +310,7 @@ export class PagesComponent implements OnInit, OnDestroy  {
     iconRegistry.addSvgIcon('outbound',
       sanitizer.bypassSecurityTrustResourceUrl('assets/icons/outbound.svg'));
     iconRegistry.addSvgIcon('storage',
-      sanitizer.bypassSecurityTrustResourceUrl('assets/icons/storage.svg'));  
+      sanitizer.bypassSecurityTrustResourceUrl('assets/icons/storage.svg'));
   }
 
   logout() {

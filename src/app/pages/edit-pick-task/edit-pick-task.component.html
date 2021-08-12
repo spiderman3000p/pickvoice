@@ -22,10 +22,6 @@
             <mat-card-content>
                 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="row">
                     <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
-                        <label>Description</label>
-                        <input class="form-control"  type="text" formControlName="description" [class.readonly]="viewMode === 'view'">
-                    </div>
-                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
                         <label>Enable Date</label>
                         <input formControlName="enableDate" type="date" class="form-control" [class.readonly]="viewMode === 'view'">
                     </div>
@@ -79,15 +75,29 @@
                             </option>
                         </select>
                     </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>User</label>
+                        <select [compareWith]="dataMap.userId.formControl.compareFn" formControlName="userId"
+                        [class.readonly]="viewMode === 'view'" class="form-control">
+                            <option *ngFor="let user of pickTaskData.userList" [value]="user.id">
+                                {{ user.firstName }} {{ user.lastName }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-12 form-group" [class.readonly]="viewMode === 'view'">
+                        <label>Description</label>
+                        <textarea class="form-control"  formControlName="description" [class.readonly]="viewMode === 'view'">
+                        </textarea>
+                    </div>
                     <hr>
                     <mat-tab-group class="tab-orders">
                         <mat-tab label="Task Lines">
                             <ng-template matTabContent>
                                 <div class="col-sm-12">
                                     <div class="col-sm-12 text-right mb-3">
-                                        <a mat-raised-button color="warn" (click)="exportPickTaskLines()">
+                                        <!--a mat-raised-button color="warn" (click)="exportPickTaskLines()">
                                             <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
-                                        </a>
+                                        </a-->
                                         <!--a mat-raised-button color="accent" (click)="addTaskLine()" class="ml-2"
                                             *ngIf="viewMode === 'edit'">
                                             <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
@@ -96,19 +106,15 @@
                                     <table mat-table [dataSource]="dataSource" matSort 
                                     [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 12">
                                         <!-- Data Columns -->
-                                        <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns">
-                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ definitions[column].name | uppercase}} </th>
-                                            <td mat-cell *matCellDef="let element"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
-                                        </ng-container>
-                                        <!-- Options Sticky Column -->
-                                        <ng-container matColumnDef="options" stickyEnd>
-                                            <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
-                                                {{'Options' | uppercase}}
-                                                <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
+                                        <ng-container [matColumnDef]="column" *ngFor="let column of displayedDataColumns; let indice = index">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> 
+                                                {{ definitions[column].name | uppercase}}
+                                                <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers"
+                                                *ngIf="indice === displayedDataColumns.length - 1">
                                                     <mat-icon>more_vert</mat-icon>
                                                 </a>
-                                                
-                                                <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
+                                                <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()"
+                                                *ngIf="indice === displayedDataColumns.length - 1">
                                                     <span>
                                                         <a mat-menu-item (click)="toggleColumn()">Show all</a>
                                                         <a mat-menu-item  *ngFor="let column of getDefaultHeadersColumns();"
@@ -119,13 +125,21 @@
                                                     </span>
                                                 </mat-menu>
                                             </th>
+                                            <td mat-cell *matCellDef="let element" [id]="column+element.pickTaskLineId"> {{ renderColumnData(definitions[column].type, element[column]) }} </td>
+                                        </ng-container>
+                                        <!-- Options Sticky Column -->
+                                        <!--ng-container matColumnDef="options" stickyEnd>
+                                            <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
+                                                {{'Options' | uppercase}}
+                                               
+                                            </th>
                                             <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
                                                 <a mat-icon-button (click)="editTaskLineOnDialog(element, 'view')">
                                                     <img src="assets/icons/zoom.png">
                                                 </a>
                                                 <a mat-icon-button (click)="editTaskLineOnDialog(element, 'edit')" *ngIf="viewMode === 'edit'">
                                                     <img src="assets/icons/page_edit.png">
-                                                </a>
+                                                </a-->
                                                 <!--a mat-icon-button [routerLink]="['/pages/' + type + '/view', element.code]">
                                                     <img src="assets/icons/zoom.png">
                                                 </a>
@@ -141,8 +155,8 @@
                                                 <!--a mat-icon-button (click)="deletePickTaskPrompt(element)" *ngIf="viewMode === 'edit'">
                                                     <img src="assets/icons/delete.png">
                                                 </a-->
-                                            </td>
-                                        </ng-container>
+                                            <!--/td>
+                                        </ng-container-->
                         
                                         <tr mat-header-row *matHeaderRowDef="getDisplayedHeadersColumns()"></tr>
                                         <!--tr mat-row *matRowDef="let row; columns: getDisplayedHeadersColumns();"
@@ -152,53 +166,6 @@
                                     </table>
                                     <mat-paginator [length]="dataSource.data.length" [pageSize]="10" [pageSizeOptions]="pageSizeOptions"></mat-paginator>
                                 </div>
-                            </ng-template>
-                        </mat-tab>
-                        <mat-tab label="User">
-                            <ng-template matTabContent>
-                                <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                        <label>User</label>
-                                        <select [compareWith]="dataMap.userId.formControl.compareFn" formControlName="userId"
-                                        [class.readonly]="viewMode === 'view'" class="form-control">
-                                            <option *ngFor="let user of pickTaskData.userList" [value]="user.id">
-                                                {{ user.firstName }} {{ user.lastName }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                <br><br>
-                                <h6>User Details</h6>
-                                <hr>
-                                <span *ngIf="selectedUser" class="row">
-                                    <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                        <label>Username</label>
-                                        <input class="form-control"  type="text" [value]="selectedUser.userName" [class.readonly]="true">
-                                    </div>
-                                    <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                        <label>First Name</label>
-                                        <input class="form-control"  type="text" [value]="selectedUser.firstName" [class.readonly]="true">
-                                    </div>
-                                    <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="true">
-                                        <label>Last Name</label>
-                                        <input class="form-control"  type="text" [value]="selectedUser.lastName" [class.readonly]="true">
-                                    </div>
-                                    <div class="col-sm-12 col-md-4 col-lg-3" [class.readonly]="viewMode === 'view'">
-                                        <label>Email</label>
-                                        <input class="form-control"  type="text" [value]="selectedUser.email" [class.readonly]="viewMode === 'view'">
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                        <label>Phone</label>
-                                        <input class="form-control"  type="text" [value]="selectedUser.phone" [class.readonly]="viewMode === 'view'">
-                                    </div>
-                                    <!--div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                        <label>Rol</label>
-                                        <input class="form-control"  type="text" [value]="selectedUser.rol.name" [class.readonly]="viewMode === 'view'">
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6" [class.readonly]="viewMode === 'view'">
-                                        <label>Status</label>
-                                        <input   hidden>
-                                        <input class="form-control"  type="text" [value]="selectedUser.status" [class.readonly]="viewMode === 'view'">
-                                    </div-->
-                                </span>
                             </ng-template>
                         </mat-tab>
                     </mat-tab-group>

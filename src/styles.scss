@@ -8,8 +8,17 @@ $secondary: #0A1060;
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 @import '~angular-tree-component/dist/angular-tree-component.css';
 @import "~@ng-select/ng-select/themes/default.theme.css";
+// estilos para query builder
+@import "../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-buttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-dropdowns/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-calendars/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-popups/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-querybuilder/styles/material.css";
 
-html, body { 
+html, body {
   height: 100%;
   /*overflow: hidden;*/
   color: #767681;
@@ -20,8 +29,12 @@ body {
   overflow-y: hidden;
   font-size: 12px;
 }
-.form-group{
+.form-group {
   position: relative;
+  display: grid;
+}
+.form-group.row {
+  display: flex;
 }
 .mat-menu-content .form-group{
   position: unset;
@@ -29,9 +42,61 @@ body {
 .form-control{
   font-size: 12px;
 }
-.form-group.row .form-control{
-  width: calc(100% - 35px);
+.form-group.row .form-control, .form-group.row .select2-container {
+  /*width: calc(100% - 35px) !important;*/
 }
+
+.select2-selection {
+  display: block !important;
+  width: 100% !important;
+  height: calc(1.5em + 0.75rem + 2px) !important;
+  padding: 0.375rem 0.75rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #495057 !important;
+  background-color: #fff !important;
+  background-clip: padding-box !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.25rem !important;
+  -webkit-transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+  font-size: 12px !important;
+}
+
+.select2-selection:focus, .select2-container:focus {
+  color: #495057 !important;
+  background-color: #fff !important;
+  border-color: #1a8aff !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 75, 153, 0.25) !important;
+}
+
+.select2.ng-invalid:not(form) ~ .select2-container .select2-selection {
+  border-left: 5px solid #a94442!important;
+}
+
+.select2.ng-valid:not(form) ~ .select2-container .select2-selection {
+  border-left: 5px solid #42A948!important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: inherit !important;
+}
+
+.select2-selection__arrow b {
+  border-color: #505050 !important;
+  border-style: solid !important;
+  border-width: 0 2px 2px 0 !important;
+  transform: rotate(45deg) !important;
+  height: 7px !important;
+  left: 50% !important;
+  margin-left: -4px !important;
+  margin-top: -2px !important;
+  position: absolute !important;
+  top: 50% !important;
+  width: 7px !important;
+}
+
 .form-check-input {
   position: relative;
   margin-top: unset;
@@ -70,6 +135,10 @@ button:focus {
 }
 .mat-sidenav>.mat-drawer-inner-container::-webkit-scrollbar {
   width: 8px;
+}
+.mat-sidenav>.mat-drawer-inner-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 .mat-sidenav>.mat-drawer-inner-container::-webkit-scrollbar-thumb {
   border-radius: 8px;
@@ -110,6 +179,9 @@ button:focus {
 }
 .column-filter-menu .mat-menu-content{
   padding: 0 !important;
+}
+.column-filter-menu .mat-menu-content .form-group {
+  display: unset !important;
 }
 .mat-menu-content:not(:empty) {
   padding-top: 0px !important;
@@ -527,8 +599,10 @@ td.mat-cell.mat-column-options.mat-table-sticky{
   padding-right: 0px !important;
   /*max-width: 100px !important;*/
   width: 100px !important;
+  background: linear-gradient(90deg, rgb(199, 199, 199) 1%, white 2%);
   min-width: 100px !important;
 }
+
 tr:hover td.mat-cell.mat-column-options.mat-table-sticky{
   /*background: none !important;*/
 }
@@ -777,6 +851,7 @@ div.tree tree-node-expander + div.node-content-wrapper {
 .status-bar {
   transition: all 1s;
   z-index: 9998;
+  display: flex;
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -788,6 +863,15 @@ div.tree tree-node-expander + div.node-content-wrapper {
   border: #D6D2C6 solid 1px;
   transition: all ease-in 1s;
 }
+
+.status-bar .row {
+  width: 100%;
+}
+
+.mat-drawer-opened ~ .mat-sidenav-content .status-bar .row {
+  width: calc(100% - 220px);
+}
+
 .status-bar .user-data{
   float: left;
   display: inline-flex;
@@ -817,7 +901,7 @@ div.tree tree-node-expander + div.node-content-wrapper {
   color: white !important;
 }
 
-@media screen and (max-width:800px){
+@media screen and (max-width:1280px){
   .header.actionbar.align-content-top .title.actionbar-section.align-content-top {
     width: 100%;
   }

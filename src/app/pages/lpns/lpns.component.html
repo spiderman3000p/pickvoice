@@ -21,9 +21,9 @@
                 <mat-card class="lpns-card">
                     <mat-card-title>
                         LPNS List
-                        <div class="more-button" [matMenuTriggerFor]="menulpn">
-                            <mat-icon>more_vert</mat-icon>
-                        </div>
+                        <button mat-icon-button class="more-button" [matMenuTriggerFor]="menulpn">
+                            <mat-icon>tune</mat-icon>
+                        </button>
                         <mat-menu #menulpn="matMenu" (click)="$event.stopPropagation()">
                             <div class="p-2" (click)="$event.stopPropagation()">
                                 <form [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
@@ -93,8 +93,8 @@
                             (activate)="viewLpnsDetail($event.node.data)">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
                                     <div [contextMenu]="node.data.id.includes('IT') ? lpnChildMenu : lpnFatherMenu"
-                                    [contextMenuSubject]="node">
-                                        <mat-icon *ngIf="node.data.id.includes('IT')" color="accent" style="font-size: 15px;">local_offer</mat-icon>
+                                    [contextMenuSubject]="node" style="display: flex;">
+                                        <mat-icon *ngIf="node.data.id.includes('IT')" color="primary" style="font-size: 15px;line-height: 15px;width: 15px;height: 15px;transform: rotate(90deg);padding: 2px;">line_weight</mat-icon>
                                         <span>{{ node.data.name }}</span>
                                     </div>
                                 </ng-template>
@@ -102,6 +102,9 @@
                             <context-menu #lpnFatherMenu>
                                 <ng-template contextMenuItem (execute)="executeContext('details', $event.item.data)">
                                     View Details
+                                </ng-template>
+                                <ng-template contextMenuItem (execute)="showRelocateDialog($event.item.data)">
+                                    Relocate
                                 </ng-template>
                             </context-menu>
                             <context-menu #lpnChildMenu>
@@ -111,10 +114,7 @@
                                 <ng-template contextMenuItem (execute)="executeContext('print', $event.item.data)">
                                     Print Label
                                 </ng-template>
-                                <ng-template contextMenuItem (execute)="executeContext('realocate', $event.item.data)">
-                                    Realocate
-                                </ng-template>
-                                <ng-template contextMenuItem (execute)="executeContext('transfer', $event.item.data)">
+                                <ng-template contextMenuItem (execute)="showTransferDialog($event.item.data)">
                                     Transfer
                                 </ng-template>
                             </context-menu>
@@ -143,8 +143,8 @@
                         </div>
                         <mat-menu #menulpnd="matMenu">
                             <div mat-menu-item (click)="openPrintDialog()" *ngIf="selectedLpns.lpnItemId">Print</div>
-                            <div mat-menu-item>Realocate</div>
-                            <div mat-menu-item>Transfer</div>
+                            <div mat-menu-item *ngIf="selectedLpns.lpnId" (click)="showRelocateDialog(selectedLpns)">Realocate</div>
+                            <div mat-menu-item *ngIf="selectedLpns.lpnItemId" (click)="showTransferDialog(selectedLpns)">Transfer</div>
                         </mat-menu>
                     </mat-card-title>
                     <mat-card-content>
@@ -152,14 +152,14 @@
                             <mat-spinner *ngIf="isLoadingLpnsDetail" class="spinner"></mat-spinner>
                         </div>
                         <!-- campos para lpn item (lpn hijo) -->
-                        <div class="row pt-2 pb-2" *ngIf="selectedLpns.lpnItemId">
+                        <!--div class="row pt-2 pb-2" *ngIf="selectedLpns.lpnItemId">
                             <div class="col-sm-4">
                                 <strong>Item ID</strong>
                             </div>
                             <div class="col-sm-8">
                                 {{selectedLpns.lpnItemId}}
                             </div>
-                        </div>
+                        </div-->
                         <div class="row pt-2 pb-2" *ngIf="selectedLpns.sku">
                             <div class="col-sm-4">
                                 <strong>Sku</strong>

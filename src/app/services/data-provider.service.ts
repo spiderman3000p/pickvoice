@@ -5,7 +5,7 @@ import { Transport, Location, Item, UomService, SectionService, OrderService, Or
          CustomerService, PickPlanning, Dock, PickTaskService, PickPlanningService, PickTask,
          DockService, UserService, ItemUomService, QualityStateService, StoreService, User,
          QualityStateTypeService, TaskTypeService, PlantService, OwnerService, DepotService,
-         LabelTemplateService, LabelTypeService, LabelTemplate, Lpn, LpnIntervalService, StorageService
+         LabelTemplateService, LabelTypeService, LabelTemplate, Lpn, LpnIntervalService, StorageService, Order
        } from '@pickvoice/pickvoice-api';
 import { UtilitiesService } from './utilities.service';
 import { AuthService } from './auth.service';
@@ -58,51 +58,51 @@ export class DataProviderService {
     }
 
     if (type === IMPORTING_TYPES.LOCATIONS) {
-      return this.createLocation(toUpload, 'response').pipe(retry(3));
+      return this.createLocation(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.ORDERS) {
-      return this.createOrder(toUpload, 'response').pipe(retry(3));
+      return this.createOrder(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.ITEM_TYPE) {
-      return this.createItemType(toUpload, 'response').pipe(retry(3));
+      return this.createItemType(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.ITEMUOMS) {
-      return this.createItemUom(toUpload, 'response').pipe(retry(3));
+      return this.createItemUom(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.QUALITY_STATE_TYPES) {
-      return this.createQualityStateType(toUpload, 'response').pipe(retry(3));
+      return this.createQualityStateType(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.QUALITY_STATES) {
-      return this.createQualityState(toUpload, 'response').pipe(retry(3));
+      return this.createQualityState(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.UOMS) {
-      return this.createUom(toUpload, 'response').pipe(retry(3));
+      return this.createUom(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.CUSTOMERS) {
-      return this.createCustomer(toUpload, 'response').pipe(retry(3));
+      return this.createCustomer(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.ORDER_TYPE) {
-      return this.createOrderType(toUpload, 'response').pipe(retry(3));
+      return this.createOrderType(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.SECTIONS) {
-      return this.createSection(toUpload, 'response').pipe(retry(3));
+      return this.createSection(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.TRANSPORTS) {
-      return this.createTransport(toUpload, 'response').pipe(retry(3));
+      return this.createTransport(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.PICK_PLANNINGS) {
-      return this.createPickPlanning(toUpload, 'response').pipe(retry(3));
+      return this.createPickPlanning(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.PICK_TASKS) {
@@ -110,7 +110,7 @@ export class DataProviderService {
     }
 
     if (type === IMPORTING_TYPES.TASK_TYPES) {
-      return this.createTaskType(toUpload, 'response').pipe(retry(3));
+      return this.createTaskType(toUpload, 'response');
     }
 
     if (type === IMPORTING_TYPES.PICK_TASKLINES) {
@@ -119,7 +119,7 @@ export class DataProviderService {
 
     if (type === IMPORTING_TYPES.DOCKS) {
       // TODO: revisar esto
-      return this.createDock(toUpload, 'response').pipe(retry(3));
+      return this.createDock(toUpload, 'response');
     }
     return of({});
   }
@@ -322,7 +322,7 @@ export class DataProviderService {
       case IMPORTING_TYPES.TRANSPORTS: {
         // TODO: falta owner
         this.utilities.log(`obteniendo transports...`);
-        toReturn = this.getAllTransports();
+        toReturn = this.getAllTransports(params);
         break;
       }
       case IMPORTING_TYPES.TRANSPORT_STATE: {
@@ -407,9 +407,14 @@ export class DataProviderService {
         toReturn = this.getAllLpns(params).pipe(retry(3));
         break;
       }
+      case IMPORTING_TYPES.LPN_LABEL_TEMPLATE: {
+        this.utilities.log(`obteniendo lpn templates...`);
+        toReturn = this.getAllTemplates().pipe(retry(3));
+        break;
+      }
       case IMPORTING_TYPES.DOCK_TYPE: {
         this.utilities.log(`obteniendo dock types...`);
-        toReturn = new Observable(suscriber  => suscriber.next(Object.keys(Dock.DockTypeEnum)));
+        toReturn = this.getAllDockTypes();
         break;
       }
       case IMPORTING_TYPES.ITEM_CLASSIFICATIONS: {
@@ -540,7 +545,7 @@ export class DataProviderService {
   /**********************************************************************************
     Grupo de metodos para items
   ***********************************************************************************/
-  public getAllItems(params = 'startRow=0;endRow=10000', observe: any = 'body', reportProgress = false) {
+  public getAllItems(params = 'startRow=0;endRow=50', observe: any = 'body', reportProgress = false) {
     return this.httpClient.get(environment.apiBaseUrl + '/settings/itemsVo1/' + params)
     .pipe(retry(3));
   }
@@ -574,7 +579,7 @@ export class DataProviderService {
     return of(false);
   }
 
-  public getItem(id: number, observe: any = 'body', reportProgress = false) {
+  public getItem(id: number, observe: any = 'body', reportProgress = false): Observable<any> {
     const owner = this.authService.getOwnerId();
     if (owner !== null) {
       return this.itemService.retrieveItem(id, owner, observe, reportProgress);
@@ -644,8 +649,9 @@ export class DataProviderService {
   ***********************************************************************************/
   public getAllLpnIntervals(observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
-    if (owner !== null) {
-      return this.lpnIntervalService.retrieveAllLpnInterval(owner, observe, reportProgress);
+    const depot = this.authService.getDepotId();
+    if (owner !== null && depot !== null) {
+      return this.lpnIntervalService.retrieveAllLpnInterval(owner, depot, observe, reportProgress);
     }
     return of([]);
   }
@@ -712,7 +718,7 @@ export class DataProviderService {
 
   public createLpns(data: any, observe: any = 'body', reportProgress = false) {
     return this.httpClient.post(environment.apiBaseUrl +
-      `/storage/lpn/generate?lpnType=${data.type}&count=${data.qty}`, data).pipe(retry(3));
+      `/storage/lpn/generate?lpnType=${data.type}&count=${data.qty}`, data);
   }
 
   public createLpn(lpnType: string, count: number, observe: any = 'body', reportProgress = false) {
@@ -934,7 +940,7 @@ export class DataProviderService {
       '/outbound/order/assignmentTransport?idTransport=' + idTransport, data);
   }
 
-  public createOrder(data: any, observe: any = 'body', reportProgress = false) {
+  public createOrder(data: any, observe: any = 'body', reportProgress = false): Observable<Order> {
     const owner = this.authService.getOwnerId();
     const depot = this.authService.getDepotId();
     if (owner !== null) {
@@ -1106,6 +1112,8 @@ export class DataProviderService {
   public createLoadPicks(data: any[], observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
     const depot = this.authService.userData.depotId;
+    console.log('owner', owner);
+    console.log('depot', depot);
     if (owner !== null && depot !== null) {
       return this.loadPickService.createLoadPick(data, owner, depot, observe, reportProgress);
     }
@@ -1273,6 +1281,10 @@ export class DataProviderService {
     return of([]);
   }
 
+  public getAllDockTypes(): Observable<any> {
+    return new Observable(suscriber  => suscriber.next(Object.keys(Dock.DockTypeEnum)));
+  }
+
   public deleteDock(id: number, observe: any = 'body', reportProgress = false) {
     const owner = this.authService.getOwnerId();
     if (owner !== null) {
@@ -1318,7 +1330,7 @@ export class DataProviderService {
   }
 
   public createTaskType(data: any, observe: any = 'body', reportProgress = false) {
-    return this.taskTypeService.createTaskType(data, observe, reportProgress).pipe(retry(3));
+    return this.taskTypeService.createTaskType(data, observe, reportProgress);
   }
 
   public getTaskType(id: number, observe: any = 'body', reportProgress = false) {
@@ -1337,8 +1349,7 @@ export class DataProviderService {
   }
 
   public saveTemplate(data: LabelTemplate, observe: any = 'body', reportProgress = false) {
-    return this.labelTemplateService.createLabelTemplate(data, observe, reportProgress)
-    .pipe(retry(3));
+    return this.labelTemplateService.createLabelTemplate(data, observe, reportProgress);
   }
 
   public updateTemplate(templateId: number, data: LabelTemplate, observe: any = 'body', reportProgress = false) {
@@ -1367,13 +1378,13 @@ export class DataProviderService {
   }
 
   public transferLpn(targetLpnId: number, lpnItems: any[]): Observable<any> {
-    return this.storageService.transferLpnItem(targetLpnId, lpnItems).pipe(retry(3));
+    return this.storageService.transferLpnItem(targetLpnId, lpnItems);
     /*return this.httpClient.get<any[]>(environment.apiBaseUrl +
       '/storage/lpn/transfer/' + targetLpnId, params).pipe(retry(3));*/
   }
 
   public relocateLpn(originLpnId: number, targetLocationId: number): Observable<any> {
-    return this.storageService.relocateLpn(originLpnId, targetLocationId).pipe(retry(3));
+    return this.storageService.relocateLpn(originLpnId, targetLocationId);
     /*return this.httpClient.get<any[]>(environment.apiBaseUrl +
       '/storage/lpn/transfer/' + targetLpnId, params).pipe(retry(3));*/
   }
@@ -1381,5 +1392,10 @@ export class DataProviderService {
   public getAllLpnVO3(params: string): Observable<any> {
     return this.httpClient.get<any>(environment.apiBaseUrl +
       '/storage/lpnVO3/all;' + params).pipe(retry(3));
+  }
+
+  public getAllLpnItemVO2(params: string): Observable<any> {
+    return this.httpClient.get<any>(environment.apiBaseUrl +
+      '/storage/lpnItemVO2/all;' + params).pipe(retry(3));
   }
 }

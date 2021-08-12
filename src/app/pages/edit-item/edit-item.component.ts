@@ -581,6 +581,7 @@ export class EditItemComponent implements OnInit {
       type: string
     }) => {
       this.viewMode = data.viewMode;
+      this.pageTitle = this.viewMode === 'edit' ? 'Edit Item' : 'View Item';
       this.type = data.type;
       this.utilities.log('viewMode', this.viewMode);
       data.row.subscribe(element => {

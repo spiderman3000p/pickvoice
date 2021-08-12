@@ -7,13 +7,13 @@ import {
 @Component({
   selector: 'app-row-option',
   template: `
-  <button type="button" color="primary" mat-icon-button (click)="deleteRow($event)">
+  <button type="button" color="primary" *ngIf="params.viewMode()" mat-icon-button (click)="deleteOrderLine($event)">
     <mat-icon>delete</mat-icon>
   </button>
-  <!--button type="button" color="primary" mat-icon-button (click)="startEditRow($event)" *ngIf="!isEditing">
+  <!--button type="button" color="primary" mat-icon-button (click)="startEditOrderLine($event)" *ngIf="!isEditing">
     <mat-icon>edit</mat-icon>
   </button-->
-  <button type="button" color="primary" mat-icon-button (click)="finishEditRow($event)" *ngIf="isEditing">
+  <button type="button" color="primary" mat-icon-button (click)="finishEditOrderLine($event)" *ngIf="isEditing">
     <mat-icon>check</mat-icon>
   </button>
   `,
@@ -26,8 +26,8 @@ import {
   `]
 })
 export class RowOptionComponent {
-  private params: any;
-  public isEditing = false;
+  params: any;
+  isEditing = false;
   @ViewChild('input', { read: ViewContainerRef }) public input;
 
   agInit(params: any): void {
@@ -39,7 +39,7 @@ export class RowOptionComponent {
     });*/
   }
 
-  deleteRow(event) {
+  deleteOrderLine(event) {
     if (this.params.deleteOrderLine instanceof Function) {
       console.log('event', event);
       console.log('params', this.params);
@@ -51,7 +51,7 @@ export class RowOptionComponent {
     }
   }
 
-  startEditRow(event) {
+  startEditOrderLine(event) {
     this.isEditing = true;
     if (this.params.startEditOrderLine instanceof Function) {
       console.log('event', event);
@@ -59,11 +59,11 @@ export class RowOptionComponent {
       const params = {
         rowData: this.params.node.data
       };
-      this.params.startEditOrderLine(params, this.params.node.rowIndex, 'denominator');
+      this.params.startEditOrderLine(params, this.params.node.rowIndex, 'itemId');
     }
   }
 
-  finishEditRow(event) {
+  finishEditOrderLine(event) {
     this.isEditing = false;
     if (this.params.finishEditOrderLine instanceof Function) {
       console.log('event', event);

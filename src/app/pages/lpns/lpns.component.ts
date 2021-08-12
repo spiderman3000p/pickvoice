@@ -20,6 +20,8 @@ import { of, Subscription, Observer } from 'rxjs';
 import { tap  } from 'rxjs/operators';
 
 import { Router } from '@angular/router';
+import { TransferDialogComponent } from 'src/app/components/transfer-dialog/transfer-dialog.component';
+import { RelocateDialogComponent } from 'src/app/components/relocate-dialog/relocate-dialog.component';
 
 @Component({
   selector: 'app-lpns',
@@ -44,7 +46,6 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   pageSizeOptions: number[] = [5, 15, 10, 25, 100];
   // MatPaginator Output
   dataSource: MyDataSource<any>;
-  filterParams = '';
   paginatorParams = '';
   pageEvent: PageEvent;
   options: any = {
@@ -153,7 +154,7 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyFilters() {
-    this.loadData();
+    this.loadDataPage();
   }
 
   editRowOnPage(element: any) {
@@ -190,53 +191,48 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     switch (action) {
       case 'print': this.print(lpn); break;
       case 'details': this.viewLpnsDetail(lpn); break;
+      case 'relocate': this.showRelocateDialog(lpn); break;
+      case 'transfer': this.showTransferDialog(lpn); break;
       default: this.utilities.log('Accion no definida');
     }
   }
-  /* TODO: delete
-  generateHtmlContent(lpn: any, htmlTemplate: string): string {
-    const htmlWrapper = document.createElement('div');
-    htmlWrapper.innerHTML = htmlTemplate;
-    let objectMap;
-    let barcode;
-    const spanAux = document.createElement('span');
-    this.utilities.log('gerating html to lpn:', lpn);
-    // sustituir valores segun el mapa
-    if (lpn.code) { // si es lpn padre
-      objectMap = ModelMap.LpnVO3Map;
-      barcode = this.utilities.generateBarCode(lpn.code);
-    } else if (lpn.sku) { // si es lpn hijo
-      objectMap = ModelMap.LpnItemVO2Map;
-      barcode = this.utilities.generateBarCode(lpn.sku);
-    }
-    this.utilities.log('model map to use for print:', objectMap);
-    // replace demo barcode
-    spanAux.innerHTML = barcode;
-    const htmlBarCode = htmlWrapper.querySelector('#data-barcode');
-    if (htmlBarCode) {
-      this.utilities.log(`propiedad barcode encontrada en el template`);
-      htmlBarCode.setAttribute('src', barcode);
-    } else {
-      this.utilities.log(`propiedad barcode no encontrada en el template`);
-    }
-    const keys = Object.keys(objectMap);
-    let htmlProp;
-    // replace demo data
-    keys.forEach(key => {
-      htmlProp = htmlWrapper.querySelector(`#data-${key}`);
-      if (htmlProp) {
-        this.utilities.log(`propiedad ${key} encontrada en el template`);
-        htmlProp.innerHTML = '';
-        spanAux.innerHTML = lpn[key];
-        htmlProp.appendChild(spanAux);
-      } else {
-        this.utilities.log(`propiedad ${key} no encontrada en el template`);
+
+  showTransferDialog(lpn: any) {
+    const dialogRef = this.dialog.open(TransferDialogComponent, {
+      width: '400px',
+      data: {
+        lpn: lpn
       }
     });
-
-    return htmlWrapper.innerHTML;
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
+    }));
   }
-  */
+
+  showRelocateDialog(lpn: any) {
+    const dialogRef = this.dialog.open(RelocateDialogComponent, {
+      width: '400px',
+      data: {
+        lpnId: lpn.lpnId
+      }
+    });
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+        
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+    }));
+  }
+
   isItem(lpn: any): boolean {
     const exist = Object.keys(Lpn.LpnStateEnum).findIndex(type => {
       return lpn.id.includes(type);
@@ -320,38 +316,6 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(observer);
   }
 
-  getFilterParams(): string {
-    const formValues = this.filtersForm.value;
-    this.utilities.log('filter form values: ', formValues);
-    const filtersToUse = [];
-    for (const filterKey in this.filters) {
-      if ((this.filters[filterKey].controls.value.value !== undefined &&
-         this.filters[filterKey].controls.value.value !== null &&
-         this.filters[filterKey].controls.value.value !== '')) {
-        filtersToUse.push(this.filters[filterKey]);
-      }
-    }
-    let aux = '';
-    const stringParams = filtersToUse.length > 0 ? filtersToUse.map(filter => {
-      aux = `${filter.key}-filterType=${filter.type};${filter.key}-type=` +
-      `${formValues[filter.key].type};`;
-
-      if (filter.type === 'date' && formValues[filter.key].type === 'inRange') {
-        aux += `${filter.key}-dateFrom=${formValues[filter.key].value};${filter.key}` +
-        `-dateTo=${formValues[filter.key].valueTo}`;
-      } else if (filter.type === 'number' && formValues[filter.key].type === 'inRange') {
-        aux += `${filter.key}-filter=${formValues[filter.key].value};${filter.key}-filterTo=` +
-        `${formValues[filter.key].valueTo}`;
-      } else {
-        aux += `${filter.key}-filter=${formValues[filter.key].value.toLowerCase()}`;
-      }
-      return aux;
-    }).join(';') : '';
-    this.utilities.log('filters to use: ', filtersToUse);
-    this.utilities.log('filters string params: ', stringParams);
-    return stringParams;
-  }
-
   getPaginatorParams(): string {
     const startRow = this.paginator.pageIndex * this.paginator.pageSize;
     return `startRow=${startRow};endRow=${startRow + this.paginator.pageSize}`;
@@ -359,7 +323,8 @@ export class LpnsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   loadDataPage() {
     this.paginatorParams = this.getPaginatorParams();
-    const paramsArray = Array.of(this.paginatorParams, this.filterParams)
+    const filter = this.filtersForm.value;
+    const paramsArray = Array.of(this.paginatorParams)
     .filter(paramArray => paramArray.length > 0);
     const params = paramsArray.length > 0 ? paramsArray.join(';') : '';
     this.utilities.log('loadDataPage() params: ', params);

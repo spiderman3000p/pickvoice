@@ -70,7 +70,7 @@ export class GenerateLpnIntervalDialogComponent implements OnInit, AfterViewInit
           const jsonTemplate = JSON.parse(this.form.value.template.jsonTemplate);
           this.utilities.log('jsonTemplate:', jsonTemplate);
           result.forEach((lpn, index) => {
-            htmlContent += index > 0 ? '<div class="page-break"></div>' : '';
+            htmlContent += index > 0 && index < result.length - 1 ? '<div class="page-break"></div>' : '';
             htmlContent += this.utilities.generateHtmlLpnContent(lpn, jsonTemplate['gjs-html']);
           });
           const cssStyles = jsonTemplate['gjs-css'];
@@ -83,7 +83,8 @@ export class GenerateLpnIntervalDialogComponent implements OnInit, AfterViewInit
       }
     }, error => {
       this.isLoading = false;
-      this.utilities.showSnackBar('Error generating Lpn', 'OK');
+      const errorMessage = error.error.message ? error.error.message : 'Error generating Lpn';
+      this.utilities.showSnackBar(errorMessage, 'OK');
       this.utilities.error('Error al generar lpn: ', error);
     });
   }

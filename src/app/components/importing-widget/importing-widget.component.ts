@@ -15,12 +15,13 @@ import { SharedDataService } from '../../services/shared-data.service';
 export class ImportingWidgetComponent implements OnInit, OnDestroy {
   fileName: string;
   sheets: any[];
+  canLoad: boolean = false
   mobileQuery: MediaQueryList;
   subscriptions: Subscription[] = [];
   constructor(
     public dialogRef: MatDialogRef<ImportingWidgetComponent>, private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any, private utilities: UtilitiesService,
-    private httpClient: HttpClient, private sharedDataService: SharedDataService,
+    private sharedDataService: SharedDataService,
     changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
       this.init();
       // responsive del panel lateral izquierdo
@@ -36,6 +37,13 @@ export class ImportingWidgetComponent implements OnInit, OnDestroy {
       }, error => {
         this.utilities.error('Error obtaining file sheets');
         this.utilities.showSnackBar('Error obtaining file sheets', 'OK');
+      }));
+      this.subscriptions.push(this.sharedDataService.rowData.subscribe(rowData => {
+        this.utilities.log('row data on importing-widget', rowData);
+          this.canLoad = rowData && rowData.length > 0
+      }, error => {
+        this.utilities.error('Error obtaining row data');
+        this.utilities.showSnackBar('Error obtaining row data', 'OK');
       }));
       this.subscriptions.push(this.sharedDataService.fileName.subscribe(fileName => {
         this.utilities.log('fileName on importing-widget', fileName);

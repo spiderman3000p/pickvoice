@@ -5,10 +5,6 @@ import { SharedDataService } from '../../../../services/shared-data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { IMPORTING_TYPES } from '../../../../models/model-maps.model';
 
-/*import { Grid } from 'ag-grid-community';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-balham.css';
-*/
 @Component({
   selector: 'app-import-type-selection',
   templateUrl: './import-type-selection.component.html',

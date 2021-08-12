@@ -582,6 +582,7 @@ export class EditDepotComponent implements OnInit {
       type: string
     }) => {
       this.viewMode = data.viewMode;
+      this.pageTitle = this.viewMode === 'edit' ? 'Edit Depot' : 'View Depot';
       this.type = data.type;
       this.utilities.log('viewMode', this.viewMode);
       data.row.subscribe(element => {

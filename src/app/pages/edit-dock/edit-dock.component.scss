@@ -1,0 +1,12 @@
+.mat-input-element:disabled, .mat-form-field-type-mat-native-select.mat-form-field-disabled .mat-form-field-infix::after {
+    color: unset!important;
+}
+.list-group{
+    border: 1px #969696 solid;
+    min-height: 200px;
+    max-height: 200px;
+    overflow-y: scroll;
+}
+.input-group-prepend{
+    cursor: pointer;
+}

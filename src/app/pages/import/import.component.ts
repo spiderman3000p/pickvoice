@@ -234,11 +234,12 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.dataToSendLength = dataToSend.length;
     this.isReadyToSend = dataToSend.length > 0 && dataToSend.length === this.dataSource.data.length;
     this.utilities.log('ready to send? ', this.isReadyToSend);
+    this.utilities.log('invalid rows', this.dataSource.data.filter(row => row.invalid));
+    this.utilities.log('valid rows', this.dataSource.data.filter(row => !row.invalid));
     if (this.isReadyToSend) {
       this.utilities.log('sending data to api:', dataToSend);
       this.startUploadProcess(dataToSend);
-    }
-    if (!this.isReadyToSend) {
+    } else {
       this.utilities.error('Data are not ready to be sent', this.dataSource.data);
       this.utilities.showSnackBar('Data are not ready to be sent', 'OK');
       // this.utilities.showSnackBar(`There are ${this.invalidRows.length} invalid records`, 'OK');
@@ -280,10 +281,21 @@ export class ImportComponent implements OnInit, OnDestroy {
         this.isUploadingData = false;
         this.uploadingDone = true;
         this.handleApiCallResult(result, dataToSend);
+      } else {
+        this.rejectedRows = 0;
+        this.importedRows = 0;
+        this.isUploadingData = false;
+        this.isDataSaved = false;
+        this.errorOnSave = false;
+        this.isReadyToSend = false;
+        this.uploadingDone = true;
+        this.uploadingResponseMessage = 'Error uploading data. Some error ocurred';
       }
     }, error => {
       this.utilities.error('Error en request', error);
       // this.utilities.showSnackBar('Error saving items', 'OK');
+      this.rejectedRows = 0;
+      this.importedRows = 0;
       this.isDataSaved = false;
       this.isUploadingData = false;
       this.errorOnSave = true;

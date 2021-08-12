@@ -113,10 +113,10 @@
               </span>
             </th>
             <td mat-cell *matCellDef="let element">
-              <span *ngIf="column !== 'progress'">
+              <span *ngIf="!column.toLowerCase().includes('progress')">
                 {{ element[column] }}
               </span>
-              <span *ngIf="column === 'progress'">
+              <span *ngIf="column.toLowerCase().includes('progress')">
                 <mat-progress-bar class="progress-bar-td" type="determinate" [value]="element[column]"></mat-progress-bar>
               </span>
             </td>

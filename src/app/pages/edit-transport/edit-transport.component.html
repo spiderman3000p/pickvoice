@@ -78,10 +78,10 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                        <div class="form-group" class="readonly">
                                             <label>Transportation Status</label>
                                             <select [compareWith]="dataMap.transportationStatus.formControl.compareFn"
-                                            formControlName="transportationStatus" [class.readonly]="viewMode === 'view'" class="form-control">
+                                            formControlName="transportationStatus" class="form-control readonly" readonly>
                                                 <option *ngFor="let status of transportData.statusList" [ngValue]="status">
                                                     {{ status }}
                                                 </option>
@@ -101,6 +101,13 @@
                                         <div class="form-group" [class.readonly]="viewMode === 'view'">
                                             <label>Weight</label>
                                             <input class="form-control"  type="number" formControlName="weight"
+                                            [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group" [class.readonly]="viewMode === 'view'">
+                                            <label>Capacity</label>
+                                            <input class="form-control"  type="number" formControlName="volume"
                                             [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
                                         </div>
                                     </div>
@@ -185,13 +192,13 @@
                             <ng-template matTabContent>
                                 <div class="col-sm-12">
                                     <div class="col-sm-12 text-right mb-3">
-                                        <a mat-raised-button color="warn" (click)="exportOrders()">
+                                        <!--a mat-raised-button color="warn" (click)="exportOrders()">
                                             <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
-                                        </a>
-                                        <!--a mat-raised-button color="accent" (click)="addPickTask()" class="ml-2"
-                                            *ngIf="viewMode === 'edit'">
-                                            <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
                                         </a-->
+                                        <a mat-raised-button color="accent" (click)="addOrder()" class="ml-2"
+                                            *ngIf="viewMode === 'edit'">
+                                            <mat-icon>add</mat-icon> <span class="btn-label">Add Order</span>
+                                        </a>
                                     </div>
                                     <table mat-table [dataSource]="dataSource" matSort 
                                     [class.mat-table-hoverflow]="getDisplayedHeadersColumns().length > 7">
@@ -203,7 +210,6 @@
                                         <!-- Options Sticky Column -->
                                         <ng-container matColumnDef="options" stickyEnd>
                                             <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
-                                                {{'Options' | uppercase}}
                                                 <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
                                                     <mat-icon>more_vert</mat-icon>
                                                 </a>

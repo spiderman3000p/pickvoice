@@ -20,10 +20,13 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { TreeModule } from 'angular-tree-component';
 import { ContextMenuModule } from 'ngx-contextmenu';
+import { TransferDialogComponent } from 'src/app/components/transfer-dialog/transfer-dialog.component';
+import { RelocateDialogComponent } from 'src/app/components/relocate-dialog/relocate-dialog.component';
 
 @NgModule({
   declarations: [
-    LpnsComponent, PrintLabelDialogComponent, GenerateLpnIntervalDialogComponent
+    LpnsComponent, PrintLabelDialogComponent, GenerateLpnIntervalDialogComponent, TransferDialogComponent,
+    RelocateDialogComponent
   ],
   imports: [
     CommonModule,

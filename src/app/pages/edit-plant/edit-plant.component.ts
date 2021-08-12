@@ -3,24 +3,15 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { UtilitiesService } from '../../services/utilities.service';
 import { DataProviderService } from '../../services/data-provider.service';
-import { ItemType, UnityOfMeasure } from '@pickvoice/pickvoice-api';
 import { AddRowDialogComponent } from '../../components/add-row-dialog/add-row-dialog.component';
 import { Location as WebLocation } from '@angular/common';
-import { ModelMap } from '../../models/model-maps.model';
+import { ModelMap, STATES } from '../../models/model-maps.model';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 import { Subscription } from 'rxjs';
-import '@ag-grid-enterprise/excel-export';
-import { AgGridAngular } from 'ag-grid-angular';
 
-interface ItemData {
-  uomsList: UnityOfMeasure[];
-  statesList: string[];
-  itemTypeList: ItemType[];
-  classificationsList: string[];
-}
 @Component({
   selector: 'app-edit-plant',
   templateUrl: './edit-plant.component.html',
@@ -49,7 +40,7 @@ export class EditPlantComponent implements OnInit, OnDestroy {
     };
     let validators;
     let value;
-    Object.keys(this.row).forEach((key, index) => {
+    Object.keys(ModelMap.PlantsMap).forEach((key, index) => {
       validators = null;
       value = this.row[key];
       if (this.definitions[key] && this.definitions[key].required !== undefined && this.definitions[key].required === true) {
@@ -60,12 +51,12 @@ export class EditPlantComponent implements OnInit, OnDestroy {
     /*formControls.countryId = new FormControl('', Validators.required);
     formControls.departmentId = new FormControl('', Validators.required);*/
     this.form = new FormGroup(formControls);
-    this.form.get('countryId').valueChanges.subscribe(countryId => {
+    /*this.form.get('countryId').valueChanges.subscribe(countryId => {
       this.selectsData.departments = this.dataProviderService.getAllDepartments(countryId);
     });
     this.form.get('departmentId').valueChanges.subscribe(departmentId => {
       this.selectsData.cities = this.dataProviderService.getAllCities(departmentId);
-    });
+    });*/
     this.utilities.log('form', this.form.value);
   }
   addNewObject(key: string, objectType: string, myTitle: string) {
@@ -142,7 +133,8 @@ export class EditPlantComponent implements OnInit, OnDestroy {
       this.viewMode = data.viewMode;
       this.pageTitle = this.viewMode === 'edit' ? 'Edit Plant' : 'View Plant';
       if (data.row) {
-        this.selectsData.countries = data.row.countries;
+        // this.selectsData.countries = data.row.countries;
+        this.selectsData.cities = data.row.cities;
         data.row.plant.subscribe(result => {
           this.row = result;
           this.isLoadingResults = false;

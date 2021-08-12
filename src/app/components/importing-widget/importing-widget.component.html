@@ -28,6 +28,6 @@
     </mat-drawer-container>
 </div>
 <div mat-dialog-actions align="end">
-    <button mat-button (click)="loadData()">LOAD</button>
+    <button mat-button (click)="loadData()" [disabled]="canLoad">LOAD</button>
     <button mat-button (click)="close()">CANCEL</button>
 </div>

@@ -120,6 +120,8 @@ const routes: Routes = [
     redirectTo: 'dashboard',
     pathMatch: 'full'
   },
+  { path: 'query-builder', loadChildren: () => import('./query-builder/query-builder.module').then(m => m.QueryBuilderModule) },
+  { path: 'pages/filters', loadChildren: () => import('./filters/filters.module').then(m => m.FiltersModule) },
   {
     path: '**',
     redirectTo: 'not-found'

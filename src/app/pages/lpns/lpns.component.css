@@ -11,3 +11,34 @@
   min-height: 400px;
   overflow: auto;
 }
+
+::ng-deep .tree-node-level-1.tree-node-leaf::before {
+  width: 30px;
+}
+
+::ng-deep .tree-node-level-2.tree-node-leaf::before {
+  width: 15px;
+}
+
+::ng-deep .tree-node-level-1.tree-node-leaf::before .tree-node-checkbox {
+  margin-left: 35px;
+}
+
+::ng-deep .tree-node-level-1.tree-node-leaf .node-wrapper {
+  padding-left: 25px!important;
+}
+
+::ng-deep .tree-node-level-2.tree-node-leaf .node-wrapper {
+  padding-left: 8px!important;
+}
+
+::ng-deep .tree-node-level-2.tree-node-leaf .node-wrapper .toggle-children-placeholder {
+  width: 0px;
+}
+
+::ng-deep .tree-node-level-1.tree-node-leaf .node-wrapper .toggle-children-placeholder {
+  width: 0px;
+}
+::ng-deep .tree-node-level-1.tree-node-leaf .node-wrapper .node-content-wrapper {
+  margin-left: 0px;
+}

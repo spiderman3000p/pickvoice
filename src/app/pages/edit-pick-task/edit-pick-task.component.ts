@@ -16,10 +16,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { MessageService } from 'src/app/services/websocket.service';
 
 interface PickTaskData {
   taskStateList: string[];
-  pickTaskLines: PickTaskLine[];
+  // pickTaskLines: PickTaskLine[];
+  pickTaskLines: any[];
   taskTypesList: TaskType[];
   userList: User[];
 }
@@ -72,7 +74,7 @@ export class EditPickTaskComponent implements OnInit {
   constructor(
     private sharedDataService: SharedDataService, private utilities: UtilitiesService, private location: WebLocation,
     private activatedRoute: ActivatedRoute, private dataProviderService: DataProviderService,
-    private router: Router, private dialog: MatDialog
+    private router: Router, private dialog: MatDialog, private messageService: MessageService
   ) {
     this.dataSource = new MatTableDataSource([]);
     this.pickTaskData = new Object() as PickTaskData;
@@ -82,7 +84,32 @@ export class EditPickTaskComponent implements OnInit {
     this.pickTaskData.userList = [];
     this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Task' : 'View Pick Task';
     this.isLoadingResults = true;
-
+    this.messageService.subject.subscribe(message => {
+      console.log('mensaje recibido en edit pick task', message);
+      if (message.taskId && message.taskLineId && message.qtySelected && message.taskId === this.row.id) {
+        const index = this.pickTaskData.pickTaskLines.findIndex(line => line.pickTaskLineId === message.taskLineId);
+        if (index > -1) {
+          this.pickTaskData.pickTaskLines[index].qtyToSelected = message.qtySelected;
+          document.getElementById('qtyToSelected'+message.taskLineId).classList.add('active');
+          setTimeout(() => {
+            document.getElementById('qtyToSelected'+message.taskLineId).classList.add('active-out');
+            document.getElementById('qtyToSelected'+message.taskLineId).classList.remove('active');
+            setTimeout(() => {
+              document.getElementById('qtyToSelected'+message.taskLineId).classList.remove('active-out');
+            }, 1000);
+          }, 1000);
+        }
+      }
+    });
+    /*setTimeout(() => {
+      this.messageService.sendMessage(JSON.stringify({taskId: 4, taskLineId: 9, qtySelected: 5}));
+    }, 5000);
+    setTimeout(() => {
+      this.messageService.sendMessage(JSON.stringify({taskId: 4, taskLineId: 10, qtySelected: 10}));
+    }, 8000);
+    setTimeout(() => {
+      this.messageService.sendMessage(JSON.stringify({taskId: 4, taskLineId: 11, qtySelected: 15}));
+    }, 10000);*/
     this.form = new FormGroup({
       description: new FormControl(''),
       enableDate: new FormControl(''),
@@ -121,7 +148,7 @@ export class EditPickTaskComponent implements OnInit {
       // inicializar tabla mat-table
       this.displayedDataColumns = Object.keys(this.definitions);
       this.displayedHeadersColumns = Object.keys(this.definitions);
-      this.displayedHeadersColumns.push('options');
+      // this.displayedHeadersColumns.push('options');
       this.initColumnsDefs(); // columnas a mostrarse en la tabla
     }
     this.form = new FormGroup({
@@ -153,7 +180,7 @@ export class EditPickTaskComponent implements OnInit {
       this.columnDefs = JSON.parse(localStorage.getItem('displayedColumnsInPickTaskPage'));
     } else {
       this.columnDefs = this.displayedHeadersColumns.map((columnName, index) => {
-        shouldShow = index === this.displayedHeadersColumns.length - 1 || index < 7;
+        shouldShow = index < 7;
         return {show: shouldShow, name: columnName};
       });
     }
@@ -492,6 +519,7 @@ export class EditPickTaskComponent implements OnInit {
       type: string
     }) => {
       this.viewMode = data.viewMode;
+      this.pageTitle = this.viewMode === 'edit' ? 'Edit Pick Task' : 'View Pick Task';
       this.type = data.type;
       this.utilities.log('viewMode', this.viewMode);
       data.row.subscribe(element => {

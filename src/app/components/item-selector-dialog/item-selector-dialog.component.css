@@ -1,0 +1,14 @@
+.user-list-wrapper {
+    height: 300px;
+    max-height: 300px;
+    min-height: 300px;
+    overflow-y: auto;
+}
+
+.user-list-wrapper .mat-action-list{
+    height: 100%;
+}
+
+.user-list-wrapper .mat-action-list .mat-list-item-content{
+    padding: 0px !important;
+}

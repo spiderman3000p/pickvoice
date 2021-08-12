@@ -6,7 +6,6 @@ import { DocksComponent } from './docks.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,10 +23,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
+import { AddDockComponent } from '../add-dock/add-dock.component';
+import { EditDockComponent } from '../edit-dock/edit-dock.component';
 
 @NgModule({
   declarations: [
-    DocksComponent
+    DocksComponent, AddDockComponent, EditDockComponent
   ],
   imports: [
     CommonModule,

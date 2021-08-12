@@ -95,6 +95,7 @@
                         <!-- campos boolean -->
                         <div  class="form-group"
                         *ngIf="dataMap[key].formControl.control === 'toggle'">
+                            <label>{{dataMap[key].name}} {{dataMap[key].required ? '*' : ''}}</label>
                             <input [formControlName]="key"  hidden>
                             <mat-slide-toggle  color="primary" [class.readonly]="viewMode === 'view'"
                             (change)="form.get(key).setValue(!form.get(key).value)" [checked]="form.get(key).value">

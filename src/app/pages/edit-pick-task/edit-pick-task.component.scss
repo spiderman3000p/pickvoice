@@ -11,3 +11,15 @@
 .tab-orders{
     width: 100%;
 }
+
+td.active {
+    background: #3bfa55;
+    font-size: 18px;
+    transition: all 1s;
+}
+
+td.active-out {
+    background: inherit;
+    font-size: 11px;
+    transition: all 1s;
+}

@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -23,8 +23,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
@@ -62,10 +60,8 @@ import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
 import { AddOrderLineDialogComponent } from './components/add-order-line-dialog/add-order-line-dialog.component';
-
+import { GestureConfig } from '@angular/material/core';
 import { NgSelectModule } from '@ng-select/ng-select';
-// import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
-// import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 export function apiConfigFactory(): Configuration {
   const params: ConfigurationParameters = {
@@ -116,8 +112,6 @@ export function apiConfigFactory(): Configuration {
     MatSnackBarModule,
     MatToolbarModule,
     MatButtonModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     MatSidenavModule,
     MatIconModule,
     MatListModule,
@@ -133,12 +127,12 @@ export function apiConfigFactory(): Configuration {
     MatSortModule,
     MatCheckboxModule,
     MatProgressBarModule,
-    NgSelectModule,
 
     PagesModule,
     AuthModule,
     FormsModule,
     ReactiveFormsModule,
+    NgSelectModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     RouterModule,
     ContextMenuModule.forRoot({useBootstrap4: true})
@@ -149,7 +143,8 @@ export function apiConfigFactory(): Configuration {
   providers: [
     { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'primary' }},
     { provide: BASE_PATH, useValue: environment.apiBaseUrl },
-    { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
+    { provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig },
   ],
   bootstrap: [AppComponent]
 })

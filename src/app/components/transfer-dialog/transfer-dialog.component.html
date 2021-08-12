@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Transfer lpn Item</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div mat-dialog-content>
+        <div class="example-loading-shade" *ngIf="isLoadingResults">
+            <mat-spinner *ngIf="isLoadingResults" class="spinner"></mat-spinner>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Target lpn code</label>
+                    <input class="form-control w-100" type="text" required formControlName="lpnCode">
+                    <div class="small" *ngIf="searchResult.message.length > 0" style="position: absolute; right: 0;"
+                    [ngClass]="{'text-success': searchResult.found, 'text-danger': !searchResult.found}">
+                        {{searchResult.message}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Quantity to transfer</label>
+                    <input class="form-control w-100" type="number" #quantity required formControlName="quantity">
+                    <div class="small text-danger" style="position: absolute; right: 0;" *ngIf="qtyError">
+                        Quantity not available
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button mat-button type="submit" [disabled]="isLoadingResults">TRANSFER</button>
+        <button type="button" (click)="close(null)" mat-button mat-dialog-close [disabled]="isLoadingResults">CANCEL</button>
+    </div>
+</form>

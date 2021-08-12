@@ -123,7 +123,6 @@ export class EditCustomerComponent implements OnInit {
     private dataProviderService: DataProviderService, private router: Router,
     private dialog: MatDialog, private authService: AuthService
   ) {
-    this.pageTitle = this.viewMode === 'edit' ? 'Edit Customer' : 'View Customer';
     this.isLoadingResults = true;
     this.form = new FormGroup({
       code: new FormControl(''),
@@ -615,6 +614,7 @@ export class EditCustomerComponent implements OnInit {
       type: string
     }) => {
       this.viewMode = data.viewMode;
+      this.pageTitle = this.viewMode === 'edit' ? 'Edit Customer' : 'View Customer';
       this.type = data.type;
       this.utilities.log('viewMode', this.viewMode);
       data.row.subscribe(element => {

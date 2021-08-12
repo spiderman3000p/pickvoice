@@ -37,7 +37,7 @@
                                         <label>Purchase Number</label>
                                         <input class="form-control" type="text" formControlName="purchaseNumber"
                                         [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
-                                    </div>    
+                                    </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
@@ -81,14 +81,37 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
+                                    <div class="form-group" [class.readonly]="viewMode === 'view'">
                                         <label>Priority</label>
-                                        <input class="form-control" type="number" formControlName="priority"
-                                        class="form-control"
-                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                        <input class="form-control" type="range" formControlName="priority"
+                                        class="form-control-range primary"
+                                        list="tickmarks"
+                                        [class.readonly]="viewMode === 'view'" min="1" max="10" [readonly]="viewMode === 'view'">
+                                        {{form.get('priority').value}}
+                                        <!--mat-slider thumbLabel="true" tickInterval="10" [class.readonly]="viewMode === 'view'"
+                                        formControlName="priority" step="1" value="5"></mat-slider-->
+                                        <datalist id="tickmarks">
+                                            <option value="1" label="1">
+                                            <option value="2" label="2">
+                                            <option value="3" label="3">
+                                            <option value="4" label="4">
+                                            <option value="5" label="5">
+                                            <option value="6" label="6">
+                                            <option value="7" label="7">
+                                            <option value="8" label="8">
+                                            <option value="9" label="9">
+                                            <option value="10" label="10">
+                                        </datalist>
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
+                                    <div class="form-group">
+                                        <label>Price</label>
+                                        <input formControlName="price" type="number" class="form-control"
+                                        [class.readonly]="viewMode === 'view'" [readonly]="viewMode === 'view'">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
                                     <div class="form-group">
                                         <label>Note</label>
                                         <textarea class="form-control" formControlName="note"
@@ -102,22 +125,30 @@
                     <mat-tab label="Customer">
                         <ng-template matTabContent>
                             <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label>Customer</label>
-                                    <select formControlName="customerId" class="form-control">
+                                <div class="form-group" style="display: flex;align-items: center;">
+                                    <label style="padding-right: 20px;">Customer</label>
+                                    <!--select formControlName="customerId" class="form-control">
                                         <option *ngFor="let customer of ordersData.customerList" [value]="customer.customerId">
                                             {{ customer.customerName }}
                                         </option>
-                                        <!--div class="select-footer" *ngIf="dataMap.customer.addNew && viewMode === 'edit'">
-                                            <span class="select-footer-content">
-                                                <a href="javascript: void(0)"
-                                                (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')">
-                                                    <mat-icon *ngIf="dataMap.customer.addNew.icon">{{ dataMap.customer.addNew.icon }}</mat-icon>
-                                                    {{ dataMap.customer.addNew.text }}
-                                                </a>
-                                            </span>
-                                        </div-->
-                                    </select>
+                                    </select-->
+                                    <ng-select [items]="ordersData.customerList"
+                                      formControlName="customerId"
+                                      style="width: 300px;max-width:100%;min-width:200px;display:grid;"
+                                      bindLabel="customerName"
+                                      bindValue="customerId"
+                                      [readonly]="viewMode == 'view'"
+                                    >
+                                    </ng-select>
+                                    <ng-container *ngIf="viewMode == 'edit'">
+                                      <button type="button" mat-icon-button
+                                          (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')">
+                                          <mat-icon>add</mat-icon>
+                                      </button>
+                                      <button type="button" mat-icon-button (click)="openSearchCustomerDialog()" matTooltip="Search customer">
+                                          <mat-icon>search</mat-icon>
+                                      </button>
+                                    </ng-container>
                                 </div>
                             </div>
                             <br><br>
@@ -170,22 +201,25 @@
                     </mat-tab>
                     <mat-tab label="Transport">
                         <ng-template matTabContent>
-                            <div class="form-group">
-                                <label>Transport</label>
-                                <select formControlName="transportId" class="form-control">
-                                    <option *ngFor="let trans of ordersData.transportList" [value]="trans.transportId">
-                                        {{ trans.transportNumber }}
-                                    </option>
-                                    <!--div class="select-footer" *ngIf="dataMap.transport.addNew && viewMode === 'edit'">
-                                        <span class="select-footer-content">
-                                            <a href="javascript: void(0)"
-                                            (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')">
-                                                <mat-icon *ngIf="dataMap.transport.addNew.icon">{{ dataMap.transport.addNew.icon }}</mat-icon>
-                                                {{ dataMap.transport.addNew.text }}
-                                            </a>
-                                        </span>
-                                    </div-->
-                                </select>
+                            <div class="form-group" style="display: flex;align-items: center;">
+                                <label style="padding-right: 20px;">Transport</label>
+                                <ng-select [items]="ordersData.transportList"
+                                  formControlName="transportId"
+                                  style="width: 300px;max-width:100%;min-width:200px;display:grid;"
+                                  bindLabel="transportNumber"
+                                  bindValue="transportId"
+                                  [readonly]="viewMode == 'view'"
+                                >
+                                </ng-select>
+                                <ng-container *ngIf="viewMode == 'edit'">
+                                  <button type="button" mat-icon-button
+                                      (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')">
+                                      <mat-icon>add</mat-icon>
+                                  </button>
+                                  <button type="button" mat-icon-button (click)="openSearchTransportDialog()" matTooltip="Search transport">
+                                      <mat-icon>search</mat-icon>
+                                  </button>
+                                </ng-container>
                             </div>
                             <br><br>
                             <h5>Transport Details</h5>
@@ -217,14 +251,6 @@
                                 </div>
                                 <div class="col-sm-12 col-md-4 col-lg-3">
                                     <div class="form-group">
-                                        <label>Carrier Code</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.carrierCode"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
                                         <label>Shipment Date</label>
                                         <input class="form-control readonly" type="date"
                                         [value]="selectedTransport.shipmentDate"
@@ -241,154 +267,6 @@
                                             [ngValue]="status">
                                                 {{ status }}
                                             </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Vehicle</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.vehicle"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Container Number</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.containerNumber"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Weight</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.weight"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Trailer</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.trailer"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Description</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.description"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Planned Checkin</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.plannedCheckin"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Actual Checkin</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.actualChecking"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Planned Start Loading</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.plannedStartLoading"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Current Start Loading</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.currentStartLoading"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Planned End Loading</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.plannedEndLoading"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Actual End Loading</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.actualEndLoading"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group readonly">
-                                        <label>Planned Shipment Completion</label>
-                                        <input class="form-control" type="text"
-                                        [value]="selectedTransport.plannedShipmentCompletion"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group readonly">
-                                        <label>Current Shipment Completion</label>
-                                        <input class="form-control readonly" type="text"
-                                        [value]="selectedTransport.currentShipmentCompletion"
-                                        readonly="true">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Uom Weight</label>
-                                        <select class="form-control readonly"
-                                        readonly="true">
-                                            <option *ngFor="let uom of ordersData.uomList"
-                                            [selected]="selectedTransport.uomWeight === uom"
-                                            [ngValue]="uom">
-                                                {{ uom.name }}
-                                            </option>
-                                            <!--div class="select-footer" *ngIf="transportDataMap.uomWeight.addNew && viewMode === 'edit'">
-                                                <span class="select-footer-content">
-                                                    <a href="javascript: void(0)"
-                                                    (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
-                                                        <mat-icon *ngIf="transportDataMap.uomWeight.addNew.icon">{{ transportDataMap.uomWeight.addNew.icon }}</mat-icon>
-                                                        <span>{{ transportDataMap.uomWeight.addNew.text }}</span>
-                                                    </a>
-                                                </span>
-                                            </div-->
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-3">
-                                    <div class="form-group">
-                                        <label>Uom Volume</label>
-                                        <select class="form-control readonly"
-                                        readonly="true">
-                                            <option *ngFor="let uom of ordersData.uomList"
-                                            [selected]="selectedTransport.uomVolume === uom"
-                                            [ngValue]="uom">
-                                                {{ uom.name }}
-                                            </option>
-                                            <!--div class="select-footer" *ngIf="transportDataMap.uomVolume.addNew && viewMode === 'edit'">
-                                                <span class="select-footer-content">
-                                                    <a href="javascript: void(0)"
-                                                    (click)="addNewObject(importingTypes.UOMS, 'Add new uom')">
-                                                        <mat-icon *ngIf="transportDataMap.uomVolume.addNew.icon">{{ transportDataMap.uomVolume.addNew.icon }}</mat-icon>
-                                                        <span>{{ transportDataMap.uomVolume.addNew.text }}</span>
-                                                    </a>
-                                                </span>
-                                            </div-->
                                         </select>
                                     </div>
                                 </div>

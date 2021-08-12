@@ -125,6 +125,7 @@ function mapData() {
           }*/
         } else if (globalData.selectedType === IMPORTING_TYPES.LOADORDERS_DTO) {
           // this.utilities.log('validating compound orders data');
+          // row.createDate = getDate();
           // no hay datos compuestos en orders dto
         } else if (globalData.selectedType === IMPORTING_TYPES.LOADPICKS_DTO) {
           // this.utilities.log('validating compound orders data');
@@ -153,6 +154,15 @@ function mapData() {
   globalData = null;
   headers = null;
   close();
+}
+
+function getDate() {
+  const date = new Date();
+  let month = (date.getMonth() + 1).toString();
+  let day  = date.getDate().toString();
+  month = month.length === 1 ? '0' + month : month;
+  day = day.length === 1 ? '0' + day : day;
+  return `${date.getFullYear()}-${month}-${day}`;
 }
 
 function validateData() {
@@ -191,7 +201,7 @@ function validateData() {
     for (const field in headers) {
       if (1) {
         // comprobando campos requeridos
-        if (headers[field].required && (row[field] == undefined || row[field] == null || row[field].length === 0)) {
+        if (headers[field].required && headers[field].required === true && (row[field] == undefined || row[field] == null || row[field].length === 0)) {
           // this.utilities.log('it is required?');
           const validationError = new Object() as any;
           validationError.index = rowIndex;
@@ -221,7 +231,7 @@ function validateData() {
         sections = null;
         validDate = true;
         if (headers[field].type === 'date') {
-          if (!validDatePattern.test(row[field])) { // si la fecha no es valida
+          if (!validDatePattern.test(row[field]) && row[field].length > 0) { // si la fecha no es valida
             // intentamos parsearla si tiene alguno de estos formatos: dd-mm-yyyy o dd/mm/yyyy
             if (row[field].includes('/') && datePattern1.test(row[field]) === true) {
               sections = row[field].split('/');

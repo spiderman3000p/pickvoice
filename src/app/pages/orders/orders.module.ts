@@ -30,10 +30,17 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { AgGridModule } from 'ag-grid-angular';
 import { AddOrderLineComponent } from '../add-order-line/add-order-line.component';
 
+import { NgSelectModule } from '@ng-select/ng-select';
+import { SelectCell2Component } from '../edit-order/select-cell2.component';
+import { SearchCustomerDialogComponent } from 'src/app/components/customer-selector-dialog/customer-selector-dialog.component';
+import { MatSliderModule } from '@angular/material';
+import { ItemSelectorDialogComponent } from 'src/app/components/item-selector-dialog/item-selector-dialog.component';
+
 @NgModule({
   declarations: [
     OrdersComponent, AddOrderComponent, EditOrderComponent, AddOrderLineComponent,
-    NumericEditorComponent, DateEditorComponent, RowOptionComponent, SelectCellComponent
+    NumericEditorComponent, DateEditorComponent, RowOptionComponent, SelectCellComponent, SelectCell2Component,
+    SearchCustomerDialogComponent, ItemSelectorDialogComponent
   ],
   imports: [
     CommonModule,
@@ -41,6 +48,7 @@ import { AddOrderLineComponent } from '../add-order-line/add-order-line.componen
 
     FormsModule,
     ReactiveFormsModule,
+    NgSelectModule,
 
     MatProgressSpinnerModule,
     MatPaginatorModule,
@@ -53,10 +61,10 @@ import { AddOrderLineComponent } from '../add-order-line/add-order-line.componen
     MatCheckboxModule,
     MatMenuModule,
     MatSlideToggleModule,
+    MatSliderModule,
     MatListModule,
     MatTabsModule,
     MatTooltipModule,
-
     AgGridModule.withComponents([])
   ],
   providers: [

@@ -33,7 +33,7 @@ export class LpnRelocateComponent implements OnInit {
         code: new FormControl('', [Validators.required])
       });
       this.searchDestLocationForm = new FormGroup({
-        type: new FormControl('', [Validators.required]),
+        type: new FormControl('Location', [Validators.required]),
         code: new FormControl('', [Validators.required])
       });
   }
@@ -128,7 +128,7 @@ export class LpnRelocateComponent implements OnInit {
     const params = `startRow=0;endRow=200;code-filterType=text;code-type=equals;` +
     `code-filter=${lpnCode.toLowerCase()}`;
     this.isLoadingLpnOrigin = true;
-    this.dataProviderService.getAllLpnVO3(params).
+    this.dataProviderService.getAllLpnItemVO2(params).
     pipe(
       retry(3),
       tap((results: any) => results.content.map(element => element.draggable = true)),
@@ -175,7 +175,7 @@ export class LpnRelocateComponent implements OnInit {
       if (this.lpnsDest.length === 0) {
         this.locationIdDest = undefined;
         this.utilities.log('No se encontro target location ' + locationCode);
-        this.utilities.showSnackBar('No elements found for target location code ' + locationCode, 'OK');
+        this.utilities.showSnackBar(`No elements found for ${locationType.toLowerCase()} code ` + locationCode, 'OK');
       } else {
         this.locationIdDest = this.lpnsDest[0].locationid; // TODO: corregir el campo locationId
         this.utilities.log('locationIdDest: ', this.locationIdDest);

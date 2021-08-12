@@ -1,160 +1,277 @@
 <div class="content-area">
-    <div class="example-loading-shade" *ngIf="isLoadingResults">
-        <mat-spinner class="spinner"></mat-spinner>
+  <div class="content">
+    <div class="section-wrapper">
+        <div class="header actionbar align-content-top">
+            <div class="title actionbar-section align-content-top">
+                <h1>Add Order</h1>
+            </div>
+        </div>
     </div>
-    <!-- button mat-fab class="fab-button" (click)="reloadData()"><mat-icon>sync</mat-icon></button-->
-    <div class="content" *ngIf="form">
-      <div class="section-wrapper">
-          <div class="header actionbar align-content-top">
-              <div class="title actionbar-section align-content-top">
-                  <h1>Add Order</h1>
+    <mat-card>
+        <div class="example-loading-shade" *ngIf="isLoadingResults">
+          <mat-spinner class="spinner"></mat-spinner>
+        </div>
+        <mat-card-content>
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+              <mat-tab-group class="tab-orders">
+                  <mat-tab label="Details">
+                      <ng-template matTabContent>
+                          <div class="row">
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Order Number</label>
+                                      <input class="form-control" type="text" formControlName="orderNumber">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Purchase Number</label>
+                                      <input class="form-control" type="text" formControlName="purchaseNumber">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Invoice Number</label>
+                                      <input class="form-control" type="text" formControlName="invoiceNumber">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Order Date</label>
+                                      <input type="date" class="form-control" formControlName="orderDate" [matDatepicker]="orderDate">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Delivery Date</label>
+                                      <input formControlName="deliveryDate" type="date" class="form-control">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Order Type</label>
+                                      <select [compareWith]="dataMap.orderTypeId.formControl.compareFn" formControlName="orderTypeId"
+                                      class="form-control">
+                                          <option *ngFor="let type of ordersData.orderTypeList" [value]="type.id">
+                                              {{ type.description }}
+                                          </option>
+                                      </select>
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Priority</label>
+                                      <input class="form-control" type="range" formControlName="priority"
+                                      class="form-control-range primary"
+                                      list="tickmarks"
+                                      min="1" max="10">
+                                      {{form.get('priority').value}}
+                                      <!--mat-slider thumbLabel="true" tickInterval="10" [class.readonly]="viewMode === 'view'"
+                                      formControlName="priority" step="1" value="5"></mat-slider-->
+                                      <datalist id="tickmarks">
+                                          <option value="1" label="1">
+                                          <option value="2" label="2">
+                                          <option value="3" label="3">
+                                          <option value="4" label="4">
+                                          <option value="5" label="5">
+                                          <option value="6" label="6">
+                                          <option value="7" label="7">
+                                          <option value="8" label="8">
+                                          <option value="9" label="9">
+                                          <option value="10" label="10">
+                                      </datalist>
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Price</label>
+                                      <input formControlName="price" type="number" class="form-control">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="form-group">
+                                      <label>Note</label>
+                                      <textarea class="form-control" formControlName="note">
+                                      </textarea>
+                                  </div>
+                              </div>
+                          </div>
+                      </ng-template>
+                  </mat-tab>
+                  <mat-tab label="Customer">
+                      <ng-template matTabContent>
+                          <div class="col-sm-12">
+                              <div class="form-group" style="display: flex;align-items: center;">
+                                  <label style="padding-right: 20px;">Customer</label>
+                                  <!--select formControlName="customerId" class="form-control">
+                                      <option *ngFor="let customer of ordersData.customerList" [value]="customer.customerId">
+                                          {{ customer.customerName }}
+                                      </option>
+                                  </select-->
+                                  <ng-select [items]="ordersData.customerList"
+                                      formControlName="customerId"
+                                      style="width: 300px;max-width:100%;min-width:200px;display:grid;"
+                                      bindLabel="customerName"
+                                      bindValue="customerId">
+                                  </ng-select>
+                                  <button type="button" mat-icon-button
+                                      (click)="addNewObject(importingTypes.CUSTOMERS, 'Add new customer')">
+                                      <mat-icon>add</mat-icon>
+                                  </button>
+                                  <button type="button" mat-icon-button (click)="openSearchCustomerDialog()" matTooltip="Search customer">
+                                      <mat-icon>search</mat-icon>
+                                  </button>
+                              </div>
+                          </div>
+                          <br><br>
+                          <h6>Customer Details</h6>
+                          <hr>
+                          <span *ngIf="selectedCustomer.id !== undefined" class="row">
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Customer Code</label>
+                                      <input class="form-control readonly" type="text"
+                                      [value]="selectedCustomer.code"
+                                      readonly="true">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Name</label>
+                                      <input class="form-control readonly" type="text"
+                                      [value]="selectedCustomer.name"
+                                      readonly="true">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Contact</label>
+                                      <input class="form-control readonly" type="text"
+                                      [value]="selectedCustomer.contact"
+                                      readonly="true">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Phone</label>
+                                      <input class="form-control readonly" type="text"
+                                      [value]="selectedCustomer.phone"
+                                      readonly="true">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Address</label>
+                                      <textarea class="form-control readonly"
+                                      [value]="selectedCustomer.address"
+                                      readonly="true">
+                                      </textarea>
+                                  </div>
+                              </div>
+                          </span>
+                      </ng-template>
+                  </mat-tab>
+                  <mat-tab label="Transport">
+                      <ng-template matTabContent>
+                          <div class="form-group" style="display: flex;align-items: center;">
+                              <label style="padding-right: 20px;">Transport</label>
+                              <ng-select [items]="ordersData.transportList"
+                                  formControlName="transportId"
+                                  style="width: 300px;max-width:100%;min-width:200px;display:grid;"
+                                  bindLabel="transportNumber"
+                                  bindValue="transportId">
+                              </ng-select>
+                              <button type="button" mat-icon-button
+                                  (click)="addNewObject(importingTypes.TRANSPORTS, 'Add new transport')">
+                                  <mat-icon>add</mat-icon>
+                              </button>
+                              <button type="button" mat-icon-button (click)="openSearchTransportDialog()" matTooltip="Search transport">
+                                  <mat-icon>search</mat-icon>
+                              </button>
+                          </div>
+                          <br><br>
+                          <h5>Transport Details</h5>
+                          <hr>
+                          <span class="row" *ngIf="selectedTransport.id !== undefined">
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Transport Number</label>
+                                      <input class="form-control readonly" type="text"
+                                      [value]="selectedTransport.transportNumber"
+                                      [readonly]="true">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Route</label>
+                                      <input class="form-control readonly" type="text"
+                                      [value]="selectedTransport.route"
+                                      readonly="true">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Name Route</label>
+                                      <input class="form-control readonly" type="text"
+                                      [value]="selectedTransport.nameRoute"
+                                      readonly="true">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Shipment Date</label>
+                                      <input class="form-control readonly" type="date"
+                                      [value]="selectedTransport.shipmentDate"
+                                      readonly="true">
+                                  </div>
+                              </div>
+                              <div class="col-sm-12 col-md-4 col-lg-3">
+                                  <div class="form-group">
+                                      <label>Transportation Status</label>
+                                      <select class="form-control readonly"
+                                      readonly="true">
+                                          <option *ngFor="let status of ordersData.transportStatus"
+                                          [selected]="selectedTransport.transportationStatus === status"
+                                          [ngValue]="status">
+                                              {{ status }}
+                                          </option>
+                                      </select>
+                                  </div>
+                              </div>
+                          </span>
+                      </ng-template>
+                  </mat-tab>
+              </mat-tab-group>
+              <hr>
+              <div class="col-sm-12" *ngIf="row.orderNumber > 0">
+                  <h5>Order Lines</h5>
+                  <div class="col-sm-12 text-right mb-3">
+                      <a mat-raised-button color="warn" (click)="exportOrderLines()" *ngIf="dataSource.data.length > 0">
+                          <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                      </a>
+                      <a mat-raised-button color="accent" (click)="addOrderLine()" class="ml-2">
+                          <mat-icon>add</mat-icon> <span class="btn-label">Add new</span>
+                      </a>
+                  </div>
+                  <ag-grid-angular
+                  #agGrid
+                  style="width: 100%; height: 300px;"
+                  class="ag-theme-balham"
+                  [frameworkComponents]="frameworkComponents"
+                  [rowData]="ordersData.orderLineList"
+                  [columnDefs]="orderLineColDefs"
+                  editType="fullRow"
+                  [animateRows]="true"
+                  (gridReady)="onGridReady($event)"
+                  (rowValueChanged)="updateOrderLine($event)">
+                  </ag-grid-angular>
               </div>
-          </div>
-      </div>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <mat-card>
-                <mat-card-content>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-section-title row">
-                                <h5>Basic details</h5>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.orderNumber.name}}</label>
-                                <div class="col">
-                                    <input class="form-control" type="text" required formControlName="orderNumber">
-                                </div>
-                                <span  class="help-icon"
-                                *ngIf="definitions.orderNumber.formControl.helpText &&
-                                definitions.orderNumber.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.orderNumber.formControl.helpText">
-                                </span>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.purchaseNumber.name}}</label>
-                                <div class="col">
-                                    <input class="form-control" type="number" required formControlName="purchaseNumber">
-                                </div>
-                                <span  class="help-icon"
-                                *ngIf="definitions.purchaseNumber.formControl.helpText &&
-                                definitions.purchaseNumber.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.purchaseNumber.formControl.helpText">
-                                </span>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.invoiceNumber.name}}</label>
-                                <div class="col">
-                                    <input class="form-control" type="number" required formControlName="invoiceNumber">
-                                </div>
-                                <span class="help-icon"
-                                *ngIf="definitions.invoiceNumber.formControl.helpText &&
-                                definitions.invoiceNumber.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.invoiceNumber.formControl.helpText">
-                                </span>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.priority.name}}</label>
-                                <div class="col">
-                                    <input class="form-control" type="number" required formControlName="priority" min="0" max="100">
-                                </div>
-                                <span class="help-icon"
-                                *ngIf="definitions.priority.formControl.helpText &&
-                                definitions.priority.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.priority.formControl.helpText">
-                                </span>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.note.name}}</label>
-                                <div class="col">
-                                    <input class="form-control" type="text" required formControlName="note">
-                                </div>
-                                <span class="help-icon"
-                                *ngIf="definitions.note.formControl.helpText &&
-                                definitions.note.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.note.formControl.helpText">
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-section-title row">
-                                <h5>Other details</h5>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.orderTypeId.name}}</label>
-                                <div class="col">
-                                    <select class="form-control" required formControlName="orderTypeId">
-                                        <option [ngValue]="option.id" *ngFor="let option of selectsData.orderTypes | async">
-                                            {{option.description}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <span class="help-icon"
-                                *ngIf="definitions.orderTypeId.formControl.helpText &&
-                                definitions.orderTypeId.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.orderTypeId.formControl.helpText">
-                                </span>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.transportId.name}}</label>
-                                <div class="col">
-                                    <select class="form-control" formControlName="transportId">
-                                        <option [ngValue]="option.transportId" *ngFor="let option of selectsData.transports | async">
-                                            {{option.transportNumber}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <span class="help-icon"
-                                *ngIf="definitions.transportId.formControl.helpText &&
-                                definitions.transportId.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.transportId.formControl.helpText">
-                                </span>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.customerId.name}}</label>
-                                <div class="col">
-                                    <select class="form-control" required formControlName="customerId">
-                                        <option [ngValue]="option.customerId" *ngFor="let option of selectsData.customers | async">
-                                            {{option.customerName}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <span class="help-icon"
-                                *ngIf="definitions.customerId.formControl.helpText &&
-                                definitions.customerId.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.customerId.formControl.helpText">
-                                </span>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.orderDate.name}}</label>
-                                <div class="col">
-                                    <input class="form-control" type="date" required formControlName="orderDate">
-                                </div>
-                                <span class="help-icon"
-                                *ngIf="definitions.orderDate.formControl.helpText &&
-                                definitions.orderDate.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.orderDate.formControl.helpText">
-                                </span>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label">{{definitions.deliveryDate.name}}</label>
-                                <div class="col">
-                                    <input class="form-control" type="date" required formControlName="deliveryDate">
-                                </div>
-                                <span class="help-icon"
-                                *ngIf="definitions.deliveryDate.formControl.helpText &&
-                                definitions.deliveryDate.formControl.helpText.length > 0"
-                                [matTooltip]="definitions.deliveryDate.formControl.helpText">
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </mat-card-content>
-                <mat-card-actions align="end" [ngClass]="'mb-0'">
-                    <small class="footer-label col-sm-12">Required fields are marked with *</small>
-                    <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
-                    <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
-                </mat-card-actions>
-            </mat-card>
-        </form>
-    </div>
+              <div class="col-sm-12 text-right">
+                  <button mat-button type="submit" [disabled]="isLoadingResults">SAVE</button>
+                  <a mat-button [disabled]="isLoadingResults" (click)="back()">BACK</a>
+              </div>
+          </form>
+        </mat-card-content>
+    </mat-card>
+  </div>
 </div>

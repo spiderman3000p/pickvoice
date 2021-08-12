@@ -24,10 +24,12 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ContextMenuModule } from 'ngx-contextmenu';
-import { UserSelectorDialogComponent } from 'src/app/components/user-selector-dialog/user-selector-dialog.component';
+import { SearchTransportDialogComponent } from 'src/app/components/transport-selector-dialog/transport-selector-dialog.component';
+import { MatSliderModule } from '@angular/material/slider';
 
 @NgModule({
-  declarations: [PickingPlanningComponent, EditPickPlanningComponent, AddPickPlanningComponent, UserSelectorDialogComponent],
+  declarations: [PickingPlanningComponent, EditPickPlanningComponent, AddPickPlanningComponent,
+  SearchTransportDialogComponent],
   imports: [
     CommonModule,
     PickingPlanningRoutingModule,
@@ -46,6 +48,7 @@ import { UserSelectorDialogComponent } from 'src/app/components/user-selector-di
     MatCheckboxModule,
     MatMenuModule,
     MatSlideToggleModule,
+    MatSliderModule,
     MatExpansionModule,
     MatListModule,
     MatTabsModule,

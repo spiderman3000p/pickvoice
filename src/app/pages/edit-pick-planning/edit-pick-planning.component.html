@@ -52,8 +52,7 @@
                     </div>
                     <div class="col-sm-12 col-md-4 col-lg-3 form-group" [class.readonly]="viewMode === 'view'">
                         <label>State</label>
-                        <select formControlName="state"
-                        [class.readonly]="viewMode === 'view'" class="form-control">
+                        <select formControlName="state" class="form-control readonly" aria-readonly="true">
                             <option *ngFor="let state of pickPlanningData.pickPlanningStates" [value]="state">
                                 {{ states[state] }}
                             </option>
@@ -104,11 +103,9 @@
                                             <!-- Options Sticky Column -->
                                             <ng-container matColumnDef="options" stickyEnd>
                                                 <th mat-header-cell *matHeaderCellDef [class.more-button-header]="true">
-                                                    {{'Options' | uppercase}}
                                                     <a mat-icon-button [matMenuTriggerFor]="toggleColumns" aria-label="Toggle headers">
                                                         <mat-icon>more_vert</mat-icon>
                                                     </a>
-                                                    
                                                     <mat-menu #toggleColumns="matMenu" (click)="$event.stopPropagation()">
                                                         <span>
                                                             <a mat-menu-item (click)="toggleColumn()">Show all</a>
@@ -214,8 +211,8 @@
                                 <ng-template matTabContent>
                                     <div class="col-sm-12">
                                         <div class="col-sm-12 text-right mb-3">
-                                            <a mat-raised-button color="warn" (click)="exportTransports()">
-                                                <mat-icon color="accent">save_alt</mat-icon> <span class="btn-label">Export</span>
+                                            <a mat-raised-button color="warn" (click)="addTransport()">
+                                                <mat-icon color="accent">add</mat-icon> <span class="btn-label">Add New</span>
                                             </a>
                                             <!--a mat-raised-button color="accent" (click)="addTransport()" class="ml-2"
                                                 *ngIf="viewMode === 'edit'">

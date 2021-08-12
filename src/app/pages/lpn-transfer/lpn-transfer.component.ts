@@ -65,7 +65,7 @@ export class LpnTransferComponent implements OnInit {
     }
     const lpnItem = {
       lpnId: lpn.lpnId,
-      itemId: lpn.lpnItemId,
+      lpnItemId: lpn.lpnItemId,
       batchNumber: lpn.batchNumber,
       expiryDate: lpn.expiryDate,
       createdDate: lpn.createdDate,
@@ -88,8 +88,9 @@ export class LpnTransferComponent implements OnInit {
         this.searchLpnDest();
       }
     }, error => {
+      const errorMessage = error.error.message ? error.error.message : 'Error on transfer lpn.';
       this.utilities.error('Error on transfer lpn', error);
-      this.utilities.showSnackBar('Error on transfer lpn. Please check internet conection', 'OK');
+      this.utilities.showSnackBar(errorMessage, 'OK');
     });
   }
 

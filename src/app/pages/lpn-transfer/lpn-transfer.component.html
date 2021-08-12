@@ -52,7 +52,7 @@
                                         <div class="col-sm-12 col-md-8 p-0 d-flex" style="align-items:center">
                                             <div class="form-group">
                                                 <small>Qty to transfer</small>
-                                                <input type="number" class="form-control" [(ngModel)]="lpn.qtyToTransfer">
+                                                <input type="number" min="0" class="form-control" [(ngModel)]="lpn.qtyToTransfer">
                                             </div>
                                             <button mat-icon-button type="button" (click)="transfer(lpn)" class="text-right">
                                                 <mat-icon>send</mat-icon>

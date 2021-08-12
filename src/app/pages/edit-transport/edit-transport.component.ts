@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { OrderSelectorDialogComponent } from 'src/app/components/order-selector-dialog/order-selector-dialog.component';
 
 interface TransportData {
   uomsList: UnityOfMeasure[];
@@ -82,7 +83,8 @@ export class EditTransportComponent implements OnInit {
       trailer: new FormControl(''),
       containerNumber: new FormControl(''),
       uomWeightId: new FormControl(''),
-      weight: new FormControl(''),
+      weight: new FormControl(0),
+      volume: new FormControl(0),
       uomVolumeId: new FormControl(''),
       transportationStatus: new FormControl(''),
       description: new FormControl(''),
@@ -126,13 +128,14 @@ export class EditTransportComponent implements OnInit {
       transportNumber: new FormControl(this.row.transportNumber),
       route: new FormControl(this.row.route),
       nameRoute: new FormControl(this.row.nameRoute),
-      carrierCode: new FormControl(this.row.nameRoute),
+      carrierCode: new FormControl(this.row.carrierCode),
       shipmentDate: new FormControl(this.row.shipmentDate),
       vehicle: new FormControl(this.row.vehicle),
       trailer: new FormControl(this.row.trailer),
       containerNumber: new FormControl(this.row.containerNumber),
       uomWeightId: new FormControl(this.row.uomWeightId),
       weight: new FormControl(this.row.weight),
+      volume: new FormControl(this.row.volume),
       uomVolumeId: new FormControl(this.row.uomVolumeId),
       transportationStatus: new FormControl(this.row.transportationStatus),
       description: new FormControl(this.row.description),
@@ -258,6 +261,7 @@ export class EditTransportComponent implements OnInit {
       type: string
     }) => {
       this.viewMode = data.viewMode;
+      this.pageTitle = this.viewMode === 'edit' ? 'Edit Transport' : 'View Transport';
       this.type = data.type;
       this.utilities.log('viewMode', this.viewMode);
       data.row.subscribe(element => {
@@ -538,6 +542,27 @@ export class EditTransportComponent implements OnInit {
       return this.utilities.getJsonFromObject(row, IMPORTING_TYPES.ORDERS_LIST);
     });
     this.utilities.exportToXlsx(dataToExport, 'Orders List');
+  }
+
+  addOrder() {
+    this.utilities.log('map to send to add dialog',
+    this.utilities.dataTypesModelMaps.orders);
+    const dialogRef = this.dialog.open(OrderSelectorDialogComponent);
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+      this.utilities.log('dialog result:', result);
+      if (result) {
+        this.dataProviderService.updateOrdersTransport(result, this.row.id).subscribe(result2 => {
+          if (result2) {
+            this.utilities.showSnackBar('Orders added successfully', 'OK');
+            this.reloadData();
+          }
+        });
+      }
+    }, error => {
+      this.utilities.error('error after closing edit row dialog');
+      this.utilities.showSnackBar('Error after closing edit dialog', 'OK');
+      this.isLoadingResults = false;
+    }));
   }
 
   /*

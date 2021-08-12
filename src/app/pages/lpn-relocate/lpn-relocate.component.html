@@ -100,7 +100,7 @@
                                 <div class="col-sm-12 col-md-4 pl-0">
                                     <div class="form-group">
                                         <label>Code</label>
-                                        <input type="text" placeholder="Type a location code" class="form-control" formControlName="code" required>
+                                        <input type="text" [placeholder]="'Type a '+searchDestLocationForm.get('type').value+' code'" class="form-control" formControlName="code" required>
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-12 p-0 text-right search-location-block">

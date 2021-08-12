@@ -391,15 +391,22 @@ export class ModelFactory {
     }
 
     public static newEmptyOrderLine(): OrderLine {
-        const object = new Object() as OrderLine;
+        const date = new Date();
+        const object = new Object() as any;
+        let month = (date.getMonth() + 1).toString();
+        let day  = date.getDate().toString();
+        month = month.length === 1 ? '0' + month : month;
+        day = day.length === 1 ? '0' + day : day;
         object.idOrder = null;
+        // object.id = Date.now();
         object.itemId = 0;
         object.qtyRequired = 0;
         object.batchNumber = '';
-        object.createDate = '';
+        object.createDate = `${date.getFullYear()}-${month}-${day}`;
         object.expiryDate = '';
         object.serial = '';
         object.qualityState = '';
+        object.reference = '';
         return object;
     }
 
